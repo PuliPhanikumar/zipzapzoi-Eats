@@ -58,8 +58,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, '..'), {
     extensions: ['html'],
     index: 'index.html',
-    maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
-    etag: process.env.NODE_ENV === 'production'
+    maxAge: 0, // Disabled aggressive caching so updates deploy instantly
+    etag: true
 }));
 
 // Rate limiting
