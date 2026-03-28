@@ -76,7 +76,13 @@
             const token = ZoiToken.get();
             if (!token) return null;
             try {
-                const payload = JSON.parse(atob(token.split('.')[1]));
+                let base64Url = token.split('.')[1];
+                let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                // Decode base64 and handle UTF-8 chars
+                let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                const payload = JSON.parse(jsonPayload);
                 // Check expiry
                 if (payload.exp && payload.exp * 1000 < Date.now()) {
                     ZoiToken.remove();
