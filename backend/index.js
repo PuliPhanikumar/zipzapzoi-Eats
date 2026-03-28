@@ -47,6 +47,8 @@ const googleClient = process.env.GOOGLE_CLIENT_ID
     : null;
 
 // ─── MIDDLEWARE ──────────────────────────────────────────
+// Trust proxy is required for Render so express-rate-limit tracks the actual user IP, not the load balancer
+app.set('trust proxy', 1);
 app.use(helmet({ contentSecurityPolicy: false })); // CSP off for static HTML pages
 app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
