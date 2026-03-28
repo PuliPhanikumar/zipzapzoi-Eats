@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: zipzapzoi-eats
+    runtime: node
+    region: singapore  # Closest to India
+    plan: starter
+    buildCommand: cd backend && npm ci && npx prisma generate
+    startCommand: cd backend && npx prisma migrate deploy && node index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: zipzapzoi-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 5000
+      - key: CORS_ORIGIN
+        value: https://zipzapzoi.onrender.com
+      - key: DEMO_MODE
+        value: false
+
+databases:
+  - name: zipzapzoi-db
+    databaseName: zipzapzoi
+    plan: starter
+    region: singapore

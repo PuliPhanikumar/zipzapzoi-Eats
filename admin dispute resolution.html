@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Admin - Dispute Resolution</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>ZoiAuth.enforceAccess('Dispute Resolution');</script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .chat-bubble-cust {
+            background: #2a2d35;
+            border: 1px solid #3f3f46;
+            color: white;
+            border-radius: 12px 12px 12px 0;
+        }
+
+        .chat-bubble-driver {
+            background: #1e3a8a;
+            border: 1px solid #1e40af;
+            color: white;
+            border-radius: 12px 12px 0 12px;
+        }
+
+        .chat-bubble-system {
+            background: #27272a;
+            color: #9ca3af;
+            font-size: 11px;
+            text-align: center;
+            border-radius: 4px;
+            padding: 4px 8px;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .active-ticket {
+            border-left: 4px solid #00f0ff;
+            background: #2a2d35;
+        }
+
+        .tab-active {
+            background: #00f0ff;
+            color: black;
+        }
+
+        .tab-inactive {
+            background: rgba(255, 255, 255, 0.05);
+            color: #9ca3af;
+        }
+    .glass { background: rgba(24, 26, 32, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white font-sans h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex flex-col flex-1 h-full min-w-0">
+
+        <header class="flex items-center justify-between px-6 py-3 border-b border-border bg-[#15171c]">
+            <div class="flex items-center gap-4">
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-red-500">warning_amber</span> Dispute Center
+                </h2>
+                <div class="h-6 w-[1px] bg-border"></div>
+                <div class="relative">
+                    <input type="date" id="date-picker" onchange="renderList()"
+                        class="bg-black/20 border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary focus:ring-0">
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <div class="relative">
+                    <input type="text" placeholder="Search Case ID..."
+                        class="bg-black/20 border border-border rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:border-primary w-64">
+                    <span class="material-symbols-outlined absolute left-2 top-1.5 text-gray-500 text-sm">search</span>
+                </div>
+                <button onclick="showToast('Exporting...', 'Report downloading.')"
+                    class="size-8 flex items-center justify-center rounded-lg bg-black/20 text-gray-400 hover:text-white hover:bg-white/10 transition">
+                    <span class="material-symbols-outlined text-[20px]">download</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-4 gap-4 px-6 py-4 border-b border-border bg-[#0f1115]">
+            <div class="bg-surface border border-border p-3 rounded-lg">
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Open Disputes</p>
+                <div class="flex justify-between items-end">
+                    <h3 class="text-xl font-bold text-white" id="stat-open">142</h3><span
+                        class="text-xs text-red-400">+5%</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border p-3 rounded-lg">
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Escalated</p>
+                <div class="flex justify-between items-end">
+                    <h3 class="text-xl font-bold text-white" id="stat-escalated">0</h3><span
+                        class="text-[10px] bg-red-500/20 text-red-400 px-1.5 rounded">Action Req</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border p-3 rounded-lg">
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Avg Resolution</p>
+                <div class="flex justify-between items-end">
+                    <h3 class="text-xl font-bold text-white">12m</h3><span class="text-xs text-green-400">-2m</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border p-3 rounded-lg">
+                <p class="text-[10px] text-gray-500 uppercase font-bold">AI Accuracy</p>
+                <div class="flex justify-between items-end">
+                    <h3 class="text-xl font-bold text-white">94%</h3><span class="text-xs text-primary">High</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-1 overflow-hidden">
+
+            <div class="w-[400px] flex flex-col border-r border-border bg-[#111316]">
+                <div class="p-3 border-b border-border flex gap-2 overflow-x-auto scrollbar-hide">
+                    <button onclick="switchTab('all')" id="tab-all"
+                        class="tab-active px-3 py-1.5 rounded-full text-xs font-bold transition-all">Queue</button>
+                    <button onclick="switchTab('Escalated')" id="tab-Escalated"
+                        class="tab-inactive px-3 py-1.5 rounded-full text-xs font-bold transition-all">Escalated</button>
+                    <button onclick="switchTab('Resolved')" id="tab-Resolved"
+                        class="tab-inactive px-3 py-1.5 rounded-full text-xs font-bold transition-all">Resolved</button>
+                </div>
+                <div class="flex-1 overflow-y-auto custom-scrollbar" id="dispute-list">
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col bg-[#0f1115] relative">
+
+                <div class="px-6 py-4 border-b border-border bg-[#15171c] flex justify-between items-start z-10">
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <h2 class="text-xl font-bold text-white" id="detail-title">Select a Ticket</h2>
+                            <span class="text-[10px] font-bold text-white bg-red-600 px-2 py-0.5 rounded-full hidden"
+                                id="detail-tag">CRITICAL</span>
+                        </div>
+                        <p class="text-sm text-gray-400" id="detail-sub">--</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="viewHistory()"
+                            class="hidden px-3 py-1.5 bg-black/40 border border-border rounded text-xs text-gray-300 hover:text-white"
+                            id="btn-history">
+                            <span class="material-symbols-outlined text-sm align-middle mr-1">history</span> History
+                        </button>
+                        <button onclick="viewCalls()"
+                            class="hidden px-3 py-1.5 bg-black/40 border border-border rounded text-xs text-gray-300 hover:text-white"
+                            id="btn-calls">
+                            <span class="material-symbols-outlined text-sm align-middle mr-1">call</span> Calls
+                        </button>
+                        <button onclick="viewEvidence()"
+                            class="hidden px-3 py-1.5 bg-black/40 border border-border rounded text-xs text-gray-300 hover:text-white"
+                            id="btn-evidence">
+                            <span class="material-symbols-outlined text-sm align-middle mr-1">image</span> Proof
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-6 scroll-smooth" id="detail-content">
+
+                    <div class="rounded-xl p-0.5 bg-gradient-to-r from-primary via-orange-500/50 to-border mb-6 hidden"
+                        id="ai-card">
+                        <div class="rounded-[10px] bg-[#1a1d24] p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">psychology</span>
+                                    <h3 class="text-white font-bold text-sm">AI Analysis</h3>
+                                </div>
+                                <span class="text-primary text-[10px] font-bold bg-primary/10 px-2 py-1 rounded">85%
+                                    Confidence</span>
+                            </div>
+                            <p class="text-sm text-gray-300 leading-relaxed" id="ai-text">--</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 space-y-4">
+                            <h4
+                                class="text-gray-500 text-xs font-bold uppercase tracking-wide border-b border-border pb-2">
+                                Investigation Log</h4>
+                            <div class="space-y-4" id="chat-log">
+                                <div class="text-center text-gray-600 text-sm mt-10">Select a dispute to view details.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6 hidden" id="order-panel">
+                            <div class="bg-surface rounded-lg border border-border overflow-hidden">
+                                <div class="p-3 border-b border-border bg-black/20">
+                                    <h4 class="text-sm font-bold text-white">Order Details</h4>
+                                </div>
+                                <div class="p-3 space-y-2" id="order-items"></div>
+                                <div
+                                    class="p-3 border-t border-border bg-black/20 flex justify-between text-sm font-bold text-white">
+                                    <span>Total Paid</span>
+                                    <span id="order-total">--</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-surface rounded-lg border border-border p-3 space-y-2">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-400">Customer LTV</span>
+                                    <span class="text-white font-bold">₹12,450 (High)</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-gray-400">Driver Rating</span>
+                                    <span class="text-white font-bold flex items-center"><span
+                                            class="material-symbols-outlined text-xs text-yellow-500 mr-1">star</span>
+                                        4.8</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-[#15171c] border-t border-border p-4 shadow-2xl z-20 hidden" id="action-footer">
+                    <div class="max-w-[1200px] mx-auto flex items-center justify-between">
+                        <div class="flex items-center gap-3 w-1/2">
+                            <input id="internal-note"
+                                class="w-full bg-black/30 border border-border rounded-lg text-sm text-white px-4 py-2.5 focus:border-primary focus:ring-0 placeholder:text-gray-600"
+                                placeholder="Add internal note..." type="text"
+                                onkeydown="if(event.key === 'Enter') addNote()">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="dismissCase()"
+                                class="px-4 py-2.5 rounded-lg border border-border text-gray-400 font-bold text-xs hover:text-white hover:bg-white/5 transition-colors">Dismiss</button>
+                            <button onclick="openChat()"
+                                class="px-4 py-2.5 rounded-lg bg-surface text-white font-bold text-xs hover:bg-border transition-colors border border-border flex items-center gap-2"><span
+                                    class="material-symbols-outlined text-sm">mail</span> Message</button>
+                            <button onclick="openResolveModal()"
+                                class="px-6 py-2.5 rounded-lg bg-primary text-black font-bold text-xs hover:bg-orange-600 transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">gavel</span> Resolve
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="resolve-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-lg p-6 shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4">Resolution Decision</h3>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <button onclick="setResolution(this, 'Refund')"
+                    class="res-btn p-4 rounded-lg border border-border bg-black/20 hover:border-primary hover:bg-primary/5 text-left group">
+                    <span class="material-symbols-outlined text-green-400 mb-2">currency_rupee</span>
+                    <h4 class="text-sm font-bold text-white">Refund</h4>
+                    <p class="text-[10px] text-gray-500">Issue full or partial refund</p>
+                </button>
+                <button onclick="setResolution(this, 'Promo')"
+                    class="res-btn p-4 rounded-lg border border-border bg-black/20 hover:border-blue-500 hover:bg-blue-500/5 text-left group">
+                    <span class="material-symbols-outlined text-blue-400 mb-2">confirmation_number</span>
+                    <h4 class="text-sm font-bold text-white">Promo Code</h4>
+                    <p class="text-[10px] text-gray-500">Send apology coupon</p>
+                </button>
+                <button onclick="setResolution(this, 'Warning')"
+                    class="res-btn p-4 rounded-lg border border-border bg-black/20 hover:border-yellow-500 hover:bg-yellow-500/5 text-left group">
+                    <span class="material-symbols-outlined text-yellow-400 mb-2">warning</span>
+                    <h4 class="text-sm font-bold text-white">Warning</h4>
+                    <p class="text-[10px] text-gray-500">Flag driver/restaurant</p>
+                </button>
+                <button onclick="setResolution(this, 'Ban')"
+                    class="res-btn p-4 rounded-lg border border-border bg-black/20 hover:border-red-500 hover:bg-red-500/5 text-left group">
+                    <span class="material-symbols-outlined text-red-400 mb-2">block</span>
+                    <h4 class="text-sm font-bold text-white">Ban Entity</h4>
+                    <p class="text-[10px] text-gray-500">Block customer/driver</p>
+                </button>
+            </div>
+
+            <textarea id="resolution-note"
+                class="w-full bg-black/20 border border-border rounded-lg p-3 text-sm text-white mb-4 focus:border-primary focus:ring-0"
+                placeholder="Reason for decision (sent to user)..."></textarea>
+
+            <div class="flex gap-3">
+                <button onclick="closeModal('resolve-modal')"
+                    class="flex-1 py-3 rounded-lg border border-border text-gray-400 font-bold hover:bg-white/5">Cancel</button>
+                <button onclick="confirmResolution()"
+                    class="flex-1 py-3 rounded-lg bg-primary text-black font-bold hover:bg-orange-600 shadow-lg">Confirm
+                    & Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-modal" class="fixed inset-0 z-[60] bg-black/90 hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-md p-6 shadow-2xl relative">
+            <h3 class="text-lg font-bold text-white mb-4" id="info-title">History</h3>
+            <div id="info-body" class="space-y-3 text-sm text-gray-300"></div>
+            <button onclick="closeModal('info-modal')"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white"><span
+                    class="material-symbols-outlined">close</span></button>
+        </div>
+    </div>
+
+    <div id="evidence-modal" class="fixed inset-0 z-[60] bg-black/95 hidden flex items-center justify-center p-8">
+        <div class="relative max-w-4xl w-full text-center">
+            <button onclick="closeModal('evidence-modal')"
+                class="absolute -top-10 right-0 text-white hover:text-primary"><span
+                    class="material-symbols-outlined text-3xl">close</span></button>
+            <img src="https://via.placeholder.com/800x600/111111/333333?text=Evidence+Photo"
+                class="rounded-xl border border-border shadow-2xl mx-auto max-h-[80vh]">
+        </div>
+    </div>
+
+    <div id="chat-modal"
+        class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div
+            class="bg-surface border border-border rounded-xl w-full max-w-md h-[500px] flex flex-col shadow-2xl relative">
+            <div class="p-4 border-b border-border flex justify-between items-center bg-[#15171c] rounded-t-xl">
+                <div>
+                    <h3 class="font-bold text-white text-sm">Customer Support</h3>
+                    <p class="text-[10px] text-gray-400" id="chat-user">...</p>
+                </div>
+                <button onclick="closeModal('chat-modal')" class="text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-bg" id="chat-body"></div>
+            <div class="p-3 border-t border-border bg-surface rounded-b-xl flex gap-2">
+                <input type="text" id="chat-input"
+                    class="flex-1 bg-bg border border-border rounded-lg px-3 py-2 text-sm text-white"
+                    placeholder="Type a message...">
+                <button onclick="sendMessage()" class="p-2 bg-primary text-black rounded-lg"><span
+                        class="material-symbols-outlined text-lg">send</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // DATA
+        const today = new Date().toISOString().split('T')[0];
+        let disputes = [];
+
+        let currentId = null;
+        let activeTab = 'all';
+        let selectedResolution = null;
+
+        // INIT
+        window.onload = () => {
+            fetch('sidebar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sidebar-container').innerHTML = data;
+                    setTimeout(() => {
+                        const links = document.querySelectorAll('#sidebar-container nav a');
+                        links.forEach(l => {
+                            if (l.innerText.includes('Disputes')) {
+                                l.className = "flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg font-bold transition-all";
+                                l.querySelector('span').classList.add('text-primary');
+                            } else {
+                                l.className = "flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group";
+                            }
+                        });
+                        ZoiAuth.renderSimLogin();
+                    }, 100);
+                });
+            renderList();
+        };
+
+        async function renderList() {
+            try {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes', {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
+                });
+                
+                if (response.ok) {
+                    const dbDisputes = await response.json();
+                    // Map DB Schema to Frontend structure
+                    disputes = dbDisputes.map(d => ({
+                        id: d.ticketId,
+                        title: d.title,
+                        user: d.user?.name || 'Unknown User',
+                        time: new Date(d.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                        type: d.type,
+                        status: d.status,
+                        ai: d.aiSummary || 'Analysis pending...',
+                        log: d.log || [],
+                        items: d.items || [],
+                        assignedTo: d.assignedTo
+                    }));
+                } else {
+                    console.warn("Dispute API failed. Using simulated data.");
+                    disputes = typeof ZoiDisputes !== 'undefined' ? ZoiDisputes.getAll() : [];
+                }
+            } catch (e) {
+                console.warn("Dispute Backend unavailable.", e);
+                disputes = typeof ZoiDisputes !== 'undefined' ? ZoiDisputes.getAll() : [];
+            }
+
+            const container = document.getElementById('dispute-list');
+            const dateFilter = document.getElementById('date-picker').value;
+            container.innerHTML = "";
+            let escalatedCount = 0;
+
+            disputes.forEach(d => {
+                const isEscalated = d.status === 'Escalated';
+                if (isEscalated) escalatedCount++;
+
+                if (activeTab === 'Escalated' && !isEscalated) return;
+                if (activeTab === 'Resolved' && d.status !== 'Resolved') return;
+                if (activeTab === 'all' && (d.status === 'Resolved' || isEscalated)) return;
+
+                const activeClass = d.id === currentId ? 'active-ticket' : 'border-l-4 border-transparent';
+                const badge = d.type === 'Critical' ? '<span class="text-[10px] font-bold text-white bg-red-600/20 px-1.5 py-0.5 rounded border border-red-600/30">CRITICAL</span>' : '';
+
+                const html = `
+                    <div onclick="loadDetails('${d.id}')" class="p-4 border-b border-border cursor-pointer hover:bg-[#2c2115] transition-colors ${activeClass}">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-xs font-mono text-[#cbad90]">#${d.id}</span>
+                            ${badge}
+                        </div>
+                        <h3 class="text-white font-bold text-sm mb-1">${d.title}</h3>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>${d.user} • ${d.time}</span>
+                        </div>
+                    </div>`;
+                container.innerHTML += html;
+            });
+            document.getElementById('stat-escalated').innerText = escalatedCount;
+        }
+
+        function switchTab(tab) {
+            activeTab = tab;
+            ['all', 'Escalated', 'Resolved'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (el) el.className = t === tab ? "tab-active px-3 py-1.5 rounded-full text-xs font-bold transition-all" : "tab-inactive px-3 py-1.5 rounded-full text-xs font-bold transition-all";
+            });
+            renderList();
+        }
+
+        function loadDetails(id) {
+            currentId = id;
+            const d = disputes.find(x => x.id === id);
+            renderList();
+            document.getElementById('detail-title').innerText = `#${d.id}: ${d.title.split(':')[0]}`;
+            document.getElementById('detail-sub').innerText = `${d.title.split(':')[1]} • ${d.user}`;
+            document.getElementById('detail-tag').classList.toggle('hidden', d.type !== 'Critical');
+            document.getElementById('ai-card').classList.remove('hidden');
+            document.getElementById('ai-text').innerText = d.ai;
+
+            const logContainer = document.getElementById('chat-log');
+            logContainer.innerHTML = "";
+            d.log.forEach(l => {
+                let bubble = "";
+                if (l.role === 'system') bubble = `<div class="chat-bubble-system">${l.msg}</div>`;
+                else if (l.role === 'cust') bubble = `<div class="flex justify-start"><div class="chat-bubble-cust px-4 py-2 text-sm max-w-[80%]">${l.msg}</div></div>`;
+                else bubble = `<div class="flex justify-end"><div class="chat-bubble-driver px-4 py-2 text-sm max-w-[80%]">${l.msg}</div></div>`;
+                logContainer.innerHTML += bubble;
+            });
+
+            document.getElementById('order-panel').classList.remove('hidden');
+            const orderList = document.getElementById('order-items');
+            orderList.innerHTML = "";
+            let total = 0;
+            d.items.forEach(i => {
+                orderList.innerHTML += `<div class="flex justify-between text-sm text-gray-300"><span>${i.n}</span><span>${i.p}</span></div>`;
+                total += parseInt(i.p.replace('₹', ''));
+            });
+            document.getElementById('order-total').innerText = '₹' + total;
+
+            document.getElementById('action-footer').classList.remove('hidden');
+            document.getElementById('btn-evidence').classList.remove('hidden');
+            document.getElementById('btn-history').classList.remove('hidden');
+            document.getElementById('btn-calls').classList.remove('hidden');
+        }
+
+        // ACTIONS
+        async function addNote() {
+            const input = document.getElementById('internal-note');
+            if (!input.value) return;
+
+            try {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes/' + currentId + '/log', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '')
+                    },
+                    body: JSON.stringify({ role: 'system', msg: `Admin Note: ${input.value}` })
+                });
+
+                if (!response.ok) throw new Error('Failed to synchronize note');
+
+                // UI Update
+                const logContainer = document.getElementById('chat-log');
+                logContainer.innerHTML += `<div class="chat-bubble-system mt-2">Admin Note: ${input.value}</div>`;
+                input.value = "";
+                logContainer.scrollTop = logContainer.scrollHeight;
+            } catch (err) {
+                showToast("Sync Error", err.message);
+            }
+        }
+
+        function dismissCase() {
+            ZoiDisputes.updateStatus(currentId, 'Dismissed');
+            showToast('Dismissed', 'Case removed from active queue.');
+            document.getElementById('detail-content').innerHTML = '<div class="text-center text-gray-600 mt-20">Select a ticket</div>';
+            document.getElementById('action-footer').classList.add('hidden');
+            renderList();
+        }
+
+        function escalateTicket() {
+            ZoiDisputes.updateStatus(currentId, 'Escalated');
+            showToast('Escalated', 'Ticket moved to manager queue.');
+            renderList();
+        }
+
+        function openResolveModal() {
+            document.getElementById('resolve-modal').classList.remove('hidden');
+            document.getElementById('resolve-modal').classList.add('flex');
+        }
+
+        function setResolution(btn, type) {
+            document.querySelectorAll('.res-btn').forEach(b => b.classList.remove('ring-2', 'ring-primary'));
+            btn.classList.add('ring-2', 'ring-primary');
+            selectedResolution = type;
+        }
+
+        async function confirmResolution() {
+            if (!selectedResolution) return showToast("Error", "Select a resolution type");
+            const note = document.getElementById('resolution-note').value;
+
+            try {
+                // 1. Update status and resolution
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes/' + currentId, {
+                    method: 'PATCH',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '')
+                    },
+                    body: JSON.stringify({ 
+                        status: 'Resolved', 
+                        resolution: selectedResolution, 
+                        resolutionNote: note 
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to resolve dispute on server');
+
+                // 2. Add log entry
+                await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes/' + currentId + '/log', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '')
+                    },
+                    body: JSON.stringify({ role: 'system', msg: `Resolved via ${selectedResolution}: ${note || 'No note'}` })
+                });
+
+                closeModal('resolve-modal');
+                showToast("Case Resolved", `${selectedResolution} applied.`);
+
+                document.getElementById('detail-content').innerHTML = '<div class="text-center text-gray-600 mt-20">Select a ticket</div>';
+                document.getElementById('action-footer').classList.add('hidden');
+                await renderList();
+            } catch (err) {
+                showToast("Resolution Failed", err.message);
+            }
+        }
+
+        function viewEvidence() {
+            document.getElementById('evidence-modal').classList.remove('hidden');
+            document.getElementById('evidence-modal').classList.add('flex');
+        }
+
+        // HISTORY / CALLS
+        function viewHistory() {
+            document.getElementById('info-title').innerText = "Case History";
+            document.getElementById('info-body').innerHTML = `
+                <div class="p-2 border-b border-border">Ticket Created (10:00 AM)</div>
+                <div class="p-2 border-b border-border">Assigned to Agent (10:05 AM)</div>
+                <div class="p-2">Customer Uploaded Proof (10:15 AM)</div>
+            `;
+            document.getElementById('info-modal').classList.remove('hidden');
+            document.getElementById('info-modal').classList.add('flex');
+        }
+
+        function viewCalls() {
+            document.getElementById('info-title').innerText = "Call Logs";
+            document.getElementById('info-body').innerHTML = `
+                <div class="p-2 border-b border-border flex justify-between"><span>Outgoing to Driver</span> <span class="text-xs text-gray-500">2m 14s</span></div>
+                <div class="p-2 flex justify-between"><span>Incoming from Customer</span> <span class="text-xs text-gray-500">Missed</span></div>
+            `;
+            document.getElementById('info-modal').classList.remove('hidden');
+            document.getElementById('info-modal').classList.add('flex');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        // --- TOAST NOTIFICATION ---
+        function showToast(title, message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-surface border border-gray-700 text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex flex-col gap-1 fade-in';
+            toast.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-sm">notifications</span>
+                    <strong class="text-sm font-bold">${title}</strong>
+                </div>
+                <p class="text-xs text-gray-400 pl-6">${message}</p>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // CHAT
+        function openChat() {
+            const d = disputes.find(x => x.id === currentId);
+            document.getElementById('chat-user').innerText = `Chatting with ${d.user}`;
+            document.getElementById('chat-body').innerHTML = `<div class="chat-bubble-system">Session Started</div>`;
+            document.getElementById('chat-modal').classList.remove('hidden');
+            document.getElementById('chat-modal').classList.add('flex');
+        }
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const logEntry = { role: 'driver', msg: msg }; // Admin acting as 'driver' or 'support'
+            ZoiDisputes.addLog(currentId, logEntry);
+
+            document.getElementById('chat-body').insertAdjacentHTML('beforeend', `<div class="flex justify-end mt-2"><div class="chat-bubble-driver px-4 py-2 text-sm max-w-[80%] bg-primary text-black">${msg}</div></div>`);
+            input.value = "";
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+
+

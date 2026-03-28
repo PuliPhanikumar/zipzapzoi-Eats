@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Eats - Fleet Command</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>
+        // Enforce RBAC Access Before Rendering
+        ZoiAuth.enforceAccess("Fleet Metrics");
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#39E079",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6",
+                        secondary: "#cbad90"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], body: ["Noto Sans", "sans-serif"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .glass {
+            background: rgba(24, 26, 32, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .marker-icon {
+            border: 2px solid white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white font-sans h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-bg">
+
+        <header class="h-16 flex items-center justify-between px-6 border-b border-border bg-surface z-20">
+            <div class="flex items-center gap-2 text-sm">
+                <span class="text-secondary font-medium">Fleet Management</span>
+                <span class="material-symbols-outlined text-secondary text-base">chevron_right</span>
+                <span class="text-white font-bold">Partner Metrics</span>
+            </div>
+            <div class="flex gap-3">
+                <div
+                    class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-border text-xs text-gray-300">
+                    <span class="material-symbols-outlined text-green-400 text-sm">battery_charging_full</span>
+                    <span>EV Fleet: 92% Charged</span>
+                </div>
+                <button
+                    class="bg-primary hover:bg-green-600 text-black px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-primary/20">
+                    <span class="material-symbols-outlined text-sm">download</span> Export Report
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 bg-surface p-4 rounded-xl border border-border">
+                <div class="lg:col-span-5 relative">
+                    <span class="material-symbols-outlined absolute left-3 top-3 text-secondary">search</span>
+                    <input id="search-input" onkeyup="renderTable()"
+                        class="block w-full h-12 pl-10 pr-3 rounded-lg bg-bg border border-border text-white focus:ring-1 focus:ring-primary focus:border-primary text-sm"
+                        placeholder="Search Partner Name, ID or Phone..." type="text" />
+                </div>
+                <div class="lg:col-span-3">
+                    <select id="zone-filter" onchange="renderTable()"
+                        class="block w-full h-12 px-3 rounded-lg bg-bg border border-border text-white focus:ring-1 focus:ring-primary text-sm">
+                        <option value="all">All Zones</option>
+                        <option value="South Delhi">South Delhi</option>
+                        <option value="Indiranagar">Indiranagar</option>
+                        <option value="Koramangala">Koramangala</option>
+                    </select>
+                </div>
+                <div class="lg:col-span-4 flex items-center justify-end gap-2 text-xs text-secondary">
+                    <span class="size-2 rounded-full bg-green-500 animate-pulse"></span> Live Data Feed Active
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div
+                    class="bg-surface rounded-xl border border-purple-500/30 p-6 relative overflow-hidden flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-white text-lg font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-purple-400">auto_awesome</span> Zap Analysis
+                        </h3>
+                        <span
+                            class="bg-purple-500/10 text-purple-300 text-[10px] font-bold px-2 py-1 rounded">Real-time</span>
+                    </div>
+                    <div class="h-40 w-full relative">
+                        <canvas id="analysisChart"></canvas>
+                    </div>
+                    <p class="text-secondary text-xs mt-4 leading-relaxed">
+                        Fleet efficiency is <span class="text-primary font-bold">12% above</span> average. However,
+                        <strong>South Delhi</strong> shows a potential supply gap in 2 hours.
+                    </p>
+                </div>
+
+                <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div
+                        class="bg-surface border border-border hover:border-purple-500/40 p-5 rounded-xl transition-all group">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="bg-bg p-2 rounded-lg border border-border text-purple-400"><span
+                                    class="material-symbols-outlined">speed</span></div>
+                            <span
+                                class="bg-purple-500/10 text-purple-300 text-[10px] font-bold px-2 py-1 rounded uppercase">High
+                                Impact</span>
+                        </div>
+                        <h4 class="text-white font-bold mb-1">Optimize Routing</h4>
+                        <p class="text-secondary text-xs mb-4">Last-mile delays detected in Sector 4. Re-route
+                            recommended.</p>
+                        <button onclick="triggerAction('Optimize')"
+                            class="w-full flex items-center justify-center gap-1 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3 py-2 rounded transition-colors shadow-lg shadow-purple-900/20">
+                            Apply Optimization
+                        </button>
+                    </div>
+                    <div
+                        class="bg-surface border border-border hover:border-blue-500/40 p-5 rounded-xl transition-all group">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="bg-bg p-2 rounded-lg border border-border text-blue-400"><span
+                                    class="material-symbols-outlined">cloud_queue</span></div>
+                            <span
+                                class="bg-blue-500/10 text-blue-300 text-[10px] font-bold px-2 py-1 rounded uppercase">Weather
+                                Trigger</span>
+                        </div>
+                        <h4 class="text-white font-bold mb-1">Rain Protocol: Zone B</h4>
+                        <p class="text-secondary text-xs mb-4">Storm front approaching. Pre-emptive surge advised.</p>
+                        <button onclick="triggerAction('Rain Mode')"
+                            class="w-full flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3 py-2 rounded transition-colors shadow-lg shadow-blue-900/20">
+                            Activate Rain Mode
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="flex flex-col gap-4">
+                    <div onclick="filterStatus('High Risk')"
+                        class="bg-surface p-5 rounded-xl border border-border cursor-pointer hover:border-red-500/50 transition-all group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-2 opacity-10"><span
+                                class="material-symbols-outlined text-red-500 text-6xl">warning</span></div>
+                        <div class="flex justify-between items-start mb-2 relative z-10">
+                            <div class="p-2 rounded-lg bg-bg text-red-500"><span
+                                    class="material-symbols-outlined">loyalty</span></div>
+                            <span class="text-xs font-bold text-red-400 bg-red-400/10 px-2 py-1 rounded">+4.2%
+                                Risk</span>
+                        </div>
+                        <p class="text-secondary text-sm relative z-10">High Risk Partners</p>
+                        <h3 class="text-white text-3xl font-bold mt-1 relative z-10">12 <span
+                                class="text-lg text-secondary font-normal">/ 265</span></h3>
+                        <p class="text-[10px] text-primary mt-2 flex items-center gap-1">Click to view list <span
+                                class="material-symbols-outlined text-[10px]">arrow_forward</span></p>
+                    </div>
+
+                    <div class="bg-surface p-5 rounded-xl border border-border">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="p-2 rounded-lg bg-bg text-primary"><span
+                                    class="material-symbols-outlined">schedule</span></div>
+                            <span class="text-xs font-bold text-green-500 bg-green-500/10 px-2 py-1 rounded">-12%</span>
+                        </div>
+                        <p class="text-secondary text-sm">Avg Delivery Time</p>
+                        <h3 class="text-white text-3xl font-bold">24m 12s</h3>
+                        <p class="text-[10px] text-gray-500 mt-1">Target: 28m</p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 bg-surface rounded-xl border border-border overflow-hidden flex flex-col">
+                    <div class="p-4 border-b border-border bg-[#192633] flex justify-between items-center">
+                        <h3 class="text-white font-bold text-sm flex items-center gap-2"><span
+                                class="material-symbols-outlined text-primary text-sm">public</span> Live Fleet Heatmap
+                        </h3>
+                        <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded animate-pulse">High
+                            Congestion: Zone 4</span>
+                    </div>
+                    <div id="fleet-map" class="flex-1 w-full min-h-[300px] grayscale-[80%] invert-[1] brightness-[0.7]">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-surface rounded-xl border border-border overflow-hidden">
+                <div class="p-6 border-b border-border flex justify-between items-center">
+                    <h3 class="text-white text-lg font-bold">Partner Directory</h3>
+                    <div class="flex gap-2">
+                        <button onclick="filterStatus('all')"
+                            class="px-3 py-1.5 text-xs font-bold bg-primary/10 text-primary rounded border border-primary/20">All</button>
+                        <button onclick="filterStatus('Online')"
+                            class="px-3 py-1.5 text-xs font-medium text-secondary hover:text-white rounded hover:bg-bg">Online</button>
+                        <button onclick="filterStatus('High Risk')"
+                            class="px-3 py-1.5 text-xs font-medium text-red-400 hover:text-white rounded hover:bg-red-900/20 border border-transparent hover:border-red-500/30">High
+                            Risk</button>
+                        <button onclick="filterStatus('Offline')"
+                            class="px-3 py-1.5 text-xs font-medium text-secondary hover:text-white rounded hover:bg-bg">Offline</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-black/20 text-secondary uppercase font-semibold">
+                            <tr>
+                                <th class="px-6 py-4">Partner</th>
+                                <th class="px-6 py-4">Status</th>
+                                <th class="px-6 py-4 text-right">Deliveries</th>
+                                <th class="px-6 py-4 text-right">Avg Time</th>
+                                <th class="px-6 py-4 text-center">Rating</th>
+                                <th class="px-6 py-4 text-right">Earnings</th>
+                                <th class="px-6 py-4 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border text-white" id="partner-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="partner-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div
+            class="bg-surface border border-border rounded-xl w-full max-w-2xl shadow-2xl relative flex flex-col max-h-[80vh]">
+            <div class="p-6 border-b border-border bg-[#192633] flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="size-14 rounded-full bg-gray-700 bg-cover border-2 border-primary" id="modal-img"></div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white" id="modal-name">--</h2>
+                        <div class="flex gap-2 items-center text-xs text-gray-400">
+                            <span id="modal-id">ID: --</span> • <span class="text-primary font-bold"
+                                id="modal-status">--</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-6">
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-bg p-3 rounded-lg border border-border text-center">
+                        <p class="text-[10px] text-gray-500 uppercase">Lifetime Trips</p>
+                        <p class="text-lg font-bold text-white" id="modal-trips">0</p>
+                    </div>
+                    <div class="bg-bg p-3 rounded-lg border border-border text-center">
+                        <p class="text-[10px] text-gray-500 uppercase">Avg Rating</p>
+                        <p class="text-lg font-bold text-yellow-400 flex items-center justify-center gap-1">
+                            <span id="modal-rating">0.0</span> <span
+                                class="material-symbols-outlined text-sm">star</span>
+                        </p>
+                    </div>
+                    <div class="bg-bg p-3 rounded-lg border border-border text-center">
+                        <p class="text-[10px] text-gray-500 uppercase">Today's Earnings</p>
+                        <p class="text-lg font-bold text-green-400" id="modal-earn">₹0</p>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button
+                        class="flex-1 py-2 bg-blue-600 hover:bg-blue-500 rounded text-xs font-bold text-white">Message</button>
+                    <button id="modal-action-btn" onclick="toggleRiderStatus('High Risk')"
+                        class="flex-1 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded text-xs font-bold border border-red-500/30 transition-colors shadow-lg">Suspend</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">Operation completed</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. DATA
+        // Fetch from "Backend"
+        let partners = ZoiFleet.getAllRiders();
+
+        // 2. MAP INIT
+        let map;
+        let markersLayer;
+        function initMap() {
+            if (document.getElementById('fleet-map')) {
+                if (!map) {
+                    map = L.map('fleet-map', { zoomControl: false }).setView([12.9716, 77.6412], 12);
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                        attribution: '', maxZoom: 19
+                    }).addTo(map);
+                    markersLayer = L.layerGroup().addTo(map);
+                }
+
+                markersLayer.clearLayers();
+
+                partners.forEach(p => {
+                    const color = p.status === 'High Risk' ? '#ef4444' : (p.status === 'Online' ? '#39E079' : '#eab308');
+                    L.circleMarker([p.lat, p.lng], {
+                        radius: 6, fillColor: color, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.8
+                    }).addTo(markersLayer).bindPopup(`<b>${p.name}</b><br>${p.status}`);
+                });
+            }
+        }
+
+        // 3. CHARTS INIT
+        function initCharts() {
+            const ctx = document.getElementById('analysisChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Efficiency', 'Coverage', 'Speed', 'Rating', 'Safety'],
+                    datasets: [{
+                        label: 'Performance Score',
+                        data: [85, 92, 78, 88, 95],
+                        backgroundColor: ['#3b82f6', '#39E079', '#eab308', '#a855f7', '#ef4444'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#2a2d35' }, ticks: { display: false } },
+                        x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        // 4. TABLE RENDER
+        function renderTable(filterStatus = null) {
+            const tbody = document.getElementById('partner-table-body');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const zoneFilter = document.getElementById('zone-filter').value;
+
+            tbody.innerHTML = "";
+
+            partners.forEach(p => {
+                if (filterStatus && filterStatus !== 'all' && p.status !== filterStatus) return;
+                if (search && !p.name.toLowerCase().includes(search) && !p.id.toLowerCase().includes(search)) return;
+                if (zoneFilter !== 'all' && p.zone !== zoneFilter) return;
+
+                const statusColor = p.status === 'Online' ? 'text-green-500 bg-green-500/10 border-green-500/20' :
+                    (p.status === 'High Risk' ? 'text-red-500 bg-red-500/10 border-red-500/20' : 'text-gray-400 bg-gray-500/10 border-gray-500/20');
+
+                const row = `
+                    <tr class="hover:bg-white/5 transition-colors border-b border-border/50 cursor-pointer" onclick="openPartnerModal('${p.id}')">
+                        <td class="px-6 py-4 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold border border-border">${p.name.charAt(0)}</div>
+                            <div><p class="font-bold text-white">${p.name}</p><p class="text-secondary text-[10px]">${p.id}</p></div>
+                        </td>
+                        <td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase border ${statusColor}">${p.status}</span></td>
+                        <td class="px-6 py-4 text-right font-mono">${p.trips}</td>
+                        <td class="px-6 py-4 text-right text-secondary">${p.time}</td>
+                        <td class="px-6 py-4 text-center"><span class="text-yellow-400 font-bold">${p.rating} ★</span></td>
+                        <td class="px-6 py-4 text-right text-white font-bold">${p.earn}</td>
+                        <td class="px-6 py-4 text-center">
+                            <button class="p-1 hover:bg-white/10 rounded text-gray-400"><span class="material-symbols-outlined text-lg">visibility</span></button>
+                        </td>
+                    </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function triggerAction(actionName) {
+            if (actionName === 'Rain Mode') {
+                // Set Global Surge to 1.5x
+                const current = ZoiSystem.getConfig();
+                ZoiSystem.setConfig('surgeMultiplier', 1.5);
+                showToast("System Alert", "Rain Mode Active! Global Surge set to 1.5x");
+            } else if (actionName === 'Optimize') {
+                showToast("System Action", "Route optimization calculations started...");
+            }
+        }
+
+        let currentModalId = null;
+
+        function toggleRiderStatus(newStatus) {
+            if (!currentModalId) return;
+            const actionText = newStatus === 'High Risk' ? 'suspend' : 'unsuspend';
+            if (confirm(`Are you sure you want to ${actionText} this partner?`)) {
+                ZoiFleet.updateRiderStatus(currentModalId, newStatus);
+                partners = ZoiFleet.getAllRiders(); // Refresh local list
+                renderTable();
+                initMap();
+                closeModal();
+                showToast(`Partner ${actionText === 'suspend' ? 'Suspended' : 'Unsuspended'}`, `ID: ${currentModalId} status updated to ${newStatus}.`);
+            }
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        // Modal Logic
+        function openPartnerModal(id) {
+            currentModalId = id;
+            const p = partners.find(x => x.id === id);
+            document.getElementById('modal-name').innerText = p.name;
+            document.getElementById('modal-id').innerText = `ID: ${p.id}`;
+            document.getElementById('modal-status').innerText = p.status;
+            document.getElementById('modal-trips').innerText = p.trips * 124;
+            document.getElementById('modal-rating').innerText = p.rating;
+            document.getElementById('modal-earn').innerText = p.earn;
+
+            const actionBtn = document.getElementById('modal-action-btn');
+            if (p.status === 'High Risk') {
+                actionBtn.innerText = "Unsuspend";
+                actionBtn.className = "flex-1 py-2 bg-green-500/10 hover:bg-green-500/20 text-green-400 rounded text-xs font-bold border border-green-500/30 transition-colors shadow-lg shadow-green-900/20";
+                actionBtn.onclick = () => toggleRiderStatus('Online');
+            } else {
+                actionBtn.innerText = "Suspend";
+                actionBtn.className = "flex-1 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded text-xs font-bold border border-red-500/30 transition-colors shadow-lg shadow-red-900/20";
+                actionBtn.onclick = () => toggleRiderStatus('High Risk');
+            }
+
+            document.getElementById('partner-modal').classList.remove('hidden');
+            document.getElementById('partner-modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('partner-modal').classList.add('hidden');
+            document.getElementById('partner-modal').classList.remove('flex');
+        }
+
+        function filterStatus(status) {
+            renderTable(status === 'all' ? null : status);
+        }
+
+        // Init
+        window.onload = function () {
+            fetch('sidebar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sidebar-container').innerHTML = data;
+                    // Highlight active nav block securely
+                    setTimeout(() => {
+                        const links = document.querySelectorAll('#sidebar-container nav a');
+                        links.forEach(l => {
+                            if (l.innerText.includes('Fleet Metrics')) {
+                                l.className = "flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg font-bold transition-all";
+                                l.querySelector('span').classList.add('text-primary');
+                            } else {
+                                l.className = "flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group";
+                            }
+                        });
+
+                        // Inject Simulate Login dropdown if God Mode
+                        ZoiAuth.renderSimLogin();
+                    }, 100);
+                });
+
+            initMap();
+            initCharts();
+            renderTable();
+        };
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+
+

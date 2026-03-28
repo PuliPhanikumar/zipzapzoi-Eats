@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi - Zone Logistics</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js?v=20260321"></script>
+    <script>ZoiAuth.enforceAccess('Zone Logistics');</script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .glass {
+            background: rgba(24, 26, 32, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .leaflet-popup-content-wrapper {
+            background: #181a20;
+            color: white;
+            border: 1px solid #00f0ff;
+            border-radius: 8px;
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .leaflet-popup-tip {
+            background: #00f0ff;
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #00f0ff;
+            margin-top: -6px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #2a2d35;
+            border-radius: 2px;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans">
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+
+        <div class="flex-1 relative z-0 h-full">
+            <div id="map" class="w-full h-full grayscale-[80%] invert-[1] brightness-[0.7]"></div>
+
+            <div
+                class="absolute top-0 left-0 w-full z-[400] bg-gradient-to-b from-black/95 via-black/50 to-transparent p-6 pointer-events-none">
+                <div class="flex justify-between items-start pointer-events-auto">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                            Zone Manager <span
+                                class="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30">Live</span>
+                        </h1>
+                        <p class="text-sm text-gray-400" id="city-desc">Logistics control for New Delhi Region.</p>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <select id="city-selector" onchange="changeCity(this.value)"
+                            class="bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-primary focus:ring-0 backdrop-blur-md transition-all font-bold">
+                            <option value="delhi">📍 New Delhi</option>
+                            <option value="hyderabad">📍 Hyderabad</option>
+                        </select>
+                        <div class="relative group">
+                            <input type="text" id="map-search" onkeydown="handleSearch(event)"
+                                placeholder="Search location or zone..."
+                                class="bg-black/50 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:border-primary focus:ring-0 w-64 backdrop-blur-md transition-all group-hover:bg-black/70">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-2.5 text-gray-400 text-lg">search</span>
+                        </div>
+
+                        <button onclick="document.getElementById('file-upload').click()"
+                            class="bg-surface border border-border hover:border-white/20 text-white px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all text-xs">
+                            <span class="material-symbols-outlined text-lg">upload_file</span> Import
+                        </button>
+                        <input type="file" id="file-upload" class="hidden" accept=".json,.geojson"
+                            onchange="handleGeoJsonImport(this)">
+
+                        <button onclick="toggleAddMode()"
+                            class="bg-primary hover:bg-orange-600 text-black px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-primary/20 transition-all text-xs">
+                            <span class="material-symbols-outlined text-lg">add_circle</span> Add Zone
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="absolute top-28 right-6 w-80 z-[400] flex flex-col gap-4 max-h-[calc(100vh-160px)] pointer-events-none">
+
+                <div class="glass rounded-xl p-4 flex flex-col max-h-[45vh] shadow-2xl pointer-events-auto">
+                    <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                        <h3 class="font-bold text-sm text-white">Active Zones</h3>
+                        <span class="text-[10px] text-gray-400 flex items-center gap-1"><span
+                                class="size-2 rounded-full bg-green-500"></span> Live</span>
+                    </div>
+                    <div class="overflow-y-auto custom-scrollbar space-y-2 flex-1 pr-1" id="zone-list">
+                    </div>
+                </div>
+
+                <div id="zone-editor"
+                    class="glass rounded-xl p-5 hidden border-l-4 border-primary shadow-2xl pointer-events-auto">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-white truncate max-w-[180px]" id="edit-name">Zone Name
+                            </h3>
+                            <p class="text-xs text-gray-400 font-mono" id="edit-id">ID: #ZN-001</p>
+                        </div>
+                        <button onclick="closeEditor()" class="text-gray-400 hover:text-white"><span
+                                class="material-symbols-outlined">close</span></button>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-1">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Coverage Radius</label>
+                            <span class="text-xs font-bold text-white" id="edit-radius-val">1500m</span>
+                        </div>
+                        <input type="range" min="500" max="5000" step="100"
+                            class="w-full h-1 bg-border rounded-lg appearance-none cursor-pointer"
+                            id="edit-radius-input" oninput="updateEditorUI()">
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-1">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Surge Multiplier</label>
+                            <span class="text-xs font-bold text-primary bg-primary/10 px-2 rounded"
+                                id="edit-surge-val">1.0x</span>
+                        </div>
+                        <input type="range" min="1.0" max="3.0" step="0.1"
+                            class="w-full h-1 bg-border rounded-lg appearance-none cursor-pointer" id="edit-surge-input"
+                            oninput="updateEditorUI()">
+                        <div class="flex justify-between text-[9px] text-gray-500 mt-1">
+                            <span>1.0x</span><span>2.0x</span><span>3.0x</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        <div class="bg-black/20 p-2 rounded-lg border border-border flex flex-col items-center">
+                            <span class="text-[9px] text-gray-400 uppercase mb-1">Active</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="edit-status" class="sr-only peer">
+                                <div
+                                    class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-success">
+                                </div>
+                            </label>
+                        </div>
+                        <div class="bg-black/20 p-2 rounded-lg border border-border flex flex-col items-center">
+                            <span class="text-[9px] text-gray-400 uppercase mb-1">Rain Mode</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="edit-rain" class="sr-only peer">
+                                <div
+                                    class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500">
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button id="save-zone-btn" onclick="saveZoneChanges()"
+                            class="flex-1 bg-white text-black font-bold py-2.5 rounded-lg text-xs hover:bg-gray-200 transition-colors shadow-lg flex items-center justify-center">Save
+                            Changes</button>
+                        <button id="delete-zone-btn" onclick="deleteZone()"
+                            class="p-2 border border-danger/30 text-danger rounded-lg hover:bg-danger/10 transition-colors flex items-center justify-center"><span
+                                class="material-symbols-outlined text-lg">delete</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute bottom-6 left-6 z-[400] hidden lg:block">
+                <div class="glass p-1 rounded-xl flex items-center shadow-2xl">
+                    <div class="px-5 py-2 border-r border-white/10">
+                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Total Zones</p>
+                        <p class="text-sm font-bold text-white" id="stat-total">0</p>
+                    </div>
+                    <div class="px-5 py-2 border-r border-white/10">
+                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Total Area</p>
+                        <p class="text-sm font-bold text-white">142 km²</p>
+                    </div>
+                    <div class="px-5 py-2 border-r border-white/10">
+                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Active Orders</p>
+                        <p class="text-sm font-bold text-primary">1,248</p>
+                    </div>
+                    <div class="px-5 py-2">
+                        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Fleet Density</p>
+                        <p class="text-sm font-bold text-green-400">High</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="toast"
+                class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/80 border border-success/50 text-white px-6 py-3 rounded-full shadow-2xl z-[500] hidden items-center gap-2 backdrop-blur-md transition-all duration-300 translate-y-4 opacity-0">
+                <span class="material-symbols-outlined" id="toast-icon">check_circle</span>
+                <span class="text-sm font-bold" id="toast-msg">Saved</span>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // 1. STATE & API MOCK
+        let map;
+        let zones = [];
+        let mapCircles = {};
+        let selectedZoneId = null;
+        let isAddMode = false;
+        let isLoading = true;
+
+        const ZoneAPI = {
+            fetchZones: async () => {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/zones', {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
+                });
+                if (!response.ok) throw new Error('Failed to fetch zones');
+                const data = await response.json();
+                // Ensure IDs are numbers for the frontend logic
+                return data.map(z => ({ ...z, id: parseInt(z.id) }));
+            },
+            saveZone: async (zone) => {
+                const isExisting = zones.some(z => z.id === zone.id && z.id < 100000); // 100000+ are temp IDs
+                const method = isExisting ? 'PUT' : 'POST';
+                const url = ZOI_CONFIG.API_BASE_URL + '/zones' + (isExisting ? '/' + zone.id : '');
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '')
+                    },
+                    body: JSON.stringify({
+                        name: zone.name,
+                        lat: parseFloat(zone.lat),
+                        lng: parseFloat(zone.lng),
+                        radius: parseInt(zone.radius),
+                        surge: parseFloat(zone.surge) || 1.0,
+                        status: zone.active ? 'Active' : 'Inactive'
+                    })
+                });
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to save zone');
+                }
+                return await response.json();
+            },
+            deleteZone: async (id) => {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/zones/' + id, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
+                });
+                if (!response.ok) throw new Error('Failed to delete zone');
+                return true;
+            }
+        };
+
+        // 2. INIT MAP
+        async function initMap() {
+            // Centered on New Delhi
+            map = L.map('map', { zoomControl: false }).setView([28.6139, 77.2090], 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '', maxZoom: 19
+            }).addTo(map);
+
+            // Add Click Listener
+            map.on('click', function (e) {
+                if (isAddMode) {
+                    createNewZone(e.latlng);
+                    isAddMode = false;
+                    map._container.style.cursor = 'grab';
+                } else {
+                    closeEditor(); // Click on map deselects
+                }
+            });
+
+            // Initial Data Load
+            isLoading = true;
+            renderSkeletons();
+            try {
+                zones = await ZoneAPI.fetchZones();
+            } catch (err) {
+                showToast("Error loading zones", "danger", "error");
+            } finally {
+                isLoading = false;
+                refreshUI();
+            }
+        }
+
+        // 3. SEARCH LOGIC (New)
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                const query = document.getElementById('map-search').value.toLowerCase();
+
+                // 1. Search Active Zones
+                const zone = zones.find(z => z.name.toLowerCase().includes(query));
+                if (zone) {
+                    selectZone(zone.id);
+                    return;
+                }
+
+                // 2. Simulate Global Geocode (Mock)
+                showToast("Searching map...");
+                setTimeout(() => {
+                    // Random jump near Delhi to simulate finding a new location
+                    const randLat = 28.6 + (Math.random() * 0.1);
+                    const randLng = 77.2 + (Math.random() * 0.1);
+                    map.flyTo([randLat, randLng], 14);
+                    showToast(`Found: ${query}`);
+                }, 1000);
+            }
+        }
+
+        // 3.5. CITY TOGGLE
+        function changeCity(city) {
+            if (city === 'hyderabad') {
+                map.flyTo([17.4065, 78.4354], 12);
+                document.getElementById('city-desc').innerText = 'Logistics control for Hyderabad Region.';
+                showToast("Diverting to Hyderabad");
+            } else {
+                map.flyTo([28.6139, 77.2090], 12);
+                document.getElementById('city-desc').innerText = 'Logistics control for New Delhi Region.';
+                showToast("Diverting to New Delhi");
+            }
+        }
+
+        function renderSkeletons() {
+            const list = document.getElementById('zone-list');
+            list.innerHTML = Array(4).fill(0).map(() => `
+                <div class="p-3 bg-black/20 rounded-lg flex justify-between items-center gap-2 animate-pulse mb-2 border border-white/5">
+                    <div class="flex items-center gap-3 w-full">
+                        <div class="size-2 rounded-full bg-gray-700 shrink-0"></div>
+                        <div class="w-full">
+                            <div class="h-3 bg-gray-700 rounded w-1/2 mb-1.5"></div>
+                            <div class="h-2 bg-gray-800 rounded w-1/3"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('stat-total').innerText = "...";
+        }
+
+        // 4. RENDER LOGIC
+        function refreshUI() {
+            // Clear Map Layers
+            Object.values(mapCircles).forEach(c => map.removeLayer(c));
+            mapCircles = {};
+            const list = document.getElementById('zone-list');
+            list.innerHTML = "";
+
+            if (zones.length === 0 && !isLoading) {
+                list.innerHTML = `<div class="p-4 text-center text-gray-500 text-xs">No zones found. Adding a zone to get started.</div>`;
+            }
+
+            zones.forEach(zone => {
+                // Map Circle
+                const color = zone.active ? (zone.surge > 1.5 ? '#ef4444' : '#00f0ff') : '#6b7280';
+                const circle = L.circle([zone.lat, zone.lng], {
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.2,
+                    radius: zone.radius,
+                    weight: 2
+                }).addTo(map);
+
+                circle.on('click', (e) => {
+                    L.DomEvent.stopPropagation(e);
+                    selectZone(zone.id);
+                });
+                mapCircles[zone.id] = circle;
+
+                // List Item (Layout Fix applied here: min-w-0 for text container)
+                const surgeBadge = zone.surge > 1
+                    ? `<span class="text-[10px] bg-yellow-500/20 text-yellow-500 px-1.5 rounded font-bold border border-yellow-500/30 whitespace-nowrap">${zone.surge}x</span>`
+                    : `<span class="text-[10px] bg-white/10 text-gray-400 px-1.5 rounded whitespace-nowrap">1.0x</span>`;
+
+                const activeDot = zone.active ? "bg-green-500 shadow-[0_0_8px_#22c55e]" : "bg-gray-600";
+
+                const item = `
+                    <div onclick="selectZone(${zone.id})" class="p-3 bg-black/20 hover:bg-white/5 border border-transparent hover:border-primary/50 rounded-lg cursor-pointer transition-all flex justify-between items-center group gap-2">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="size-2 rounded-full ${activeDot} shrink-0"></div>
+                            <div class="overflow-hidden">
+                                <h4 class="text-xs font-bold text-white truncate group-hover:text-primary transition-colors">${zone.name}</h4>
+                                <p class="text-[9px] text-gray-500 truncate">${zone.orders} Orders • ${zone.riders} Riders</p>
+                            </div>
+                        </div>
+                        ${surgeBadge}
+                    </div>`;
+                list.innerHTML += item;
+            });
+
+            document.getElementById('stat-total').innerText = zones.length;
+        }
+
+        // 5. SELECTION & EDITING
+        function selectZone(id) {
+            selectedZoneId = id;
+            const zone = zones.find(z => z.id === id);
+
+            // Fly to zone
+            map.flyTo([zone.lat, zone.lng], 14);
+
+            // Populate Editor
+            document.getElementById('edit-name').innerText = zone.name;
+            document.getElementById('edit-id').innerText = `ID: #ZN-00${zone.id}`;
+            document.getElementById('edit-radius-input').value = zone.radius;
+            document.getElementById('edit-radius-val').innerText = `${zone.radius}m`;
+            document.getElementById('edit-surge-input').value = zone.surge;
+            document.getElementById('edit-surge-val').innerText = `${zone.surge}x`;
+            document.getElementById('edit-status').checked = zone.active;
+
+            document.getElementById('zone-editor').classList.remove('hidden');
+        }
+
+        function closeEditor() {
+            document.getElementById('zone-editor').classList.add('hidden');
+            selectedZoneId = null;
+            map.flyTo([28.6139, 77.2090], 12);
+        }
+
+        function updateEditorUI() {
+            const rad = document.getElementById('edit-radius-input').value;
+            const surge = document.getElementById('edit-surge-input').value;
+            document.getElementById('edit-radius-val').innerText = `${rad}m`;
+            document.getElementById('edit-surge-val').innerText = `${surge}x`;
+
+            // Live Preview on Map
+            if (selectedZoneId && mapCircles[selectedZoneId]) {
+                mapCircles[selectedZoneId].setRadius(rad);
+            }
+        }
+
+        async function saveZoneChanges() {
+            if (!selectedZoneId) return;
+            const zone = zones.find(z => z.id === selectedZoneId);
+
+            const oldRadius = zone.radius;
+            const oldSurge = zone.surge;
+            const oldActive = zone.active;
+
+            zone.radius = parseInt(document.getElementById('edit-radius-input').value);
+            zone.surge = parseFloat(document.getElementById('edit-surge-input').value);
+            zone.active = document.getElementById('edit-status').checked;
+
+            const btn = document.getElementById('save-zone-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin mr-1 text-[16px]">progress_activity</span> Saving...`;
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            try {
+                await ZoneAPI.saveZone(zone);
+                refreshUI();
+                showToast(`Updated ${zone.name}`, "success", "check_circle");
+            } catch (err) {
+                // Revert changes on error
+                zone.radius = oldRadius;
+                zone.surge = oldSurge;
+                zone.active = oldActive;
+                showToast(err || "Failed to update zone", "danger", "error");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        async function deleteZone() {
+            if (confirm("Delete zone definitively? This action cannot be reversed.")) {
+                const btn = document.getElementById('delete-zone-btn');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[16px]">progress_activity</span>`;
+                btn.disabled = true;
+
+                try {
+                    await ZoneAPI.deleteZone(selectedZoneId);
+                    zones = zones.filter(z => z.id !== selectedZoneId);
+                    closeEditor();
+                    refreshUI();
+                    showToast("Zone Deleted Successfully", "success", "delete");
+                } catch(err) {
+                    showToast("Failed to delete zone", "danger", "error");
+                } finally {
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        // 6. IMPORT & ADD LOGIC
+        function toggleAddMode() {
+            isAddMode = !isAddMode;
+            if (isAddMode) {
+                document.body.style.cursor = 'crosshair';
+                showToast("Click map to add zone");
+            } else {
+                document.body.style.cursor = 'default';
+            }
+        }
+
+        async function createNewZone(latlng) {
+            const name = prompt("Enter Zone Name:", "New Zone");
+            if (name === null) {
+                map._container.style.cursor = 'grab';
+                return; // Cancelled
+            }
+            if (name.trim() === '') {
+                showToast("Zone name cannot be empty", "danger", "error");
+                map._container.style.cursor = 'grab';
+                return;
+            }
+
+            const newId = zones.length > 0 ? Math.max(...zones.map(z => z.id)) + 1 : 1;
+            const newZone = {
+                id: newId, name: name, lat: latlng.lat, lng: latlng.lng,
+                radius: 1200, surge: 1.0, active: true, orders: 0, riders: 0
+            };
+            
+            showToast("Creating zone...", "info", "sync");
+            try {
+                await ZoneAPI.saveZone(newZone);
+                zones.push(newZone);
+                refreshUI();
+                selectZone(newId);
+                showToast("Zone Added Successfully", "success", "add_circle");
+            } catch (err) {
+                showToast(err || "Failed to create zone", "danger", "error");
+            } finally {
+                map._container.style.cursor = 'grab';
+            }
+        }
+
+        function handleGeoJsonImport(input) {
+            if (input.files && input.files[0]) {
+                // Simulation of file reading
+                setTimeout(() => {
+                    alert(`Imported: ${input.files[0].name}\n(Simulated) Parsed 12 zones successfully.`);
+                    // Add a mock zone to show it worked
+                    zones.push({
+                        id: 99, name: "Imported Sector 45", lat: 28.65, lng: 77.23,
+                        radius: 1500, surge: 1.0, active: true, orders: 0, riders: 0
+                    });
+                    refreshUI();
+                    showToast("GeoJSON Imported");
+                }, 1000);
+            }
+        }
+
+        const TOAST_COLORS = {
+            success: { bg: 'rgba(34,197,94,0.15)', border: 'rgba(34,197,94,0.4)', text: '#22c55e' },
+            danger: { bg: 'rgba(239,68,68,0.15)', border: 'rgba(239,68,68,0.4)', text: '#ef4444' },
+            info: { bg: 'rgba(59,130,246,0.15)', border: 'rgba(59,130,246,0.4)', text: '#3b82f6' }
+        };
+
+        let toastTimeout;
+        function showToast(msg, type = "success", icon = "check_circle") {
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            clearTimeout(toastTimeout);
+            
+            document.getElementById('toast-msg').innerText = msg;
+            toastIcon.innerText = icon;
+            
+            const c = TOAST_COLORS[type] || TOAST_COLORS.success;
+            toast.style.backgroundColor = c.bg;
+            toast.style.borderColor = c.border;
+            toastIcon.style.color = c.text;
+
+            toast.classList.remove('hidden');
+            toast.classList.add('flex');
+            
+            // Trigger animation
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 10);
+
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                    toast.classList.remove('flex');
+                }, 300);
+            }, 3000);
+        }
+
+        // INIT
+        window.onload = initMap;
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

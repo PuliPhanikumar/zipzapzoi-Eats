@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | ZipZapZoi Eats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00f0ff',
+                        secondary: '#ff00ff',
+                        accent: '#00ff00',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #05010a;
+            color: #ffffff;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #00f0ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-bg {
+            background: rgba(26, 11, 54, 0.4);
+            border: 1px solid rgba(60, 30, 110, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-pattern {
+            background-image: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 255, 0.15) 0%, transparent 40%);
+            background-size: 100% 100%;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <!-- Unified Header -->
+    <header class="sticky top-0 z-50 bg-[#0a0314]/80 backdrop-blur-md border-b border-[#3c1e6e]/50">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity shrink-0">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-[#00f0ff] flex items-center justify-center text-[#0a0314] shadow-lg shadow-[#00f0ff]/50">
+                        <span class="material-symbols-outlined text-xl">bolt</span>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight hidden sm:block text-white"
+                        style="font-family: 'Quicksand', sans-serif;">Zoi<span class="text-[#00f0ff]">Eats</span></span>
+                </a>
+
+                <!-- Center Nav -->
+                <div class="hidden xl:flex items-center gap-6">
+                    <a class="text-sm font-bold text-[#ffff00] hover:text-white transition-colors flex items-center gap-1"
+                        href="promotions & offers.html">
+                        <span class="material-symbols-outlined text-sm">local_offer</span> Offers & Deals
+                    </a>
+                    <div class="hidden xl:flex items-center gap-6">
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="customer_restaurant_listing.html">Restaurants</a>
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="feedback.html">Feedback</a>
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="customer support help.html">Support</a>
+                    </div>
+                </div>
+
+                <!-- Right Nav -->
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <a href="restaurant pricing plans.html"
+                        class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#ff00ff]/50 hover:bg-[#ff00ff]/10 transition-all group">
+                        <span
+                            class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#ff00ff] transition-colors">store</span>
+                        <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Add
+                            Restaurant</span>
+                    </a>
+                    <a href="delivery partner application.html"
+                        class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#00ff00]/50 hover:bg-[#00ff00]/10 transition-all group">
+                        <span
+                            class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#00ff00] transition-colors">two_wheeler</span>
+                        <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Ride
+                            with Us</span>
+                    </a>
+                    <button
+                        class="hidden sm:flex items-center gap-2 bg-[#1a0b36] px-3 py-1.5 rounded-full border border-[#3c1e6e]/50 shadow-inner shadow-[#00f0ff]/5 cursor-pointer hover:border-[#00ff00]/50 transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-[#00ff00] text-sm group-hover:animate-bounce">location_on</span>
+                        <span class="text-xs font-medium text-[#b4a5d8]">Bengaluru</span>
+                    </button>
+                    <a href="shopping_cart.html"
+                        class="relative p-2 rounded-full hover:bg-[#1a0b36] transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-[#00f0ff] group-hover:text-white transition-colors">shopping_cart</span>
+                        <span class="zoi-cart-badge absolute top-1 right-1 min-w-[16px] h-4 bg-[#ff00ff] text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse hidden">0</span>
+                    </a>
+                    <a href="login & registration.html"
+                        class="w-9 h-9 rounded-full bg-cover bg-center border-2 border-[#00f0ff]/50 ring-2 ring-[#00f0ff]/30 cursor-pointer shadow-lg hover:ring-[#ff00ff] transition-all group overflow-hidden relative"
+                        data-alt="User profile"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBT6tCKI45lIHrDLxsyuh-TDPmobyPeVU6AyG7iM4HJzbXt4FAgaDQwWFcZnvtqXNR2v3lDATirSitKZgMb_FnrCII5JPdAZBxC-dcoHwPte4HShdkJMCfiA4IDkriDys7wgNvhhqh9d7SijAKyWm5ODFazB5xCczQkThdsZabwrvSBdIdzaX2H6j4kbcbHlX86Enzq9IK-Y2zpqCliaGC8ekgZyi2dYF6J2WftA0Fh9_LuEmN84hmLZsHM7I4nSAuwQ4ZPT3UIBcU');">
+                        <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <section class="relative hero-pattern pt-20 pb-24 overflow-hidden">
+            <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <div
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a0b36] border border-[#3c1e6e] mb-8">
+                    <span class="material-symbols-outlined text-[#00f0ff] text-sm">psychology</span>
+                    <span class="text-sm font-medium text-[#b4a5d8]">Intelligently Connecting Food & People</span>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+                    Your AI-Powered Portal to <br class="hidden md:block" />
+                    <span class="gradient-text">Comforting Flavors</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-[#b4a5d8] max-w-3xl mx-auto mb-10 leading-relaxed">
+                    At ZipZapZoi Eats, we don't just deliver food. We orchestrate a seamless, predictable, and
+                    hyper-personalized culinary journey from the kitchen to your doorstep.
+                </p>
+            </div>
+
+            <!-- Decorative elements -->
+            <div class="absolute top-1/4 left-10 w-32 h-32 bg-[#00f0ff]/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-1/4 right-10 w-48 h-48 bg-[#ff00ff]/10 rounded-full blur-3xl"></div>
+        </section>
+
+        <!-- Key Pillars Section -->
+        <section class="py-20 border-t border-[#3c1e6e]/30 bg-[#0a0314]/50">
+            <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Our <span class="text-[#00f0ff]">Core Pillars</span>
+                    </h2>
+                    <p class="text-[#b4a5d8] max-w-2xl mx-auto">The foundational principles that drive our innovation
+                        and ensure a top-tier experience for every user in our ecosystem.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+                    <!-- Pillar 1 -->
+                    <div class="card-bg p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 group">
+                        <div
+                            class="w-14 h-14 rounded-xl bg-[#00f0ff]/10 text-[#00f0ff] flex items-center justify-center mb-6 border border-[#00f0ff]/30 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl">auto_awesome</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-white">AI-Driven Curation</h3>
+                        <p class="text-[#b4a5d8] text-sm leading-relaxed">
+                            Our advanced algorithms learn your taste profile over time, offering hyper-personalized
+                            restaurant and dish recommendations that hit the spot every time.
+                        </p>
+                    </div>
+
+                    <!-- Pillar 2 -->
+                    <div class="card-bg p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 group">
+                        <div
+                            class="w-14 h-14 rounded-xl bg-[#ff00ff]/10 text-[#ff00ff] flex items-center justify-center mb-6 border border-[#ff00ff]/30 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl">rocket_launch</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-white">Lightning Fast</h3>
+                        <p class="text-[#b4a5d8] text-sm leading-relaxed">
+                            Real-time traffic analysis and predictive dispatching ensure that your food arrives hot and
+                            fresh, precisely when we estimate it will.
+                        </p>
+                    </div>
+
+                    <!-- Pillar 3 -->
+                    <div class="card-bg p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 group">
+                        <div
+                            class="w-14 h-14 rounded-xl bg-[#00ff00]/10 text-[#00ff00] flex items-center justify-center mb-6 border border-[#00ff00]/30 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl">storefront</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-white">Empowering Locals</h3>
+                        <p class="text-[#b4a5d8] text-sm leading-relaxed">
+                            We provide robust analytics and growth tools to our restaurant partners, helping local
+                            businesses thrive in a digital-first economy.
+                        </p>
+                    </div>
+
+                    <!-- Pillar 4 -->
+                    <div class="card-bg p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 group">
+                        <div
+                            class="w-14 h-14 rounded-xl bg-[#ffff00]/10 text-[#ffff00] flex items-center justify-center mb-6 border border-[#ffff00]/30 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl">eco</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-white">Sustainable Ops</h3>
+                        <p class="text-[#b4a5d8] text-sm leading-relaxed">
+                            From route optimization that lowers emissions to promoting eco-friendly packaging options,
+                            we are committed to reducing our carbon footprint.
+                        </p>
+                    </div>
+
+                    <!-- Pillar 5 -->
+                    <div
+                        class="card-bg p-8 rounded-2xl hover:-translate-y-2 transition-transform duration-300 group md:col-span-2 lg:col-span-1">
+                        <div
+                            class="w-14 h-14 rounded-xl bg-[#ff8800]/10 text-[#ff8800] flex items-center justify-center mb-6 border border-[#ff8800]/30 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-3xl">point_of_sale</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-white">Integrated POS</h3>
+                        <p class="text-[#b4a5d8] text-sm leading-relaxed">
+                            A seamless, cloud-based Point of Sale system designed specifically for our restaurant
+                            partners to manage orders and inventory effortlessly.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Our Story Section -->
+        <section class="py-20 relative overflow-hidden">
+            <div
+                class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-10 mix-blend-luminosity">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#05010a] via-[#05010a]/80 to-[#05010a]"></div>
+
+            <div class="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <span class="text-[#00f0ff] font-medium tracking-widest uppercase text-sm mb-4 block">Our Origin</span>
+                <h2 class="text-3xl md:text-5xl font-bold mb-8">The Story of ZipZapZoi Eats</h2>
+
+                <div class="space-y-6 text-[#b4a5d8] text-lg leading-relaxed text-left md:text-center">
+                    <p>
+                        It started with a simple frustration: choosing what to eat was too complicated, and the delivery
+                        experience was too unpredictable. In 2023, a team of food enthusiasts and AI engineers came
+                        together to solve this problem.
+                    </p>
+                    <p>
+                        We envisioned a platform that didn't just list restaurants, but actively understood its users. A
+                        platform where the interface felt alive, intuitive, and remarkably fast.
+                    </p>
+                    <p>
+                        Today, ZipZapZoi Eats serves millions of customized meals daily across India. By bridging the
+                        gap between cutting-edge technology and local culinary arts, we are redefining convenience and
+                        elevating the everyday dining experience.
+                    </p>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 pt-12 border-t border-[#3c1e6e]/50">
+                    <div>
+                        <div class="text-4xl font-bold text-white mb-2">50K+</div>
+                        <div class="text-sm text-[#b4a5d8]">Partner Restaurants</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold text-white mb-2">2M+</div>
+                        <div class="text-sm text-[#b4a5d8]">Happy Customers</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold text-white mb-2">30m</div>
+                        <div class="text-sm text-[#b4a5d8]">Avg. Delivery Time</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold text-white mb-2">99%</div>
+                        <div class="text-sm text-[#b4a5d8]">Order Accuracy</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-24 border-t border-[#3c1e6e]/30">
+            <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                    <!-- Customer CTA -->
+                    <div class="card-bg p-10 rounded-3xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-8xl text-[#00f0ff]">restaurant</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-4">Hungry for more?</h3>
+                        <p class="text-[#b4a5d8] mb-8 pr-8">Explore thousands of top-rated restaurants and get your
+                            favorite meals delivered in a flash.</p>
+                        <a href="customer_restaurant_listing.html"
+                            class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#00f0ff] text-[#0a0314] font-bold hover:bg-white transition-colors duration-300">
+                            Order Now <span class="material-symbols-outlined ml-2 text-xl">arrow_right_alt</span>
+                        </a>
+                    </div>
+
+                    <!-- Restaurant CTA -->
+                    <div class="card-bg p-10 rounded-3xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-8xl text-[#ff00ff]">storefront</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-4">Grow your business</h3>
+                        <p class="text-[#b4a5d8] mb-8 pr-8">Reach millions of new customers and leverage our AI tools to
+                            optimize your operations.</p>
+                        <a href="restaurant pricing plans.html"
+                            class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-transparent border-2 border-[#ff00ff] text-[#ff00ff] font-bold hover:bg-[#ff00ff]/10 transition-colors duration-300">
+                            Partner With Us <span class="material-symbols-outlined ml-2 text-xl">trending_up</span>
+                        </a>
+                    </div>
+
+                    <!-- Driver CTA -->
+                    <div class="card-bg p-10 rounded-3xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-8xl text-[#00ff00]">two_wheeler</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-4">Be your own boss</h3>
+                        <p class="text-[#b4a5d8] mb-8 pr-8">Enjoy flexible hours, competitive earnings, and weekly
+                            payouts. Deliver smiles across the city.</p>
+                        <a href="delivery partner application.html"
+                            class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-transparent border-2 border-[#00ff00] text-[#00ff00] font-bold hover:bg-[#00ff00]/10 transition-colors duration-300">
+                            Ride With Us <span class="material-symbols-outlined ml-2 text-xl">local_shipping</span>
+                        </a>
+                    </div>
+
+                    <!-- POS CTA -->
+                    <div class="card-bg p-10 rounded-3xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-8xl text-[#ff8800]">point_of_sale</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-4">Upgrade your op</h3>
+                        <p class="text-[#b4a5d8] mb-8 pr-8">Get our dedicated POS system to streamline your operations
+                            and manage your entire restaurant from a single dashboard.</p>
+                        <a href="pos-signup.html"
+                            class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#ff8800]/20 border-2 border-[#ff8800] text-[#ffb84d] font-bold hover:bg-[#ff8800]/40 transition-colors duration-300">
+                            Get our POS <span class="material-symbols-outlined ml-2 text-xl">devices</span>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Unified Footer -->
+    <footer class="bg-[#0a0314] text-[#b4a5d8] border-t border-[#3c1e6e] mt-auto">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
+                <!-- Column 1: Brand -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span
+                            class="material-symbols-outlined text-[#00f0ff] text-2xl drop-shadow-[0_0_8px_currentColor]">bolt</span>
+                        <span class="font-bold text-xl text-white"
+                            style="font-family: 'Quicksand', sans-serif;">ZoiEats</span>
+                    </div>
+                    <p class="text-sm mb-4 text-[#b4a5d8]">
+                        Your AI-powered portal to the comforting flavors of India.
+                    </p>
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00ff00]/20 border border-[#00ff00]/30 shadow-md shadow-[#00ff00]/10">
+                        <span class="relative flex h-2 w-2">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff00] opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#00ff00]"></span>
+                        </span>
+                        <span class="text-xs font-mono font-medium text-[#00ff00]">AI System: OPTIMAL</span>
+                    </div>
+                </div>
+
+                <!-- Column 2: Explore ZoiEats -->
+                <div>
+                    <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Explore ZoiEats
+                    </h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a class="hover:text-[#00f0ff] transition-colors" href="promotions & offers.html">Offers &
+                                Promos</a></li>
+                        <li><a class="hover:text-[#00f0ff] transition-colors" href="feedback.html">Feedback Portal</a>
+                        </li>
+                        <li><a class="hover:text-[#00f0ff] transition-colors" href="customer support help.html">Customer
+                                Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Partner with Us -->
+                <div>
+                    <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Partner with Us
+                    </h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a class="hover:text-[#00f0ff] transition-colors"
+                                href="restaurant pricing plans.html">Add Restaurant</a></li>
+                        <li><a class="hover:text-[#00f0ff] transition-colors"
+                                href="delivery partner application.html">Ride with Us</a></li>
+                        <li><a class="hover:text-[#00f0ff] transition-colors" href="dev_hub.html">Developer APIs</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Company -->
+                <div>
+                    <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Company</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a class="hover:text-[#00f0ff] transition-colors" href="careerspage.html">Careers</a></li>
+                        <li><a class="hover:text-[#00f0ff] transition-colors" href="press & media kit.html">Press &
+                                Media</a></li>
+                        <li><a class="hover:text-[#00f0ff] transition-colors" href="about us.html">About Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-[#3c1e6e] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm">
+                    <span>© 2025 ZoiEats. All rights reserved.</span>
+                    <span class="hidden sm:inline-block text-[#3c1e6e]">|</span>
+                    <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms & Conditions</a>
+                    <a class="hover:text-white transition-colors" href="privacy policy.html">Privacy Policy</a>
+                    <a class="hover:text-white transition-colors" href="gst disclaimer.html">GST & Taxation</a>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-6 mt-6 md:mt-0">
+                    <div class="flex flex-col gap-2">
+                        <a href="mailto:reachus@zipzapzoi.in"
+                            class="text-sm hover:text-[#00f0ff] transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[16px]">mail</span> reachus@zipzapzoi.in
+                        </a>
+                        <a href="mailto:phanikumar@zipzapzoi.in"
+                            class="text-sm hover:text-[#00f0ff] transition-colors flex items-center gap-2 text-[#3c1e6e]/80">
+                            <span class="material-symbols-outlined text-[16px]">developer_mode</span>
+                            phanikumar@zipzapzoi.in
+                        </a>
+                    </div>
+                    <div class="flex gap-4 items-center">
+                        <a class="hover:text-white transition-colors text-lg" href="https://x.com/ZipZapZoi"
+                            target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                        <a class="hover:text-white transition-colors text-lg" href="https://www.youtube.com/@ZipZapZoi"
+                            target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                        <a class="hover:text-white transition-colors text-lg"
+                            href="https://www.instagram.com/zipzapzoi/" target="_blank" rel="noopener noreferrer"><i
+                                class="fa fa-instagram"></i></a>
+                        <a class="hover:text-white transition-colors text-lg"
+                            href="https://www.facebook.com/profile.php?id=61585106515522" target="_blank"
+                            rel="noopener noreferrer"><i class="fa fa-facebook"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+<script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_customer_engine.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>

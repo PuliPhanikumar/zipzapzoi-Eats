@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency SOS - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="hostel_shared.js"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        @keyframes sos-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+            }
+        }
+
+        .sos-btn {
+            animation: sos-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(236, 72, 153, 0.1));
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+            font-weight: 700;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Emergency SOS & Safety <span
+                        class="material-symbols-outlined text-red-500 text-3xl blink">emergency</span></h2>
+                <p class="text-gray-400 text-sm">Emergency alerts, safety compliance, fire drill logs, and emergency
+                    contacts.</p>
+            </div>
+            <div id="sos-status" class="glass-panel px-4 py-2 flex items-center gap-2"><span
+                    class="h-2 w-2 rounded-full bg-green-400"></span><span class="text-xs font-bold text-green-400">All
+                    Clear</span></div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-8 pb-24 space-y-6">
+            <!-- SOS BUTTON -->
+            <div class="glass-panel p-8 flex flex-col items-center text-center border-red-500/10">
+                <button onclick="triggerSOS()"
+                    class="sos-btn h-32 w-32 rounded-full bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center mb-4 hover:from-red-500 hover:to-red-700 transition-colors cursor-pointer shadow-[0_0_30px_rgba(239,68,68,0.3)]"><span
+                        class="material-symbols-outlined text-5xl text-white">emergency_share</span></button>
+                <h3 class="font-extrabold text-white text-xl mb-1">Emergency SOS</h3>
+                <p class="text-sm text-gray-400 max-w-md">Press the button to immediately alert the warden, owner, and
+                    security. SMS and push notifications will be sent to all emergency contacts.</p>
+            </div>
+
+            <!-- Emergency Contacts + Safety Status -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Emergency Contacts -->
+                <div class="glass-panel p-6 bouncy-card">
+                    <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                            class="material-symbols-outlined text-red-400 text-lg">contact_phone</span> Emergency
+                        Contacts</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3 p-3 bg-red-500/5 rounded-xl border border-red-500/10">
+                            <div class="h-10 w-10 rounded-full bg-red-500/20 flex items-center justify-center"><span
+                                    class="material-symbols-outlined text-red-400">local_police</span></div>
+                            <div class="flex-1">
+                                <p class="font-bold text-white text-sm">Whitefield Police Station</p>
+                                <p class="text-[10px] text-gray-400">Dial 100 • 080-2845-1234</p>
+                            </div><a href="tel:100"
+                                class="p-2 bg-red-500/10 rounded-lg text-red-400 hover:bg-red-500/20"><span
+                                    class="material-symbols-outlined text-lg">call</span></a>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-orange-500/5 rounded-xl border border-orange-500/10">
+                            <div class="h-10 w-10 rounded-full bg-orange-500/20 flex items-center justify-center"><span
+                                    class="material-symbols-outlined text-orange-400">local_fire_department</span></div>
+                            <div class="flex-1">
+                                <p class="font-bold text-white text-sm">Fire Department</p>
+                                <p class="text-[10px] text-gray-400">Dial 101 • 080-2222-0101</p>
+                            </div><a href="tel:101"
+                                class="p-2 bg-orange-500/10 rounded-lg text-orange-400 hover:bg-orange-500/20"><span
+                                    class="material-symbols-outlined text-lg">call</span></a>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                            <div class="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center"><span
+                                    class="material-symbols-outlined text-blue-400">local_hospital</span></div>
+                            <div class="flex-1">
+                                <p class="font-bold text-white text-sm">Manipal Hospital (Nearest)</p>
+                                <p class="text-[10px] text-gray-400">080-2502-3456 • 2 km away</p>
+                            </div><a href="tel:08025023456"
+                                class="p-2 bg-blue-500/10 rounded-lg text-blue-400 hover:bg-blue-500/20"><span
+                                    class="material-symbols-outlined text-lg">call</span></a>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-violet-500/5 rounded-xl border border-violet-500/10">
+                            <div class="h-10 w-10 rounded-full bg-violet-500/20 flex items-center justify-center"><span
+                                    class="material-symbols-outlined text-violet-400">person</span></div>
+                            <div class="flex-1">
+                                <p class="font-bold text-white text-sm">Hostel Owner — Phani Kumar</p>
+                                <p class="text-[10px] text-gray-400">+91 9876543210</p>
+                            </div><a href="tel:9876543210"
+                                class="p-2 bg-violet-500/10 rounded-lg text-violet-400 hover:bg-violet-500/20"><span
+                                    class="material-symbols-outlined text-lg">call</span></a>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-pink-500/5 rounded-xl border border-pink-500/10">
+                            <div class="h-10 w-10 rounded-full bg-pink-500/20 flex items-center justify-center"><span
+                                    class="material-symbols-outlined text-pink-400">shield_person</span></div>
+                            <div class="flex-1">
+                                <p class="font-bold text-white text-sm">Warden — Ramesh K.</p>
+                                <p class="text-[10px] text-gray-400">+91 9876001001</p>
+                            </div><a href="tel:9876001001"
+                                class="p-2 bg-pink-500/10 rounded-lg text-pink-400 hover:bg-pink-500/20"><span
+                                    class="material-symbols-outlined text-lg">call</span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Safety Compliance Checklist -->
+                <div class="glass-panel p-6 bouncy-card">
+                    <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                            class="material-symbols-outlined text-green-400 text-lg">verified_user</span> Safety
+                        Compliance Checklist</h3>
+                    <div class="space-y-3" id="checklist"></div>
+                    <div class="mt-4 p-3 bg-white/[0.03] rounded-xl text-center">
+                        <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Compliance Score</p>
+                        <p class="text-3xl font-extrabold text-green-400" id="compliance-score">0%</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fire Drill Log + Incident History -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Fire Drill Log -->
+                <div class="glass-panel p-0 overflow-hidden bouncy-card">
+                    <div class="p-4 border-b border-border flex items-center justify-between">
+                        <h3 class="font-bold text-white text-sm flex items-center gap-2"><span
+                                class="material-symbols-outlined text-orange-400 text-lg">local_fire_department</span>
+                            Fire Drill Log</h3><button onclick="logDrill()"
+                            class="text-xs font-bold text-orange-400 bg-orange-500/10 px-3 py-1.5 rounded-lg border border-orange-500/30 hover:bg-orange-500/20">+
+                            Log Drill</button>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Date</th>
+                                <th class="py-3 px-4">Duration</th>
+                                <th class="py-3 px-4">Participants</th>
+                                <th class="py-3 px-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="drill-tbody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Incident History -->
+                <div class="glass-panel p-0 overflow-hidden bouncy-card">
+                    <div class="p-4 border-b border-border">
+                        <h3 class="font-bold text-white text-sm flex items-center gap-2"><span
+                                class="material-symbols-outlined text-red-400 text-lg">history</span> Incident History
+                        </h3>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Incident</th>
+                                <th class="py-3 px-4">Type</th>
+                                <th class="py-3 px-4">Date</th>
+                                <th class="py-3 px-4">Resolved</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incident-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    const DRILLS = ZoiDB.get('fire_drills', [
+    { date: '2026-02-15', duration: '12 min', participants: 38, status: 'pass' },
+    { date: '2026-01-10', duration: '15 min', participants: 35, status: 'pass' },
+    { date: '2025-12-05', duration: '18 min', participants: 30, status: 'partial' },
+    { date: '2025-11-01', duration: '20 min', participants: 28, status: 'pass' },
+    ]);
+
+    const INCIDENTS = [
+    { name: 'Gas leak in kitchen', type: 'Gas', date: '2026-02-20', resolved: true },
+    { name: 'Electrical short circuit — Floor 2', type: 'Electrical', date: '2026-01-25', resolved: true },
+    { name: 'Hosteler fainted (low BP)', type: 'Medical', date: '2026-01-12', resolved: true },
+    { name: 'Minor fire in laundry room', type: 'Fire', date: '2025-11-18', resolved: true },
+    { name: 'Snake spotted in garden', type: 'Wildlife', date: '2025-10-05', resolved: true },
+    ];
+
+    const CHECKLIST = [
+    { item: 'Fire extinguishers inspected', checked: true },
+    { item: 'Emergency exit signs lit', checked: true },
+    { item: 'First aid kit stocked', checked: true },
+    { item: 'CCTV cameras operational', checked: true },
+    { item: 'Emergency exit routes clear', checked: true },
+    { item: 'Fire alarm system tested', checked: false },
+    { item: 'Emergency contact list updated', checked: true },
+    { item: 'Night guard on duty', checked: true },
+    ];
+
+    const TYPE_COLORS = { Gas: 'amber', Electrical: 'blue', Medical: 'pink', Fire: 'red', Wildlife: 'green' };
+
+    function renderDrills() {
+    document.getElementById('drill-tbody').innerHTML = DRILLS.map((d, i) => `<tr
+        class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+        <td class="py-3 px-4 text-white font-bold text-sm">${d.date}</td>
+        <td class="py-3 px-4 text-gray-300">${d.duration}</td>
+        <td class="py-3 px-4 text-gray-300">${d.participants} hostelers</td>
+        <td class="py-3 px-4">${d.status === 'pass' ? '<span
+                class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">✓ Pass</span>' : '<span
+                class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">⚠ Partial</span>'}</td>
+    </tr>`).join('');
+    }
+
+    function renderIncidents() {
+    document.getElementById('incident-tbody').innerHTML = INCIDENTS.map((inc, i) => {
+    const c = TYPE_COLORS[inc.type] || 'gray';
+    return `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+        <td class="py-3 px-4 text-white font-bold text-sm">${inc.name}</td>
+        <td class="py-3 px-4"><span
+                class="bg-${c}-500/20 text-${c}-400 px-2 py-0.5 rounded text-[10px] font-bold">${inc.type}</span></td>
+        <td class="py-3 px-4 text-gray-400 text-xs">${inc.date}</td>
+        <td class="py-3 px-4">${inc.resolved ? '<span
+                class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">✓ Resolved</span>' :
+            '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">Open</span>'}</td>
+    </tr>`;
+    }).join('');
+    }
+
+    function renderChecklist() {
+    document.getElementById('checklist').innerHTML = CHECKLIST.map((c, i) => `<div
+        class="flex items-center gap-3 p-3 bg-white/[0.03] rounded-xl cursor-pointer hover:bg-white/[0.05] transition-colors"
+        onclick="toggleCheck(${i})">
+        <div
+            class="h-6 w-6 rounded-md ${c.checked ? 'bg-green-500/20 border-green-500/40' : 'bg-white/10 border-white/10'} border flex items-center justify-center">
+            <span
+                class="material-symbols-outlined text-sm ${c.checked ? 'text-green-400' : 'text-gray-500'}">${c.checked
+                ? 'check' : 'close'}</span>
+        </div>
+        <span class="text-sm ${c.checked ? 'text-white' : 'text-gray-400'}">${c.item}</span>
+    </div>`).join('');
+    const score = Math.round((CHECKLIST.filter(c => c.checked).length / CHECKLIST.length) * 100);
+    document.getElementById('compliance-score').innerText = score + '%';
+    document.getElementById('compliance-score').className = `text-3xl font-extrabold ${score >= 80 ? 'text-green-400' :
+    score >= 50 ? 'text-amber-400' : 'text-red-400'}`;
+    }
+
+    function toggleCheck(i) { CHECKLIST[i].checked = !CHECKLIST[i].checked; renderChecklist(); }
+
+    function triggerSOS() {
+    document.getElementById('sos-status').innerHTML = '<span class="h-2 w-2 rounded-full bg-red-500 blink"></span><span
+        class="text-xs font-bold text-red-400 blink">🚨 SOS ACTIVE</span>';
+    showToast('🚨 EMERGENCY SOS TRIGGERED! SMS & Push notifications sent to contacts. Help is on the way!', 'error');
+    setTimeout(() => {
+    document.getElementById('sos-status').innerHTML = '<span class="h-2 w-2 rounded-full bg-green-400"></span><span
+        class="text-xs font-bold text-green-400">All Clear</span>';
+    }, 10000);
+    }
+
+    function logDrill() {
+    DRILLS.unshift({ date: new Date().toISOString().split('T')[0], duration: '— min', participants: 42, status: 'pass'
+    });
+    ZoiDB.set('fire_drills', DRILLS);
+    renderDrills();
+    showToast('🔥 Fire drill logged for today!', 'success');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => { renderDrills(); renderIncidents(); renderChecklist(); });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

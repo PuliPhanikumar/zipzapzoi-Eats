@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Eats - Promotions &amp; Offers</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0ff",
+                        "primary-hover": "#00d7e6",
+                        "background-light": "#f7f5f8",
+                        "background-dark": "#0a0314",
+                        "card-dark": "#1a0b36",
+                        "border-dark": "#3c1e6e",
+                        "surface-dark": "#1a0b36",
+                        "surface-light": "#ffffff",
+                        "text-secondary": "#b4a5d8",
+                        "neon-pink": "#ff00ff",
+                        "neon-green": "#00ff00",
+                        "neon-yellow": "#ffff00"
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Nunito", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        /* Custom scrollbar for chips */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="bg-[#0a0314] font-display text-white antialiased">
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+        <!-- Top Navigation Bar -->
+        <header class="sticky top-0 z-50 bg-[#0a0314]/80 backdrop-blur-md border-b border-[#3c1e6e]/50">
+            <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity shrink-0">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-[#00f0ff] flex items-center justify-center text-[#0a0314] shadow-lg shadow-[#00f0ff]/50">
+                            <span class="material-symbols-outlined text-xl">bolt</span>
+                        </div>
+                        <span class="font-bold text-xl tracking-tight hidden sm:block text-white"
+                            style="font-family: 'Quicksand', sans-serif;">Zoi<span
+                                class="text-[#00f0ff]">Eats</span></span>
+                    </a>
+
+                    <div class="hidden xl:flex items-center gap-6">
+                        <a class="text-sm font-bold text-[#ffff00] hover:text-white transition-colors flex items-center gap-1"
+                            href="promotions & offers.html">
+                            <span class="material-symbols-outlined text-sm">local_offer</span> Offers & Deals
+                        </a>
+
+                        <div class="hidden xl:flex items-center gap-6">
+                            <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                                href="customer_restaurant_listing.html">Restaurants</a>
+                            <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                                href="feedback.html">Feedback</a>
+                            <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                                href="customer support help.html">Support</a>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 sm:gap-4">
+
+                        <a href="restaurant pricing plans.html"
+                            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#ff00ff]/50 hover:bg-[#ff00ff]/10 transition-all group">
+                            <span
+                                class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#ff00ff] transition-colors">store</span>
+                            <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Add
+                                Restaurant</span>
+                        </a>
+
+                        <a href="delivery partner application.html"
+                            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#00ff00]/50 hover:bg-[#00ff00]/10 transition-all group">
+                            <span
+                                class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#00ff00] transition-colors">two_wheeler</span>
+                            <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Ride
+                                with Us</span>
+                        </a>
+
+                        <button
+                            class="hidden sm:flex items-center gap-2 bg-[#1a0b36] px-3 py-1.5 rounded-full border border-[#3c1e6e]/50 shadow-inner shadow-[#00f0ff]/5 cursor-pointer hover:border-[#00ff00]/50 transition-colors group">
+                            <span
+                                class="material-symbols-outlined text-[#00ff00] text-sm group-hover:animate-bounce">location_on</span>
+                            <span class="text-xs font-medium text-[#b4a5d8]">Bengaluru</span>
+                        </button>
+
+                        <a href="shopping_cart.html"
+                            class="relative p-2 rounded-full hover:bg-[#1a0b36] transition-colors group">
+                            <span
+                                class="material-symbols-outlined text-[#00f0ff] group-hover:text-white transition-colors">shopping_cart</span>
+                            <span class="zoi-cart-badge absolute top-1 right-1 min-w-[16px] h-4 bg-[#ff00ff] text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse hidden">0</span>
+                        </a>
+
+                        <a href="login & registration.html"
+                            class="w-9 h-9 rounded-full bg-cover bg-center border-2 border-[#00f0ff]/50 ring-2 ring-[#00f0ff]/30 cursor-pointer shadow-lg hover:ring-[#ff00ff] transition-all group overflow-hidden relative"
+                            data-alt="User profile"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBT6tCKI45lIHrDLxsyuh-TDPmobyPeVU6AyG7iM4HJzbXt4FAgaDQwWFcZnvtqXNR2v3lDATirSitKZgMb_FnrCII5JPdAZBxC-dcoHwPte4HShdkJMCfiA4IDkriDys7wgNvhhqh9d7SijAKyWm5ODFazB5xCczQkThdsZabwrvSBdIdzaX2H6j4kbcbHlX86Enzq9IK-Y2zpqCliaGC8ekgZyi2dYF6J2WftA0Fh9_LuEmN84hmLZsHM7I4nSAuwQ4ZPT3UIBcU');">
+                            <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors">
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="flex-1 w-full max-w-[1200px] mx-auto px-4 py-6 lg:px-8">
+            <!-- Savings Gamification Badge -->
+            <div
+                class="mb-6 flex w-full items-center justify-between rounded-xl bg-gradient-to-r from-emerald-900 to-[#0a0314] p-4 border border-emerald-800/50 shadow-lg">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400">
+                        <span class="material-symbols-outlined">savings</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-emerald-200">Total Savings This Month</p>
+                        <p class="text-xl font-bold text-white">₹450.00</p>
+                    </div>
+                </div>
+                <div class="hidden sm:block">
+                    <a href="customer_orders history.html"
+                        class=" font-bold text-emerald-400 hover:text-emerald-300 transition-colors">View History →</a>
+                </div>
+            </div>
+            <!-- Hero Section -->
+            <div class="@container mb-10">
+                <div class="flex min-h-[400px] flex-col gap-6 rounded-2xl bg-cover bg-center bg-no-repeat p-8 shadow-2xl items-start justify-end transition-transform hover:scale-[1.01] duration-500"
+                    data-alt="Delicious spread of indian food with dark overlay"
+                    style='background-image: linear-gradient(rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCF3eHZNb0erB0c04KP5PToJhj88IEV9S-ode9lV0RxqJIO28vHF2Exf5z_TQ7Yto0hkLWk2GcWHu-1_urTpJXZgihHSsNKIJmzlFsvkR23lS5Ml_2_pRyOXOdpnZbFNPnrNyHLNNBtU7Y5t-PrTJjZvdPZ4-e5i457TPmJsPgRzEtG7x6YX5SQpct0QvTOvaPCKZd2FsWJ2W2gMvTSzwMc0B46rVrNdtLNDuzVpOsXbYPIjQgTU264_4tcqWzZ30Ynwt1Win5DpmQ");'>
+                    <div class="flex flex-col gap-2 text-left max-w-2xl">
+                        <div
+                            class="inline-flex w-fit items-center rounded-md bg-red-600/90 px-2 py-1 text-xs font-bold uppercase tracking-wide text-white mb-2 backdrop-blur-sm">
+                            <span class="material-symbols-outlined text-sm mr-1">timer</span> Ends in 02:45:00
+                        </div>
+                        <h1
+                            class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[600px]:text-6xl drop-shadow-lg">
+                            Mega Monsoon Sale: <span class="text-primary">50% OFF</span>
+                        </h1>
+                        <h2 class="text-gray-200 text-lg font-medium leading-normal max-w-lg drop-shadow-md">
+                            Rainy cravings? We got you. Use code <span
+                                class="text-white font-bold bg-white/10 px-1 rounded">ZIPZAP60</span> on your first 3
+                            orders. Valid until Sunday.
+                        </h2>
+                    </div>
+                    <div class="flex gap-4">
+                        <a href="customer_restaurant_listing.html"
+                            class="flex min-w-[140px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-primary text-[#0a0314] text-base font-bold tracking-[0.015em] hover:bg-[#00d7e6] transition-colors shadow-lg shadow-primary/30">
+                            Order Now
+                        </a>
+                        <a href="terms&conditions.html"
+                            class="flex min-w-[140px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-white/10 backdrop-blur-md text-white border border-white/20 text-base font-bold tracking-[0.015em] hover:bg-white/20 transition-colors">
+                            View T&amp;C
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Chips Filters -->
+            <div
+                class="sticky top-[72px] z-40 -mx-4 mb-8 bg-[#0a0314]/95 px-4 py-3 backdrop-blur-sm lg:mx-0 lg:px-0 lg:bg-transparent lg:backdrop-blur-none border-b border-white/5 lg:border-none">
+                <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-1" id="filter-chips">
+                    <button data-filter="all"
+                        class="filter-chip active group flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary pl-5 pr-5 shadow-lg shadow-primary/20 transition-all">
+                        <span class="text-[#0a0314] text-sm font-bold">All Deals</span>
+                    </button>
+                    <button data-filter="recommended"
+                        class="filter-chip group flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-dark border border-white/10 pl-5 pr-5 hover:border-primary transition-all">
+                        <span class="material-symbols-outlined text-[18px] text-purple-400">auto_awesome</span>
+                        <span class="text-gray-200 text-sm font-medium group-hover:text-primary">Recommended</span>
+                    </button>
+                    <button data-filter="bank"
+                        class="filter-chip group flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-dark border border-white/10 pl-5 pr-5 hover:border-primary transition-all">
+                        <span class="material-symbols-outlined text-[18px] text-blue-400">account_balance_wallet</span>
+                        <span class="text-gray-200 text-sm font-medium group-hover:text-primary">Bank Offers</span>
+                    </button>
+                    <button data-filter="steal"
+                        class="filter-chip group flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-dark border border-white/10 pl-5 pr-5 hover:border-primary transition-all">
+                        <span class="material-symbols-outlined text-[18px] text-green-400">local_offer</span>
+                        <span class="text-gray-200 text-sm font-medium group-hover:text-primary">Steal Deals</span>
+                    </button>
+                    <button data-filter="bogo"
+                        class="filter-chip group flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-dark border border-white/10 pl-5 pr-5 hover:border-primary transition-all">
+                        <span class="text-gray-200 text-sm font-medium group-hover:text-primary">BOGO</span>
+                    </button>
+                    <button data-filter="healthy"
+                        class="filter-chip group flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-surface-dark border border-white/10 pl-5 pr-5 hover:border-primary transition-all">
+                        <span class="text-gray-200 text-sm font-medium group-hover:text-primary">Healthy Eats</span>
+                    </button>
+                </div>
+            </div>
+            <!-- AI Recommended Section -->
+            <section class="mb-12" id="section-recommended" data-category="recommended">
+                <div class="flex items-center gap-3 mb-6">
+                    <h2 class="text-[22px] font-bold leading-tight tracking-[-0.015em] dark:text-white">Recommended for
+                        You</h2>
+                    <span
+                        class="inline-flex items-center rounded bg-purple-500/20 px-2 py-0.5 text-xs font-bold text-purple-300 border border-purple-500/30">
+                        <span class="material-symbols-outlined text-[14px] mr-1">smart_toy</span> AI Pick
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Coupon Card 1 -->
+                    <div
+                        class="group relative flex overflow-hidden rounded-xl bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/5 hover:border-primary/50 transition-all shadow-sm hover:shadow-lg dark:shadow-none">
+                        <div
+                            class="absolute left-0 top-0 z-10 rounded-br-lg bg-blue-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+                            Top Pick
+                        </div>
+                        <div class="w-1/3 shrink-0 bg-gray-200 dark:bg-gray-800">
+                            <img class="h-full w-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                                data-alt="Plate of Biryani"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeFvp7Xo6XCw4NgMzdVgtvXOD7giGCfZ1z69to3WNfcs9v2_Tval1XwAUv0Tvsq_5tuvNZtQ--Um6vkcam-nBjgLy1IpOzddErt1dbifk4B2cN1jG6fHaLYSyFBy1tVtfUjLv1MEjhs2vnFk72IGb6h1R9_iH0qIgRssVhUZrBdx1j40Ie6Q76F5OIu_YYCsHimmNfz99nNs04zWg0uvAlD4yfRegZ5lkR4t1owgRCC-fwql_Dk1m4vQxAWMMq8wTOVSJr8WITYdk" />
+                        </div>
+                        <div class="relative flex flex-1 flex-col justify-between p-4">
+                            <!-- AI Context -->
+                            <div class="mb-2 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                                <span class="material-symbols-outlined text-[14px]">history</span>
+                                Because you ordered Biryani
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-black text-gray-900 dark:text-white">FLAT ₹150 OFF</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">On Behrouz Biryani orders above ₹499
+                                </p>
+                            </div>
+                            <div
+                                class="mt-4 flex items-center justify-between gap-3 border-t border-dashed border-gray-300 dark:border-white/10 pt-3">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-semibold uppercase text-gray-400">Code</span>
+                                    <span
+                                        class="font-mono text-sm font-bold text-primary tracking-wide">BIRYANILOVE</span>
+                                </div>
+                                <button
+                                    class="rounded-lg bg-primary/10 hover:bg-primary px-4 py-2 text-sm font-bold text-primary hover:text-[#0a0314] transition-colors">
+                                    Apply
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Decorative circles for coupon effect -->
+                        <div
+                            class="absolute -bottom-2 left-[31%] h-4 w-4 rounded-full bg-background-light dark:bg-background-dark">
+                        </div>
+                        <div
+                            class="absolute -top-2 left-[31%] h-4 w-4 rounded-full bg-background-light dark:bg-background-dark">
+                        </div>
+                    </div>
+                    <!-- Coupon Card 2 -->
+                    <div
+                        class="group relative flex overflow-hidden rounded-xl bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/5 hover:border-primary/50 transition-all shadow-sm hover:shadow-lg dark:shadow-none">
+                        <div class="w-1/3 shrink-0 bg-gray-200 dark:bg-gray-800">
+                            <img class="h-full w-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                                data-alt="Cheesy Pizza"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaR1RuJwdqP_oPi1iW2k9W_gbfI3BWxf0NJ0kStvACepSfYBKRIipQ9p4e5YnazAl9IotkE0y-7KHeBF7JZn6Rz_xiPZtOBivyi-HmZUSl8iNRWERmp_LmxffWZWJGTnD3XUtPEvThgEE_7OjlgBp2isGbVDdagdlBlbrGG9HYBtUPXrA0vYg-coRmLgITWov6eXs6Ny0Ow1uEI8Rkni03IyivC60JI01mTnPxtUjM2nr36hKwmKdrW_HPhBaq6bedn-muOK4e7vE" />
+                        </div>
+                        <div class="relative flex flex-1 flex-col justify-between p-4">
+                            <!-- AI Context -->
+                            <div class="mb-2 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                                <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                Perfect for Friday Night
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-black text-gray-900 dark:text-white">FREE GARLIC BREAD</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">With any Medium or Large Pizza</p>
+                            </div>
+                            <div
+                                class="mt-4 flex items-center justify-between gap-3 border-t border-dashed border-gray-300 dark:border-white/10 pt-3">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-semibold uppercase text-gray-400">Code</span>
+                                    <span
+                                        class="font-mono text-sm font-bold text-primary tracking-wide">CHEESYFRI</span>
+                                </div>
+                                <button
+                                    class="rounded-lg bg-primary/10 hover:bg-primary px-4 py-2 text-sm font-bold text-primary hover:text-[#0a0314] transition-colors">
+                                    Apply
+                                </button>
+                            </div>
+                        </div>
+                        <div
+                            class="absolute -bottom-2 left-[31%] h-4 w-4 rounded-full bg-background-light dark:bg-background-dark">
+                        </div>
+                        <div
+                            class="absolute -top-2 left-[31%] h-4 w-4 rounded-full bg-background-light dark:bg-background-dark">
+                        </div>
+                    </div>
+                    <!-- Coupon Card 3 -->
+                    <div
+                        class="group relative flex overflow-hidden rounded-xl bg-white dark:bg-surface-dark border border-gray-200 dark:border-white/5 hover:border-primary/50 transition-all shadow-sm hover:shadow-lg dark:shadow-none">
+                        <div class="w-1/3 shrink-0 bg-gray-200 dark:bg-gray-800">
+                            <img class="h-full w-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                                data-alt="Burger and Fries"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9ZTn1RDzoqMRH6rqrPeIIFnG-EpvsOF5WjkUmQgGhOIobkQ0Xip2ANy2ePK7UVNJGU71y7O1GkYp0cWI-rSAsKR5cwYr0gBFxAKD5vitieP8mRd4sNqNmymS6YNjmJF3BMBd2vWL5K0KxgIxRK2Q8DLKmgZngRI8MFVSh3YYto8ELGZtJTDuj-KA0M8q6TZtnLVRAh4JN70os2ONtHsglZ-dqtdnntSo42X-MyLGkvLtTMrQXiTTIo96VUplLhl8ctCA_FSpdzJQ" />
+                        </div>
+                        <div class="relative flex flex-1 flex-col justify-between p-4">
+                            <!-- AI Context -->
+                            <div class="mb-2 flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+                                <span class="material-symbols-outlined text-[14px]">trending_up</span>
+                                Trending in your area
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-black text-gray-900 dark:text-white">20% CASHBACK</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">On all Burger King orders</p>
+                            </div>
+                            <div
+                                class="mt-4 flex items-center justify-between gap-3 border-t border-dashed border-gray-300 dark:border-white/10 pt-3">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-semibold uppercase text-gray-400">Code</span>
+                                    <span class="font-mono text-sm font-bold text-primary tracking-wide">KING20</span>
+                                </div>
+                                <button
+                                    class="rounded-lg bg-primary/10 hover:bg-primary px-4 py-2 text-sm font-bold text-primary hover:text-[#0a0314] transition-colors">
+                                    Apply
+                                </button>
+                            </div>
+                        </div>
+                        <div
+                            class="absolute -bottom-2 left-[31%] h-4 w-4 rounded-full bg-background-light dark:bg-background-dark">
+                        </div>
+                        <div
+                            class="absolute -top-2 left-[31%] h-4 w-4 rounded-full bg-background-light dark:bg-background-dark">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Bank & Wallet Offers -->
+            <section class="mb-12" id="section-bank" data-category="bank">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-[22px] font-bold leading-tight tracking-[-0.015em] dark:text-white">Bank &amp;
+                        Wallet Offers</h2>
+                    <a class="text-sm font-medium text-primary hover:underline" href="#">View All</a>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Bank Card 1 -->
+                    <div
+                        class="flex flex-col rounded-xl bg-gradient-to-br from-blue-900 to-blue-950 border border-blue-800 p-5 shadow-lg relative overflow-hidden group cursor-pointer">
+                        <div
+                            class="absolute -right-4 -top-4 size-24 rounded-full bg-blue-500/10 transition-transform group-hover:scale-150">
+                        </div>
+                        <div class="mb-4 size-10 rounded-full bg-white flex items-center justify-center p-1">
+                            <img alt="SBI Logo" class="h-full w-full object-contain" data-alt="SBI Bank Logo"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVCf1ZHJH5msSTuEO7khK1pEjpTGY8fK5MFd-wDOzWVy-yjwDQTHZ9aHEWqEGA4pFMFh2yCUoUCW06r5BpC9PAVXnpBarhOA0PpCO8bXyH7gFEy7_DUqkMWRAA1DL91md7Db3q4ynKPgVORHmQoWr5UbgnJYyy3pvHZDdCHUm95mxKd4vU_xCxrMvGLujpNQWSEI-D8a7DX3u5dbWitivIRHJD6eVXrwo5PWKs4s1ePqaCixG7j-9j5jOC1r1fgd1mHtpWZdoAKIk" />
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">15% Instant Off</h3>
+                        <p class="text-sm text-blue-200 mb-4">On SBI Credit Cards. Min order ₹500.</p>
+                        <div class="mt-auto flex items-center text-xs font-bold text-blue-300">
+                            NO CODE REQUIRED <span
+                                class="material-symbols-outlined ml-auto text-sm">arrow_forward</span>
+                        </div>
+                    </div>
+                    <!-- Bank Card 2 -->
+                    <div
+                        class="flex flex-col rounded-xl bg-gradient-to-br from-[#002f6c] to-[#001f4d] border border-gray-700 p-5 shadow-lg relative overflow-hidden group cursor-pointer">
+                        <div
+                            class="absolute -right-4 -top-4 size-24 rounded-full bg-white/5 transition-transform group-hover:scale-150">
+                        </div>
+                        <div class="mb-4 size-10 rounded-full bg-white flex items-center justify-center p-1">
+                            <img alt="Mastercard Logo" class="h-full w-full object-contain" data-alt="Mastercard Logo"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAivPI0uooKGhixV-kllTNAvTG_ETycPeUDlgwDD0P_Wd1wvhlT5HYQi6TCwYqOsBcYrkt_fSGeq7hJesb8KIc1W-FZwrGrffnEVa8ekJwXr1Xdgmliyw6VDzU65huItJ6D8lVDSSCCEgulIdDroAQoDY3VMLcRIhYYoL3XefDw9erw0BnwG9oTASSSnlt-yAF3rHxAXLzIODjkD_Q0Z1TLXcky7uoB-hMkkmTw1bHBJXWR-dXFvbpxTvKFiAIua-WfUBR6NEU8NS8" />
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">Flat ₹100 Off</h3>
+                        <p class="text-sm text-gray-300 mb-4">Using Mastercard World Elite cards.</p>
+                        <div class="mt-auto flex items-center text-xs font-bold text-gray-400">
+                            CODE: MASTER100 <span class="material-symbols-outlined ml-auto text-sm">arrow_forward</span>
+                        </div>
+                    </div>
+                    <!-- Wallet Card 3 -->
+                    <div
+                        class="flex flex-col rounded-xl bg-gradient-to-br from-indigo-800 to-indigo-950 border border-indigo-700 p-5 shadow-lg relative overflow-hidden group cursor-pointer">
+                        <div
+                            class="absolute -right-4 -top-4 size-24 rounded-full bg-indigo-500/10 transition-transform group-hover:scale-150">
+                        </div>
+                        <div class="mb-4 size-10 rounded-full bg-white flex items-center justify-center p-1">
+                            <span
+                                class="material-symbols-outlined text-indigo-700 text-2xl">account_balance_wallet</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">₹50 Cashback</h3>
+                        <p class="text-sm text-indigo-200 mb-4">On your first Paytm Wallet transaction.</p>
+                        <div class="mt-auto flex items-center text-xs font-bold text-indigo-300">
+                            AUTO APPLIED <span class="material-symbols-outlined ml-auto text-sm">arrow_forward</span>
+                        </div>
+                    </div>
+                    <!-- Bank Card 4 -->
+                    <div
+                        class="flex flex-col rounded-xl bg-gradient-to-br from-red-900 to-red-950 border border-red-800 p-5 shadow-lg relative overflow-hidden group cursor-pointer">
+                        <div
+                            class="absolute -right-4 -top-4 size-24 rounded-full bg-red-500/10 transition-transform group-hover:scale-150">
+                        </div>
+                        <div class="mb-4 size-10 rounded-full bg-white flex items-center justify-center p-1">
+                            <img alt="HDFC Logo" class="h-full w-full object-contain" data-alt="HDFC Bank Logo"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5MPT7DUNwq42gZ5LWSo5XzDXKC_V2EsMuRX4BiiGT3TraFBdj8qa-OLr3U0SUjXq4haLO31vmEsUcw6wimYGa5_azGsK5mbfAnn_zrVY7GLdNx0B2pXFQ7fQtXpSBPBHq0haJ7po0baNkBeTTZCStBQoOdNBNHIJ5mhv2hVgygTkXQd7Xnc8QSS0F4kIuY2vpIPjFdai_ksjx6x0uB4IFp7mIxAx5FwzdMpluYjsxeGXhAeB9RfflGcSzN5sbUmmKUzDc3wKahYw" />
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-1">5X Reward Points</h3>
+                        <p class="text-sm text-red-200 mb-4">On HDFC Diners Club cards this weekend.</p>
+                        <div class="mt-auto flex items-center text-xs font-bold text-red-300">
+                            KNOW MORE <span class="material-symbols-outlined ml-auto text-sm">arrow_forward</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Restaurant Specials -->
+            <section class="mb-20" id="section-restaurants" data-category="steal">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-[22px] font-bold leading-tight tracking-[-0.015em] dark:text-white">Restaurant
+                        Specials</h2>
+                    <div class="flex gap-2">
+                        <button
+                            class="size-8 flex items-center justify-center rounded-full border border-gray-600 bg-transparent text-gray-400 hover:text-white hover:border-white transition-colors">
+                            <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <button
+                            class="size-8 flex items-center justify-center rounded-full border border-gray-600 bg-transparent text-gray-400 hover:text-white hover:border-white transition-colors">
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <!-- Restaurant Card 1 -->
+                    <div class="group flex flex-col gap-3 cursor-pointer">
+                        <div class="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-800">
+                            <div
+                                class="absolute left-3 top-3 z-10 rounded bg-primary px-2 py-1 text-[10px] font-bold text-[#0a0314]">
+                                60% OFF
+                            </div>
+                            <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                data-alt="Juicy Burger"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwotfShftcZoIivNfStqksPZZJq3_P3kHjJfr0sCHXE5LTbhzLKkOA_OJCxgUgKZYUPlfb5ChZGTRAE0NzF2UOAfgyfdMA_gUNP4Wu8XHtleuLAuJbijfsQCeOsRPFZDGcbJOegIrnbxZmyaaAA5_YEiMQvAJKiFmL8qiYtr9YlebrmcuskgcTzoDjxt73HAa_rZzkodOnwJvL9RbeIsKI4RAH3O2h46Q2zOqtKkAetikJFfifqu_7hb8j6ODL-ZlrApYzVMajKyI" />
+                            <div
+                                class="absolute bottom-3 right-3 rounded-full bg-white px-2 py-1 text-xs font-bold text-black shadow-md flex items-center gap-1">
+                                4.2 <span
+                                    class="material-symbols-outlined text-[12px] text-green-600 fill-current">star</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-bold text-gray-900 dark:text-white truncate">Burger Singh</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 truncate">American, Fast Food</p>
+                            <p class="text-xs font-medium text-green-500 mt-1">Up to ₹120 off</p>
+                        </div>
+                    </div>
+                    <!-- Restaurant Card 2 -->
+                    <div class="group flex flex-col gap-3 cursor-pointer">
+                        <div class="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-800">
+                            <div
+                                class="absolute left-3 top-3 z-10 rounded bg-blue-500 px-2 py-1 text-[10px] font-bold text-white">
+                                BOGO
+                            </div>
+                            <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                data-alt="Chai and Samosa"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAl2Lb6xq-0tDopajUnW2cHR8TIOTEUEkV38RYgtmjKWnVYPl1BMsDLQhN4Ksp2NUT-4agVZt5PYoND8wd3RwRO0L4bcyWtMUa8NGLcPONnohVQmhmbDiiTSy-2pkTkTehFqwwZqD8gAe9a97PKQd1lpnBkVdpV2HW0wY3LGn-BEXUiBgtnTQJDb2hoJWYlrSxNBS6yDxaheWPuPtGoA0FCFOAxdJBYoPOaq3DTHr-j03pVm2WQAL04SHjxZmK7T9jfhxQOn9Tp-WQ" />
+                            <div
+                                class="absolute bottom-3 right-3 rounded-full bg-white px-2 py-1 text-xs font-bold text-black shadow-md flex items-center gap-1">
+                                4.5 <span
+                                    class="material-symbols-outlined text-[12px] text-green-600 fill-current">star</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-bold text-gray-900 dark:text-white truncate">Chaayos</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 truncate">Tea, Snacks, Indian</p>
+                            <p class="text-xs font-medium text-blue-400 mt-1">Buy 1 Get 1 Free</p>
+                        </div>
+                    </div>
+                    <!-- Restaurant Card 3 -->
+                    <div class="group flex flex-col gap-3 cursor-pointer">
+                        <div class="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-800">
+                            <div
+                                class="absolute left-3 top-3 z-10 rounded bg-primary px-2 py-1 text-[10px] font-bold text-[#0a0314]">
+                                FLAT ₹125
+                            </div>
+                            <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                data-alt="Pizza Slice"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcFzy8ypWPag0LqR7tByE-Rd1QZ8msimnZqKH__J7Uc8ThOUXGyNTglT1IEPkAHXnWjjp506LM9wHZq52PorzpU_31mS_BbuxNMC0s5rFV86554N1rnPLcKLyz8-OaCD0vRNSqp3ZpdDHMDwf3Pm9-ji68V7cqJfbOwSo6H98WXHYQIVX3gBCkZ5mUxqK5lp11gPryYNQZeAdiQbwjw6QN_axjT3V-C3obVgF2bSWGP1oBeTgl1E4X15BJVa3YCbIYTp3Mdj7003A" />
+                            <div
+                                class="absolute bottom-3 right-3 rounded-full bg-white px-2 py-1 text-xs font-bold text-black shadow-md flex items-center gap-1">
+                                3.9 <span
+                                    class="material-symbols-outlined text-[12px] text-green-600 fill-current">star</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-bold text-gray-900 dark:text-white truncate">La Pino'z Pizza</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 truncate">Pizza, Italian</p>
+                            <p class="text-xs font-medium text-green-500 mt-1">Flat deal on Large Pizza</p>
+                        </div>
+                    </div>
+                    <!-- Restaurant Card 4 -->
+                    <div class="group flex flex-col gap-3 cursor-pointer">
+                        <div class="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-800">
+                            <div
+                                class="absolute left-3 top-3 z-10 rounded bg-green-600 px-2 py-1 text-[10px] font-bold text-white">
+                                FREE DELIVERY
+                            </div>
+                            <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                data-alt="Bowl of Salad"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVX1p4LizdXBSi-G7E-HSf4qKSUMWeii6BCBJaHQ9xTW302LVviSxj2k4FCj76DpShWPlBLH3wYX09FPwgvbf7J2QPvIfIb0_WmcQZch6eRTzZB0U3c5Zdvl7bU5isn2uvrmd24yLA7FcpBScSzKL74bhUxHJ7Se_xQJzmoPNhiaCLNLTUi4qBmS6goXyzp65ptPK712gq762qd5h60-w37hdB60sDIKv88vuluk2AgoS1nw9xsTGbq4YzTvfykD8Prkg9aEbav2Q" />
+                            <div
+                                class="absolute bottom-3 right-3 rounded-full bg-white px-2 py-1 text-xs font-bold text-black shadow-md flex items-center gap-1">
+                                4.8 <span
+                                    class="material-symbols-outlined text-[12px] text-green-600 fill-current">star</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-bold text-gray-900 dark:text-white truncate">EatFit</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 truncate">Healthy, Salads, Thalis</p>
+                            <p class="text-xs font-medium text-green-500 mt-1">Free delivery above ₹200</p>
+                        </div>
+                    </div>
+                    <!-- Restaurant Card 5 -->
+                    <div class="group flex flex-col gap-3 cursor-pointer">
+                        <div class="relative aspect-square w-full overflow-hidden rounded-xl bg-gray-800">
+                            <div
+                                class="absolute left-3 top-3 z-10 rounded bg-primary px-2 py-1 text-[10px] font-bold text-[#0a0314]">
+                                50% OFF
+                            </div>
+                            <img class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                data-alt="Bowl of Ramen"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIF4lMWRHYMebghYQVYy7kpHU-Wrn3WnbVNVhGa1fyi08tqRx8LQHhswKcvxc24fJDbhVSKUB9sEG9UpRWH3dhzbFHfGujNC40_EfpB04oxdUcmO6L2MpLM9R4XgDeywKmFdjGqPdWRj_C0YLpgbuy9X90g1X7qhjYQ7zI32vJ_krvG6qRNZbnbE2unz52MBnEajFmQH2tX9m-Sui7XvZfJ8yImX_lFk13mVMTGP9X357kD1FrfnU5ZVDdUzdSi802DvZvQbPJLHA" />
+                            <div
+                                class="absolute bottom-3 right-3 rounded-full bg-white px-2 py-1 text-xs font-bold text-black shadow-md flex items-center gap-1">
+                                4.6 <span
+                                    class="material-symbols-outlined text-[12px] text-green-600 fill-current">star</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-bold text-gray-900 dark:text-white truncate">Mamagoto</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 truncate">Asian, Ramen, Sushi</p>
+                            <p class="text-xs font-medium text-green-500 mt-1">Deal of the day</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <footer class="bg-background-dark border-t border-border-dark mt-auto shadow-inner shadow-primary/5">
+            <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
+                    <!-- Column 1: Brand -->
+                    <div class="col-span-1 md:col-span-2">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span
+                                class="material-symbols-outlined text-primary text-2xl shadow-text-primary">bolt</span>
+                            <span class="font-display font-bold text-xl text-white">ZoiEats</span>
+                        </div>
+                        <p class="text-text-secondary text-sm mb-4">
+                            Your AI-powered portal to the comforting flavors of India.
+                        </p>
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-green/20 border border-neon-green/30 shadow-md shadow-neon-green/10">
+                            <span class="relative flex h-2 w-2">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-green opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-neon-green"></span>
+                            </span>
+                            <span class="text-xs font-mono font-medium text-neon-green">AI System: OPTIMAL</span>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Explore ZoiEats -->
+                    <div>
+                        <h4 class="text-white font-bold mb-4 font-display">Explore ZoiEats</h4>
+                        <ul class="space-y-2 text-sm text-text-secondary">
+                            <li><a class="hover:text-primary transition-colors" href="promotions & offers.html">Offers &
+                                    Promos</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="feedback.html">Feedback Portal</a>
+                            </li>
+                            <li><a class="hover:text-primary transition-colors"
+                                    href="customer support help.html">Customer Support</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Partner with Us -->
+                    <div>
+                        <h4 class="text-white font-bold mb-4 font-display">Partner with Us</h4>
+                        <ul class="space-y-2 text-sm text-text-secondary">
+                            <li><a class="hover:text-primary transition-colors"
+                                    href="restaurant pricing plans.html">Add Restaurant</a></li>
+                            <li><a class="hover:text-primary transition-colors"
+                                    href="delivery partner application.html">Ride with Us</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="dev_hub.html">Developer APIs</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Company -->
+                    <div>
+                        <h4 class="text-white font-bold mb-4 font-display">Company</h4>
+                        <ul class="space-y-2 text-sm text-text-secondary">
+                            <li><a class="hover:text-primary transition-colors" href="careerspage.html">Careers</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="press & media kit.html">Press &
+                                    Media</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="about us.html">About Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div
+                    class="border-t border-border-dark pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-text-secondary">
+                        <span>© 2025 ZoiEats. All rights reserved.</span>
+                        <span class="hidden sm:inline-block text-border-dark">|</span>
+                        <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms &
+                            Conditions</a>
+                        <a class="hover:text-white transition-colors" href="privacy policy.html">Privacy Policy</a>
+                        <a class="hover:text-white transition-colors" href="gst disclaimer.html">GST & Taxation</a>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-6 mt-6 md:mt-0">
+                        <div class="flex flex-col gap-2">
+                            <a href="mailto:reachus@zipzapzoi.in"
+                                class="text-sm hover:text-primary transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px]">mail</span> reachus@zipzapzoi.in
+                            </a>
+                            <a href="mailto:phanikumar@zipzapzoi.in"
+                                class="text-sm hover:text-primary transition-colors flex items-center gap-2 text-[#3c1e6e]/80">
+                                <span class="material-symbols-outlined text-[16px]">developer_mode</span>
+                                phanikumar@zipzapzoi.in
+                            </a>
+                        </div>
+                        <div class="flex gap-4 items-center">
+                            <a class="hover:text-white transition-colors text-lg" href="https://x.com/ZipZapZoi"
+                                target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                            <a class="hover:text-white transition-colors text-lg"
+                                href="https://www.youtube.com/@ZipZapZoi" target="_blank" rel="noopener noreferrer"><i
+                                    class="fa fa-youtube-play"></i></a>
+                            <a class="hover:text-white transition-colors text-lg"
+                                href="https://www.instagram.com/zipzapzoi/" target="_blank" rel="noopener noreferrer"><i
+                                    class="fa fa-instagram"></i></a>
+                            <a class="hover:text-white transition-colors text-lg"
+                                href="https://www.facebook.com/profile.php?id=61585106515522" target="_blank"
+                                rel="noopener noreferrer"><i class="fa fa-facebook"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+<script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+<script src="js/zoi_customer_engine.js"></script>
+    <script src="js/zoi_api.js"></script>
+<script src="js/zoi_ai_assistant.js?v=4"></script>
+<script>
+    // === PROMOTIONS PAGE INTERACTIVITY ===
+
+    // 1. COUNTDOWN TIMER
+    (function() {
+        const timerEl = document.querySelector('[class*="timer"]');
+        if (!timerEl) return;
+        const parentBadge = timerEl.closest('div');
+        if (!parentBadge) return;
+        let totalSeconds = 2 * 3600 + 45 * 60; // 2h 45m
+        function updateTimer() {
+            const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const s = String(totalSeconds % 60).padStart(2, '0');
+            parentBadge.innerHTML = '<span class="material-symbols-outlined text-sm mr-1">timer</span> Ends in ' + h + ':' + m + ':' + s;
+            if (totalSeconds > 0) totalSeconds--;
+        }
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    })();
+
+    // 2. APPLY COUPON BUTTONS
+    document.querySelectorAll('button').forEach(btn => {
+        if (btn.innerText.trim() === 'Apply') {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const codeEl = this.closest('div').querySelector('.font-mono');
+                if (!codeEl) return;
+                const code = codeEl.innerText.trim();
+                navigator.clipboard.writeText(code).then(() => {
+                    showToast('Coupon "' + code + '" copied! Apply it at checkout.', 'success');
+                    this.innerText = 'Copied!';
+                    this.classList.add('bg-green-600', 'text-white');
+                    setTimeout(() => { this.innerText = 'Apply'; this.classList.remove('bg-green-600', 'text-white'); }, 2000);
+                }).catch(() => {
+                    showToast('Code: ' + code + ' — copy it manually at checkout.', 'info');
+                });
+            });
+        }
+    });
+
+    // 3. TOAST NOTIFICATION
+    function showToast(msg, type) {
+        const existing = document.getElementById('promo-toast');
+        if (existing) existing.remove();
+        const colors = { success: 'bg-green-600', info: 'bg-blue-600', error: 'bg-red-600' };
+        const toast = document.createElement('div');
+        toast.id = 'promo-toast';
+        toast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-xl text-white text-sm font-bold shadow-2xl ' + (colors[type] || colors.info) + ' transition-all animate-bounce';
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.classList.remove('animate-bounce'); }, 600);
+        setTimeout(() => { toast.remove(); }, 3500);
+    }
+
+    // 4. FILTER CHIPS
+    const chips = document.querySelectorAll('.filter-chip');
+    const sections = document.querySelectorAll('section[data-category]');
+    chips.forEach(chip => {
+        chip.addEventListener('click', function() {
+            // Reset all chips
+            chips.forEach(c => {
+                c.classList.remove('bg-primary', 'shadow-lg', 'shadow-primary/20');
+                c.classList.add('bg-surface-dark', 'border', 'border-white/10');
+                const span = c.querySelector('span:last-child') || c.querySelector('span');
+                if (span) { span.classList.remove('text-[#0a0314]'); span.classList.add('text-gray-200'); }
+            });
+            // Activate clicked
+            this.classList.add('bg-primary', 'shadow-lg', 'shadow-primary/20');
+            this.classList.remove('bg-surface-dark', 'border', 'border-white/10');
+            const activeSpan = this.querySelector('span:last-child') || this.querySelector('span');
+            if (activeSpan) { activeSpan.classList.add('text-[#0a0314]'); activeSpan.classList.remove('text-gray-200'); }
+
+            const filter = this.dataset.filter;
+            if (filter === 'all') {
+                sections.forEach(s => s.style.display = '');
+            } else {
+                sections.forEach(s => {
+                    s.style.display = s.dataset.category === filter ? '' : 'none';
+                });
+            }
+        });
+    });
+
+    // 5. RESTAURANT SPECIALS - link cards to restaurant pages
+    const restCards = document.querySelectorAll('#section-restaurants .group.flex.flex-col.gap-3');
+    const restLinks = [
+        'restaurant_menu.html?id=110', // Burger Singh
+        'restaurant_menu.html?id=111', // Chaayos
+        'restaurant_menu.html?id=104', // La Pino'z Pizza
+        'restaurant_menu.html?id=112', // EatFit
+        'restaurant_menu.html?id=113'  // Mamagoto
+    ];
+    restCards.forEach((card, i) => {
+        card.addEventListener('click', () => {
+            window.location.href = restLinks[i] || 'customer_restaurant_listing.html';
+        });
+    });
+
+    // 6. CAROUSEL ARROWS for Restaurant Specials
+    const specGrid = document.querySelector('#section-restaurants .grid');
+    const [prevBtn, nextBtn] = document.querySelectorAll('#section-restaurants .flex.gap-2 button');
+    if (prevBtn && nextBtn && specGrid) {
+        // Convert grid to horizontal scroll on arrow click
+        specGrid.style.overflowX = 'auto';
+        specGrid.style.scrollBehavior = 'smooth';
+        specGrid.classList.add('hide-scrollbar');
+        prevBtn.addEventListener('click', () => specGrid.scrollBy({ left: -300, behavior: 'smooth' }));
+        nextBtn.addEventListener('click', () => specGrid.scrollBy({ left: 300, behavior: 'smooth' }));
+    }
+
+    // 7. BANK OFFER CARDS - click to show details
+    document.querySelectorAll('#section-bank .cursor-pointer').forEach(card => {
+        card.addEventListener('click', function() {
+            const title = this.querySelector('h3')?.innerText || '';
+            const desc = this.querySelector('p')?.innerText || '';
+            const code = this.querySelector('.font-bold:last-child')?.innerText?.replace('arrow_forward', '').trim() || '';
+            if (code.includes('NO CODE')) {
+                showToast(title + ' — Auto-applied at checkout!', 'success');
+            } else if (code.includes('CODE:')) {
+                const c = code.replace('CODE:', '').trim();
+                navigator.clipboard.writeText(c).then(() => showToast('Code "' + c + '" copied!', 'success'));
+            } else {
+                showToast(title + ' — ' + desc, 'info');
+            }
+        });
+    });
+
+    // 8. VIEW ALL link for Bank section
+    const viewAllLink = document.querySelector('#section-bank a[href="#"]');
+    if (viewAllLink) {
+        viewAllLink.href = 'customer_restaurant_listing.html';
+    }
+</script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>

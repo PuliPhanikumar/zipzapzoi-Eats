@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="description" content="ZipZapZoi Eats: Your AI-powered portal to the comforting flavors of India. Discover, order, and track authentic local food instantly.">
+    <meta name="keywords" content="food delivery, indian food, zipzapzoi, biryani, dosa, order food online">
+    <meta property="og:title" content="ZipZapZoi Eats">
+    <meta property="og:description" content="Discover authentic Indian food curated by AI. Fast delivery and real-time tracking.">
+    <meta name="theme-color" content="#00f0ff">
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081162.png">
+    <title>ZipZapZoi Eats: Authentic Indian Comforts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Nunito:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0ff",
+                        "primary-hover": "#00d7e6",
+                        "background-light": "#f7f5f8",
+                        "background-dark": "#0a0314",
+                        "card-dark": "#1a0b36",
+                        "border-dark": "#3c1e6e",
+                        "text-secondary": "#b4a5d8",
+                        "neon-pink": "#ff00ff",
+                        "neon-green": "#00ff00",
+                        "neon-yellow": "#ffff00",
+                    },
+                    fontFamily: {
+                        "display": ["Quicksand", "sans-serif"],
+                        "body": ["Nunito", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: "Nunito", sans-serif;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .font-display {
+            font-family: "Quicksand", "sans-serif";
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .quest-card-irregular {
+            clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
+            transform: rotate(-1deg);
+        }
+
+        .quest-card-irregular:nth-child(even) {
+            transform: rotate(1deg);
+        }
+
+        .discovery-zone-irregular {
+            clip-path: polygon(0% 10%, 100% 0%, 100% 90%, 0% 100%);
+        }
+
+        .pixel-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0gAAAAFElEQVQYV2NkwAIYFhUV/f8PJwADAgB36g4y9sY56AAAAABJRU5ErkJggg==');
+            background-size: 2px 2px;
+            opacity: 0.1;
+            mix-blend-mode: overlay;
+        }
+
+        .gradient-border-neon {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gradient-border-neon::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(45deg, var(--tw-gradient-stops));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        /* === 3D EFFECTS ENGINE === */
+        @keyframes float3D {
+
+            0%,
+            100% {
+                transform: translateY(0) rotateX(0deg);
+            }
+
+            25% {
+                transform: translateY(-8px) rotateX(2deg);
+            }
+
+            75% {
+                transform: translateY(4px) rotateX(-1deg);
+            }
+        }
+
+        .animate-float-3d {
+            animation: float3D 4s ease-in-out infinite;
+        }
+
+        .card-3d {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .card-3d-inner {
+            transition: transform 0.5s cubic-bezier(.25, .46, .45, .94), box-shadow 0.5s ease;
+            transform-style: preserve-3d;
+        }
+
+        .card-3d:hover .card-3d-inner {
+            transform: translateZ(20px) rotateY(-3deg) rotateX(2deg);
+            box-shadow: 20px 20px 60px rgba(0, 0, 0, 0.4), -5px -5px 20px rgba(0, 240, 255, 0.1);
+        }
+
+        .category-3d {
+            perspective: 600px;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .category-3d:hover {
+            transform: rotateY(15deg) rotateX(-5deg) translateZ(10px) scale(1.05);
+            box-shadow: 10px 10px 30px rgba(0, 240, 255, 0.2), 0 0 40px rgba(124, 58, 237, 0.15);
+        }
+
+        @keyframes neonPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), 0 0 60px rgba(255, 0, 255, 0.1);
+            }
+
+            50% {
+                box-shadow: 0 0 40px rgba(0, 240, 255, 0.5), 0 0 80px rgba(255, 0, 255, 0.25), inset 0 0 30px rgba(0, 240, 255, 0.05);
+            }
+        }
+
+        .neon-pulse-glow {
+            animation: neonPulse 3s ease-in-out infinite;
+        }
+
+        .search-3d {
+            transition: transform 0.4s cubic-bezier(.34, 1.56, .64, 1), box-shadow 0.4s ease;
+        }
+
+        .search-3d:focus-within {
+            transform: perspective(1000px) rotateX(2deg) translateY(-4px) scale(1.02);
+            box-shadow: 0 16px 50px rgba(0, 240, 255, 0.3), 0 0 0 2px rgba(255, 0, 255, 0.4);
+        }
+
+        .parallax-card {
+            transition: transform 0.6s cubic-bezier(.25, .46, .45, .94), box-shadow 0.4s ease;
+        }
+
+        .parallax-card:hover {
+            transform: scale(1.04) translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 240, 255, 0.15);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-gray-900 dark:text-white min-h-screen flex flex-col overflow-x-hidden">
+
+    <header class="sticky top-0 z-50 bg-[#0a0314]/80 backdrop-blur-md border-b border-[#3c1e6e]/50">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity shrink-0">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-[#00f0ff] flex items-center justify-center text-[#0a0314] shadow-lg shadow-[#00f0ff]/50">
+                        <span class="material-symbols-outlined text-xl">bolt</span>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight hidden sm:block text-white"
+                        style="font-family: 'Quicksand', sans-serif;">Zoi<span class="text-[#00f0ff]">Eats</span></span>
+                </a>
+
+                <div class="hidden xl:flex items-center gap-6">
+                    <a class="text-sm font-bold text-[#ffff00] hover:text-white transition-colors flex items-center gap-1"
+                        href="promotions & offers.html">
+                        <span class="material-symbols-outlined text-sm">local_offer</span> Offers & Deals
+                    </a>
+
+                    <div class="hidden xl:flex items-center gap-6">
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="customer_restaurant_listing.html">Restaurants</a>
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="feedback.html">Feedback</a>
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="customer support help.html">Support</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 sm:gap-4">
+
+                    <a href="restaurant pricing plans.html"
+                        class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#ff00ff]/50 hover:bg-[#ff00ff]/10 transition-all group">
+                        <span
+                            class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#ff00ff] transition-colors">store</span>
+                        <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Add
+                            Restaurant</span>
+                    </a>
+
+                    <a href="delivery partner application.html"
+                        class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#00ff00]/50 hover:bg-[#00ff00]/10 transition-all group">
+                        <span
+                            class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#00ff00] transition-colors">two_wheeler</span>
+                        <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Ride
+                            with Us</span>
+                    </a>
+
+                    <button
+                        class="hidden sm:flex items-center gap-2 bg-[#1a0b36] px-3 py-1.5 rounded-full border border-[#3c1e6e]/50 shadow-inner shadow-[#00f0ff]/5 cursor-pointer hover:border-[#00ff00]/50 transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-[#00ff00] text-sm group-hover:animate-bounce">location_on</span>
+                        <span class="text-xs font-medium text-[#b4a5d8]">Bengaluru</span>
+                    </button>
+
+                    <a href="shopping_cart.html"
+                        class="relative p-2 rounded-full hover:bg-[#1a0b36] transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-[#00f0ff] group-hover:text-white transition-colors">shopping_cart</span>
+                        <span id="cart-badge" class="zoi-cart-badge absolute top-1 right-1 min-w-[16px] h-4 bg-[#ff00ff] text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse hidden">0</span>
+                    </a>
+
+                    <a id="user-avatar-link" href="login & registration.html"
+                        class="w-9 h-9 rounded-full border-2 border-[#00f0ff]/50 ring-2 ring-[#00f0ff]/30 cursor-pointer shadow-lg hover:ring-[#ff00ff] transition-all overflow-hidden relative bg-[#1a0b36] flex items-center justify-center"
+                        data-alt="User profile">
+                        <span id="user-avatar-text" class="text-[#00f0ff] font-bold text-sm"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="flex-grow flex flex-col">
+        <section class="relative w-full overflow-hidden pb-20">
+            <div class="absolute inset-0 z-0"
+                style="background-image: linear-gradient(135deg, rgba(10, 3, 20, 0.95) 0%, rgba(26, 11, 54, 0.85) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuB8ydBLJhvGF_wDP3j4PYbn0hLDiskRtiyLF6_C85jy4q9JI_LbD14UOWrb-uRCb5TNXAFgAOaeicwihQ1CSQwewKww2Y0-70QO-DgGwM8DhM9FdjoXYQvakFL4i1IkD--0uwPIXn5yzvRq-P5kTUMoDIpSHs9NhNbyN-DWQYlt1iaci75WReGb8Q_Q3-GUD1H-Dz6c6V2hlXPCrxLf5DBQKRA2eBlLWCcjubSApjzIufayquUvetiettPoJiQohFMi9SlUL1zt-98'); background-size: cover; background-position: center;">
+                <div
+                    class="absolute inset-0 bg-[url('data:image/svg+xml;utf8,<svg width=\'100%\' height=\'100%\' xmlns=\'http://www.w3.org/2000/svg\'><defs><pattern id=\'smallGrid\' width=\'10\' height=\'10\' patternUnits=\'userSpaceOnUse\'><path d=\'M 10 0 L 0 0 L 0 10\' fill=\'none\' stroke=\'%233c1e6e\' stroke-width=\'0.5\'/></pattern><pattern id=\'grid\' width=\'100\' height=\'100\' patternUnits=\'userSpaceOnUse\'><rect width=\'100\' height=\'100\' fill=\'url(%23smallGrid)\'/><path d=\'M 100 0 L 0 0 L 0 100\' fill=\'none\' stroke=\'%233c1e6e\' stroke-width=\'1\'/></pattern></defs><rect width=\'100%\' height=\'100%\' fill=\'url(%23grid)\' /></svg>')] opacity-20">
+                </div>
+            </div>
+
+            <div
+                class="relative z-10 max-w-4xl mx-auto px-4 py-16 sm:py-24 text-center flex flex-col gap-6 items-center">
+                <div
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neon-green/20 border border-neon-green/30 backdrop-blur-sm shadow-md shadow-neon-green/10 animate-float-3d">
+                    <span class="w-2 h-2 rounded-full bg-neon-green"></span>
+                    <span class="text-xs font-medium text-neon-green">Zap AI Online - Regional Cravings Detected!</span>
+                </div>
+
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight">
+                    Authentic Flavors <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-neon-pink">Near You</span>
+                </h1>
+                <p class="text-text-secondary text-base sm:text-lg max-w-xl">
+                    Discover the richness of Indian cuisine, curated by AI for your location and taste.
+                </p>
+
+                <div class="w-full max-w-2xl mt-4">
+                    <form action="search_results.html" method="GET"
+                        class="search-3d relative flex items-center w-full h-14 sm:h-16 rounded-2xl bg-card-dark border border-primary/50 shadow-2xl shadow-primary/30 overflow-hidden focus-within:border-neon-pink transition-colors">
+                        <div class="pl-5 pr-3 text-text-secondary">
+                            <span class="material-symbols-outlined text-2xl">search</span>
+                        </div>
+                        <input name="q"
+                            class="w-full h-full bg-transparent border-none focus:ring-0 text-white placeholder-text-secondary/70 font-display text-lg"
+                            placeholder="Ask Zoi: 'Hearty Punjabi thali' or 'Find South Indian filter coffee'..."
+                            type="text" />
+                        <button type="submit"
+                            class="absolute right-2 h-10 sm:h-12 px-6 bg-gradient-to-r from-primary to-neon-pink hover:from-primary-hover hover:to-neon-pink/80 text-white font-bold rounded-xl transition-all flex items-center gap-2 shadow-lg shadow-primary/20">
+                            <span class="hidden sm:inline">Discover</span>
+                            <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-3 mt-4">
+                    <a href="customer_restaurant_listing.html?tag=pure-veg"
+                        class="flex items-center gap-2 px-4 py-2 rounded-xl bg-card-dark/70 border border-primary/30 hover:border-neon-green/50 transition-all backdrop-blur-md group shadow-md shadow-primary/5">
+                        <span
+                            class="material-symbols-outlined text-neon-green text-lg group-hover:scale-110 transition-transform">eco</span>
+                        <span class="text-sm font-medium text-text-secondary group-hover:text-neon-green">#PureVeg
+                            Delights</span>
+                    </a>
+                    <a href="customer_restaurant_listing.html?tag=spicy"
+                        class="flex items-center gap-2 px-4 py-2 rounded-xl bg-card-dark/70 border border-primary/30 hover:border-neon-pink/50 transition-all backdrop-blur-md group shadow-md shadow-primary/5">
+                        <span
+                            class="material-symbols-outlined text-neon-pink text-lg group-hover:scale-110 transition-transform">local_fire_department</span>
+                        <span class="text-sm font-medium text-text-secondary group-hover:text-neon-pink">#Spicy
+                            Andhra</span>
+                    </a>
+                    <a href="customer_restaurant_listing.html?tag=tiffins"
+                        class="flex items-center gap-2 px-4 py-2 rounded-xl bg-card-dark/70 border border-primary/30 hover:border-primary/50 transition-all backdrop-blur-md group shadow-md shadow-primary/5">
+                        <span
+                            class="material-symbols-outlined text-primary text-lg group-hover:scale-110 transition-transform">timer</span>
+                        <span class="text-sm font-medium text-text-secondary group-hover:text-primary">#Quick
+                            Tiffins</span>
+                    </a>
+                    <a href="customer_restaurant_listing.html?tag=trending"
+                        class="flex items-center gap-2 px-4 py-2 rounded-xl bg-card-dark/70 border border-primary/30 hover:border-neon-yellow/50 transition-all backdrop-blur-md group shadow-md shadow-primary/5">
+                        <span
+                            class="material-symbols-outlined text-neon-yellow text-lg group-hover:scale-110 transition-transform">trending_up</span>
+                        <span class="text-sm font-medium text-text-secondary group-hover:text-neon-yellow">#Trending
+                            Thalis</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <div class="max-w-[1280px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-20">
+            <section>
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold font-display flex items-center gap-3 text-white">
+                            <span class="material-symbols-outlined text-neon-green text-3xl">restaurant_menu</span>
+                            Zap's Daily Culinary Journey
+                        </h2>
+                        <p class="text-text-secondary text-sm mt-2">AI-Predicted Cravings • Based on your regional
+                            preferences</p>
+                    </div>
+                    <a href="customer_restaurant_listing.html"
+                        class="text-primary hover:text-neon-pink text-sm font-medium transition-colors">View All
+                        Delights</a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div
+                        class="group bg-card-dark rounded-2xl overflow-hidden border border-border-dark hover:border-neon-green/50 transition-all shadow-xl hover:shadow-neon-green/10 quest-card-irregular relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-card-dark to-primary/10 -z-10 rounded-2xl">
+                        </div>
+                        <div class="relative h-48 bg-cover bg-center"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuArH5JE7vTgIYMxybP_vgfWNG4CxLpFMFHlRFXT9xHW6wLDQ8C_QcR2fzK_gzzdBPZsGh0sKOAUjGY_BTeOfibAHla0O4OwE3QUpQAeUQZt9TwIEcvzrT2ZEt0JVGHb7CDjQXy_XSammpsHDABzlbNR2j1WYrudBZFRAAcgfDONLhGmumU-GE5xKmo4Y0KNcT5wPl6StcfL4P3ilVXhMJQX8QrOME1YZ4QDOamnI3D0WpPviCXtq6KFXPOEi2NaVYdTIn0NTLNxCl8');">
+                            <div class="pixel-overlay"></div>
+                            <div
+                                class="absolute top-3 right-3 bg-background-dark/80 backdrop-blur-sm px-2 py-1 rounded-lg border border-primary/20 flex items-center gap-1 shadow-inner shadow-primary/5">
+                                <span class="material-symbols-outlined text-neon-yellow text-sm">star</span>
+                                <span class="text-xs font-bold text-white">4.9</span>
+                            </div>
+                            <div
+                                class="absolute bottom-3 left-3 bg-neon-green text-background-dark text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-neon-green/40">
+                                Zap's Breakfast Pick
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-bold group-hover:text-neon-green transition-colors">Crispy
+                                    Masala Dosa</h3>
+                                <button
+                                    class="bg-card-dark p-1.5 rounded-full border border-border-dark group-hover:border-neon-pink/50 group-hover:bg-neon-pink/20 transition-all">
+                                    <span
+                                        class="material-symbols-outlined text-text-secondary text-sm group-hover:text-neon-pink">favorite</span>
+                                </button>
+                            </div>
+                            <p class="text-xs text-neon-green mb-2 font-medium">"Zap noticed you love South Indian
+                                breakfasts!"</p>
+                            <div class="flex items-center gap-4 text-sm text-text-secondary mb-4">
+                                <span class="flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-sm text-primary">schedule</span> 20
+                                    mins</span>
+                                <span>•</span>
+                                <span>₹180 for two</span>
+                            </div>
+                            <a href="restaurant_menu.html?id=108"
+                                class="w-full py-2.5 rounded-xl bg-gradient-to-r from-primary/30 to-card-dark/80 hover:from-primary hover:to-neon-pink text-white font-medium transition-all text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/10">
+                                <span class="material-symbols-outlined text-sm">refresh</span>
+                                Reorder Favorite
+                            </a>
+                        </div>
+                    </div>
+
+                    <div
+                        class="group bg-card-dark rounded-2xl overflow-hidden border border-border-dark hover:border-neon-yellow/50 transition-all shadow-xl hover:shadow-neon-yellow/10 quest-card-irregular relative">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-card-dark to-neon-yellow/10 -z-10 rounded-2xl">
+                        </div>
+                        <div class="relative h-48 bg-cover bg-center"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC3lsPgvpwXtnxK3K9t1j0Wou61_OdbqYwv3pyL5nETlcOgJXJ2g6GdFV0JUgyjvlC1nVmKHYUVapikcMbnwl7NSgukfj51gYjXfb44KXxCqMeDOWHLCZIy5GgEBjrhzXCofqSbK7edixAYOTaP3g5er3inMcfP-8CnPzWZ8b_xBmSqWTryDhHF1TB5udk0V1VWms4RkrnkF7XoTrvLLO48pXdz0KQoYOl_5AByW3GLS1_SZaOlRllWASXz758wndsDFpc5QVg-P7A');">
+                            <div class="pixel-overlay"></div>
+                            <div
+                                class="absolute top-3 right-3 bg-background-dark/80 backdrop-blur-sm px-2 py-1 rounded-lg border border-primary/20 flex items-center gap-1 shadow-inner shadow-primary/5">
+                                <span class="material-symbols-outlined text-neon-yellow text-sm">star</span>
+                                <span class="text-xs font-bold text-white">4.7</span>
+                            </div>
+                            <button onclick="detectLocation('card-location-text')"
+                                class="hidden sm:flex items-center gap-2 bg-card-dark px-3 py-1.5 rounded-full border border-border-dark/50 shadow-inner shadow-primary/5 cursor-pointer hover:border-neon-green/50 transition-colors group">
+                                <span
+                                    class="material-symbols-outlined text-neon-green text-sm group-hover:animate-bounce">location_on</span>
+                                <span id="card-location-text" class="text-xs font-medium text-text-secondary">Locate
+                                    Me</span>
+                            </button>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-bold group-hover:text-neon-yellow transition-colors">Homestyle
+                                    Dal Makhani</h3>
+                                <button
+                                    class="bg-card-dark p-1.5 rounded-full border border-border-dark group-hover:border-neon-pink/50 group-hover:bg-neon-pink/20 transition-all">
+                                    <span
+                                        class="material-symbols-outlined text-text-secondary text-sm group-hover:text-neon-pink">favorite</span>
+                                </button>
+                            </div>
+                            <p class="text-xs text-neon-yellow mb-2 font-medium">"Top rated Punjabi comfort food near
+                                you."</p>
+                            <div class="flex items-center gap-4 text-sm text-text-secondary mb-4">
+                                <span class="flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-sm text-primary">schedule</span> 35
+                                    mins</span>
+                                <span>•</span>
+                                <span>₹250 for two</span>
+                            </div>
+                            <a href="restaurant_menu.html?id=107"
+                                class="w-full py-2.5 rounded-xl bg-gradient-to-r from-primary/30 to-card-dark/80 hover:from-primary hover:to-neon-pink text-white font-medium transition-all text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/10">
+                                <span class="material-symbols-outlined text-sm">shopping_bag</span>
+                                Order Now
+                            </a>
+                        </div>
+                    </div>
+
+                    <div
+                        class="group bg-card-dark rounded-2xl overflow-hidden border border-border-dark hover:border-neon-pink/50 transition-all shadow-xl hover:shadow-neon-pink/10 quest-card-irregular relative">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-br from-card-dark to-neon-pink/10 -z-10 rounded-2xl">
+                        </div>
+                        <div class="relative h-48 bg-cover bg-center"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD5dhP82afCTOiEvPFGPkPq8mikHUWp_GYe6ld8PQjwT_FqCK-i9a3JWIMijmoW6kaSD2Dy-4KcQCKTzNA22KCBMiiCNVtewV2QukSo4_xqgwhWoIHXyO_laQ5IWE5swV7GY-dQ6pZ4I3UGGG1Ai6MnJiuiURgiHSK3NbH53OEVoi9Z-S0Ai2V1mADDDq94X-oSqNnrdkqoJZBL4mgXcKX16WskY-5YlLA2ubFV3g8xIr3xcKJ_4MVg9xTVlJYfJJvML7O9g8UFTbQ');">
+                            <div class="pixel-overlay"></div>
+                            <div
+                                class="absolute top-3 right-3 bg-background-dark/80 backdrop-blur-sm px-2 py-1 rounded-lg border border-primary/20 flex items-center gap-1 shadow-inner shadow-primary/5">
+                                <span class="material-symbols-outlined text-neon-yellow text-sm">star</span>
+                                <span class="text-xs font-bold text-white">4.8</span>
+                            </div>
+                            <div
+                                class="absolute bottom-3 left-3 bg-neon-pink/80 text-background-dark text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-neon-pink/40">
+                                Trending Now
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-bold group-hover:text-neon-pink transition-colors">Spicy
+                                    Hyderabadi Biryani</h3>
+                                <button
+                                    class="bg-card-dark p-1.5 rounded-full border border-border-dark group-hover:border-neon-pink/50 group-hover:bg-neon-pink/20 transition-all">
+                                    <span
+                                        class="material-symbols-outlined text-text-secondary text-sm group-hover:text-neon-pink">favorite</span>
+                                </button>
+                            </div>
+                            <p class="text-xs text-neon-pink mb-2 font-medium">"Authentic Dum preparation method
+                                verified."</p>
+                            <div class="flex items-center gap-4 text-sm text-text-secondary mb-4">
+                                <span class="flex items-center gap-1"><span
+                                        class="material-symbols-outlined text-sm text-primary">schedule</span> 45
+                                    mins</span>
+                                <span>•</span>
+                                <span>₹350 for two</span>
+                            </div>
+                            <a href="restaurant_menu.html?id=109"
+                                class="w-full py-2.5 rounded-xl bg-gradient-to-r from-primary/30 to-card-dark/80 hover:from-primary hover:to-neon-pink text-white font-medium transition-all text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/10">
+                                <span class="material-symbols-outlined text-sm">shopping_bag</span>
+                                Indulge Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-3xl font-bold font-display flex items-center gap-3 text-white">
+                        <span class="material-symbols-outlined text-primary text-3xl">explore</span>
+                        Explore What Makes You Happy
+                    </h2>
+                    <div class="flex gap-2">
+                        <button
+                            class="w-10 h-10 rounded-full bg-card-dark border border-border-dark flex items-center justify-center hover:bg-primary/20 transition-colors shadow-md shadow-primary/5">
+                            <span class="material-symbols-outlined text-sm text-primary">arrow_back</span>
+                        </button>
+                        <button
+                            class="w-10 h-10 rounded-full bg-card-dark border border-border-dark flex items-center justify-center hover:bg-primary/20 transition-colors shadow-md shadow-primary/5">
+                            <span class="material-symbols-outlined text-sm text-primary">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="flex gap-6 overflow-x-auto hide-scrollbar pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+                    <a href="customer_restaurant_listing.html?category=gujarati"
+                        class="min-w-[280px] h-64 rounded-3xl relative overflow-hidden group cursor-pointer discovery-zone-irregular transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/10 gradient-border-neon from-primary/70 to-neon-pink/70 block">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB2fKrVBlDDwDtMiJTXa3CT9vkObCVSNp7Vc-8oZUuXemiXQVSHqp6qrWh86djN2UA5xpbMsAwWHgcUkb6rYDEdesADSM7vJuhc06LiUlaT-dtFm1dJ8s-BydFsCA9YExDBBd6HAPR2B6qWO2OviGc4RGxLzpGu--gjePEq6hzTrTIVOglJPrHCq_R0esoy3QzpzLrcnumVXAVbBxKUE-WVRW1aaYVMaix9xVvSBfQRznGIXS3Im-qWY_EWWF_5D0iMVOmtkHSVKJU');">
+                        </div>
+                        <div class="pixel-overlay"></div>
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/50 to-transparent">
+                        </div>
+                        <div class="absolute bottom-5 left-5 right-5 z-10">
+                            <h3 class="text-xl font-bold mb-1 text-white group-hover:text-primary">Gujarati Kathiyawadi
+                            </h3>
+                            <p class="text-sm text-text-secondary">Authentic Thalis • 92% Match</p>
+                        </div>
+                        <span
+                            class="absolute top-3 right-3 material-symbols-outlined text-3xl text-primary opacity-0 group-hover:opacity-100 transition-opacity z-10">lunch_dining</span>
+                    </a>
+
+                    <a href="customer_restaurant_listing.html?category=south-indian"
+                        class="min-w-[280px] h-64 rounded-3xl relative overflow-hidden group cursor-pointer discovery-zone-irregular transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-neon-green/10 gradient-border-neon from-neon-green/70 to-primary/70 block">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA7LTvHjsCLDuF0qQ6jBqkySbpLAIwB0hJswDKnug9rtJu6hmcM8rRmHVLzp63p6ArR0CNuUn9tNKXoIaD7Zrz-SpA3z5mh39SMAyVl9h1NDzYDN3MhvAhv9TMg4mrQRzCXqBmqOEzKLbt4AoxFAGgTqF9Fm8tTBQKScOTSoRTXxgKyYEsnwTPekcBhqcqWIpdeg_iupPt0F_y25raPEP6Amhg0ADgmktutVMsi4FEDZ6ooGpkFsc8k9x-cMTfT3FtkHXhyd8XD0w8');">
+                        </div>
+                        <div class="pixel-overlay"></div>
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/50 to-transparent">
+                        </div>
+                        <div class="absolute bottom-5 left-5 right-5 z-10">
+                            <h3 class="text-xl font-bold mb-1 text-white group-hover:text-neon-green">Udupi Breakfasts
+                            </h3>
+                            <p class="text-sm text-text-secondary">Idlis & Dosas • 98% Match</p>
+                        </div>
+                        <span
+                            class="absolute top-3 right-3 material-symbols-outlined text-3xl text-neon-green opacity-0 group-hover:opacity-100 transition-opacity z-10">coffee</span>
+                    </a>
+
+                    <a href="customer_restaurant_listing.html?category=bengali"
+                        class="min-w-[280px] h-64 rounded-3xl relative overflow-hidden group cursor-pointer discovery-zone-irregular transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-neon-yellow/10 gradient-border-neon from-neon-yellow/70 to-primary/70 block">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB3r0ac4hUZL412YnYtllAlIJupSgGlrvj03cOWgSUJEtzzlJbMWnKXMaAhT4F073dfSvZ3HQpM93KfCSWhHEZMF30Aqp_cQBYzTYkF8_xyaVPoNKsvMobRL_PKoEo4lg46iPC95KiLyrSb-o4XAVeaaiovnXVxaiiIcufYGXKe2gGYfbLMqLKmEg1XQOoYrX8dH4KH75abQSW8mJ8JDwS5e0gKMLsxNB8hFHWd3GoRprnWWkCbCFdCc83X5iDQrb9XDXPnTVwxYO8');">
+                        </div>
+                        <div class="pixel-overlay"></div>
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/50 to-transparent">
+                        </div>
+                        <div class="absolute bottom-5 left-5 right-5 z-10">
+                            <h3 class="text-xl font-bold mb-1 text-white group-hover:text-neon-yellow">Bengali Sweets &
+                                Fish</h3>
+                            <p class="text-sm text-text-secondary">Kolkata Special • 99% Match</p>
+                        </div>
+                        <span
+                            class="absolute top-3 right-3 material-symbols-outlined text-3xl text-neon-yellow opacity-0 group-hover:opacity-100 transition-opacity z-10">set_meal</span>
+                    </a>
+
+                    <a href="customer_restaurant_listing.html?category=mughlai"
+                        class="min-w-[280px] h-64 rounded-3xl relative overflow-hidden group cursor-pointer discovery-zone-irregular transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-neon-pink/10 gradient-border-neon from-neon-pink/70 to-neon-green/70 block">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD5dhP82afCTOiEvPFGPkPq8mikHUWp_GYe6ld8PQjwT_FqCK-i9a3JWIMijmoW6kaSD2Dy-4KcQCKTzNA22KCBMiiCNVtewV2QukSo4_xqgwhWoIHXyO_laQ5IWE5swV7GY-dQ6pZ4I3UGGG1Ai6MnJiuiURgiHSK3NbH53OEVoi9Z-S0Ai2V1mADDDq94X-oSqNnrdkqoJZBL4mgXcKX16WskY-5YlLA2ubFV3g8xIr3xcKJ_4MVg9xTVlJYfJJvML7O9g8UFTbQ');">
+                        </div>
+                        <div class="pixel-overlay"></div>
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/50 to-transparent">
+                        </div>
+                        <div class="absolute bottom-5 left-5 right-5 z-10">
+                            <h3 class="text-xl font-bold mb-1 text-white group-hover:text-neon-pink">Awadhi & Mughlai
+                            </h3>
+                            <p class="text-sm text-text-secondary">Royal Kitchens • 85% Match</p>
+                        </div>
+                        <span
+                            class="absolute top-3 right-3 material-symbols-outlined text-3xl text-neon-pink opacity-0 group-hover:opacity-100 transition-opacity z-10">restaurant</span>
+                    </a>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div
+                    class="lg:col-span-2 relative rounded-3xl overflow-hidden bg-gradient-to-br from-primary to-neon-pink h-64 lg:h-auto flex items-center shadow-2xl shadow-neon-pink/30 border border-primary/50 neon-pulse-glow">
+                    <div class="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCvNVoyvpBJWHETu7sv9uYCR50RDb9k6Omz8O27wxWOZKddrmF8nJzxAEUaAfe7QqQDkbRXJfszCiMes6ZiQR-F1r0vHU63_ST1P7YAxJd54TFpC0NXr3uIxTeflMN3v7vZfrUwRJSYlM7S3hbHRvz0DoflDrTXa5QmnvhmdV8cieiXF7T9qL-t7K4VLWziECu6tuKpCThiRK3GpZFsI1YjR5wlk4r8up03kv6OV7bPVJmaSX7lUOqZyD1wAVrG9MJ5eqQc-NNgC1A');">
+                    </div>
+                    <div class="pixel-overlay !opacity-20 !mix-blend-mode-normal"></div>
+                    <div class="relative z-10 p-8 sm:p-10 flex flex-col justify-center h-full">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span
+                                class="px-2 py-1 bg-neon-yellow text-background-dark text-xs font-bold uppercase rounded-md shadow-md shadow-neon-yellow/30">Limited
+                                Offer!</span>
+                            <span class="text-white/80 text-sm font-medium">Flash Deal Active</span>
+                        </div>
+                        <h3 class="text-3xl sm:text-4xl font-black text-white mb-2 leading-tight">Flash Deal: 50% OFF
+                        </h3>
+                        <p class="text-white/90 mb-6 max-w-md">On all "Homestyle" curries near you for the next 45
+                            minutes.</p>
+                        <div class="flex items-center gap-4">
+                            <a href="customer_restaurant_listing.html?promo=flash50"
+                                class="bg-white text-background-dark px-6 py-3 rounded-xl font-bold hover:bg-gray-100 transition-colors shadow-lg shadow-white/20 inline-block">Claim
+                                Your Discount</a>
+                            <div
+                                class="flex items-center gap-1 text-white font-mono bg-black/40 px-3 py-2 rounded-lg backdrop-blur-sm border border-white/20">
+                                <span class="material-symbols-outlined text-sm">timer</span>
+                            <span id="flash-timer">45:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-card-dark border border-border-dark rounded-3xl p-6 flex flex-col justify-between gap-4 shadow-xl shadow-primary/10">
+                    <h3 class="text-xl font-bold font-display text-white mb-2">Zap's Comfort Promise</h3>
+                    <div
+                        class="flex items-start gap-3 p-3 rounded-xl bg-background-dark/50 hover:bg-background-dark transition-colors border border-background-dark/50 hover:border-primary/50 shadow-inner shadow-primary/5">
+                        <div
+                            class="w-10 h-10 rounded-full bg-neon-green/10 flex items-center justify-center text-neon-green shrink-0 border border-neon-green/30">
+                            <span class="material-symbols-outlined">rocket_launch</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-white">Smart Routing: Fresh & Fast</h4>
+                            <p class="text-xs text-text-secondary">Optimized routes for piping hot delivery.</p>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-start gap-3 p-3 rounded-xl bg-background-dark/50 hover:bg-background-dark transition-colors border border-background-dark/50 hover:border-primary/50 shadow-inner shadow-primary/5">
+                        <div
+                            class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/30">
+                            <span class="material-symbols-outlined">verified_user</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-white">Authenticity Verified</h4>
+                            <p class="text-xs text-text-secondary">AI checks for traditional preparation methods.</p>
+                        </div>
+                    </div>
+                    <div
+                        class="flex items-start gap-3 p-3 rounded-xl bg-background-dark/50 hover:bg-background-dark transition-colors border border-background-dark/50 hover:border-primary/50 shadow-inner shadow-primary/5">
+                        <div
+                            class="w-10 h-10 rounded-full bg-neon-pink/10 flex items-center justify-center text-neon-pink shrink-0 border border-neon-pink/30">
+                            <span class="material-symbols-outlined">psychology</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm text-white">Zap Genius: Your Regional Guide</h4>
+                            <p class="text-xs text-text-secondary">Learns your taste for local spices & sweets.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section>
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-3xl font-bold font-display flex items-center gap-3 text-white">
+                        <span class="material-symbols-outlined text-neon-yellow text-3xl">store</span>
+                        Beloved Eateries & Timeless Classics
+                    </h2>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
+                    <a href="customer_restaurant_listing.html?category=dhaba"
+                        class="flex flex-col items-center justify-center gap-3 p-4 bg-card-dark rounded-2xl border border-border-dark hover:border-neon-pink transition-all cursor-pointer group shadow-lg hover:shadow-neon-pink/20">
+                        <div
+                            class="w-16 h-16 rounded-full bg-background-dark/50 flex items-center justify-center overflow-hidden border-2 border-primary/50 group-hover:border-neon-pink">
+                            <span class="text-3xl">🍛</span>
+                        </div>
+                        <span class="text-sm font-medium group-hover:text-neon-pink text-text-secondary">Local
+                            Dhaba</span>
+                    </a>
+
+                    <a href="customer_restaurant_listing.html?category=veg"
+                        class="flex flex-col items-center justify-center gap-3 p-4 bg-card-dark rounded-2xl border border-border-dark hover:border-neon-green transition-all cursor-pointer group shadow-lg hover:shadow-neon-green/20">
+                        <div
+                            class="w-16 h-16 rounded-full bg-background-dark/50 flex items-center justify-center overflow-hidden border-2 border-primary/50 group-hover:border-neon-green">
+                            <span class="text-3xl">🥗</span>
+                        </div>
+                        <span class="text-sm font-medium group-hover:text-neon-green text-text-secondary">Pure Veg
+                            Cafe</span>
+                    </a>
+
+                    <a href="customer_restaurant_listing.html?category=biryani"
+                        class="flex flex-col items-center justify-center gap-3 p-4 bg-card-dark rounded-2xl border border-border-dark hover:border-primary transition-all cursor-pointer group shadow-lg hover:shadow-primary/20">
+                        <div
+                            class="w-16 h-16 rounded-full bg-background-dark/50 flex items-center justify-center overflow-hidden border-2 border-primary/50 group-hover:border-primary">
+                            <span class="text-3xl">🍚</span>
+                        </div>
+                        <span class="text-sm font-medium group-hover:text-primary text-text-secondary">Biryani
+                            House</span>
+                    </a>
+
+                    <a href="customer_restaurant_listing.html?category=sweets"
+                        class="flex flex-col items-center justify-center gap-3 p-4 bg-card-dark rounded-2xl border border-border-dark hover:border-neon-yellow transition-all cursor-pointer group shadow-lg hover:shadow-neon-yellow/20">
+                        <div
+                            class="w-16 h-16 rounded-full bg-background-dark/50 flex items-center justify-center overflow-hidden border-2 border-primary/50 group-hover:border-neon-yellow">
+                            <span class="text-3xl">🍬</span>
+                        </div>
+                        <span class="text-sm font-medium group-hover:text-neon-yellow text-text-secondary">Sweet
+                            Shop</span>
+                    </a>
+
+                    <a href="customer_restaurant_listing.html?category=tiffin"
+                        class="flex flex-col items-center justify-center gap-3 p-4 bg-card-dark rounded-2xl border border-border-dark hover:border-primary/70 transition-all cursor-pointer group shadow-lg hover:shadow-primary/20">
+                        <div
+                            class="w-16 h-16 rounded-full bg-background-dark/50 flex items-center justify-center overflow-hidden border-2 border-primary/50 group-hover:border-primary/70">
+                            <span class="text-3xl">🫕</span>
+                        </div>
+                        <span class="text-sm font-medium group-hover:text-primary/70 text-text-secondary">Tiffin
+                            Service</span>
+                    </a>
+
+                    <a href="customer_restaurant_listing.html?category=chai"
+                        class="flex flex-col items-center justify-center gap-3 p-4 bg-card-dark rounded-2xl border border-border-dark hover:border-neon-green/70 transition-all cursor-pointer group shadow-lg hover:shadow-neon-green/20">
+                        <div
+                            class="w-16 h-16 rounded-full bg-background-dark/50 flex items-center justify-center overflow-hidden border-2 border-primary/50 group-hover:border-neon-green/70">
+                            <span class="text-3xl">☕</span>
+                        </div>
+                        <span class="text-sm font-medium group-hover:text-neon-green/70 text-text-secondary">Chai
+                            Stalls</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="bg-background-dark border-t border-border-dark mt-auto shadow-inner shadow-primary/5">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
+                <!-- Column 1: Brand -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-symbols-outlined text-primary text-2xl shadow-text-primary">bolt</span>
+                        <span class="font-display font-bold text-xl text-white">ZoiEats</span>
+                    </div>
+                    <p class="text-text-secondary text-sm mb-4">
+                        Your AI-powered portal to the comforting flavors of India.
+                    </p>
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-green/20 border border-neon-green/30 shadow-md shadow-neon-green/10">
+                        <span class="relative flex h-2 w-2">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-green opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-neon-green"></span>
+                        </span>
+                        <span class="text-xs font-mono font-medium text-neon-green">AI System: OPTIMAL</span>
+                    </div>
+                </div>
+
+                <!-- Column 2: Explore ZoiEats -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 font-display">Explore ZoiEats</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary">
+                        <li><a class="hover:text-primary transition-colors" href="promotions & offers.html">Offers &
+                                Promos</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="feedback.html">Feedback Portal</a>
+                        </li>
+                        <li><a class="hover:text-primary transition-colors" href="customer support help.html">Customer
+                                Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Partner with Us -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 font-display">Partner with Us</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary">
+                        <li><a class="hover:text-primary transition-colors"
+                                href="restaurant pricing plans.html">Add Restaurant</a></li>
+                        <li><a class="hover:text-primary transition-colors"
+                                href="delivery partner application.html">Ride with Us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="dev_hub.html">Developer APIs</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Company -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 font-display">Company</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary">
+                        <li><a class="hover:text-primary transition-colors" href="careerspage.html">Careers</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="press & media kit.html">Press &
+                                Media</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="about us.html">About Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-border-dark pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-text-secondary">
+                    <span>© 2025 ZoiEats. All rights reserved.</span>
+                    <span class="hidden sm:inline-block text-border-dark">|</span>
+                    <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms & Conditions</a>
+                    <a class="hover:text-white transition-colors" href="privacy policy.html">Privacy Policy</a>
+                    <a class="hover:text-white transition-colors" href="gst disclaimer.html">GST & Taxation</a>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-6 mt-6 md:mt-0">
+                    <div class="flex flex-col gap-2">
+                        <a href="mailto:reachus@zipzapzoi.in"
+                            class="text-sm hover:text-[#00f0ff] transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[16px]">mail</span> reachus@zipzapzoi.in
+                        </a>
+                        <a href="mailto:phanikumar@zipzapzoi.in"
+                            class="text-sm hover:text-[#00f0ff] transition-colors flex items-center gap-2 text-[#3c1e6e]/80">
+                            <span class="material-symbols-outlined text-[16px]">developer_mode</span>
+                            phanikumar@zipzapzoi.in
+                        </a>
+                    </div>
+                    <div class="flex gap-4 items-center">
+                        <a class="hover:text-white transition-colors text-lg" href="https://x.com/ZipZapZoi"
+                            target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                        <a class="hover:text-white transition-colors text-lg" href="https://www.youtube.com/@ZipZapZoi"
+                            target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                        <a class="hover:text-white transition-colors text-lg"
+                            href="https://www.instagram.com/zipzapzoi/" target="_blank" rel="noopener noreferrer"><i
+                                class="fa fa-instagram"></i></a>
+                        <a class="hover:text-white transition-colors text-lg"
+                            href="https://www.facebook.com/profile.php?id=61585106515522" target="_blank"
+                            rel="noopener noreferrer"><i class="fa fa-facebook"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="fixed bottom-40 right-6 z-50">
+        <a href="feedback.html"
+            class="flex items-center gap-2 bg-gradient-to-r from-primary to-neon-pink text-white pl-3 pr-4 py-3 rounded-full shadow-2xl shadow-primary/40 hover:from-primary-hover hover:to-neon-pink/80 transition-transform hover:-translate-y-1">
+            <span class="material-symbols-outlined text-xl">chat_bubble</span>
+            <span class="font-bold text-sm">Feedback Portal</span>
+        </a>
+    </div>
+    <script>
+        function detectLocation(elementId) {
+            // We pass the specific ID of the text we want to change
+            const locationText = document.getElementById(elementId);
+
+            if (!locationText) {
+                console.error("Element not found:", elementId);
+                return;
+            }
+
+            // 1. Check if browser supports Geolocation
+            if (!navigator.geolocation) {
+                locationText.innerText = "Not Supported";
+                return;
+            }
+
+            locationText.innerText = "Locating...";
+
+            // 2. Get the position
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    // 3. Convert Coordinates to City Name
+                    // We add a User-Agent header which is often required by OpenStreetMap
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, {
+                        headers: {
+                            'User-Agent': 'ZipZapZoi-Eats-App'
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            const city = data.address.city || data.address.town || data.address.village || data.address.county || "Unknown";
+                            // Update text
+                            locationText.innerText = `${city}`;
+                            // Optional: Save to local storage so other pages know the location
+                            localStorage.setItem('userLocation', city);
+                        })
+                        .catch((error) => {
+                            console.error("API Error:", error);
+                            locationText.innerText = "Error";
+                        });
+                },
+                (error) => {
+                    console.error("Geolocation Error:", error);
+                    if (error.code === 1) {
+                        locationText.innerText = "Denied";
+                        showIndexToast("Error", "Please allow location access in your browser settings.");
+                    } else {
+                        locationText.innerText = "GPS Error";
+                    }
+                }
+            );
+        }
+
+        // === TOAST NOTIFICATION ===
+        function showIndexToast(title, message) {
+            let toast = document.getElementById('index-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'index-toast';
+                toast.className = 'fixed bottom-32 right-6 bg-[#2a2d35] border border-primary text-white px-6 py-4 rounded-xl shadow-[0_10px_40px_rgba(0, 240, 255,0.3)] z-[9999] flex items-center gap-3 transition-all duration-300 translate-y-20 opacity-0 pointer-events-none';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<span class="material-symbols-outlined text-primary text-2xl">info</span> 
+                           <div>
+                             <h4 class="font-bold text-sm text-white">${title}</h4>
+                             <p class="text-xs text-gray-400">${message}</p>
+                           </div>`;
+
+            // Force reflow
+            void toast.offsetWidth;
+
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+
+            if (window._indexToastTimeout) clearTimeout(window._indexToastTimeout);
+
+            window._indexToastTimeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+            }, 3000);
+        }
+    </script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_customer_engine.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="js/zoi_ai_assistant.js?v=5"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userAvatarLink = document.getElementById('user-avatar-link');
+            const userAvatarText = document.getElementById('user-avatar-text');
+            if (userAvatarLink && userAvatarText) {
+                let session = typeof ZoiCustomer !== 'undefined' ? ZoiCustomer.getSession() : (JSON.parse(localStorage.getItem('zoiCustomerSession')) || JSON.parse(localStorage.getItem('zoiUser')));
+                if (session && session.name && session.name !== 'New User') {
+                    userAvatarLink.href = 'customer profile.html';
+                    let initials = session.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                    userAvatarText.textContent = initials;
+                } else {
+                    userAvatarLink.href = 'login & registration.html';
+                    userAvatarText.innerHTML = '<span class="material-symbols-outlined text-sm">person</span>';
+                }
+            }
+        });
+    </script>
+
+
+
+
+    <script>
+        // === LIVE FLASH DEAL COUNTDOWN ===
+        (function() {
+            const timerEl = document.getElementById('flash-timer');
+            if (!timerEl) return;
+            let totalSeconds = 45 * 60; // 45 minutes
+            const saved = sessionStorage.getItem('flashDealEnd');
+            if (saved) {
+                const remaining = Math.floor((parseInt(saved) - Date.now()) / 1000);
+                totalSeconds = remaining > 0 ? remaining : 0;
+            } else {
+                sessionStorage.setItem('flashDealEnd', Date.now() + totalSeconds * 1000);
+            }
+            function tick() {
+                if (totalSeconds <= 0) { timerEl.innerText = 'EXPIRED'; return; }
+                const m = Math.floor(totalSeconds / 60);
+                const s = totalSeconds % 60;
+                timerEl.innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                totalSeconds--;
+                setTimeout(tick, 1000);
+            }
+            tick();
+        })();
+
+        // === SERVICE WORKER REGISTRATION ===
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(reg => {
+                console.log('🟢 SW registered:', reg.scope);
+            }).catch(err => {
+                console.warn('🔴 SW registration failed:', err.message);
+            });
+        }
+    </script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>

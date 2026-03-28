@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Eats - Customer Support</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0ff",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#0a0314",
+                        "surface-dark": "#1a0b36",
+                        "border-brown": "#3c1e6e",
+                        "text-beige": "#b4a5d8",
+                        "card-dark": "#150a2e",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Custom scrollbar for dark theme feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0314;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3c1e6e;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+    </style>
+</head>
+
+<body class="bg-background-dark font-display antialiased text-white">
+    <div class="flex flex-col min-h-screen w-full overflow-x-hidden">
+        <!-- Navbar -->
+        <header class="sticky top-0 z-50 bg-[#0a0314]/95 backdrop-blur-md border-b border-[#3c1e6e]/50">
+            <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity shrink-0">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-[#00f0ff] flex items-center justify-center text-[#0a0314] shadow-lg shadow-[#00f0ff]/50">
+                            <span class="material-symbols-outlined text-xl">bolt</span>
+                        </div>
+                        <span class="font-bold text-xl tracking-tight hidden sm:block text-white"
+                            style="font-family: 'Quicksand', sans-serif;">Zoi<span
+                                class="text-[#00f0ff]">Eats</span></span>
+                    </a>
+
+                    <div class="hidden xl:flex items-center gap-6">
+                        <a class="text-sm font-bold text-[#ffff00] hover:text-white transition-colors flex items-center gap-1"
+                            href="promotions & offers.html">
+                            <span class="material-symbols-outlined text-sm">local_offer</span> Offers & Deals
+                        </a>
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="customer_restaurant_listing.html">Restaurants</a>
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="feedback.html">Feedback</a>
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="customer support help.html">Support</a>
+                    </div>
+
+                    <div class="flex items-center gap-3 sm:gap-4">
+
+                        <a href="restaurant pricing plans.html"
+                            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#ff00ff]/50 hover:bg-[#ff00ff]/10 transition-all group">
+                            <span
+                                class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#ff00ff] transition-colors">store</span>
+                            <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Add
+                                Restaurant</span>
+                        </a>
+
+                        <a href="delivery partner application.html"
+                            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#00ff00]/50 hover:bg-[#00ff00]/10 transition-all group">
+                            <span
+                                class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#00ff00] transition-colors">two_wheeler</span>
+                            <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Ride
+                                with Us</span>
+                        </a>
+
+                        <button
+                            class="hidden sm:flex items-center gap-2 bg-[#1a0b36] px-3 py-1.5 rounded-full border border-[#3c1e6e]/50 shadow-inner shadow-[#00f0ff]/5 cursor-pointer hover:border-[#00ff00]/50 transition-colors group">
+                            <span
+                                class="material-symbols-outlined text-[#00ff00] text-sm group-hover:animate-bounce">location_on</span>
+                            <span class="text-xs font-medium text-[#b4a5d8]">Bengaluru</span>
+                        </button>
+
+                        <a href="shopping_cart.html"
+                            class="relative p-2 rounded-full hover:bg-[#1a0b36] transition-colors group">
+                            <span
+                                class="material-symbols-outlined text-[#00f0ff] group-hover:text-white transition-colors">shopping_cart</span>
+                            <span id="cart-badge" class="zoi-cart-badge absolute top-1 right-1 min-w-[16px] h-4 bg-[#ff00ff] text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse hidden">0</span>
+                        </a>
+
+                        <a href="customer profile.html" id="header-user-avatar"
+                            class="w-9 h-9 rounded-full border-2 border-[#00f0ff]/50 ring-2 ring-[#00f0ff]/30 cursor-pointer shadow-lg hover:ring-[#ff00ff] transition-all overflow-hidden flex items-center justify-center bg-[#00f0ff]/20 text-[#00f0ff] font-black text-base"
+                            id="support-header-avatar">U
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="flex flex-1 w-full">
+        <!-- Universal Sidebar -->
+        <aside class="hidden lg:flex flex-col w-72 border-r border-border-dark shrink-0 h-[calc(100vh-65px)] sticky top-[65px] overflow-y-auto p-4 gap-6">
+            <div class="flex gap-3 p-3 rounded-xl bg-gradient-to-br from-border-dark/50 to-transparent border border-border-dark/30">
+                <div id="sidebar-avatar" class="size-12 rounded-full shrink-0 bg-primary/20 flex items-center justify-center text-primary font-black text-xl">U</div>
+                <div class="flex flex-col justify-center">
+                    <h1 id="sidebar-name" class="text-white text-base font-bold leading-normal">Loading...</h1>
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-primary text-[14px] fill-1">verified</span>
+                        <p class="text-text-muted text-xs font-normal leading-normal" id="sidebar-plan">ZipZap Gold Member</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-border-dark/50 transition-colors group text-text-muted hover:text-white zoi-3d-btn" href="customer profile.html">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+                    <p class="text-sm font-bold leading-normal">Overview</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-border-dark/50 transition-colors group text-text-muted hover:text-white zoi-3d-btn" href="customer_orders history.html">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <p class="text-sm font-medium leading-normal">My Orders</p>
+                </a>
+                <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-border-dark/50 transition-colors group text-text-muted hover:text-white zoi-3d-btn" href="customer profile.html#favorites-section">
+                    <span class="material-symbols-outlined">favorite</span>
+                    <p class="text-sm font-medium leading-normal">Favorites</p>
+                </a>
+                <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-border-dark/50 transition-colors group text-text-muted hover:text-white zoi-3d-btn" href="customer profile.html#zapwallet-section">
+                    <span class="material-symbols-outlined">account_balance_wallet</span>
+                    <p class="text-sm font-medium leading-normal">ZapWallet</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-border-dark/50 transition-colors group text-text-muted hover:text-white zoi-3d-btn" href="customer gamification hub.html">
+                    <span class="material-symbols-outlined">stars</span>
+                    <p class="text-sm font-medium leading-normal">ZapPoints</p>
+                </a>
+                <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-border-dark/50 transition-colors group text-text-muted hover:text-white zoi-3d-btn" href="customer profile.html#addresses-section">
+                    <span class="material-symbols-outlined">location_on</span>
+                    <p class="text-sm font-medium leading-normal">Addresses</p>
+                </a>
+                <div class="h-px w-full bg-border-dark my-2"></div>
+                <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-border-dark/50 transition-colors group text-text-muted hover:text-white zoi-3d-btn" href="customer profile.html#settings-section">
+                    <span class="material-symbols-outlined">settings</span>
+                    <p class="text-sm font-medium leading-normal">Settings</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-border-dark/50 transition-colors group text-text-muted hover:text-white zoi-3d-btn" href="customer support help.html">
+                    <span class="material-symbols-outlined">support_agent</span>
+                    <p class="text-sm font-medium leading-normal">Support Help</p>
+                </a>
+                <a id="logout-btn" onclick="if(typeof ZoiCustomer !== 'undefined') ZoiCustomer.logout()" class="flex items-center gap-3 px-3 py-3 mt-2 rounded-lg hover:bg-red-500/20 transition-colors group text-red-400 hover:text-red-300 cursor-pointer zoi-3d-btn">
+                    <span class="material-symbols-outlined">logout</span>
+                    <p class="text-sm font-bold leading-normal">Log Out</p>
+                </a>
+            </div>
+            <div class="mt-auto p-4 rounded-xl bg-gradient-to-b from-border-dark to-transparent border border-border-dark/50 relative overflow-hidden group cursor-pointer zoi-3d-layer">
+                <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <span class="material-symbols-outlined text-6xl rotate-12 zoi-3d-image">lunch_dining</span>
+                </div>
+                <p class="text-text-muted text-xs uppercase tracking-wider font-bold mb-1">Weekly Offer</p>
+                <p class="text-white font-bold text-sm mb-3">Get 20% off on all Biryanis this weekend!</p>
+                <button onclick="window.location.href='promotions & offers.html'" class="w-full bg-primary text-background-dark font-bold text-xs py-2 rounded-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.4)] transition-all uppercase tracking-wider zoi-3d-btn">Claim Offer</button>
+            </div>
+        </aside>
+        <div class="flex flex-1 flex-col min-w-0 bg-background-dark overflow-y-auto">
+            <!-- Hero Search Section -->
+            <div class="w-full bg-[#0a0314] flex justify-center pb-8 pt-6 px-4">
+                <div class="flex flex-col w-full max-w-[960px] gap-6">
+                    <div class="relative overflow-hidden rounded-xl min-h-[320px] flex flex-col items-center justify-center p-6 gap-6 bg-cover bg-center"
+                        data-alt="Dark abstract background with subtle food patterns"
+                        style='background-image: linear-gradient(rgba(10, 3, 20, 0.85), rgba(10, 3, 20, 0.6)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCOK_poo7Z0JkdPDJMREodtP8YQ_OkcEErnSOVow3CU7O91oW4zML46R0EkETUM1bVfoOAse5yBz3GluT4yThsz6v31PkI-7fiB4Nw5R_JNkHqU8PeiBFoiXLePbQfOSxIwmtsAIVzt8rEait1UIeJZ_AX-h3GSEWzdpfyl8cRwOycF6DTJGbi8IjZRNu9_w0YeoDHN2pe-cLPB0-ZOGao__ipmg6Tcsqt_T5T3oIBj_2rbbAWWiD2KEEDuC1Q9PoxK_jOwdvWmMqc");'>
+                        <div class="flex flex-col gap-3 text-center max-w-2xl">
+                            <h1 class="text-white text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">
+                                How can we help you today?
+                            </h1>
+                            <p class="text-text-beige text-base font-normal leading-normal">
+                                Search for topics, track your orders, or chat with our AI assistant.
+                            </p>
+                        </div>
+                        <!-- Search Bar -->
+                        <div class="w-full max-w-[560px]">
+                            <label class="flex flex-col h-14 w-full">
+                                <div class="flex w-full flex-1 items-stretch rounded-lg h-full shadow-lg">
+                                    <div
+                                        class="text-text-beige flex border border-border-brown bg-surface-dark items-center justify-center pl-4 rounded-l-lg border-r-0">
+                                        <span class="material-symbols-outlined">search</span>
+                                    </div>
+                                    <input
+                                        class="flex w-full min-w-0 flex-1 resize-none overflow-hidden text-white focus:outline-0 focus:ring-0 border border-border-brown bg-surface-dark focus:border-primary h-full placeholder:text-text-beige px-3 border-x-0 text-base font-normal leading-normal"
+                                        placeholder="e.g. 'Missing item' or 'Refund status'" value="" />
+                                    <div
+                                        class="flex items-center justify-center rounded-r-lg border-l-0 border border-border-brown bg-surface-dark pr-2">
+                                        <button
+                                            class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-6 bg-primary text-[#0a0314] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition-opacity">
+                                            Search
+                                        </button>
+                                    </div>
+                                </div>
+                            </label>
+                            <div class="flex gap-2 mt-3 justify-center text-xs text-text-beige flex-wrap">
+                                <span>Popular:</span>
+                                <a class="underline hover:text-primary" href="javascript:void(0)" onclick="openChat()">Where is my order?</a>
+                                <a class="underline hover:text-primary" href="javascript:void(0)" onclick="openChat()">Payment issue</a>
+                                <a class="underline hover:text-primary" href="javascript:void(0)" onclick="openChat()">Change address</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Main Grid Layout -->
+            <div class="layout-content-container flex flex-col max-w-[960px] w-full mx-auto px-4 md:px-10 pb-20 gap-10">
+                <!-- Recent Orders Section -->
+                <section>
+                    <div class="flex items-center justify-between pb-3 pt-2">
+                        <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Recent Orders
+                        </h2>
+                        <a class="text-primary text-sm font-bold hover:underline" href="customer_orders history.html">View All Orders</a>
+                    </div>
+                    <div id="support-orders-container" class="flex flex-col gap-3">
+                        <p class="text-gray-500 dark:text-text-beige text-sm italic py-4">Loading your recent orders...</p>
+                    </div>
+                </section>
+                <!-- Help Categories Grid -->
+                <section>
+                    <h2 class="text-gray-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-5">Browse by
+                        Category</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Category Card 1 -->
+                        <div
+                            class="group flex flex-col gap-3 rounded-xl border border-border-brown bg-surface-dark p-5 hover:border-primary cursor-pointer transition-all hover:bg-[#1a0b36]">
+                            <div
+                                class="w-10 h-10 rounded-full bg-[#1a0b36] group-hover:bg-primary/20 flex items-center justify-center text-primary transition-colors">
+                                <span class="material-symbols-outlined">payments</span>
+                            </div>
+                            <div>
+                                <h3 class="text-white text-lg font-bold mb-1">Payments &amp; Refunds</h3>
+                                <p class="text-text-beige text-sm">Manage payment methods, refund status, and billing
+                                    issues.</p>
+                            </div>
+                        </div>
+                        <!-- Category Card 2 -->
+                        <div
+                            class="group flex flex-col gap-3 rounded-xl border border-border-brown bg-surface-dark p-5 hover:border-primary cursor-pointer transition-all hover:bg-[#1a0b36]">
+                            <div
+                                class="w-10 h-10 rounded-full bg-[#1a0b36] group-hover:bg-primary/20 flex items-center justify-center text-primary transition-colors">
+                                <span class="material-symbols-outlined">account_circle</span>
+                            </div>
+                            <div>
+                                <h3 class="text-white text-lg font-bold mb-1">Account Settings</h3>
+                                <p class="text-text-beige text-sm">Update profile details, address book, and
+                                    preferences.</p>
+                            </div>
+                        </div>
+                        <!-- Category Card 3 -->
+                        <div
+                            class="group flex flex-col gap-3 rounded-xl border border-border-brown bg-surface-dark p-5 hover:border-primary cursor-pointer transition-all hover:bg-[#1a0b36]">
+                            <div
+                                class="w-10 h-10 rounded-full bg-[#1a0b36] group-hover:bg-primary/20 flex items-center justify-center text-primary transition-colors">
+                                <span class="material-symbols-outlined">loyalty</span>
+                            </div>
+                            <div>
+                                <h3 class="text-white text-lg font-bold mb-1">ZipZapZoi Gold</h3>
+                                <p class="text-text-beige text-sm">Membership benefits, renewal, and exclusive offers.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Category Card 4 -->
+                        <div
+                            class="group flex flex-col gap-3 rounded-xl border border-border-brown bg-surface-dark p-5 hover:border-primary cursor-pointer transition-all hover:bg-[#1a0b36]">
+                            <div
+                                class="w-10 h-10 rounded-full bg-[#1a0b36] group-hover:bg-primary/20 flex items-center justify-center text-primary transition-colors">
+                                <span class="material-symbols-outlined">health_and_safety</span>
+                            </div>
+                            <div>
+                                <h3 class="text-white text-lg font-bold mb-1">Safety &amp; Hygiene</h3>
+                                <p class="text-text-beige text-sm">Report safety concerns regarding food or delivery
+                                    partners.</p>
+                            </div>
+                        </div>
+                        <!-- Category Card 5 -->
+                        <div
+                            class="group flex flex-col gap-3 rounded-xl border border-border-brown bg-surface-dark p-5 hover:border-primary cursor-pointer transition-all hover:bg-[#1a0b36]">
+                            <div
+                                class="w-10 h-10 rounded-full bg-[#1a0b36] group-hover:bg-primary/20 flex items-center justify-center text-primary transition-colors">
+                                <span class="material-symbols-outlined">local_shipping</span>
+                            </div>
+                            <div>
+                                <h3 class="text-white text-lg font-bold mb-1">Delivery Partner</h3>
+                                <p class="text-text-beige text-sm">Issues with delivery time or partner behavior.</p>
+                            </div>
+                        </div>
+                        <!-- Category Card 6 -->
+                        <div
+                            class="group flex flex-col gap-3 rounded-xl border border-border-brown bg-surface-dark p-5 hover:border-primary cursor-pointer transition-all hover:bg-[#1a0b36]">
+                            <div
+                                class="w-10 h-10 rounded-full bg-[#1a0b36] group-hover:bg-primary/20 flex items-center justify-center text-primary transition-colors">
+                                <span class="material-symbols-outlined">redeem</span>
+                            </div>
+                            <div>
+                                <h3 class="text-white text-lg font-bold mb-1">Coupons &amp; Offers</h3>
+                                <p class="text-text-beige text-sm">Troubleshoot promo codes and referral rewards.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- FAQ Section -->
+                <section>
+                    <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-5">Top Frequently
+                        Asked Questions</h2>
+                    <div class="flex flex-col gap-1">
+                        <!-- FAQ Item -->
+                        <details
+                            class="group bg-surface-dark border border-border-brown rounded-lg open:border-primary/50 transition-all">
+                            <summary
+                                class="flex cursor-pointer items-center justify-between p-4 font-medium text-white hover:text-primary transition-colors list-none">
+                                <span>How do I cancel my order?</span>
+                                <span
+                                    class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+                            </summary>
+                            <div
+                                class="px-4 pb-4 text-text-beige text-sm leading-relaxed border-t border-border-brown/50 pt-3">
+                                You can cancel your order within 60 seconds of placing it by going to the 'Order
+                                Tracking' screen and tapping 'Cancel'. If the restaurant has already started preparing
+                                your food, cancellation fees may apply.
+                            </div>
+                        </details>
+                        <!-- FAQ Item -->
+                        <details
+                            class="group bg-surface-dark border border-border-brown rounded-lg open:border-primary/50 transition-all">
+                            <summary
+                                class="flex cursor-pointer items-center justify-between p-4 font-medium text-white hover:text-primary transition-colors list-none">
+                                <span>I received the wrong items. What should I do?</span>
+                                <span
+                                    class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+                            </summary>
+                            <div
+                                class="px-4 pb-4 text-text-beige text-sm leading-relaxed border-t border-border-brown/50 pt-3">
+                                We are sorry for the mix-up! Please go to your Recent Orders, select the order with the
+                                issue, and tap "Get Help". Choose "Wrong Item Delivered" and upload a photo of the item
+                                you received. Our AI will process a refund or replacement instantly.
+                            </div>
+                        </details>
+                        <!-- FAQ Item -->
+                        <details
+                            class="group bg-surface-dark border border-border-brown rounded-lg open:border-primary/50 transition-all">
+                            <summary
+                                class="flex cursor-pointer items-center justify-between p-4 font-medium text-white hover:text-primary transition-colors list-none">
+                                <span>How long does a refund take to process?</span>
+                                <span
+                                    class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+                            </summary>
+                            <div
+                                class="px-4 pb-4 text-text-beige text-sm leading-relaxed border-t border-border-brown/50 pt-3">
+                                Refunds to ZipZapZoi Credits are instant. Refunds to original payment sources (UPI,
+                                Credit/Debit Card) typically take 3-5 business days depending on your bank.
+                            </div>
+                        </details>
+                        <!-- FAQ Item -->
+                        <details
+                            class="group bg-surface-dark border border-border-brown rounded-lg open:border-primary/50 transition-all">
+                            <summary
+                                class="flex cursor-pointer items-center justify-between p-4 font-medium text-white hover:text-primary transition-colors list-none">
+                                <span>Can I change my delivery address after placing an order?</span>
+                                <span
+                                    class="material-symbols-outlined transition-transform group-open:rotate-180">expand_more</span>
+                            </summary>
+                            <div
+                                class="px-4 pb-4 text-text-beige text-sm leading-relaxed border-t border-border-brown/50 pt-3">
+                                You can change the address only if the delivery partner hasn't picked up the order yet.
+                                Please contact support immediately via Chat for assistance with address changes.
+                            </div>
+                        </details>
+                    </div>
+                    <div class="flex justify-center mt-6">
+                        <button class="text-primary text-sm font-bold hover:underline flex items-center gap-1">
+                            View All FAQs
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </button>
+                    </div>
+                </section>
+                <!-- Split-Pane Support Inbox -->
+                <section class="mt-8" id="support-inbox-section">
+                    <div class="flex flex-col lg:flex-row gap-0 lg:gap-0 bg-white dark:bg-[#0a0314] rounded-2xl border border-gray-200 dark:border-border-brown h-[700px] overflow-hidden shadow-2xl glass-panel relative">
+                        <!-- LEFT PANE: TICKETS LIST -->
+                        <div class="w-full lg:w-[350px] flex flex-col border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-border-brown bg-gray-50 dark:bg-surface-dark shrink-0 h-[300px] lg:h-full">
+                            <!-- Inbox Header -->
+                            <div class="p-5 border-b border-gray-200 dark:border-border-brown flex justify-between items-center bg-gray-100 dark:bg-[#1a0b36]">
+                                <h2 class="text-gray-900 dark:text-white text-lg font-bold">Conversations</h2>
+                                <button onclick="createNewTicket()" class="bg-primary text-black size-8 rounded-full flex items-center justify-center hover:bg-opacity-80 transition-transform hover:scale-105 shadow-[0_0_10px_rgba(0,240,255,0.3)]" title="Start New Chat">
+                                    <span class="material-symbols-outlined text-[20px]">add</span>
+                                </button>
+                            </div>
+                            <!-- Inbox Filter -->
+                            <div class="p-3 border-b border-gray-200 dark:border-border-brown bg-white dark:bg-[#1a0b36]/50">
+                                <div class="relative">
+                                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-beige text-sm">search</span>
+                                    <input type="text" id="ticket-search" placeholder="Search tickets..." class="w-full bg-gray-50 dark:bg-[#0a0314] border border-gray-300 dark:border-border-brown rounded-lg pl-9 pr-3 py-2 text-sm text-gray-900 dark:text-white focus:border-primary focus:outline-none placeholder:text-gray-400 dark:placeholder:text-text-beige/50 transition-colors" onkeyup="filterTickets()">
+                                </div>
+                            </div>
+                            <!-- Ticket List -->
+                            <div id="inbox-ticket-list" class="flex-1 overflow-y-auto flex flex-col custom-scrollbar">
+                                <p class="text-text-beige text-sm italic p-5 text-center">Loading conversations...</p>
+                            </div>
+                        </div>
+
+                        <!-- Right Pane: Chat Window -->
+                        <div class="flex-1 flex flex-col h-full relative bg-white dark:bg-[#0a0314]" id="inbox-chat-view">
+                            <!-- Empty State Overlay -->
+                            <div id="chat-empty-state" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 dark:bg-[#0a0314] z-10 transition-opacity duration-300">
+                                <div class="size-20 bg-white dark:bg-surface-dark rounded-full flex items-center justify-center mb-6 shadow-lg border border-gray-200 dark:border-border-brown">
+                                    <span class="material-symbols-outlined text-4xl text-primary/50 font-light">forum</span>
+                                </div>
+                                <h3 class="text-gray-900 dark:text-white text-2xl font-bold mb-3 tracking-tight">How can we help?</h3>
+                                <p class="text-gray-500 dark:text-text-beige text-sm max-w-sm text-center mb-8 leading-relaxed">Select an existing conversation from the list to continue, or start a new chat for immediate AI assistance.</p>
+                                <button onclick="createNewTicket()" class="px-8 py-3 bg-primary text-black font-bold rounded-xl hover:bg-opacity-90 transition-all flex items-center gap-2 shadow-[0_4px_20px_rgba(0,240,255,0.25)] hover:-translate-y-1">
+                                    <span class="material-symbols-outlined text-[20px]">chat</span> Start New Chat
+                                </button>
+                            </div>
+
+                            <!-- Chat Header -->
+                            <div class="p-4 border-b border-gray-200 dark:border-border-brown bg-gray-100 dark:bg-[#1a0b36] flex justify-between items-center z-0">
+                                <div class="flex items-center gap-3">
+                                    <div class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 border border-primary/20">
+                                        <span class="material-symbols-outlined">support_agent</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <h3 id="active-ticket-subject" class="text-gray-900 dark:text-white font-bold text-base line-clamp-1">Support Session</h3>
+                                        <div class="flex items-center gap-2 mt-0.5">
+                                            <span id="active-ticket-status" class="px-2 py-0.5 rounded text-[9px] font-black border bg-yellow-100 dark:bg-yellow-900/50 border-yellow-300 dark:border-yellow-700 text-yellow-600 dark:text-yellow-400 uppercase tracking-wider">OPEN</span>
+                                            <span id="active-ticket-id" class="text-gray-500 dark:text-text-beige/60 text-[10px] font-mono tracking-widest">#TCK---</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="resolveCurrentTicket()" id="btn-resolve-ticket" class="text-xs px-3 py-1.5 border border-gray-300 dark:border-border-brown rounded-lg text-gray-500 dark:text-text-beige hover:text-green-600 dark:hover:text-green-400 hover:border-green-400/50 hover:bg-green-50 dark:hover:bg-green-400/10 transition-all flex items-center gap-1.5 font-bold bg-white dark:bg-surface-dark">
+                                        <span class="material-symbols-outlined text-[16px]">check_circle</span> Resolve
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Order Context Picker -->
+                            <div id="order-context-picker" class="hidden p-3 border-b border-gray-200 dark:border-border-brown bg-gray-50 dark:bg-surface-dark/40 overflow-x-auto whitespace-nowrap custom-scrollbar shrink-0">
+                                <p class="text-[10px] font-bold text-primary uppercase tracking-widest mb-2 px-1">Attach order context (Optional)</p>
+                                <div id="context-orders-list" class="flex gap-3 pb-1"></div>
+                            </div>
+
+                            <!-- Transcript Window -->
+                            <div id="inbox-chat-messages" class="flex-1 overflow-y-auto p-5 flex flex-col gap-5 custom-scrollbar bg-white dark:bg-gradient-to-b dark:from-[#0a0314] dark:to-surface-dark/20 z-0 relative">
+                                <div class="text-[10px] text-center font-medium tracking-widest uppercase text-gray-400 dark:text-text-beige/40 my-2 sticky top-0 bg-white/90 dark:bg-[#0a0314]/90 py-1 z-10">
+                                    <span class="material-symbols-outlined text-[10px] align-middle mr-1">lock</span> Secure Channel
+                                </div>
+                            </div>
+
+                            <!-- Input Area -->
+                            <div class="p-4 border-t border-gray-200 dark:border-border-brown bg-gray-100 dark:bg-[#1a0b36] shrink-0 z-0">
+                                <form id="inbox-chat-form" class="flex gap-3 items-end" onsubmit="event.preventDefault(); submitInboxMessage();">
+                                    <div class="flex-1 bg-white dark:bg-surface-dark border border-gray-300 dark:border-border-brown rounded-xl overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50 transition-all shadow-inner">
+                                        <textarea id="inbox-chat-input" rows="1" class="w-full bg-transparent border-none focus:ring-0 text-sm text-gray-900 dark:text-white px-4 py-3.5 placeholder:text-gray-400 dark:placeholder:text-text-beige/50 resize-none block overflow-hidden leading-relaxed" style="min-height: 50px; max-height: 150px;" placeholder="Describe your issue..." oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'" onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); submitInboxMessage(); }"></textarea>
+                                    </div>
+                                    <button type="submit" id="inbox-chat-send" class="size-[50px] shrink-0 bg-primary text-black rounded-xl flex items-center justify-center hover:bg-opacity-90 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_15px_rgba(0,240,255,0.2)]">
+                                        <span class="material-symbols-outlined" style="font-variation-settings:'wght' 700">send</span>
+                                    </button>
+                                </form>
+                                <div class="flex justify-between mt-2.5 px-2">
+                                    <p class="text-[10px] text-gray-400 dark:text-text-beige/40 font-medium">Shift + Enter for new line</p>
+                                    <p class="text-[10px] text-primary/80 font-bold flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[10px] animate-pulse">auto_awesome</span> Zoi AI Active
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer moved completely outside the flex container -->
+    <footer class="bg-surface-dark dark:bg-[#0a0314] text-gray-500 dark:text-[#b4a5d8] border-t border-gray-200 dark:border-[#3c1e6e] mt-auto">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
+                    <!-- Column 1: Brand -->
+                    <div class="col-span-1 md:col-span-2">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span
+                                class="material-symbols-outlined text-[#00f0ff] text-2xl drop-shadow-[0_0_8px_currentColor]">bolt</span>
+                            <span class="font-bold text-xl text-white"
+                                style="font-family: 'Quicksand', sans-serif;">ZoiEats</span>
+                        </div>
+                        <p class="text-sm mb-4 text-[#b4a5d8]">
+                            Your AI-powered portal to the comforting flavors of India.
+                        </p>
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00ff00]/20 border border-[#00ff00]/30 shadow-md shadow-[#00ff00]/10">
+                            <span class="relative flex h-2 w-2">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff00] opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-[#00ff00]"></span>
+                            </span>
+                            <span class="text-xs font-mono font-medium text-[#00ff00]">AI System: OPTIMAL</span>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Explore ZoiEats -->
+                    <div>
+                        <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Explore
+                            ZoiEats</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a class="hover:text-[#00f0ff] transition-colors" href="promotions & offers.html">Offers
+                                    & Promos</a></li>
+                            <li><a class="hover:text-[#00f0ff] transition-colors" href="feedback.html">Feedback
+                                    Portal</a></li>
+                            <li><a class="hover:text-[#00f0ff] transition-colors"
+                                    href="customer support help.html">Customer Support</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Partner with Us -->
+                    <div>
+                        <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Partner with
+                            Us</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a class="hover:text-[#00f0ff] transition-colors"
+                                    href="restaurant pricing plans.html">Add Restaurant</a></li>
+                            <li><a class="hover:text-[#00f0ff] transition-colors"
+                                    href="delivery partner application.html">Ride with Us</a></li>
+                            <li><a class="hover:text-[#00f0ff] transition-colors" href="dev_hub.html">Developer APIs</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Company -->
+                    <div>
+                        <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Company</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a class="hover:text-[#00f0ff] transition-colors" href="careerspage.html">Careers</a>
+                            </li>
+                            <li><a class="hover:text-[#00f0ff] transition-colors" href="press & media kit.html">Press &
+                                    Media</a></li>
+                            <li><a class="hover:text-[#00f0ff] transition-colors" href="about us.html">About Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div
+                    class="border-t border-[#3c1e6e] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm">
+                        <span>© 2025 ZoiEats. All rights reserved.</span>
+                        <span class="hidden sm:inline-block text-[#3c1e6e]">|</span>
+                        <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms &
+                            Conditions</a>
+                        <a class="hover:text-white transition-colors" href="privacy policy.html">Privacy Policy</a>
+                        <a class="hover:text-white transition-colors" href="gst disclaimer.html">GST & Taxation</a>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-6 mt-6 md:mt-0">
+                        <div class="flex flex-col gap-2">
+                            <a href="mailto:reachus@zipzapzoi.in"
+                                class="text-sm hover:text-[#00f0ff] transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px]">mail</span> reachus@zipzapzoi.in
+                            </a>
+                            <a href="mailto:phanikumar@zipzapzoi.in"
+                                class="text-sm hover:text-[#00f0ff] transition-colors flex items-center gap-2 text-[#3c1e6e]/80">
+                                <span class="material-symbols-outlined text-[16px]">developer_mode</span>
+                                phanikumar@zipzapzoi.in
+                            </a>
+                        </div>
+                        <div class="flex gap-4 items-center">
+                            <a class="hover:text-white transition-colors text-lg" href="https://x.com/ZipZapZoi"
+                                target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                            <a class="hover:text-white transition-colors text-lg"
+                                href="https://www.youtube.com/@ZipZapZoi" target="_blank" rel="noopener noreferrer"><i
+                                    class="fa fa-youtube-play"></i></a>
+                            <a class="hover:text-white transition-colors text-lg"
+                                href="https://www.instagram.com/zipzapzoi/" target="_blank" rel="noopener noreferrer"><i
+                                    class="fa fa-instagram"></i></a>
+                            <a class="hover:text-white transition-colors text-lg"
+                                href="https://www.facebook.com/profile.php?id=61585106515522" target="_blank"
+                                rel="noopener noreferrer"><i class="fa fa-facebook"></i></a>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+</div>
+<script src="js/zoi_config.js"></script>
+<script src="js/zoi_customer_engine.js"></script>
+<script src="js/zoi_ai_assistant.js?v=4"></script>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+    let chatSocket = null;
+    let userName = 'Guest User';
+    let _localChat = true; // Fallback to local AI chat if no WebSocket
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+            window.location.href = 'login & registration.html';
+            return;
+        }
+        
+        const activeSession = ZoiToken.getUser();
+        if (activeSession && activeSession.name) userName = activeSession.name;
+        
+        // Populate sidebar name and avatars from session
+        const sidebarName = document.getElementById('sidebar-name');
+        if (sidebarName) sidebarName.textContent = activeSession.name || 'Guest';
+        const userInitial = activeSession.name ? activeSession.name.charAt(0).toUpperCase() : 'U';
+        const sidebarAv = document.getElementById('sidebar-avatar');
+        if (sidebarAv) sidebarAv.textContent = userInitial;
+        const headerAv = document.getElementById('support-header-avatar');
+        if (headerAv) headerAv.textContent = userInitial;
+        
+        // Hydrate Recent Orders Context
+        const ordersContainer = document.getElementById('support-orders-container');
+        if (ordersContainer) {
+            ordersContainer.innerHTML = '';
+            try {
+                const sysOrders = JSON.parse(localStorage.getItem('zoiCompletedOrders') || '[]');
+                const histOrders = JSON.parse(localStorage.getItem('zoiOrderHistory') || '[]');
+                let myOrders = [...sysOrders, ...histOrders].filter(o => o.customer === activeSession.name || o.userId === activeSession.id || o.userName === activeSession.name);
+                
+                myOrders = Array.from(new Map(myOrders.map(item => [item.id, item])).values());
+                
+                if (myOrders.length === 0) {
+                    ordersContainer.innerHTML = '<p class="text-text-beige text-sm italic py-4">No recent orders found. Issue with a past order? Try searching.</p>';
+                } else {
+                    myOrders.sort((a,b) => new Date(b.date || b.timestamp) - new Date(a.date || a.timestamp));
+                    const recentTop2 = myOrders.slice(0, 2);
+                    
+                    recentTop2.forEach((order) => {
+                        let statusColor = 'text-green-300 border-green-700 bg-green-900';
+                        if (order.status === 'Cancelled') {
+                            statusColor = 'text-red-300 border-red-700 bg-red-900';
+                        } else if (order.status !== 'delivered' && order.status !== 'Delivered') {
+                            statusColor = 'text-yellow-300 border-yellow-700 bg-yellow-900';
+                        }
+                        
+                        const orderTotal = (order.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+                        const dateFormatted = order.date ? String(order.date) : new Date(order.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' });
+                        const defaultImg = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8NHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=60';
+
+                        ordersContainer.innerHTML += `
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-surface-dark border border-border-brown rounded-xl p-4 justify-between transition-colors hover:border-primary/50">
+                            <div class="flex items-center gap-4 w-full sm:w-auto">
+                                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16 shrink-0"
+                                    style="background-image: url('${order.image || defaultImg}');">
+                                </div>
+                                <div class="flex flex-col justify-center">
+                                    <div class="flex items-center gap-2">
+                                        <p class="text-white text-base font-bold leading-normal line-clamp-1">${order.restaurantName || order.restaurant || 'Local Restaurant'}</p>
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${statusColor} uppercase">${order.status || 'Completed'}</span>
+                                    </div>
+                                    <p class="text-text-beige text-sm font-normal leading-normal mt-1">Order #${order.id} • ₹${orderTotal}</p>
+                                    <p class="text-text-beige/60 text-xs font-normal leading-normal mt-0.5">${dateFormatted}</p>
+                                </div>
+                            </div>
+                            <div class="w-full sm:w-auto shrink-0 mt-2 sm:mt-0">
+                                <button onclick="openSupportChat()" class="flex w-full sm:w-auto cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-[#3c1e6e] hover:bg-primary/20 text-white text-sm font-medium leading-normal transition-colors">
+                                    Get Help
+                                </button>
+                            </div>
+                        </div>`;
+                    });
+                }
+            } catch(e) {
+                console.error("Error loading help orders:", e);
+                ordersContainer.innerHTML = '<p class="text-red-400 text-sm italic py-4">Error loading recent orders.</p>';
+            }
+        }
+
+        // Load Inbox
+        loadInboxTickets();
+    });
+
+    let currentTicketId = null;
+    let allTickets = [];
+
+    // 1. Initial Load & Hydrate Tickets Sidebar
+    function loadInboxTickets() {
+        allTickets = JSON.parse(localStorage.getItem('zoiSupportTickets') || '[]');
+        renderTicketsList(allTickets);
+    }
+
+    function renderTicketsList(tickets) {
+        const listEl = document.getElementById('inbox-ticket-list');
+        if (!listEl) return;
+        
+        if (tickets.length === 0) {
+            listEl.innerHTML = `
+                <div class="flex flex-col items-center justify-center p-8 opacity-50 mt-10">
+                    <span class="material-symbols-outlined text-4xl mb-3">inbox</span>
+                    <p class="text-sm font-medium">No conversations found.</p>
+                </div>`;
+            return;
+        }
+
+        listEl.innerHTML = '';
+        tickets.forEach(t => {
+            const isResolved = t.status === 'resolved';
+            const statusColor = isResolved ? 'text-green-400 bg-green-400/10' : 'text-yellow-400 bg-yellow-400/10';
+            const statusDot = isResolved ? 'bg-green-500' : 'bg-yellow-500 animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]';
+            const isActive = t.id === currentTicketId;
+            const bgClass = isActive ? 'bg-primary/10 border-l-4 border-l-primary' : 'hover:bg-white/5 border-l-4 border-l-transparent';
+            
+            const lastMsg = t.messages && t.messages.length > 0 ? t.messages[t.messages.length-1].text : 'Start of conversation...';
+
+            listEl.innerHTML += `
+            <div onclick="openTicket('${t.id}')" class="p-4 border-b border-border-brown cursor-pointer transition-colors ${bgClass}">
+                <div class="flex justify-between items-start mb-1.5">
+                    <h4 class="text-white font-bold text-[13px] line-clamp-1 flex-1 pr-2 tracking-wide">${t.subject}</h4>
+                    <span class="text-[9px] font-bold uppercase tracking-wider text-text-beige/50 shrink-0">${t.date}</span>
+                </div>
+                <p class="text-text-beige/80 text-xs line-clamp-1 mb-2.5 leading-relaxed">${lastMsg}</p>
+                <div class="flex items-center gap-1.5">
+                    <div class="size-1.5 rounded-full ${statusDot}"></div>
+                    <span class="text-[8px] font-black uppercase tracking-widest ${statusColor} px-1.5 py-0.5 rounded">${t.status}</span>
+                </div>
+            </div>`;
+        });
+    }
+
+    function filterTickets() {
+        const query = document.getElementById('ticket-search').value.toLowerCase();
+        if (!query) return renderTicketsList(allTickets);
+        const filtered = allTickets.filter(t => t.subject.toLowerCase().includes(query) || (t.id && t.id.toLowerCase().includes(query)));
+        renderTicketsList(filtered);
+    }
+
+    // 2. Open Existing Ticket
+    function openTicket(ticketId) {
+        currentTicketId = ticketId;
+        const ticket = allTickets.find(t => t.id === ticketId);
+        if (!ticket) return;
+        
+        // Hide empty state
+        document.getElementById('chat-empty-state').style.opacity = '0';
+        document.getElementById('chat-empty-state').style.pointerEvents = 'none';
+
+        // Update Header
+        document.getElementById('active-ticket-subject').textContent = ticket.subject;
+        document.getElementById('active-ticket-id').textContent = '#' + ticket.id;
+        
+        const statusBadge = document.getElementById('active-ticket-status');
+        if (ticket.status === 'resolved') {
+            statusBadge.className = 'px-2 py-0.5 rounded text-[9px] font-black border bg-green-900/50 border-green-700 text-green-400 uppercase tracking-wider';
+            statusBadge.textContent = 'RESOLVED';
+            document.getElementById('btn-resolve-ticket').style.display = 'none';
+        } else {
+            statusBadge.className = 'px-2 py-0.5 rounded text-[9px] font-black border bg-yellow-900/50 border-yellow-700 text-yellow-400 uppercase tracking-wider';
+            statusBadge.textContent = 'OPEN';
+            document.getElementById('btn-resolve-ticket').style.display = 'flex';
+        }
+
+        // Hide Order Context Picker
+        document.getElementById('order-context-picker').classList.add('hidden');
+
+        // Render Messages
+        const msgContainer = document.getElementById('inbox-chat-messages');
+        msgContainer.innerHTML = `
+            <div class="text-[10px] text-center font-medium tracking-widest uppercase text-primary/60 my-2 sticky top-0 bg-[#0a0314]/90 backdrop-blur-sm py-1 z-10 rounded-full w-max mx-auto px-4 border border-primary/20">
+                <span class="material-symbols-outlined text-[12px] align-middle mr-1">encrypted</span> End-to-End Secure Channel
+            </div>
+        `;
+        
+        if (ticket.messages) {
+            ticket.messages.forEach(msg => {
+                appendChatBubbleHTML(msg.sender, msg.text, msg.sender === userName || msg.sender === 'Customer', msg.time);
+            });
+        }
+        
+        // Enable input if open
+        const input = document.getElementById('inbox-chat-input');
+        const btn = document.getElementById('inbox-chat-send');
+        if (ticket.status === 'resolved') {
+            input.disabled = true;
+            btn.disabled = true;
+            input.placeholder = "This conversation is resolved.";
+        } else {
+            input.disabled = false;
+            btn.disabled = false;
+            input.placeholder = "Describe your issue...";
+            input.focus();
+        }
+
+        // Re-render sidebar to highlight active
+        renderTicketsList(allTickets);
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+    }
+
+    // 3. Start New Ticket Flow
+    function createNewTicket() {
+        currentTicketId = null;
+        
+        document.getElementById('chat-empty-state').style.opacity = '0';
+        document.getElementById('chat-empty-state').style.pointerEvents = 'none';
+
+        document.getElementById('active-ticket-subject').textContent = "New Support Request";
+        document.getElementById('active-ticket-id').textContent = '#TCK-NEW';
+        
+        const statusBadge = document.getElementById('active-ticket-status');
+        statusBadge.className = 'px-2 py-0.5 rounded text-[9px] font-black border bg-primary/20 border-primary text-primary uppercase tracking-wider';
+        statusBadge.textContent = 'DRAFT';
+        document.getElementById('btn-resolve-ticket').style.display = 'none';
+
+        // Show Order Context Picker
+        renderOrderContextPicker();
+
+        const msgContainer = document.getElementById('inbox-chat-messages');
+        msgContainer.innerHTML = `
+            <div class="text-[10px] text-center font-medium tracking-widest uppercase text-primary/60 my-2 sticky top-0 bg-[#0a0314]/90 backdrop-blur-sm py-1 z-10 rounded-full w-max mx-auto px-4 border border-primary/20">
+                <span class="material-symbols-outlined text-[12px] align-middle mr-1">encrypted</span> End-to-End Secure Channel
+            </div>
+            <div class="self-start bg-gray-100 dark:bg-surface-dark text-gray-900 dark:text-white border border-gray-300 dark:border-border-brown px-4 py-3 rounded-2xl rounded-tl-sm max-w-[85%] text-sm shadow-md mt-4 animate-[fade-in-up_0.3s_ease-out]">
+                <span class="text-[10px] font-black block mb-1.5 opacity-80 uppercase tracking-widest text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">smart_toy</span> Zoi AI</span>
+                Hi ${userName}! 👋 I'm Zoi, your dedicated support assistant. To help me resolve this quickly, please describe your issue, or tap an order context above if this is regarding a specific meal!
+            </div>
+        `;
+
+        const input = document.getElementById('inbox-chat-input');
+        const btn = document.getElementById('inbox-chat-send');
+        input.disabled = false;
+        btn.disabled = false;
+        input.placeholder = "Describe your issue...";
+        input.value = '';
+        input.focus();
+        
+        renderTicketsList(allTickets);
+    }
+
+    function renderOrderContextPicker() {
+        const picker = document.getElementById('order-context-picker');
+        const list = document.getElementById('context-orders-list');
+        picker.classList.remove('hidden');
+        list.innerHTML = '';
+        
+        try {
+             const sysOrders = JSON.parse(localStorage.getItem('zoiCompletedOrders') || '[]');
+             const histOrders = JSON.parse(localStorage.getItem('zoiOrderHistory') || '[]');
+             const activeSession = typeof ZoiToken !== 'undefined' ? ZoiToken.getUser() || {name: 'Guest'} : {name: 'Guest'};
+             let myOrders = [...sysOrders, ...histOrders].filter(o => o.customer === activeSession.name || o.userId === activeSession.id || o.userName === activeSession.name);
+             myOrders = Array.from(new Map(myOrders.map(item => [item.id, item])).values());
+             myOrders.sort((a,b) => new Date(b.date || b.timestamp) - new Date(a.date || a.timestamp));
+             
+             if(myOrders.length === 0) {
+                 picker.classList.add('hidden');
+                 return;
+             }
+             
+             myOrders.slice(0, 5).forEach(o => {
+                 const total = (o.total || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+                 list.innerHTML += `
+                     <button onclick="attachOrderContext('${o.id}', '${o.restaurantName || o.restaurant}', '${total}')" class="shrink-0 flex items-center gap-2.5 px-3 py-2 bg-[#0a0314] border border-border-brown hover:border-primary/50 hover:bg-primary/10 transition-colors rounded-xl text-left group shadow-inner">
+                        <span class="material-symbols-outlined text-text-beige/60 group-hover:text-primary text-[20px] transition-colors">receipt_long</span>
+                        <div class="flex flex-col">
+                            <span class="text-white text-xs font-bold leading-none mb-1">${o.restaurantName || o.restaurant || 'Local Restaurant'}</span>
+                            <span class="text-text-beige/70 text-[9px] uppercase tracking-wider font-mono leading-none">#${o.id} • ₹${total}</span>
+                        </div>
+                     </button>
+                 `;
+             });
+        } catch(e) {}
+    }
+
+    function attachOrderContext(orderId, restaurant, total) {
+        document.getElementById('inbox-chat-input').value = `I have an issue with Order #${orderId} from ${restaurant} (₹${total}). \n`;
+        document.getElementById('inbox-chat-input').focus();
+    }
+
+    // 4. Send & Save Messages
+    function submitInboxMessage() {
+        const input = document.getElementById('inbox-chat-input');
+        const text = input.value.trim();
+        if (!text) return;
+        
+        const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        
+        // If draft, create actual ticket
+        if (!currentTicketId) {
+            currentTicketId = 'TCK-' + Math.floor(100000 + Math.random() * 900000);
+            const newTck = {
+                id: currentTicketId,
+                subject: text.substring(0, 40) + (text.length > 40 ? '...' : ''),
+                date: new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}),
+                status: 'open',
+                messages: [
+                    { sender: 'Zoi AI', text: `Hi ${userName}! 👋 I'm Zoi, your dedicated support assistant. To help me resolve this quickly, please describe your issue, or tap an order context above if this is regarding a specific meal!`, time: now },
+                    { sender: userName, text: text, time: now }
+                ]
+            };
+            allTickets.unshift(newTck);
+            document.getElementById('active-ticket-subject').textContent = newTck.subject;
+            document.getElementById('active-ticket-id').textContent = '#' + newTck.id;
+            const statusBadge = document.getElementById('active-ticket-status');
+            statusBadge.className = 'px-2 py-0.5 rounded text-[9px] font-black border bg-yellow-900/50 border-yellow-700 text-yellow-400 uppercase tracking-wider';
+            statusBadge.textContent = 'OPEN';
+            document.getElementById('btn-resolve-ticket').style.display = 'flex';
+            document.getElementById('order-context-picker').classList.add('hidden');
+        } else {
+            const ticket = allTickets.find(t => t.id === currentTicketId);
+            if (ticket) {
+                ticket.messages.push({ sender: userName, text: text, time: now });
+            }
+        }
+        
+        appendChatBubbleHTML(userName, text, true, now);
+        input.value = '';
+        input.style.height = '50px';
+        saveTicketsToStorage();
+
+        // Simulate AI Reply Contextually
+        setTimeout(() => {
+            const isOrderIssue = text.toLowerCase().includes('order #');
+            const responses = isOrderIssue ? [
+                `I found the details for your order. Let me investigate what's happening with the merchant. Can you wait 2 minutes while I fetch the dispatch logs?`,
+                `Thanks for attaching the order context. I've initiated a priority trace on this transaction. A human agent will take over shortly if needed.`,
+            ] : [
+                `I understand. Let me check our system regarding "${text.substring(0,25)}...". Please hold on.`,
+                `Thanks for providing that detail, ${userName}. Our AI is analyzing the best resolution for you.`,
+                `I understand your frustration. Would you like me to connect you with a live human Support Agent?`,
+                `I've logged this information to ticket ${currentTicketId}. We will update you via email or push notification once resolved.`
+            ];
+            const reply = responses[Math.floor(Math.random() * responses.length)];
+            const time2 = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            const ticket = allTickets.find(t => t.id === currentTicketId);
+            if (ticket) ticket.messages.push({ sender: 'Zoi AI', text: reply, time: time2 });
+            
+            appendChatBubbleHTML('Zoi AI', reply, false, time2);
+            saveTicketsToStorage();
+        }, 1000 + Math.random() * 1500);
+    }
+
+    function appendChatBubbleHTML(name, text, isMe, timeStr) {
+        const msgsDiv = document.getElementById('inbox-chat-messages');
+        const bubble = document.createElement('div');
+        
+        const formattedText = text.replace(/\\n/g, '<br>');
+        
+        if (isMe) {
+            bubble.className = 'self-end flex flex-col items-end max-w-[85%] animate-[fade-in-up_0.3s_ease-out]';
+            bubble.innerHTML = `
+                <div class="bg-primary text-black px-4 py-3 rounded-2xl rounded-tr-sm text-sm shadow-[0_4px_15px_rgba(0,240,255,0.15)] font-medium leading-relaxed">
+                    ${formattedText}
+                </div>
+                <span class="text-[9px] text-text-beige/50 mt-1 font-bold tracking-widest uppercase">${timeStr} • You</span>
+            `;
+        } else {
+            bubble.className = 'self-start flex flex-col items-start max-w-[85%] animate-[fade-in-up_0.3s_ease-out]';
+            bubble.innerHTML = `
+                <div class="bg-surface-dark text-white border border-border-brown px-4 py-3 rounded-2xl rounded-tl-sm text-sm shadow-md leading-relaxed">
+                    <span class="text-[10px] font-black block mb-1.5 opacity-80 uppercase tracking-widest text-[#00f0ff] flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[13px]">smart_toy</span> Zoi AI Support
+                    </span>
+                    ${formattedText}
+                </div>
+                <span class="text-[9px] text-text-beige/50 mt-1 font-bold tracking-widest uppercase">${timeStr} • Automated</span>
+            `;
+        }
+        
+        msgsDiv.appendChild(bubble);
+        msgsDiv.scrollTop = msgsDiv.scrollHeight;
+    }
+
+    function resolveCurrentTicket() {
+        if (!currentTicketId) return;
+        if(confirm("Are you sure you want to mark this issue as resolved?")) {
+            const ticket = allTickets.find(t => t.id === currentTicketId);
+            if (ticket) {
+                ticket.status = 'resolved';
+                saveTicketsToStorage();
+                showSupportToast("Ticket #" + ticket.id + " has been officially closed.");
+                openTicket(ticket.id); // reload UI
+            }
+        }
+    }
+
+    function saveTicketsToStorage() {
+        localStorage.setItem('zoiSupportTickets', JSON.stringify(allTickets));
+        renderTicketsList(allTickets);
+    }
+
+    // Contact Helper
+    function requestCallback() {
+        const phone = prompt('Enter your phone number for callback:');
+        if (!phone) return;
+        if (phone.length < 10) { alert('Please enter a valid phone number'); return; }
+        
+        const currentTicketId = 'TCK-' + Math.floor(100000 + Math.random() * 900000);
+        allTickets.unshift({
+            id: currentTicketId,
+            subject: 'Callback Request: ' + phone,
+            date: new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}),
+            status: 'open',
+            messages: [
+                { sender: 'Zoi AI', text: `A human support agent will call ${phone} within 30 minutes. Ticket created successfully.`, time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) }
+            ]
+        });
+        saveTicketsToStorage();
+        showSupportToast('Callback successfully requested!');
+    }
+
+    function showSupportToast(msg) {
+        const existing = document.getElementById('support-toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.id = 'support-toast';
+        toast.className = 'fixed bottom-10 right-6 bg-surface-dark border border-primary text-white px-5 py-3 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-[9999] text-sm font-bold flex items-center gap-3 animate-[fade-in-up_0.3s_ease-out]';
+        toast.innerHTML = `<span class="material-symbols-outlined text-[#00ff00]">check_circle</span> ${msg}`;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            toast.style.transition = 'all 0.3s';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+</script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>

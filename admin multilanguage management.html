@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Admin - Polyglot Engine</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6",
+                        ai: "#8b5cf6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] },
+                    animation: { 'pulse-slow': 'pulse 3s infinite' }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .nav-item.active {
+            background: rgba(0, 240, 255, 0.1);
+            color: #00f0ff;
+            border-color: rgba(0, 240, 255, 0.2);
+            border-width: 1px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+    .glass { background: rgba(24, 26, 32, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white font-sans h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>
+        // Enforce RBAC
+        ZoiAuth.enforceAccess("Languages");
+    </script>
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-bg">
+
+        <header class="h-16 flex items-center justify-between px-6 border-b border-border bg-surface z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold text-white flex items-center gap-2">
+                    Polyglot Engine <span
+                        class="text-[10px] bg-ai/10 text-ai px-2 py-0.5 rounded border border-ai/20 flex items-center gap-1"><span
+                            class="material-symbols-outlined text-[10px]">translate</span> Z.O.I. Translation</span>
+                </h1>
+                <div class="h-6 w-[1px] bg-border"></div>
+                <select id="lang-select"
+                    class="bg-black/30 border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary"
+                    onchange="renderTable()">
+                    <option value="hi">Hindi (हिन्दी)</option>
+                    <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                    <option value="fr">French (Français)</option>
+                </select>
+                <div
+                    class="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-border text-[10px] text-gray-400">
+                    <span>Health:</span>
+                    <span class="text-white font-bold" id="progress-text">Loading...</span>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="runAudit()"
+                    class="bg-surface border border-border hover:border-white text-white px-3 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">health_and_safety</span> Audit
+                </button>
+                <button onclick="autoTranslate()"
+                    class="bg-ai hover:bg-violet-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(139,92,246,0.3)]">
+                    <span class="material-symbols-outlined text-sm">auto_fix_high</span> Magic Translate
+                </button>
+                <button onclick="publishLang()"
+                    class="bg-primary hover:bg-orange-600 text-black px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">rocket_launch</span> Publish
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-auto p-6 space-y-6 custom-scrollbar">
+
+            <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-lg">
+                <div class="p-4 border-b border-border bg-black/20 flex justify-between items-center">
+                    <div class="flex gap-3">
+                        <button onclick="openAddModal()"
+                            class="text-xs bg-white/5 hover:bg-white/10 text-white px-3 py-1.5 rounded font-bold border border-border flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">add</span> Add Key
+                        </button>
+                        <button onclick="downloadJson()"
+                            class="text-xs bg-white/5 hover:bg-white/10 text-white px-3 py-1.5 rounded font-bold border border-border flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">download</span> Export JSON
+                        </button>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="filter-status" onchange="renderTable()"
+                            class="bg-black/30 border border-border rounded-lg px-2 py-1 text-xs text-white focus:border-primary">
+                            <option value="all">All Keys</option>
+                            <option value="missing">Missing Only</option>
+                            <option value="verified">Verified Only</option>
+                        </select>
+                        <input type="text" id="search-key" onkeyup="renderTable()" placeholder="Search keys..."
+                            class="bg-black/30 border border-border rounded-lg px-3 py-1 text-xs text-white focus:border-primary w-48">
+                    </div>
+                </div>
+
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-black/40 text-gray-500 uppercase font-bold">
+                        <tr>
+                            <th class="p-4 w-1/4">Key Name</th>
+                            <th class="p-4 w-1/3">English (Source)</th>
+                            <th class="p-4 w-1/3">Target Translation</th>
+                            <th class="p-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border text-gray-300" id="lang-table">
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="add-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Add New Key</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Key ID (e.g. nav_profile)</label>
+                    <input type="text" id="new-key-id"
+                        class="w-full bg-black/30 border border-border rounded-lg px-3 py-2 text-sm text-white font-mono focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">English Text</label>
+                    <input type="text" id="new-key-en"
+                        class="w-full bg-black/30 border border-border rounded-lg px-3 py-2 text-sm text-white focus:border-primary">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeAddModal()"
+                    class="px-4 py-2 text-gray-400 hover:text-white text-xs font-bold">Cancel</button>
+                <button onclick="saveNewKey()"
+                    class="px-4 py-2 bg-primary text-black font-bold text-xs rounded-lg hover:bg-orange-600">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-ai text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-ai">translate</span>
+        <div>
+            <h4 class="font-bold text-sm text-ai" id="toast-title">Z.O.I. Action</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. DATA ENGINE (Load from Storage or Init)
+        let keys = [];
+
+        function initData() {
+            const stored = localStorage.getItem('zipeats_lang_keys');
+            if (stored) {
+                keys = JSON.parse(stored);
+            } else {
+                keys = [
+                    { key: "nav_home", en: "Home", hi: "घर", kn: "ಮನೆ", fr: "Accueil" },
+                    { key: "nav_cart", en: "Cart", hi: "टोकरी", kn: "", fr: "Panier" },
+                    { key: "btn_checkout", en: "Proceed to Pay", hi: "", kn: "ಪಾವತಿಸಲು ಮುಂದುವರಿಯಿರಿ", fr: "" },
+                    { key: "err_network", en: "No Internet Connection", hi: "कोई इंटरनेट नहीं", kn: "", fr: "Pas d'internet" },
+                    { key: "lbl_delivery", en: "Delivery Fee", hi: "", kn: "", fr: "Frais de livraison" },
+                    { key: "lbl_welcome", en: "Welcome back, {name}", hi: "", kn: "", fr: "" }
+                ];
+                saveData();
+            }
+            renderTable();
+        }
+
+        function saveData() {
+            localStorage.setItem('zipeats_lang_keys', JSON.stringify(keys));
+            updateStats();
+        }
+
+        // 2. RENDER LOGIC
+        function renderTable() {
+            const tbody = document.getElementById('lang-table');
+            const targetLang = document.getElementById('lang-select').value;
+            const search = document.getElementById('search-key').value.toLowerCase();
+            const filter = document.getElementById('filter-status').value;
+
+            tbody.innerHTML = "";
+            let filledCount = 0;
+
+            keys.forEach((item, idx) => {
+                const translation = item[targetLang] || "";
+
+                // Filters
+                if (search && !item.key.toLowerCase().includes(search) && !item.en.toLowerCase().includes(search)) return;
+                if (filter === 'missing' && translation) return;
+                if (filter === 'verified' && !translation) return;
+
+                if (translation) filledCount++;
+
+                const statusColor = translation ? "border-green-500/30" : "border-red-500/30";
+
+                const row = `
+                    <tr class="hover:bg-white/5 transition-colors group">
+                        <td class="p-4 font-mono text-gray-500 select-all">${item.key}</td>
+                        <td class="p-4 text-white">${item.en}</td>
+                        <td class="p-4">
+                            <input type="text" value="${translation}" 
+                                class="w-full bg-black/30 border ${statusColor} rounded px-2 py-1 text-white focus:border-primary focus:ring-0 transition-colors"
+                                onchange="updateTranslation(${idx}, '${targetLang}', this.value)"
+                                placeholder="Enter translation...">
+                        </td>
+                        <td class="p-4 text-right">
+                            <button onclick="deleteKey(${idx})" class="text-gray-500 hover:text-red-400 transition-colors p-1"><span class="material-symbols-outlined text-[16px]">delete</span></button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+            updateStats();
+        }
+
+        function updateStats() {
+            const targetLang = document.getElementById('lang-select').value;
+            const filled = keys.filter(k => k[targetLang]).length;
+            const pct = Math.round((filled / keys.length) * 100);
+            const el = document.getElementById('progress-text');
+            el.innerText = `${pct}% Complete`;
+            el.className = pct === 100 ? "text-success font-bold" : "text-warning font-bold";
+        }
+
+        // 3. CRUD LOGIC
+        function updateTranslation(idx, lang, val) {
+            keys[idx][lang] = val;
+            saveData();
+            renderTable(); // Re-render to update border colors
+        }
+
+        function openAddModal() {
+            document.getElementById('add-modal').classList.remove('hidden');
+            document.getElementById('add-modal').classList.add('flex');
+        }
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.add('hidden');
+            document.getElementById('add-modal').classList.remove('flex');
+        }
+        function saveNewKey() {
+            const id = document.getElementById('new-key-id').value;
+            const en = document.getElementById('new-key-en').value;
+            if (!id || !en) return showToast("Error", "All fields required");
+
+            keys.unshift({ key: id, en: en, hi: "", kn: "", fr: "" });
+            saveData();
+            closeAddModal();
+            renderTable();
+            showToast("Success", "New key added.");
+        }
+
+        function deleteKey(idx) {
+            if (confirm("Delete this key permanently?")) {
+                keys.splice(idx, 1);
+                saveData();
+                renderTable();
+                showToast("Deleted", "Key removed.");
+            }
+        }
+
+        // 4. Z.O.I. FEATURES
+        function autoTranslate() {
+            const targetLang = document.getElementById('lang-select').value;
+            const btn = document.querySelector('button[onclick="autoTranslate()"]');
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Translating...`;
+
+            setTimeout(() => {
+                // Mock Translations
+                const mocks = {
+                    hi: { "Proceed to Pay": "भुगतान करें", "Delivery Fee": "वितरण शुल्क", "Welcome back, {name}": "स्वागत है, {name}" },
+                    kn: { "Cart": "ಕಾರ್ಟ್", "No Internet Connection": "ಇಂಟರ್ನೆಟ್ ಇಲ್ಲ", "Delivery Fee": "ವಿತರಣಾ ಶುಲ್ಕ", "Taxes & Charges": "ತೆರಿಗೆಗಳು" },
+                    fr: { "Proceed to Pay": "Payer", "Taxes & Charges": "Taxes et frais" }
+                };
+
+                let count = 0;
+                keys.forEach(k => {
+                    if (!k[targetLang] && mocks[targetLang] && mocks[targetLang][k.en]) {
+                        k[targetLang] = mocks[targetLang][k.en];
+                        count++;
+                    }
+                });
+
+                saveData();
+                renderTable();
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">auto_fix_high</span> Magic Translate`;
+                showToast("Z.O.I. Completed", `Auto-filled ${count} missing fields.`);
+            }, 1500);
+        }
+
+        function runAudit() {
+            // Check for placeholders mismatch
+            let issues = 0;
+            const targetLang = document.getElementById('lang-select').value;
+
+            keys.forEach(k => {
+                if (k.en.includes('{') && k[targetLang] && !k[targetLang].includes('{')) {
+                    issues++;
+                }
+            });
+
+            if (issues > 0) {
+                showToast("Audit Failed", `Found ${issues} placeholder mismatches (e.g. {name} missing).`);
+            } else {
+                showToast("Audit Passed", "All variables and lengths look safe.");
+            }
+        }
+
+        function downloadJson() {
+            const targetLang = document.getElementById('lang-select').value;
+            const data = {};
+            keys.forEach(k => { if (k[targetLang]) data[k.key] = k[targetLang]; });
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zipeats_${targetLang}.json`;
+            a.click();
+            showToast("Exported", "JSON file downloaded.");
+        }
+
+        function publishLang() {
+            const targetLang = document.getElementById('lang-select').value;
+            showToast("Published", `Language pack [${targetLang.toUpperCase()}] pushed to CDN.`);
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        // INIT
+        window.onload = function () {
+            fetch('sidebar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sidebar-container').innerHTML = data;
+                    setTimeout(() => {
+                        const links = document.querySelectorAll('#sidebar-container nav a');
+                        links.forEach(l => {
+                            if (l.innerText.includes('Languages')) {
+                                l.className = "flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg font-bold transition-all";
+                                l.querySelector('span').classList.add('text-primary');
+                            } else {
+                                l.className = "flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group";
+                            }
+                        });
+                        ZoiAuth.renderSimLogin();
+                    }, 100);
+                });
+            initData();
+        };
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+
+

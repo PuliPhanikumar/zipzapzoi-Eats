@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi - Real-time Pricing Engine</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #00f0ff;
+            margin-top: -6px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #2a2d35;
+            border-radius: 2px;
+        }
+
+        .nav-item.active {
+            background: rgba(0, 240, 255, 0.1);
+            color: #00f0ff;
+            border-color: rgba(0, 240, 255, 0.2);
+            border-width: 1px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+    .glass { background: rgba(24, 26, 32, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white font-sans h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+
+    <script>
+        // Enforce RBAC
+        ZoiAuth.enforceAccess("Surge Pricing");
+    </script>
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-bg">
+
+        <header class="h-16 flex items-center justify-between px-6 border-b border-border bg-surface z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold text-white flex items-center gap-2">
+                    Dynamic Pricing Engine <span
+                        class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded border border-primary/20">Live
+                        Sync</span>
+                </h1>
+                <div class="h-6 w-[1px] bg-border"></div>
+                <div class="flex items-center gap-2 bg-black/20 border border-border px-3 py-1.5 rounded-lg">
+                    <span class="text-xs text-gray-400">Global Cap:</span>
+                    <span class="text-xs font-bold text-white font-mono">3.0x</span>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="resetAllSurge()"
+                    class="bg-surface border border-border hover:border-white text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">restart_alt</span> Reset All
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-auto p-6 space-y-6">
+
+            <div class="grid grid-cols-3 gap-6">
+                <div class="col-span-2 bg-surface border border-border rounded-xl p-5 shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-white flex items-center gap-2 text-sm">
+                            <span class="material-symbols-outlined text-primary text-sm">monitoring</span> Demand vs
+                            Price Sensitivity
+                        </h3>
+                        <select class="bg-black/30 border border-border rounded text-[10px] px-2 py-1 text-gray-400">
+                            <option>Last Hour</option>
+                        </select>
+                    </div>
+                    <div class="h-48 w-full">
+                        <canvas id="surgeChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-span-1 bg-surface border border-border rounded-xl p-5 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-white text-sm mb-1">Active High Demand</h3>
+                        <p class="text-xs text-gray-500">Zones currently > 1.2x</p>
+                    </div>
+                    <div class="text-4xl font-black text-white" id="stat-high-zones">0</div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs text-gray-400"><span>Avg Multiplier</span><span
+                                class="text-white font-bold" id="stat-avg-surge">1.0x</span></div>
+                        <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-primary h-full" style="width: 20%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-lg">
+                <div class="p-4 border-b border-border flex justify-between items-center bg-black/20">
+                    <h3 class="font-bold text-white text-sm">Zone Controls</h3>
+                    <input type="text" id="search-zone" onkeyup="renderTable()" placeholder="Search Zone..."
+                        class="bg-bg border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary w-48">
+                </div>
+
+                <table class="w-full text-left">
+                    <thead class="bg-black/40 text-xs uppercase text-gray-500 font-bold">
+                        <tr>
+                            <th class="p-4">Zone Name</th>
+                            <th class="p-4">Demand Level</th>
+                            <th class="p-4">Rain Mode</th>
+                            <th class="p-4 w-1/3">Surge Multiplier</th>
+                            <th class="p-4 text-right">Current Price</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-border" id="pricing-body">
+                    </tbody>
+                </table>
+                <div id="empty-state" class="hidden p-8 text-center text-gray-500 text-sm">
+                    No zones found. Go to <a href="admin zone management.html" class="text-primary hover:underline">Zone
+                        Manager</a> to create one.
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. DATA SYNC (From Zone Manager)
+        let zones = [];
+        const BASE_DELIVERY_FEE = 40; // ₹40 base fee
+
+        function loadZones() {
+            // Fetch from ZoiDB (Real World Persistence)
+            zones = ZoiZones.getAll();
+            if (!zones || zones.length === 0) {
+                // Fallback or initialization handled by ZoiZones internally now
+            }
+            renderTable();
+            updateStats();
+        }
+
+        // 2. RENDER TABLE
+        function renderTable() {
+            const tbody = document.getElementById('pricing-body');
+            const search = document.getElementById('search-zone').value.toLowerCase();
+            tbody.innerHTML = "";
+            let matchCount = 0;
+
+            if (zones.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden');
+                return;
+            }
+
+            zones.forEach((z, index) => {
+                if (search && !z.name.toLowerCase().includes(search)) return;
+                matchCount++;
+
+                // Styling Logic
+                const demandColor = z.demand === 'High' ? 'text-red-400 bg-red-500/10 border-red-500/20' :
+                    (z.demand === 'Medium' ? 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' : 'text-green-400 bg-green-500/10 border-green-500/20');
+
+                const finalPrice = Math.round(BASE_DELIVERY_FEE * z.surge);
+                const isRainy = z.rainMode ? 'checked' : '';
+                const rainClass = z.rainMode ? 'text-blue-400' : 'text-gray-600';
+
+                const row = `
+                    <tr class="hover:bg-white/5 transition-colors group">
+                        <td class="p-4 font-bold text-white">${z.name}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase border ${demandColor}">${z.demand}</span></td>
+                        <td class="p-4">
+                            <label class="inline-flex items-center cursor-pointer group/rain">
+                                <input type="checkbox" class="sr-only peer" ${isRainy} onchange="toggleRain(${index})">
+                                <div class="relative w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-500"></div>
+                                <span class="ml-2 material-symbols-outlined ${rainClass} text-lg group-hover/rain:text-blue-300 transition-colors">rainy</span>
+                            </label>
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-4">
+                                <input type="range" min="1.0" max="3.0" step="0.1" value="${z.surge}" class="w-full h-1 bg-border rounded-lg cursor-pointer" oninput="updateSurge(${index}, this.value)">
+                                <span class="font-mono font-bold text-primary w-10 text-right">${z.surge}x</span>
+                            </div>
+                        </td>
+                        <td class="p-4 text-right font-mono text-white">₹${finalPrice}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+
+            document.getElementById('empty-state').classList.toggle('hidden', matchCount > 0);
+        }
+
+        // 3. LOGIC & ACTIONS
+        function updateSurge(index, val) {
+            zones[index].surge = parseFloat(val);
+            // Dynamic updates without full re-render for performance
+            event.target.nextElementSibling.innerText = val + 'x';
+            const row = event.target.closest('tr');
+            row.lastElementChild.innerText = '₹' + Math.round(BASE_DELIVERY_FEE * val);
+
+            saveData();
+            updateStats();
+        }
+
+        function toggleRain(index) {
+            zones[index].rainMode = !zones[index].rainMode;
+            // Auto-increase surge if rain starts
+            if (zones[index].rainMode && zones[index].surge < 1.5) {
+                zones[index].surge = 1.5;
+                showToast("Auto-Surge", "Rain mode set min surge to 1.5x");
+            }
+            saveData();
+            renderTable(); // Re-render for visual toggle
+        }
+
+        function saveData() {
+            ZoiZones.saveAll(zones); // Persist all changes
+        }
+
+        function resetAllSurge() {
+            if (confirm("Reset all zones to base pricing (1.0x)?")) {
+                zones.forEach(z => { z.surge = 1.0; z.rainMode = false; });
+                saveData();
+                renderTable();
+                updateStats();
+                showToast("Reset Complete", "All zones back to standard pricing.");
+            }
+        }
+
+        function updateStats() {
+            const highZones = zones.filter(z => z.surge > 1.2).length;
+            const avgSurge = (zones.reduce((a, b) => a + b.surge, 0) / zones.length).toFixed(2);
+
+            document.getElementById('stat-high-zones').innerText = highZones;
+            document.getElementById('stat-avg-surge').innerText = avgSurge + 'x';
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        // 4. CHART INIT
+        function initChart() {
+            const ctx = document.getElementById('surgeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['10am', '11am', '12pm', '1pm', '2pm', '3pm'],
+                    datasets: [
+                        { label: 'Demand', data: [40, 55, 80, 95, 70, 60], borderColor: '#3b82f6', tension: 0.4 },
+                        { label: 'Avg Surge', data: [1.0, 1.1, 1.8, 2.2, 1.5, 1.2], borderColor: '#00f0ff', yAxisID: 'y1', tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { display: false },
+                        y1: { position: 'right', grid: { display: false }, ticks: { color: '#00f0ff', callback: v => v + 'x' } },
+                        x: { grid: { display: false }, ticks: { color: '#6b7280' } }
+                    },
+                    plugins: { legend: { display: true, labels: { color: '#fff', font: { size: 10 } } } }
+                }
+            });
+        }
+
+        window.onload = function () {
+            fetch('sidebar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sidebar-container').innerHTML = data;
+                    setTimeout(() => {
+                        const links = document.querySelectorAll('#sidebar-container nav a');
+                        links.forEach(l => {
+                            if (l.innerText.includes('Surge Pricing')) {
+                                l.className = "flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg font-bold transition-all";
+                                l.querySelector('span').classList.add('text-primary');
+                            } else {
+                                l.className = "flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group";
+                            }
+                        });
+                        ZoiAuth.renderSimLogin();
+                    }, 100);
+                });
+            loadZones();
+            initChart();
+        };
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+
+

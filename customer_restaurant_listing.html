@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="theme-color" content="#00f0ff">
+    <link rel="manifest" href="manifest.json" />
+    <title>ZipZapZoi Eats - Restaurant Listing</title>
+    <meta name="description" content="Browse the best restaurants near you on ZipZapZoi Eats. Discover local dhabas, biryani houses, pure veg cafes, and more with AI-powered recommendations.">
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script
+        id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#00f0ff", "primary-hover": "#00d7e6", "background-light": "#f7f5f8", "background-dark": "#0a0314", "card-dark": "#1a0b36", "border-dark": "#3c1e6e", "surface-dark": "#1a0b36", "text-secondary": "#b4a5d8", "neon-pink": "#ff00ff", "neon-green": "#00ff00", "neon-yellow": "#ffff00" }, fontFamily: { display: ["Quicksand", "sans-serif"], body: ["Nunito", "sans-serif"] }, borderRadius: { DEFAULT: "0.5rem", lg: "1rem", xl: "1.5rem", "2xl": "2rem", full: "9999px" } } } };</script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0314;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3c1e6e;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a38a0;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Nunito:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-body transition-colors duration-200 min-h-screen flex flex-col">
+    <header class="sticky top-0 z-50 bg-[#0a0314]/90 backdrop-blur-md border-b border-[#3c1e6e]/50">
+        <div class="max-w-[1440px] mx-auto px-4 lg:px-8 py-3 flex items-center justify-between gap-6">
+            <div class="flex items-center gap-3 min-w-fit"></div><a href="index.html"
+                class="flex items-center gap-3 min-w-fit hover:opacity-80 transition-opacity">
+                <div
+                    class="size-10 bg-primary/20 rounded-lg flex items-center justify-center text-primary shadow-lg shadow-primary/30">
+                    <span class="material-symbols-outlined text-[28px]">bolt</span></div>
+                <div class="hidden md:block">
+                    <h1 class="text-xl font-extrabold tracking-tight leading-none text-white"
+                        style="font-family: 'Quicksand', sans-serif;">Zoi<span class="text-primary">Eats</span></h1>
+                    <p class="text-[10px] font-bold text-primary tracking-widest uppercase">Eats</p>
+                </div>
+            </a>
+            <div class="hidden md:flex flex-1 max-w-2xl mx-auto">
+                <div
+                    class="flex w-full items-center bg-card-dark rounded-xl border border-border-dark hover:border-primary/50 transition-colors group focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/50">
+                    <div class="pl-4 text-text-secondary"><span class="material-symbols-outlined">location_on</span>
+                    </div><input
+                        class="bg-transparent border-none text-sm font-medium text-white placeholder-text-secondary focus:ring-0 w-48 truncate cursor-pointer"
+                        readonly="" type="text" value="Connaught Place, New Delhi" />
+                    <div class="h-6 w-[1px] bg-[#493622] mx-2"></div>
+                    <div class="pl-2 text-text-secondary"><span class="material-symbols-outlined">search</span></div>
+                    <input
+                        class="flex-1 bg-transparent border-none text-sm text-white placeholder-text-secondary focus:ring-0 py-3"
+                        placeholder="Search for 'Biryani', 'Pizza', or restaurants..." type="text" />
+                </div>
+            </div>
+            <div class="flex items-center gap-3"><button onclick="window.location.href='promotions & offers.html'"
+                    class="flex items-center gap-2 text-sm font-medium text-white hover:text-primary transition-colors px-3 py-2 rounded-lg hover:bg-card-dark"><span
+                        class="material-symbols-outlined">percent</span><span
+                        class="hidden lg:inline">Offers</span></button><a href="shopping_cart.html"
+                    class="relative p-2 text-white hover:text-primary transition-colors rounded-lg hover:bg-card-dark"><span
+                        class="material-symbols-outlined">shopping_bag</span><span id="header-cart-dot"
+                        class="zoi-cart-badge absolute top-1 right-1 size-2 bg-primary rounded-full hidden"></span></a><a
+                    href="login & registration.html" id="header-profile-link"
+                    class="p-2 text-white hover:text-primary transition-colors rounded-lg hover:bg-card-dark"><span
+                        class="material-symbols-outlined">person</span></a></div>
+        </div>
+    </header>
+    <div class="flex-1 max-w-[1440px] w-full mx-auto px-4 lg:px-8 py-6">
+        <main class="flex-1 min-w-0 flex flex-col gap-8">
+            <section class="w-full">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2"><span
+                        class="material-symbols-outlined text-primary">local_fire_department</span>Best Offers for You
+                </h2>
+                <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                        <a href="promotions & offers.html"
+                            class="min-w-[280px] md:min-w-[320px] h-[160px] rounded-xl relative overflow-hidden group cursor-pointer block">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent z-10 flex flex-col justify-center px-6">
+                                <p class="text-primary font-bold text-xs uppercase mb-1">Limited Time</p>
+                                <h3 class="text-2xl font-black text-white leading-tight mb-2">50% OFF<br />Up to ₹100
+                                </h3><button
+                                    class="bg-white text-black text-xs font-bold px-3 py-1.5 rounded-full w-fit group-hover:scale-105 transition-transform">Claim
+                                    Now</button>
+                            </div>
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                                data-alt="Delicious pizza with melted cheese being pulled"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBDBJU2G1rMNGHXmWxsy_AUlZL4Cq6KySFGA2TVN5pzjbi1DNl4GECaS-6jgnf1gyf2b1A-WDDu00ZoIJUD74Lkg6hB6ldfIpv8-9FqpxVbw7wDsYYidGnQlW-7eN5BWj5CM8NkLavQTZrR0tpE-TpYWqf_6kKSjkZcsVeXPYfI0DxivqCWd3jYC5H6R82OsraJvsHTOp33RU7Viknp4A4SW_AWHxSCKq-Q8tKLKhdl0s5Ifxc26LXK9ObfYq41MuP2uIWZ8PRMrr4');">
+                            </div>
+                        </a>
+                        <a href="customer_restaurant_listing.html?q=healthy"
+                            class="min-w-[280px] md:min-w-[320px] h-[160px] rounded-xl relative overflow-hidden group cursor-pointer block">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-transparent z-10 flex flex-col justify-center px-6">
+                                <p class="text-blue-300 font-bold text-xs uppercase mb-1">New Arrival</p>
+                                <h3 class="text-2xl font-black text-white leading-tight mb-2">Try<br />Bowl Company</h3>
+                                <button
+                                    class="bg-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full w-fit group-hover:scale-105 transition-transform">Order
+                                    Now</button>
+                            </div>
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                                data-alt="Healthy salad bowl with fresh vegetables"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD1gEQt1h0uZMIv5v9fTY1lsLF6F4FJ3rwyjtR5I8jO-4_UA7A6XppZMRwoAN8rO80IABZWtyMjufiDbtOv0haC5Kb6zA_NpRDmngchfjo1ihomeIRUjoVfERjqwB6phX2V61SJWZFn2OdDBqGppR7mwjRwpV7OE2ewOFOB7UVfAZhyTP7ov5DoKnWCts-25F0M1MzH8Oh_QlDeKIC-hJeyX2d4x4xsEknl4Np9V410iJAMMW55cJq_GrbNEes0mI77xT2axmPnOJw');">
+                            </div>
+                        </a>
+                        <a href="login & registration.html"
+                            class="min-w-[280px] md:min-w-[320px] h-[160px] rounded-xl relative overflow-hidden group cursor-pointer block">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-orange-900/90 to-transparent z-10 flex flex-col justify-center px-6">
+                                <p class="text-orange-300 font-bold text-xs uppercase mb-1">Free Delivery</p>
+                                <h3 class="text-2xl font-black text-white leading-tight mb-2">On First 3<br />Orders
+                                </h3><button
+                                    class="bg-primary text-white text-xs font-bold px-3 py-1.5 rounded-full w-fit group-hover:scale-105 transition-transform">Get
+                                    Started</button>
+                            </div>
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                                data-alt="Assorted fast food including burgers and fries"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBmqVeS043oNCjp-uzO8hgiKz0N2Mj2V0xM8HOGk2iOGWY1avCnq_hQSwvCaH0g9eFuAcAdBe3lLuxJx3KgQFJ1yArSc8LQwM6T97sP_fqWUwP-UqaI2CZi_jWp5l3gy_VuiDNzmzLJy9TubgofYi98Z6RvEqPug5RpN6y9-2wBHsLlUmsujEMePuwwUZez6JKfSvNBXZZlx6r-IyhWwqKAQokIKrgHT2keakU3eao_8r7FBAHoztxNGLsGi7nIUbqDXzEPmv1yz1w');">
+                            </div>
+                        </a>
+                </div>
+            </section>
+            <div>
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <h2 class="text-2xl font-bold" id="rest-count">Loading Restaurants...</h2>
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1"><button
+                            class="flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2319] border border-[#493622] hover:border-primary transition-colors"><span
+                                class="material-symbols-outlined text-green-500 text-lg">spa</span><span
+                                class="text-sm font-medium">Vegan</span></button><button
+                            class="flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2319] border border-[#493622] hover:border-primary transition-colors"><span
+                                class="material-symbols-outlined text-yellow-500 text-lg">grain</span><span
+                                class="text-sm font-medium">Gluten-Free</span></button><button
+                            class="flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2319] border border-[#493622] hover:border-primary transition-colors"><span
+                                class="material-symbols-outlined text-primary text-lg">bolt</span><span
+                                class="text-sm font-medium">Fast Delivery</span></button><button
+                            class="flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2319] border border-[#493622] hover:border-primary transition-colors"><span
+                                class="material-symbols-outlined text-yellow-500 text-lg">star</span><span
+                                class="text-sm font-medium">Ratings 4.0+</span></button><button
+                            class="flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2319] border border-[#493622] hover:border-primary transition-colors"><span
+                                class="text-sm font-medium">Under ₹300</span></button></div>
+                </div>
+                <!-- DYNAMIC GRID -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" id="restaurants-grid">
+                        <!-- Cards will be injected here by JS -->
+                    </div>
+                    <div class="flex justify-center mt-12 mb-8"><button
+                            class="px-8 py-3 bg-[#2d2319] border border-[#493622] hover:bg-[#493622] text-white rounded-full font-bold text-sm transition-colors flex items-center gap-2">Show
+                            more restaurants <span class="material-symbols-outlined">expand_more</span></button></div>
+            </div>
+        </main>
+    </div>
+<footer class="bg-background-dark border-t border-border-dark mt-auto shadow-inner shadow-primary/5">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
+                <!-- Column 1: Brand -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-symbols-outlined text-primary text-2xl shadow-text-primary">bolt</span>
+                        <span class="font-display font-bold text-xl text-white">ZoiEats</span>
+                    </div>
+                    <p class="text-text-secondary text-sm mb-4">
+                        Your AI-powered portal to the comforting flavors of India.
+                    </p>
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-green/20 border border-neon-green/30 shadow-md shadow-neon-green/10">
+                        <span class="relative flex h-2 w-2">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-neon-green opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-neon-green"></span>
+                        </span>
+                        <span class="text-xs font-mono font-medium text-neon-green">AI System: OPTIMAL</span>
+                    </div>
+                </div>
+
+                <!-- Column 2: Explore ZoiEats -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 font-display">Explore ZoiEats</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary">
+                        <li><a class="hover:text-primary transition-colors" href="promotions & offers.html">Offers &
+                                Promos</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="feedback.html">Feedback Portal</a>
+                        </li>
+                        <li><a class="hover:text-primary transition-colors" href="customer support help.html">Customer
+                                Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Partner with Us -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 font-display">Partner with Us</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary">
+                        <li><a class="hover:text-primary transition-colors"
+                                href="restaurant pricing plans.html">Add Restaurant</a></li>
+                        <li><a class="hover:text-primary transition-colors"
+                                href="delivery partner application.html">Ride with Us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="dev_hub.html">Developer APIs</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Company -->
+                <div>
+                    <h4 class="text-white font-bold mb-4 font-display">Company</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary">
+                        <li><a class="hover:text-primary transition-colors" href="careerspage.html">Careers</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="press & media kit.html">Press &
+                                Media</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="about us.html">About Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-border-dark pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-text-secondary">
+                    <span>© 2025 ZoiEats. All rights reserved.</span>
+                    <span class="hidden sm:inline-block text-border-dark">|</span>
+                    <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms & Conditions</a>
+                    <a class="hover:text-white transition-colors" href="privacy policy.html">Privacy Policy</a>
+                    <a class="hover:text-white transition-colors" href="gst disclaimer.html">GST & Taxation</a>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-6 mt-6 md:mt-0">
+                    <div class="flex flex-col gap-2">
+                        <a href="mailto:reachus@zipzapzoi.in"
+                            class="text-sm hover:text-[#00f0ff] transition-colors flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[16px]">mail</span> reachus@zipzapzoi.in
+                        </a>
+                        <a href="mailto:phanikumar@zipzapzoi.in"
+                            class="text-sm hover:text-[#00f0ff] transition-colors flex items-center gap-2 text-[#3c1e6e]/80">
+                            <span class="material-symbols-outlined text-[16px]">developer_mode</span>
+                            phanikumar@zipzapzoi.in
+                        </a>
+                    </div>
+                    <div class="flex gap-4 items-center">
+                        <a class="hover:text-white transition-colors text-lg" href="https://x.com/ZipZapZoi"
+                            target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                        <a class="hover:text-white transition-colors text-lg" href="https://www.youtube.com/@ZipZapZoi"
+                            target="_blank" rel="noopener noreferrer"><i class="fa fa-youtube-play"></i></a>
+                        <a class="hover:text-white transition-colors text-lg"
+                            href="https://www.instagram.com/zipzapzoi/" target="_blank" rel="noopener noreferrer"><i
+                                class="fa fa-instagram"></i></a>
+                        <a class="hover:text-white transition-colors text-lg"
+                            href="https://www.facebook.com/profile.php?id=61585106515522" target="_blank"
+                            rel="noopener noreferrer"><i class="fa fa-facebook"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script> // 1. LOAD RESTAURANTS FROM DB_RESTAURANTS (source of truth)
+        const grid = document.getElementById('restaurants-grid');
+        let dbRestaurants = [];
+        let displayedCount = 6; // Show 6 initially
+
+        function loadRestaurants() {
+            // Use DB_RESTAURANTS directly (always up-to-date)
+            if (typeof DB_RESTAURANTS !== 'undefined') {
+                dbRestaurants = DB_RESTAURANTS;
+            } else if (typeof ZoiRestaurants !== 'undefined') {
+                dbRestaurants = ZoiRestaurants.getAll();
+            }
+
+            document.getElementById('rest-count').innerText = `${dbRestaurants.length} Restaurants near you`;
+
+            // Check URL params for search/tag
+            const params = new URLSearchParams(window.location.search);
+            const searchQuery = params.get('q');
+            const tagQuery = params.get('tag');
+
+            if (searchQuery) {
+                const searchInput = document.querySelector('input[placeholder*="Search"]');
+                if (searchInput) searchInput.value = searchQuery;
+                filterRestaurants(searchQuery);
+            } else if (tagQuery) {
+                filterRestaurants(tagQuery);
+            } else {
+                renderRestaurants(dbRestaurants.slice(0, displayedCount));
+            }
+        }
+
+        // Render Cards
+        function renderRestaurants(restaurants) {
+            if (restaurants.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-16"><span class="material-symbols-outlined text-6xl text-text-secondary mb-4 block">search_off</span><h3 class="text-xl font-bold text-white mb-2">No restaurants found</h3><p class="text-text-secondary">Try a different search or filter</p></div>';
+                return;
+            }
+            grid.innerHTML = restaurants.map(rest => `
+                <div onclick="window.location.href='restaurant_menu.html?id=${rest.id}'"
+                    class="group bg-card-dark rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 border border-transparent hover:border-border-dark block cursor-pointer relative">
+                    <div class="relative aspect-[4/3] overflow-hidden">
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                            style="background-image: url('${rest.image}');"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60"></div>
+                        ${rest.promoted ? '<div class="absolute top-3 left-3 bg-black/60 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold tracking-wider text-white uppercase border border-white/10">Promoted</div>' : ''}
+                        ${rest.offer ? '<div class="absolute bottom-3 left-3 bg-primary text-black text-xs font-bold px-2 py-1 rounded shadow-lg">' + rest.offer + '</div>' : ''}
+                        <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur text-black text-[10px] font-bold px-2 py-1 rounded shadow-lg flex items-center gap-1">
+                            <span class="material-symbols-outlined text-primary text-xs">schedule</span> ${rest.time}
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="text-lg font-bold text-white truncate pr-2">${rest.name}</h3>
+                            <div class="flex items-center gap-1 bg-green-800 text-white px-1.5 py-0.5 rounded text-xs font-bold shrink-0">
+                                ${rest.rating} <span class="material-symbols-outlined text-[10px]">star</span>
+                            </div>
+                        </div>
+                        <p class="text-text-secondary text-sm truncate mb-3">${[...new Set(rest.tags)].slice(0, 3).join(', ')}</p>
+                        <div class="flex items-center justify-between border-t border-border-dark pt-3 mt-1">
+                            <div class="flex items-center gap-1.5 text-xs text-text-secondary">
+                                <span class="material-symbols-outlined text-primary text-sm">assistant</span>
+                                <span class="text-white font-medium">${Math.floor(80 + Math.random() * 19)}% Match</span>
+                            </div>
+                            <div class="text-xs text-text-secondary font-medium">${rest.cost}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 2. SEARCH FUNCTIONALITY
+        function filterRestaurants(query) {
+            const lowerQuery = query.toLowerCase().trim();
+            if (!lowerQuery) {
+                renderRestaurants(dbRestaurants.slice(0, displayedCount));
+                document.getElementById('rest-count').innerText = `${dbRestaurants.length} Restaurants near you`;
+                return;
+            }
+
+            const filtered = dbRestaurants.filter(r =>
+                r.name.toLowerCase().includes(lowerQuery) ||
+                r.tags.some(t => t.toLowerCase().includes(lowerQuery)) ||
+                (r.offer && r.offer.toLowerCase().includes(lowerQuery))
+            );
+            renderRestaurants(filtered);
+            document.getElementById('rest-count').innerText = `${filtered.length} Restaurant${filtered.length !== 1 ? 's' : ''} found`;
+        }
+
+        // 3. FILTER BUTTONS
+        let activeFilter = null;
+        const filterButtons = document.querySelectorAll('.flex.gap-2.overflow-x-auto button');
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const label = this.innerText.trim();
+
+                // Toggle off if same filter clicked again
+                if (activeFilter === label) {
+                    activeFilter = null;
+                    filterButtons.forEach(b => b.classList.remove('border-primary', 'bg-primary/10'));
+                    renderRestaurants(dbRestaurants.slice(0, displayedCount));
+                    document.getElementById('rest-count').innerText = `${dbRestaurants.length} Restaurants near you`;
+                    return;
+                }
+
+                activeFilter = label;
+                filterButtons.forEach(b => b.classList.remove('border-primary', 'bg-primary/10'));
+                this.classList.add('border-primary', 'bg-primary/10');
+
+                let filtered = dbRestaurants;
+                if (label === 'Vegan') {
+                    filtered = dbRestaurants.filter(r => r.tags.some(t => t.toLowerCase().includes('healthy') || t.toLowerCase().includes('salad') || t.toLowerCase().includes('vegan')));
+                } else if (label === 'Gluten-Free') {
+                    filtered = dbRestaurants.filter(r => r.tags.some(t => t.toLowerCase().includes('healthy') || t.toLowerCase().includes('salad') || t.toLowerCase().includes('bowl')));
+                } else if (label === 'Fast Delivery') {
+                    filtered = dbRestaurants.filter(r => {
+                        const timeStr = r.time.replace(/[^0-9-]/g, '');
+                        const minTime = parseInt(timeStr.split('-')[0]) || 99;
+                        return minTime <= 25;
+                    });
+                } else if (label === 'Ratings 4.0+') {
+                    filtered = dbRestaurants.filter(r => parseFloat(r.rating) >= 4.0);
+                } else if (label === 'Under ₹300') {
+                    filtered = dbRestaurants.filter(r => {
+                        const costNum = parseInt(r.cost.replace(/[^0-9]/g, '')) || 999;
+                        return costNum <= 300;
+                    });
+                }
+
+                renderRestaurants(filtered);
+                document.getElementById('rest-count').innerText = `${filtered.length} Restaurant${filtered.length !== 1 ? 's' : ''} found`;
+            });
+        });
+
+        // 4. SHOW MORE BUTTON
+        const showMoreBtn = document.querySelector('.flex.justify-center.mt-12 button');
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener('click', function() {
+                displayedCount += 6;
+                if (displayedCount >= dbRestaurants.length) {
+                    displayedCount = dbRestaurants.length;
+                    this.style.display = 'none';
+                }
+                if (!activeFilter) {
+                    renderRestaurants(dbRestaurants.slice(0, displayedCount));
+                }
+            });
+        }
+
+        // Initialize
+        // Show skeleton loading before rendering real data
+        function renderSkeletonCards() {
+            grid.innerHTML = Array(6).fill(0).map(() => `
+                <div class="bg-card-dark rounded-2xl overflow-hidden border border-border-dark animate-pulse">
+                    <div class="aspect-[4/3] bg-gray-800"></div>
+                    <div class="p-4 space-y-3">
+                        <div class="flex justify-between"><div class="h-5 w-32 bg-gray-700 rounded"></div><div class="h-5 w-10 bg-gray-700 rounded"></div></div>
+                        <div class="h-3 w-48 bg-gray-700/60 rounded"></div>
+                        <div class="border-t border-border-dark pt-3 flex justify-between"><div class="h-3 w-20 bg-gray-700 rounded"></div><div class="h-3 w-16 bg-gray-700 rounded"></div></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        renderSkeletonCards();
+        setTimeout(() => loadRestaurants(), 600);
+
+        // Debounced search
+        let searchTimer = null;
+
+        // Fix missing logic for profile and cart dot
+        setTimeout(() => {
+            if (typeof ZoiCustomer !== 'undefined' && ZoiCustomer.isLoggedIn()) {
+                const profileLink = document.getElementById('header-profile-link');
+                if (profileLink) profileLink.href = 'customer profile.html';
+            }
+            if (typeof ZoiCart !== 'undefined') {
+                const updateDot = () => {
+                    const dot = document.getElementById('header-cart-dot');
+                    if (dot) dot.style.display = ZoiCart.getCount() > 0 ? 'block' : 'none';
+                };
+                updateDot();
+                window.addEventListener('zoiCartUpdated', updateDot);
+            }
+        }, 300);
+
+        const input = document.querySelector('input[placeholder*="Search"]');
+        if (input) {
+            input.addEventListener('input', (e) => {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(() => filterRestaurants(e.target.value), 350);
+            });
+        }
+
+    </script>
+    <script src="js/zoi_customer_engine.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+    <script src="js/zoi_partner_engine.js"></script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>

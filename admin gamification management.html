@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Admin - Gamification</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>
+        // Enforce RBAC Access Before Rendering
+        ZoiAuth.enforceAccess("Gamification");
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6",
+                        ai: "#8b5cf6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] },
+                    animation: { 'pulse-slow': 'pulse 3s infinite' }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .nav-item.active {
+            background: rgba(0, 240, 255, 0.1);
+            color: #00f0ff;
+            border-color: rgba(0, 240, 255, 0.2);
+            border-width: 1px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        /* Action Menu */
+        .action-menu {
+            transform-origin: top right;
+            transition: all 0.1s ease-out;
+        }
+
+        .action-menu.hidden {
+            transform: scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .action-menu.visible {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Icon Grid Selection */
+        .icon-option.selected {
+            border-color: #00f0ff;
+            background: rgba(0, 240, 255, 0.2);
+            color: white;
+        }
+    .glass { background: rgba(24, 26, 32, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white font-sans h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-bg">
+
+        <header class="h-16 flex items-center justify-between px-6 border-b border-border bg-surface z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold text-white flex items-center gap-2">
+                    Level Up Engine <span
+                        class="text-[10px] bg-ai/10 text-ai px-2 py-0.5 rounded border border-ai/20 flex items-center gap-1"><span
+                            class="material-symbols-outlined text-[10px]">auto_awesome</span> Z.O.I. Enabled</span>
+                </h1>
+                <div class="h-6 w-[1px] bg-border"></div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-400">Total Points Issued:</span>
+                    <span class="text-xs font-bold text-warning font-mono">12.4M ZipPoints</span>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="openCreateModal()"
+                    class="bg-surface border border-border hover:border-white text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">add</span> Manual Create
+                </button>
+                <button onclick="triggerAIChallenge()"
+                    class="bg-ai hover:bg-violet-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(139,92,246,0.3)]">
+                    <span class="material-symbols-outlined text-sm">auto_awesome</span> AI Generate
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-auto p-6 space-y-8 custom-scrollbar">
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-surface border border-border rounded-xl p-6 min-h-[400px]">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-success text-sm">verified</span> Active Badges
+                        </h3>
+                        <span class="text-xs text-gray-500" id="active-count">0 Active</span>
+                    </div>
+
+                    <div class="space-y-4" id="badge-list-active">
+                    </div>
+                </div>
+
+                <div class="bg-surface border border-border rounded-xl p-6 min-h-[400px] border-dashed border-gray-700">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-sm font-bold text-gray-400 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-gray-500 text-sm">inventory_2</span> Badge
+                            Library
+                        </h3>
+                        <span class="text-xs text-gray-600" id="library-count">0 Items</span>
+                    </div>
+
+                    <div class="space-y-4 opacity-70 hover:opacity-100 transition-opacity" id="badge-list-library">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-xl p-6 relative overflow-hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-ai text-sm">settings_suggest</span> Point Logic
+                        Configuration
+                    </h3>
+                    <button onclick="saveRules()"
+                        class="text-xs bg-primary hover:bg-orange-600 text-black px-3 py-1.5 rounded font-bold transition-all">Save
+                        Rules</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div>
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-gray-400">Base Points (per ₹100)</span>
+                            <span class="text-white font-bold font-mono" id="disp-base">10 pts</span>
+                        </div>
+                        <input type="range"
+                            class="w-full accent-primary h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                            min="1" max="50" value="10" oninput="updateRuleVal('base', this.value)">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-gray-400">Review Bonus</span>
+                            <span class="text-white font-bold font-mono" id="disp-review">50 pts</span>
+                        </div>
+                        <input type="range"
+                            class="w-full accent-info h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                            min="10" max="100" value="50" oninput="updateRuleVal('review', this.value)">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs mb-2">
+                            <span class="text-gray-400">Referral Bonus</span>
+                            <span class="text-white font-bold font-mono" id="disp-ref">500 pts</span>
+                        </div>
+                        <input type="range"
+                            class="w-full accent-success h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                            min="100" max="1000" value="500" oninput="updateRuleVal('ref', this.value)">
+                    </div>
+                </div>
+
+                <div class="p-4 bg-ai/5 border border-ai/20 rounded-lg mt-6">
+                    <div class="flex items-start gap-3">
+                        <span class="material-symbols-outlined text-ai text-lg mt-0.5 animate-pulse">psychology</span>
+                        <div>
+                            <p class="text-xs font-bold text-white mb-1">Z.O.I. Recommendation</p>
+                            <p class="text-[11px] text-gray-400 leading-relaxed">
+                                User retention drops after the 3rd order. Suggest increasing "3rd Order Bonus" to <span
+                                    class="text-white font-bold">100 pts</span> to boost habit formation.
+                            </p>
+                            <button onclick="applyRecommendation()"
+                                class="mt-2 text-[10px] bg-ai text-white px-3 py-1.5 rounded font-bold hover:bg-violet-600 transition-colors">Apply
+                                Fix</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="create-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4" id="modal-title">Create New Badge</h3>
+            <input type="hidden" id="edit-id" value="">
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Badge Name</label>
+                    <input type="text" id="new-name" placeholder="e.g. Sushi Master"
+                        class="w-full bg-black/30 border border-border rounded-lg px-3 py-2 text-sm text-white focus:border-primary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Description</label>
+                    <input type="text" id="new-desc" placeholder="e.g. Order Sushi 5 times"
+                        class="w-full bg-black/30 border border-border rounded-lg px-3 py-2 text-sm text-white focus:border-primary">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2">Select Icon</label>
+                    <div class="grid grid-cols-6 gap-2" id="icon-grid">
+                    </div>
+                    <input type="hidden" id="selected-icon" value="stars">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Color Theme</label>
+                    <select id="new-color"
+                        class="w-full bg-black/30 border border-border rounded-lg px-3 py-2 text-sm text-white focus:border-primary">
+                        <option value="orange">Orange (Primary)</option>
+                        <option value="blue">Blue (Info)</option>
+                        <option value="green">Green (Health)</option>
+                        <option value="purple">Purple (Night)</option>
+                        <option value="red">Red (Hot)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModal('create-modal')"
+                    class="px-4 py-2 text-gray-400 hover:text-white text-xs font-bold">Cancel</button>
+                <button onclick="saveBadge()"
+                    class="px-4 py-2 bg-primary text-black font-bold text-xs rounded-lg hover:bg-orange-600">Save
+                    Badge</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-ai text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-ai">smart_toy</span>
+        <div>
+            <h4 class="font-bold text-sm text-ai" id="toast-title">Action</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. DATA MODEL
+        let badges = ZoiGamification.getBadges();
+        let config = ZoiGamification.getConfig();
+
+        const icons = ['stars', 'emoji_events', 'rice_bowl', 'dark_mode', 'eco', 'share', 'local_pizza', 'ramen_dining', 'coffee', 'bolt', 'favorite', 'verified'];
+
+        // 2. RENDER LOGIC
+        function renderBadges() {
+            const activeList = document.getElementById('badge-list-active');
+            const libraryList = document.getElementById('badge-list-library');
+            activeList.innerHTML = "";
+            libraryList.innerHTML = "";
+
+            let activeCount = 0;
+            let libraryCount = 0;
+
+            badges.forEach(b => {
+                const colorMap = {
+                    orange: "text-orange-400 bg-orange-500/10 border-orange-500/20",
+                    blue: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+                    green: "text-green-400 bg-green-500/10 border-green-500/20",
+                    purple: "text-purple-400 bg-purple-500/10 border-purple-500/20",
+                    red: "text-red-400 bg-red-500/10 border-red-500/20"
+                };
+                const colorClass = colorMap[b.color] || colorMap['orange'];
+
+                const html = `
+                    <div class="relative group">
+                        <div class="flex items-center justify-between p-3 rounded-xl border ${colorClass} hover:bg-white/5 transition-colors">
+                            <div class="flex items-center gap-4">
+                                <div class="size-10 rounded-full bg-black/20 flex items-center justify-center border border-current ${colorClass.split(' ')[0]}">
+                                    <span class="material-symbols-outlined">${b.icon}</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">${b.name}</h4>
+                                    <p class="text-[10px] text-gray-400">${b.desc}</p>
+                                </div>
+                            </div>
+                            <button onclick="toggleMenu(${b.id})" class="p-1 rounded hover:bg-black/20 text-gray-500 hover:text-white relative z-10">
+                                <span class="material-symbols-outlined">more_vert</span>
+                            </button>
+                        </div>
+                        
+                        <div id="menu-${b.id}" class="action-menu hidden absolute right-0 top-10 w-32 bg-black border border-border rounded-lg shadow-xl z-20 overflow-hidden">
+                            <button onclick="openEditModal(${b.id})" class="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/10 hover:text-white flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[14px]">edit</span> Edit
+                            </button>
+                            <button onclick="toggleStatus(${b.id})" class="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-white/10 hover:text-white flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[14px]">${b.status === 'active' ? 'inventory_2' : 'verified'}</span> ${b.status === 'active' ? 'To Library' : 'Activate'}
+                            </button>
+                            <button onclick="deleteBadge(${b.id})" class="w-full text-left px-4 py-2 text-xs text-red-400 hover:bg-red-500/20 flex items-center gap-2 border-t border-border">
+                                <span class="material-symbols-outlined text-[14px]">delete</span> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                if (b.status === 'active') {
+                    activeList.innerHTML += html;
+                    activeCount++;
+                } else {
+                    libraryList.innerHTML += html;
+                    libraryCount++;
+                }
+            });
+
+            document.getElementById('active-count').innerText = `${activeCount} Active`;
+            document.getElementById('library-count').innerText = `${libraryCount} Items`;
+
+            // Render Config
+            updateRuleVal('base', config.base);
+            updateRuleVal('review', config.review);
+            updateRuleVal('ref', config.ref);
+            // Update inputs
+            document.querySelector('input[oninput*="base"]').value = config.base;
+            document.querySelector('input[oninput*="review"]').value = config.review;
+            document.querySelector('input[oninput*="ref"]').value = config.ref;
+        }
+
+        // 3. MENU ACTIONS
+        let openMenuId = null;
+        function toggleMenu(id) {
+            // Close others
+            if (openMenuId && openMenuId !== id) {
+                document.getElementById(`menu-${openMenuId}`).classList.add('hidden');
+                document.getElementById(`menu-${openMenuId}`).classList.remove('visible');
+            }
+            const menu = document.getElementById(`menu-${id}`);
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                setTimeout(() => menu.classList.add('visible'), 10);
+                openMenuId = id;
+            } else {
+                menu.classList.remove('visible');
+                setTimeout(() => menu.classList.add('hidden'), 100);
+                openMenuId = null;
+            }
+            event.stopPropagation();
+        }
+
+        document.addEventListener('click', function (e) {
+            if (openMenuId) {
+                const menu = document.getElementById(`menu-${openMenuId}`);
+                if (!menu.contains(e.target)) {
+                    menu.classList.remove('visible');
+                    setTimeout(() => menu.classList.add('hidden'), 100);
+                    openMenuId = null;
+                }
+            }
+        });
+
+        // 4. CRUD LOGIC
+        function toggleStatus(id) {
+            ZoiGamification.toggleStatus(id);
+            badges = ZoiGamification.getBadges(); // Refresh
+            renderBadges();
+            showToast("Status Updated", `Badge moved.`);
+        }
+
+        function deleteBadge(id) {
+            if (confirm("Permanently delete this badge?")) {
+                ZoiGamification.deleteBadge(id);
+                badges = ZoiGamification.getBadges(); // Refresh
+                renderBadges();
+                showToast("Deleted", "Badge removed.");
+            }
+        }
+
+        // 5. MODAL & ICONS
+        function renderIconGrid(selected) {
+            const grid = document.getElementById('icon-grid');
+            grid.innerHTML = "";
+            icons.forEach(ic => {
+                const isSelected = ic === selected ? 'selected' : 'border-border text-gray-500';
+                grid.innerHTML += `
+                    <div onclick="selectIcon('${ic}')" class="icon-option size-10 rounded border flex items-center justify-center cursor-pointer hover:border-primary transition-colors ${isSelected}">
+                        <span class="material-symbols-outlined text-lg">${ic}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function selectIcon(ic) {
+            document.getElementById('selected-icon').value = ic;
+            renderIconGrid(ic);
+        }
+
+        function openCreateModal() {
+            document.getElementById('modal-title').innerText = "Create New Badge";
+            document.getElementById('edit-id').value = "";
+            document.getElementById('new-name').value = "";
+            document.getElementById('new-desc').value = "";
+            selectIcon('stars'); // Default
+            document.getElementById('create-modal').classList.remove('hidden');
+            document.getElementById('create-modal').classList.add('flex');
+        }
+
+        function openEditModal(id) {
+            const b = badges.find(x => x.id === id);
+            document.getElementById('modal-title').innerText = "Edit Badge";
+            document.getElementById('edit-id').value = b.id;
+            document.getElementById('new-name').value = b.name;
+            document.getElementById('new-desc').value = b.desc;
+            document.getElementById('new-color').value = b.color;
+            selectIcon(b.icon);
+
+            document.getElementById('create-modal').classList.remove('hidden');
+            document.getElementById('create-modal').classList.add('flex');
+        }
+
+        function saveBadge() {
+            const id = document.getElementById('edit-id').value;
+            const name = document.getElementById('new-name').value;
+            const desc = document.getElementById('new-desc').value;
+            const icon = document.getElementById('selected-icon').value;
+            const color = document.getElementById('new-color').value;
+
+            if (!name) return showToast("Error", "Name required");
+
+            if (id) {
+                // Edit
+                const b = badges.find(x => x.id == id);
+                const updated = { ...b, name, desc, icon, color };
+                ZoiGamification.saveBadge(updated);
+                showToast("Updated", `${name} saved.`);
+            } else {
+                // Create
+                const newBadge = { id: Date.now(), name, desc, icon, color, status: 'active' };
+                ZoiGamification.saveBadge(newBadge);
+                showToast("Created", "New badge added.");
+            }
+
+            badges = ZoiGamification.getBadges(); // Refresh
+            closeModal('create-modal');
+            renderBadges();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        // 6. RULES ENGINE
+        function updateRuleVal(type, val) {
+            document.getElementById(`disp-${type}`).innerText = val + " pts";
+            config[type] = parseInt(val);
+        }
+
+        function saveRules() {
+            ZoiGamification.saveConfig(config);
+            showToast("Success", "Point rule saved successfully.");
+        }
+
+        // 7. AI & TOAST
+        function triggerAIChallenge() {
+            const btn = document.querySelector('button[onclick="triggerAIChallenge()"]');
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Generating...`;
+            setTimeout(() => {
+                const newBadge = { id: Date.now(), name: "Monsoon Munchies", icon: "thunderstorm", desc: "Order soup during rain", color: "blue", status: 'active' };
+                ZoiGamification.saveBadge(newBadge);
+                badges = ZoiGamification.getBadges(); // Refresh
+                renderBadges();
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">auto_awesome</span> AI Generate`;
+                showToast("Z.O.I. Created", "New 'Monsoon' challenge is now live.");
+            }, 1000);
+        }
+
+        function applyRecommendation() {
+            updateRuleVal('review', 100); // Simulate
+            showToast("Applied", "Optimization rule engaged.");
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        // INIT
+        window.onload = () => {
+            fetch('sidebar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sidebar-container').innerHTML = data;
+                    setTimeout(() => {
+                        const links = document.querySelectorAll('#sidebar-container nav a');
+                        links.forEach(l => {
+                            if (l.innerText.includes('Gamification')) {
+                                l.className = "flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg font-bold transition-all";
+                                l.querySelector('span').classList.add('text-primary');
+                            } else {
+                                l.className = "flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group";
+                            }
+                        });
+                        ZoiAuth.renderSimLogin();
+                    }, 100);
+                });
+            renderBadges();
+        };
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+
+

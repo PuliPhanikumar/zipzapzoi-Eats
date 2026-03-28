@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Careers - ZipZapZoi Eats</title>
+    <!-- Google Fonts: Manrope -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet" />
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Tailwind Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0ff",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221910",
+                        "surface-dark": "#2e2319",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-[#111418] dark:text-white font-display overflow-x-hidden">
+    <div class="relative flex min-h-screen w-full flex-col group/design-root">
+        <!-- Navbar -->
+        <header class="sticky top-0 z-50 bg-[#0a0314]/80 backdrop-blur-md border-b border-[#3c1e6e]/50">
+            <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity shrink-0">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-[#00f0ff] flex items-center justify-center text-[#0a0314] shadow-lg shadow-[#00f0ff]/50">
+                            <span class="material-symbols-outlined text-xl">bolt</span>
+                        </div>
+                        <span class="font-bold text-xl tracking-tight hidden sm:block text-white"
+                            style="font-family: 'Quicksand', sans-serif;">Zoi<span
+                                class="text-[#00f0ff]">Eats</span></span>
+                    </a>
+
+                    <div class="hidden xl:flex items-center gap-6">
+                        <a class="text-sm font-bold text-[#ffff00] hover:text-white transition-colors flex items-center gap-1"
+                            href="promotions & offers.html">
+                            <span class="material-symbols-outlined text-sm">local_offer</span> Offers & Deals
+                        </a>
+
+                        <div class="hidden xl:flex items-center gap-6">
+                            <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                                href="customer_restaurant_listing.html">Restaurants</a>
+                            <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                                href="feedback.html">Feedback</a>
+                            <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                                href="customer support help.html">Support</a>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 sm:gap-4">
+
+                        <a href="restaurant pricing plans.html"
+                            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#ff00ff]/50 hover:bg-[#ff00ff]/10 transition-all group">
+                            <span
+                                class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#ff00ff] transition-colors">store</span>
+                            <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Add
+                                Restaurant</span>
+                        </a>
+
+                        <a href="delivery partner application.html"
+                            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#00ff00]/50 hover:bg-[#00ff00]/10 transition-all group">
+                            <span
+                                class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#00ff00] transition-colors">two_wheeler</span>
+                            <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Ride
+                                with Us</span>
+                        </a>
+
+                        <button
+                            class="hidden sm:flex items-center gap-2 bg-[#1a0b36] px-3 py-1.5 rounded-full border border-[#3c1e6e]/50 shadow-inner shadow-[#00f0ff]/5 cursor-pointer hover:border-[#00ff00]/50 transition-colors group">
+                            <span
+                                class="material-symbols-outlined text-[#00ff00] text-sm group-hover:animate-bounce">location_on</span>
+                            <span class="text-xs font-medium text-[#b4a5d8]">Bengaluru</span>
+                        </button>
+
+                        <a href="shopping_cart.html"
+                            class="relative p-2 rounded-full hover:bg-[#1a0b36] transition-colors group">
+                            <span
+                                class="material-symbols-outlined text-[#00f0ff] group-hover:text-white transition-colors">shopping_cart</span>
+                            <span class="zoi-cart-badge absolute top-1 right-1 min-w-[16px] h-4 bg-[#ff00ff] text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse hidden">0</span>
+                        </a>
+
+                        <a href="login & registration.html"
+                            class="w-9 h-9 rounded-full bg-cover bg-center border-2 border-[#00f0ff]/50 ring-2 ring-[#00f0ff]/30 cursor-pointer shadow-lg hover:ring-[#ff00ff] transition-all group overflow-hidden relative"
+                            data-alt="User profile"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBT6tCKI45lIHrDLxsyuh-TDPmobyPeVU6AyG7iM4HJzbXt4FAgaDQwWFcZnvtqXNR2v3lDATirSitKZgMb_FnrCII5JPdAZBxC-dcoHwPte4HShdkJMCfiA4IDkriDys7wgNvhhqh9d7SijAKyWm5ODFazB5xCczQkThdsZabwrvSBdIdzaX2H6j4kbcbHlX86Enzq9IK-Y2zpqCliaGC8ekgZyi2dYF6J2WftA0Fh9_LuEmN84hmLZsHM7I4nSAuwQ4ZPT3UIBcU');">
+                            <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors">
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="flex flex-col flex-1">
+            <!-- Hero Section -->
+            <section class="relative">
+                <div class="px-4 md:px-40 flex flex-1 justify-center py-5">
+                    <div class="flex flex-col max-w-[960px] flex-1">
+                        <div class="@container">
+                            <div class="@[480px]:p-4">
+                                <div class="flex min-h-[560px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-xl items-center justify-center p-6 text-center relative overflow-hidden"
+                                    data-alt="Futuristic city skyline with drone delivery network"
+                                    style='background-image: linear-gradient(rgba(0, 0, 0, 0.4) 0%, rgba(34, 25, 16, 0.9) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBLGnIBJS70WL68GEy7BFOmN0ezDdAT8jKeeo_CBcaRzfe20gJ-Ez_CmxF-LriGyDo0ZeljqceHhQp0eUYWS40a0VkhtnxxvUzFHIcaQwRmM0gIL6j59YQb2IeK6kNgdQO2cXFNFlcCMoCkqctQJxJZ9qByK8suZUrV64FXabBaQ6AT9_CQe6H5tliIWsnE2UgMAFvdqwVrTF1htqafnGET-bWQpadQ_K5m_XcoMKnswVbVONAZCV0ZnNEt4oZYZ6CcPCRhbRqqAKk");'>
+                                    <div class="flex flex-col gap-4 max-w-[800px] z-10">
+                                        <h1
+                                            class="text-white text-5xl md:text-6xl font-black leading-[1.1] tracking-[-0.033em]">
+                                            Building the Future of <span class="text-primary">Flavor</span>
+                                        </h1>
+                                        <h2
+                                            class="text-gray-200 text-lg md:text-xl font-medium leading-relaxed max-w-[640px] mx-auto">
+                                            Join ZipZapZoi Eats as we use AI to connect the world through food. From
+                                            local kitchens in India to a global ecosystem.
+                                        </h2>
+                                    </div>
+                                    <div class="flex flex-col sm:flex-row gap-4 z-10 mt-4">
+                                        <button
+                                            class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-primary hover:bg-primary/90 transition-all text-[#0a0314] text-base font-bold leading-normal shadow-lg shadow-primary/25"
+                                            onclick="document.getElementById('open-roles').scrollIntoView({behavior: 'smooth'})">
+                                            View Open Roles
+                                        </button>
+                                        <button
+                                            class="flex min-w-[160px] cursor-pointer items-center justify-center rounded-lg h-12 px-6 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white text-base font-bold leading-normal transition-all">
+                                            Our Culture
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Core Values Section -->
+            <section class="py-10 px-4 md:px-40 bg-background-light dark:bg-background-dark">
+                <div class="flex flex-col items-center max-w-[960px] mx-auto">
+                    <div class="flex flex-col gap-4 text-center mb-12">
+                        <h2
+                            class="text-[#111418] dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
+                            Driven by AI, Obsessed with Flavor
+                        </h2>
+                        <p
+                            class="text-[#637588] dark:text-[#b4a5d8] text-base md:text-lg font-normal leading-normal max-w-[720px] mx-auto">
+                            We are building a scalable ecosystem connecting customers, restaurants, and delivery
+                            partners with intelligence and empathy.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                        <!-- Card 1 -->
+                        <div
+                            class="flex flex-col gap-4 rounded-xl border border-[#e6e8eb] dark:border-[#3c1e6e] bg-white dark:bg-[#2e2319] p-6 shadow-sm hover:shadow-md transition-shadow">
+                            <div
+                                class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <span class="material-symbols-outlined text-3xl">psychology</span>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <h3 class="text-[#111418] dark:text-white text-xl font-bold leading-tight">AI-First
+                                    Mindset</h3>
+                                <p class="text-[#637588] dark:text-[#b4a5d8] text-sm leading-relaxed">
+                                    Leveraging predictive algorithms to anticipate cravings and optimize logistics
+                                    before an order is even placed.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 2 -->
+                        <div
+                            class="flex flex-col gap-4 rounded-xl border border-[#e6e8eb] dark:border-[#3c1e6e] bg-white dark:bg-[#2e2319] p-6 shadow-sm hover:shadow-md transition-shadow">
+                            <div
+                                class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <span class="material-symbols-outlined text-3xl">favorite</span>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <h3 class="text-[#111418] dark:text-white text-xl font-bold leading-tight">Customer
+                                    Obsession</h3>
+                                <p class="text-[#637588] dark:text-[#b4a5d8] text-sm leading-relaxed">
+                                    Delivering happiness with every order. We listen, adapt, and improve based on real
+                                    human feedback.
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Card 3 -->
+                        <div
+                            class="flex flex-col gap-4 rounded-xl border border-[#e6e8eb] dark:border-[#3c1e6e] bg-white dark:bg-[#2e2319] p-6 shadow-sm hover:shadow-md transition-shadow">
+                            <div
+                                class="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <span class="material-symbols-outlined text-3xl">public</span>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <h3 class="text-[#111418] dark:text-white text-xl font-bold leading-tight">Global Scale
+                                </h3>
+                                <p class="text-[#637588] dark:text-[#b4a5d8] text-sm leading-relaxed">
+                                    Building for the world, starting with the vibrant complexity of India. Local roots,
+                                    global ambition.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Benefits / Perks -->
+            <section class="py-16 px-4 md:px-40 bg-white dark:bg-[#1a120b]">
+                <div class="flex flex-col max-w-[960px] mx-auto w-full">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+                        <h2 class="text-[#111418] dark:text-white text-3xl font-bold tracking-tight">Perks &amp;
+                            Benefits</h2>
+                        <a class="text-primary font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all"
+                            href="#">
+                            View full benefits guide <span
+                                class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div
+                            class="p-5 rounded-lg bg-[#f8f7f5] dark:bg-[#2e2319] border border-transparent dark:border-[#3c1e6e] hover:border-primary/30 transition-colors">
+                            <div class="text-primary mb-3">
+                                <span class="material-symbols-outlined text-[32px]">flight_takeoff</span>
+                            </div>
+                            <h4 class="text-[#111418] dark:text-white font-bold mb-1">Remote Friendly</h4>
+                            <p class="text-xs text-[#637588] dark:text-[#b4a5d8]">Work from where you feel most
+                                productive, with global offsites.</p>
+                        </div>
+                        <div
+                            class="p-5 rounded-lg bg-[#f8f7f5] dark:bg-[#2e2319] border border-transparent dark:border-[#3c1e6e] hover:border-primary/30 transition-colors">
+                            <div class="text-primary mb-3">
+                                <span class="material-symbols-outlined text-[32px]">health_and_safety</span>
+                            </div>
+                            <h4 class="text-[#111418] dark:text-white font-bold mb-1">Comprehensive Health</h4>
+                            <p class="text-xs text-[#637588] dark:text-[#b4a5d8]">Full coverage for you and your
+                                dependents, plus mental wellness.</p>
+                        </div>
+                        <div
+                            class="p-5 rounded-lg bg-[#f8f7f5] dark:bg-[#2e2319] border border-transparent dark:border-[#3c1e6e] hover:border-primary/30 transition-colors">
+                            <div class="text-primary mb-3">
+                                <span class="material-symbols-outlined text-[32px]">lunch_dining</span>
+                            </div>
+                            <h4 class="text-[#111418] dark:text-white font-bold mb-1">Unlimited Zoi Credits</h4>
+                            <p class="text-xs text-[#637588] dark:text-[#b4a5d8]">Generous monthly allowance to order
+                                from the best spots in town.</p>
+                        </div>
+                        <div
+                            class="p-5 rounded-lg bg-[#f8f7f5] dark:bg-[#2e2319] border border-transparent dark:border-[#3c1e6e] hover:border-primary/30 transition-colors">
+                            <div class="text-primary mb-3">
+                                <span class="material-symbols-outlined text-[32px]">trending_up</span>
+                            </div>
+                            <h4 class="text-[#111418] dark:text-white font-bold mb-1">Competitive Equity</h4>
+                            <p class="text-xs text-[#637588] dark:text-[#b4a5d8]">Own a piece of the pie. We offer
+                                competitive ESOPs for all roles.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Social Proof / Image Gallery -->
+            <section class="py-10 px-4 md:px-40 overflow-hidden bg-background-light dark:bg-background-dark">
+                <div class="flex flex-col max-w-[960px] mx-auto w-full gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-[400px]">
+                        <div class="bg-gray-800 rounded-xl overflow-hidden relative group">
+                            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                data-alt="Team meeting in a modern office discussion room"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuS2KIPUtNRnEaUxKyTt1hHb056bWlGZSgQDT34wn-tmRuFd13w8IqEur1hGbpDwXr_YbogGe4dAJpWfaApZmKqKIAjoZNVgsDImjdIm1mrZmgrfwDWRgxRjg8nOXePVTFdHn0rDEtrmUJGVD1aGgFQEaLO-wH98n2q-KsI3-6xTnd4aok_XRD8toRJ9VT4QTsU5rm_yWabexw6AN3eGR1GYZVyOkUh4MuUfNwV4tLrt0P3gy5fNBSRpl214EPlbGAoYBeDR3UbPw" />
+                            <div
+                                class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                                <p class="text-white font-bold text-lg">"We build fast, break barriers, and eat well."
+                                </p>
+                                <p class="text-white/70 text-sm mt-1">— Engineering Team, Bengaluru</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-4 h-full">
+                            <div class="flex-1 bg-gray-800 rounded-xl overflow-hidden relative group">
+                                <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    data-alt="Two people collaborating on a laptop with data screens"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPUzav40fCDannXZULGBjeWZHxpmbOFH9HuvYjTvRoOJ7yFdliz7BTEZ7NqszMTjk7550GUqX_hBWj1mNhFFxOWqLlldNc7PkZ1bedxQfRNmIUgHGrgvcIwe3IwaRI69qriXKtcFEk3703Xru5eXzbxlfy0ntUcV1GnV9KIxEfs0sLzd9pn9V7yldJjte0ZrjUped5P2ze2gYccnV0rmNFjP-gVlgJPpn1mmCWiDfSpkgzwwXuTijZ3-zLqsGpk88OU8bgv9T0H2E" />
+                            </div>
+                            <div class="flex-1 bg-gray-800 rounded-xl overflow-hidden relative group">
+                                <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    data-alt="Healthy colorful salad bowl food photography"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZQi0li_kERjCiyb9ZiXQ2zU-tIgCoE3NnO1N2wuL1IM2YOXdgILLRTvsSnyFw9UiYV9Hd2JZ8POrMw3rhKYe96hPJn32UaLQzRP216uv3_NfBKQJnmi25HMiTw6tZxwcPj8hd0xED2wTZJjsqg8Er-05fMvkUz1VbFb-ROEYBQQbOKUArIkdvKiat86HtQuahbL1bMe8keX-l4EIRVPisfNic_SmZq_3EQpNcZnI-Eo5siRhYkLg9QAzMlOVeFFa9eGmThtvN7hU" />
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span class="text-white font-bold text-xl">Flavor First</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Job Board Section -->
+            <section class="py-20 px-4 md:px-40 bg-white dark:bg-[#1a120b]" id="open-roles">
+                <div class="flex flex-col max-w-[960px] mx-auto w-full gap-8">
+                    <div
+                        class="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-[#e6e8eb] dark:border-[#3c1e6e] pb-6">
+                        <div class="flex flex-col gap-2">
+                            <h2 class="text-[#111418] dark:text-white text-3xl font-black tracking-tight">Open Roles
+                            </h2>
+                            <p class="text-[#637588] dark:text-[#b4a5d8]">Join us in shaping the future of delivery.</p>
+                        </div>
+                        <div class="flex gap-2 overflow-x-auto pb-2 w-full md:w-auto">
+                            <button
+                                class="px-4 py-2 rounded-full bg-primary text-[#0a0314] text-sm font-bold whitespace-nowrap">All
+                                Roles</button>
+                            <button
+                                class="px-4 py-2 rounded-full bg-[#f8f7f5] dark:bg-[#2e2319] text-[#111418] dark:text-[#b4a5d8] hover:bg-gray-200 dark:hover:bg-[#3d2f22] text-sm font-medium transition-colors whitespace-nowrap">Engineering</button>
+                            <button
+                                class="px-4 py-2 rounded-full bg-[#f8f7f5] dark:bg-[#2e2319] text-[#111418] dark:text-[#b4a5d8] hover:bg-gray-200 dark:hover:bg-[#3d2f22] text-sm font-medium transition-colors whitespace-nowrap">Product</button>
+                            <button
+                                class="px-4 py-2 rounded-full bg-[#f8f7f5] dark:bg-[#2e2319] text-[#111418] dark:text-[#b4a5d8] hover:bg-gray-200 dark:hover:bg-[#3d2f22] text-sm font-medium transition-colors whitespace-nowrap">Operations</button>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <!-- Job Card 1 -->
+                        <div
+                            class="group flex flex-col md:flex-row justify-between items-start md:items-center p-6 rounded-xl border border-[#e6e8eb] dark:border-[#2e2319] bg-[#f8f7f5] dark:bg-[#221910] hover:border-primary dark:hover:border-primary transition-all cursor-pointer">
+                            <div class="flex flex-col gap-1">
+                                <h3
+                                    class="text-[#111418] dark:text-white text-lg font-bold group-hover:text-primary transition-colors">
+                                    Senior Backend Engineer (Python/Go)</h3>
+                                <div class="flex items-center gap-4 text-xs text-[#637588] dark:text-[#9ca3af]">
+                                    <span class="flex items-center gap-1"><span
+                                            class="material-symbols-outlined text-sm">location_on</span> Bengaluru,
+                                        India</span>
+                                    <span class="flex items-center gap-1"><span
+                                            class="material-symbols-outlined text-sm">schedule</span> Full-time</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 md:mt-0 flex items-center gap-3">
+                                <span
+                                    class="px-3 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase tracking-wider">Engineering</span>
+                                <span
+                                    class="material-symbols-outlined text-[#637588] dark:text-[#b4a5d8] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </div>
+                        </div>
+                        <!-- Job Card 2 -->
+                        <div
+                            class="group flex flex-col md:flex-row justify-between items-start md:items-center p-6 rounded-xl border border-[#e6e8eb] dark:border-[#2e2319] bg-[#f8f7f5] dark:bg-[#221910] hover:border-primary dark:hover:border-primary transition-all cursor-pointer">
+                            <div class="flex flex-col gap-1">
+                                <h3
+                                    class="text-[#111418] dark:text-white text-lg font-bold group-hover:text-primary transition-colors">
+                                    AI Research Scientist</h3>
+                                <div class="flex items-center gap-4 text-xs text-[#637588] dark:text-[#9ca3af]">
+                                    <span class="flex items-center gap-1"><span
+                                            class="material-symbols-outlined text-sm">location_on</span> Remote /
+                                        Global</span>
+                                    <span class="flex items-center gap-1"><span
+                                            class="material-symbols-outlined text-sm">schedule</span> Full-time</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 md:mt-0 flex items-center gap-3">
+                                <span
+                                    class="px-3 py-1 rounded bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-bold uppercase tracking-wider">Data
+                                    Science</span>
+                                <span
+                                    class="material-symbols-outlined text-[#637588] dark:text-[#b4a5d8] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </div>
+                        </div>
+                        <!-- Job Card 3 -->
+                        <div
+                            class="group flex flex-col md:flex-row justify-between items-start md:items-center p-6 rounded-xl border border-[#e6e8eb] dark:border-[#2e2319] bg-[#f8f7f5] dark:bg-[#221910] hover:border-primary dark:hover:border-primary transition-all cursor-pointer">
+                            <div class="flex flex-col gap-1">
+                                <h3
+                                    class="text-[#111418] dark:text-white text-lg font-bold group-hover:text-primary transition-colors">
+                                    Growth Marketing Manager</h3>
+                                <div class="flex items-center gap-4 text-xs text-[#637588] dark:text-[#9ca3af]">
+                                    <span class="flex items-center gap-1"><span
+                                            class="material-symbols-outlined text-sm">location_on</span> Mumbai,
+                                        India</span>
+                                    <span class="flex items-center gap-1"><span
+                                            class="material-symbols-outlined text-sm">schedule</span> Hybrid</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 md:mt-0 flex items-center gap-3">
+                                <span
+                                    class="px-3 py-1 rounded bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-bold uppercase tracking-wider">Marketing</span>
+                                <span
+                                    class="material-symbols-outlined text-[#637588] dark:text-[#b4a5d8] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </div>
+                        </div>
+                        <!-- Job Card 4 -->
+                        <div
+                            class="group flex flex-col md:flex-row justify-between items-start md:items-center p-6 rounded-xl border border-[#e6e8eb] dark:border-[#2e2319] bg-[#f8f7f5] dark:bg-[#221910] hover:border-primary dark:hover:border-primary transition-all cursor-pointer">
+                            <div class="flex flex-col gap-1">
+                                <h3
+                                    class="text-[#111418] dark:text-white text-lg font-bold group-hover:text-primary transition-colors">
+                                    Lead Product Designer</h3>
+                                <div class="flex items-center gap-4 text-xs text-[#637588] dark:text-[#9ca3af]">
+                                    <span class="flex items-center gap-1"><span
+                                            class="material-symbols-outlined text-sm">location_on</span> Bengaluru,
+                                        India</span>
+                                    <span class="flex items-center gap-1"><span
+                                            class="material-symbols-outlined text-sm">schedule</span> Full-time</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 md:mt-0 flex items-center gap-3">
+                                <span
+                                    class="px-3 py-1 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-bold uppercase tracking-wider">Design</span>
+                                <span
+                                    class="material-symbols-outlined text-[#637588] dark:text-[#b4a5d8] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <!-- Footer -->
+        <footer class="bg-[#0a0314] text-[#b4a5d8] border-t border-[#3c1e6e] mt-auto">
+            <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
+                    <!-- Column 1: Brand -->
+                    <div class="col-span-1 md:col-span-2">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span
+                                class="material-symbols-outlined text-primary text-2xl drop-shadow-[0_0_8px_currentColor]">bolt</span>
+                            <span class="font-bold text-xl text-white"
+                                style="font-family: 'Quicksand', sans-serif;">ZoiEats</span>
+                        </div>
+                        <p class="text-sm mb-4 text-[#b4a5d8]">
+                            Your AI-powered portal to the comforting flavors of India.
+                        </p>
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00ff00]/20 border border-[#00ff00]/30 shadow-md shadow-[#00ff00]/10">
+                            <span class="relative flex h-2 w-2">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff00] opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-[#00ff00]"></span>
+                            </span>
+                            <span class="text-xs font-mono font-medium text-[#00ff00]">AI System: OPTIMAL</span>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Explore ZoiEats -->
+                    <div>
+                        <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Explore
+                            ZoiEats</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a class="hover:text-primary transition-colors" href="promotions & offers.html">Offers &
+                                    Promos</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="feedback.html">Feedback Portal</a>
+                            </li>
+                            <li><a class="hover:text-primary transition-colors"
+                                    href="customer support help.html">Customer Support</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Partner with Us -->
+                    <div>
+                        <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Partner with
+                            Us</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a class="hover:text-primary transition-colors"
+                                    href="restaurant pricing plans.html">Add Restaurant</a></li>
+                            <li><a class="hover:text-primary transition-colors"
+                                    href="delivery partner application.html">Ride with Us</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="dev_hub.html">Developer APIs</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Company -->
+                    <div>
+                        <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Company</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li><a class="hover:text-primary transition-colors" href="careerspage.html">Careers</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="press & media kit.html">Press &
+                                    Media</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="about us.html">About Us</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div
+                    class="border-t border-[#3c1e6e] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm">
+                        <span>© 2025 ZoiEats. All rights reserved.</span>
+                        <span class="hidden sm:inline-block text-[#3c1e6e]">|</span>
+                        <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms &
+                            Conditions</a>
+                        <a class="hover:text-white transition-colors" href="privacy policy.html">Privacy Policy</a>
+                        <a class="hover:text-white transition-colors" href="gst disclaimer.html">GST & Taxation</a>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-6 mt-6 md:mt-0">
+                        <div class="flex flex-col gap-2">
+                            <a href="mailto:reachus@zipzapzoi.in"
+                                class="text-sm hover:text-primary transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px]">mail</span> reachus@zipzapzoi.in
+                            </a>
+                            <a href="mailto:phanikumar@zipzapzoi.in"
+                                class="text-sm hover:text-primary transition-colors flex items-center gap-2 text-[#3c1e6e]/80">
+                                <span class="material-symbols-outlined text-[16px]">developer_mode</span>
+                                phanikumar@zipzapzoi.in
+                            </a>
+                        </div>
+                        <div class="flex gap-4 items-center">
+                            <a class="hover:text-white transition-colors text-lg" href="https://x.com/ZipZapZoi"
+                                target="_blank" rel="noopener noreferrer"><i class="fa fa-twitter"></i></a>
+                            <a class="hover:text-white transition-colors text-lg"
+                                href="https://www.youtube.com/@ZipZapZoi" target="_blank" rel="noopener noreferrer"><i
+                                    class="fa fa-youtube-play"></i></a>
+                            <a class="hover:text-white transition-colors text-lg"
+                                href="https://www.instagram.com/zipzapzoi/" target="_blank" rel="noopener noreferrer"><i
+                                    class="fa fa-instagram"></i></a>
+                            <a class="hover:text-white transition-colors text-lg"
+                                href="https://www.facebook.com/profile.php?id=61585106515522" target="_blank"
+                                rel="noopener noreferrer"><i class="fa fa-facebook"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_customer_engine.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>
+

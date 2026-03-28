@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Standalone POS - Financials</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: { colors: { primary: "#00f0ff", bg: "#0f1115", surface: "#181a20", border: "#2a2d35", success: "#22c55e", danger: "#ef4444" }, fontFamily: { sans: ["Inter", "sans-serif"], mono: ["JetBrains Mono", "monospace"] } }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans selection:bg-primary selection:text-black">
+
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <header
+            class="h-16 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-6 z-20">
+            <h1 class="text-xl font-bold text-white">Finance & Payouts</h1>
+            <div class="flex items-center gap-2 px-3 py-1.5 bg-black/20 border border-border rounded-lg">
+                <span class="text-xs text-gray-400">Next Payout:</span>
+                <span class="text-sm font-bold text-white">Oct 28</span>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div
+                    class="bg-gradient-to-br from-green-900/40 to-surface border border-green-500/30 p-6 rounded-xl relative overflow-hidden">
+                    <p class="text-xs text-green-300 font-bold uppercase tracking-wider">Available for Payout</p>
+                    <h3 class="text-3xl font-black text-white mt-2" id="available-bal">₹42,500</h3>
+                    <p class="text-xs text-gray-400 mt-1">Net after commission & tax</p>
+                    <button onclick="requestWithdrawal()"
+                        class="mt-4 px-4 py-2 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg text-xs w-full shadow-lg shadow-green-900/20 transition-all"
+                        id="withdraw-btn">Withdraw Now</button>
+                </div>
+                <div class="bg-surface border border-border p-6 rounded-xl">
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">This Week's Gross</p>
+                    <h3 class="text-3xl font-black text-white mt-2">₹58,200</h3>
+                    <div class="mt-4 space-y-1 text-xs">
+                        <div class="flex justify-between text-gray-400"><span>Commission (15%)</span><span
+                                class="text-red-400">- ₹8,730</span></div>
+                        <div class="flex justify-between text-gray-400"><span>Tax (GST)</span><span
+                                class="text-red-400">- ₹2,910</span></div>
+                        <div class="flex justify-between text-gray-400"><span>Marketing Ads</span><span
+                                class="text-red-400">- ₹500</span></div>
+                    </div>
+                </div>
+                <div class="bg-surface border border-border p-6 rounded-xl">
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Past Settlements</p>
+                    <div class="mt-4 space-y-3">
+                        <div class="flex justify-between items-center border-b border-border pb-2 cursor-pointer hover:bg-white/5 p-1 rounded"
+                            onclick="openBreakdown('Oct 21')">
+                            <div>
+                                <p class="text-sm font-bold text-white">Oct 21</p>
+                                <p class="text-[10px] text-gray-500">Ref: UTR-8829</p>
+                            </div>
+                            <span class="text-green-500 font-mono font-bold">₹38,200</span>
+                        </div>
+                        <div class="flex justify-between items-center p-1 rounded hover:bg-white/5 cursor-pointer"
+                            onclick="openBreakdown('Oct 14')">
+                            <div>
+                                <p class="text-sm font-bold text-white">Oct 14</p>
+                                <p class="text-[10px] text-gray-500">Ref: UTR-1102</p>
+                            </div>
+                            <span class="text-green-500 font-mono font-bold">₹41,500</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-lg">
+                <div class="p-4 border-b border-border flex justify-between items-center bg-black/20">
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wide">Transaction Ledger</h3>
+                    <button onclick="downloadCSV()"
+                        class="text-xs font-bold text-primary hover:text-white flex items-center gap-1 transition-colors">
+                        <span class="material-symbols-outlined text-sm">download</span> Download CSV
+                    </button>
+                </div>
+                <table class="w-full text-left text-sm" id="ledger-table">
+                    <thead class="bg-black/40 text-gray-500 uppercase text-xs">
+                        <tr>
+                            <th class="p-4">Date</th>
+                            <th class="p-4">ID</th>
+                            <th class="p-4">Description</th>
+                            <th class="p-4">Amount</th>
+                            <th class="p-4 text-right">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border text-gray-300">
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 text-xs text-gray-400">Oct 24, 14:30</td>
+                            <td class="p-4 font-mono text-xs">ORD-8821</td>
+                            <td class="p-4 text-white">Order Payment</td>
+                            <td class="p-4 text-green-500 font-bold">+₹450.00</td>
+                            <td class="p-4 text-right"><span
+                                    class="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded">CREDITED</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 text-xs text-gray-400">Oct 24, 14:30</td>
+                            <td class="p-4 font-mono text-xs">COM-8821</td>
+                            <td class="p-4 text-gray-400">Commission (20%)</td>
+                            <td class="p-4 text-red-400 font-bold">-₹90.00</td>
+                            <td class="p-4 text-right"><span
+                                    class="bg-red-500/10 text-red-500 text-[10px] font-bold px-2 py-1 rounded">DEBITED</span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-white/5 transition-colors">
+                            <td class="p-4 text-xs text-gray-400">Oct 23, 09:00</td>
+                            <td class="p-4 font-mono text-xs">AD-9902</td>
+                            <td class="p-4 text-gray-400">Ad Spend</td>
+                            <td class="p-4 text-red-400 font-bold">-₹250.00</td>
+                            <td class="p-4 text-right"><span
+                                    class="bg-red-500/10 text-red-500 text-[10px] font-bold px-2 py-1 rounded">DEBITED</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="breakdown-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-1">Settlement Details</h3>
+            <p class="text-xs text-gray-400 mb-4" id="modal-date">Date: Oct 21</p>
+            <div class="space-y-2 border-t border-b border-border py-4 my-2 text-sm">
+                <div class="flex justify-between text-gray-300"><span>Gross Sales</span><span>₹45,000</span></div>
+                <div class="flex justify-between text-red-400"><span>Commission</span><span>- ₹6,750</span></div>
+                <div class="flex justify-between text-red-400"><span>Taxes (TCS/TDS)</span><span>- ₹450</span></div>
+                <div class="flex justify-between text-red-400"><span>Cancellations</span><span>- ₹0</span></div>
+            </div>
+            <div class="flex justify-between font-bold text-white text-lg">
+                <span>Net Payout</span>
+                <span>₹37,800</span>
+            </div>
+            <div class="flex justify-end mt-6 gap-2">
+                <button onclick="downloadInvoice()"
+                    class="px-4 py-2 border border-border text-gray-400 text-xs font-bold rounded-lg hover:text-white">Tax
+                    Invoice</button>
+                <button onclick="closeModal('breakdown-modal')"
+                    class="px-4 py-2 bg-primary text-black text-xs font-bold rounded-lg">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-[90] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // LOGIC
+        function requestWithdrawal() {
+            const btn = document.getElementById('withdraw-btn');
+            const bal = document.getElementById('available-bal');
+            if (bal.innerText === "₹0") return alert("No funds available.");
+
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Processing...`;
+            setTimeout(() => {
+                btn.innerHTML = "Request Sent";
+                btn.className = "mt-4 px-4 py-2 bg-gray-700 text-gray-400 font-bold rounded-lg text-xs w-full cursor-not-allowed";
+                showToast("Initiated", "Funds will reflect in 24-48 hrs.");
+                bal.innerText = "₹0.00";
+            }, 1500);
+        }
+
+        function downloadCSV() {
+            let csv = "Date,ID,Description,Amount,Status\n";
+            csv += "Oct 24 14:30,ORD-8821,Order Payment,+450,Credited\n";
+            csv += "Oct 24 14:30,COM-8821,Commission,-90,Debited\n";
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ledger_oct24.csv';
+            a.click();
+            showToast("Downloaded", "Ledger export complete.");
+        }
+
+        function openBreakdown(date) {
+            document.getElementById('modal-date').innerText = "Settlement Date: " + date;
+            document.getElementById('breakdown-modal').classList.remove('hidden');
+            document.getElementById('breakdown-modal').classList.add('flex');
+        }
+
+        function downloadInvoice() {
+            showToast("Downloading", "Tax Invoice PDF generating...");
+            setTimeout(() => closeModal('breakdown-modal'), 1000);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+    </script>
+    <script>
+        (function () {
+            try {
+                const u = JSON.parse(localStorage.getItem('zoiUser') || '{}');
+                if (u.role === 'pos_staff' || u.isPosOnly) {
+                    const hubTitle = document.querySelector('aside h1');
+                    if (hubTitle) hubTitle.textContent = 'POS Hub';
+                    const logoDiv = document.querySelector('aside > div[onclick]');
+                    if (logoDiv) logoDiv.setAttribute('onclick', "window.location.href='standalone_pos_terminal.html'");
+                    document.querySelectorAll('aside nav a').forEach(link => {
+                        const text = link.textContent.trim();
+                        if (['Promotions', 'Loyalty', 'Reviews'].includes(text)) link.style.display = 'none';
+                        if (text === 'Dashboard') { link.href = 'standalone_pos_terminal.html'; link.innerHTML = '<span class="material-symbols-outlined">point_of_sale</span> POS Terminal'; }
+                    });
+                    document.querySelectorAll('aside nav div').forEach(el => { if (el.textContent.trim() === 'Growth') el.style.display = 'none'; });
+                }
+            } catch (e) { }
+        })();
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+    <script src="js/zoi_config.js"></script>
+    <script src="js/zoi_partner_engine.js"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+

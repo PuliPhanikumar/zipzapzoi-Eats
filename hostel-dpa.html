@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Data Processing Agreement - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { bg: "#0B0C10", surface: "#1A1B23" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        .legal-content h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            color: #fff;
+        }
+
+        .legal-content h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #e5e7eb;
+        }
+
+        .legal-content p,
+        .legal-content li {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            line-height: 1.75;
+        }
+
+        .legal-content ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+        }
+
+        .legal-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .legal-content th,
+        .legal-content td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem;
+            text-align: left;
+            font-size: 0.813rem;
+        }
+
+        .legal-content th {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-weight: 600;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white min-h-screen font-sans">
+    <div class="max-w-3xl mx-auto px-6 py-12">
+        <a href="hostel-registration.html"
+            class="text-sm text-pink-400 hover:underline mb-6 inline-flex items-center gap-1">← Back to Registration</a>
+        <h1 class="text-3xl font-extrabold text-white mb-2">Data Processing Agreement</h1>
+        <p class="text-sm text-gray-500 mb-8">Between You ("Data Principal") and ZipZapZoi Technologies Pvt. Ltd. ("Data
+            Fiduciary")</p>
+        <div class="legal-content">
+            <h2>1. Scope and Purpose</h2>
+            <p>This Data Processing Agreement ("DPA") governs the processing of personal data by the Data Fiduciary on
+                behalf of the Data Principal in connection with the Zoi Hostel POS service. This DPA is compliant with
+                the Digital Personal Data Protection Act, 2023 (DPDP Act).</p>
+
+            <h2>2. Definitions</h2>
+            <ul>
+                <li><strong>Data Principal:</strong> The hostel owner/manager who controls the data entered into the
+                    platform.</li>
+                <li><strong>Data Fiduciary:</strong> ZipZapZoi Technologies Pvt. Ltd., which processes data on behalf of
+                    the Data Principal.</li>
+                <li><strong>Personal Data:</strong> Any data about an individual who is identifiable, including hosteler
+                    names, Aadhaar numbers, contact details, and financial records.</li>
+                <li><strong>Significant Data Fiduciary:</strong> If applicable based on volume and sensitivity of data
+                    processed.</li>
+            </ul>
+
+            <h2>3. Categories of Personal Data Processed</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Data Elements</th>
+                        <th>Purpose</th>
+                        <th>Retention</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Identity Data</td>
+                        <td>Name, Aadhaar, PAN, photo</td>
+                        <td>KYC compliance</td>
+                        <td>Active + 90 days</td>
+                    </tr>
+                    <tr>
+                        <td>Contact Data</td>
+                        <td>Phone, email, address</td>
+                        <td>Communication</td>
+                        <td>Active + 90 days</td>
+                    </tr>
+                    <tr>
+                        <td>Financial Data</td>
+                        <td>Rent, payments, invoices</td>
+                        <td>Billing & GST</td>
+                        <td>7 years (tax law)</td>
+                    </tr>
+                    <tr>
+                        <td>Accommodation Data</td>
+                        <td>Room, bed, check-in/out</td>
+                        <td>Operations</td>
+                        <td>Active + 90 days</td>
+                    </tr>
+                    <tr>
+                        <td>Health Data</td>
+                        <td>Blood group, emergency contact</td>
+                        <td>Safety</td>
+                        <td>Active + 90 days</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>4. Lawful Basis for Processing</h2>
+            <p>Processing is carried out based on:</p>
+            <ul>
+                <li><strong>Consent:</strong> Hostelers provide consent during admission (Aadhaar upload, personal
+                    details).</li>
+                <li><strong>Contractual Necessity:</strong> Processing required to fulfill the hostel accommodation
+                    contract.</li>
+                <li><strong>Legal Obligation:</strong> GST compliance, tax record retention, and government reporting.
+                </li>
+                <li><strong>Legitimate Interest:</strong> AI analytics for operational improvement (anonymized data
+                    only).</li>
+            </ul>
+
+            <h2>5. Data Security Measures</h2>
+            <ul>
+                <li>AES-256 encryption for stored data.</li>
+                <li>TLS 1.3 for all data transmission.</li>
+                <li>Role-based access control (Owner/Warden roles).</li>
+                <li>Multi-factor authentication for Owner accounts.</li>
+                <li>Regular security audits and vulnerability assessments.</li>
+                <li>All servers located within India.</li>
+            </ul>
+
+            <h2>6. Sub-Processors</h2>
+            <p>The Data Fiduciary may engage sub-processors for:</p>
+            <ul>
+                <li>Cloud hosting (Indian data centers only).</li>
+                <li>Payment processing (PCI-DSS compliant gateways).</li>
+                <li>SMS/Email OTP delivery.</li>
+            </ul>
+            <p>All sub-processors are bound by equivalent data protection obligations.</p>
+
+            <h2>7. Data Principal Rights</h2>
+            <p>As per the DPDP Act 2023, Data Principals (hostelers and hostel owners) have the right to:</p>
+            <ul>
+                <li>Access their personal data.</li>
+                <li>Correct inaccurate or misleading data.</li>
+                <li>Erase data (subject to legal retention).</li>
+                <li>Nominate another individual to exercise rights.</li>
+                <li>File grievances with the Data Protection Board of India.</li>
+            </ul>
+
+            <h2>8. Data Breach Notification</h2>
+            <p>In the event of a personal data breach, the Data Fiduciary will:</p>
+            <ul>
+                <li>Notify the Data Protection Board of India within 72 hours.</li>
+                <li>Notify affected Data Principals without undue delay.</li>
+                <li>Take immediate remediation measures.</li>
+                <li>Maintain a breach register with details and actions taken.</li>
+            </ul>
+
+            <h2>9. Cross-Border Data Transfer</h2>
+            <p>Personal data is not transferred outside India. All processing occurs on servers located within the
+                territory of India, in compliance with Section 16 of the DPDP Act.</p>
+
+            <h2>10. Audit & Compliance</h2>
+            <p>The Data Principal may request annual audit reports on data processing activities. The Data Fiduciary
+                will cooperate with any audits conducted by or on behalf of the Data Protection Board of India.</p>
+
+            <h2>11. Termination & Data Return</h2>
+            <p>Upon termination of the subscription, the Data Fiduciary will:</p>
+            <ul>
+                <li>Provide a 30-day data export window.</li>
+                <li>Delete all personal data within 90 days of termination (except records required by law).</li>
+                <li>Provide written confirmation of deletion upon request.</li>
+            </ul>
+
+            <h2>12. Governing Law</h2>
+            <p>This DPA is governed by the laws of India, specifically the DPDP Act 2023 and the Information Technology
+                Act, 2000. Disputes are subject to the jurisdiction of courts in Bengaluru, Karnataka.</p>
+        </div>
+        <div class="mt-10 pt-6 border-t border-white/10 flex gap-6 text-xs text-gray-500">
+            <a href="hostel-terms.html" class="hover:text-white">Terms & Conditions</a>
+            <a href="hostel-privacy.html" class="hover:text-white">Privacy Policy</a>
+            <span class="ml-auto">© 2026 ZipZapZoi Technologies Pvt. Ltd.</span>
+        </div>
+    </div>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

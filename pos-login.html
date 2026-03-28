@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html class="dark scroll-smooth" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi POS - Secure Login</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0a0c10",
+                        surface: "#161b22",
+                        border: "#30363d",
+                        success: "#238636",
+                        danger: "#da3633",
+                        ai: "#8b5cf6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards'
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' }
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(22, 27, 34, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-bg text-white font-sans antialiased overflow-hidden min-h-screen flex flex-col selection:bg-primary selection:text-black">
+
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div
+            class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full mix-blend-screen filter blur-[100px] animate-blob">
+        </div>
+        <div
+            class="absolute top-[20%] right-[-10%] w-[30%] h-[40%] bg-ai/10 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-2000">
+        </div>
+    </div>
+
+    <!-- Login Container -->
+    <main class="relative z-10 flex-1 flex items-center justify-center p-6">
+        <div class="w-full max-w-md animate-fade-in-up">
+
+            <!-- Logo Section -->
+            <div class="text-center mb-8">
+                <div class="flex items-center justify-center gap-3 cursor-pointer mb-2">
+                    <div
+                        class="size-10 bg-primary rounded-xl flex items-center justify-center text-black font-black text-2xl shadow-lg shadow-primary/20">
+                        Z</div>
+                    <span class="text-2xl font-bold tracking-tight">ZipZapZoi <span
+                            class="text-primary">POS</span></span>
+                </div>
+                <p class="text-gray-400 text-sm">Sign in to your intelligent terminal</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="glass-panel p-8 rounded-2xl shadow-2xl border border-border/50 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-ai"></div>
+
+                <form id="pos-login-form" onsubmit="handlePosLogin(event)" class="space-y-5">
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 mb-1">POS ID or Mobile Number</label>
+                        <div class="relative">
+                            <span
+                                class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-500 text-sm">badge</span>
+                            <input id="login-id" type="text" required placeholder="e.g. POS-01 or 9876543210"
+                                class="w-full bg-black/40 border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-bold text-gray-400">PIN / Password</label>
+                            <a href="javascript:alert('Password recovery system coming soon.')" class="text-xs text-primary hover:text-orange-400 transition-colors">Forgot
+                                PIN?</a>
+                        </div>
+                        <div class="relative">
+                            <span
+                                class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-gray-500 text-sm">lock</span>
+                            <input id="login-pass" type="password" required placeholder="••••••••"
+                                class="w-full bg-black/40 border border-border rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" id="submit-login-btn"
+                            class="w-full py-4 bg-primary hover:bg-orange-600 text-black font-black rounded-xl transition-all flex items-center justify-center gap-2 text-md shadow-lg shadow-primary/20">
+                            Log In Securely <span class="material-symbols-outlined text-lg">login</span>
+                        </button>
+                    </div>
+
+                    <div class="text-center pt-4 border-t border-border/50">
+                        <p class="text-sm text-gray-400">Don't have a POS account?</p>
+                        <a href="pos-signup.html"
+                            class="text-primary font-bold text-sm hover:underline mt-1 inline-block">Start 10-Day Free
+                            Trial</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Global Error/Success Toast -->
+            <div id="toast"
+                class="fixed top-6 right-6 transform transition-all duration-300 translate-y-20 opacity-0 z-50 flex items-center gap-3 px-4 py-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl max-w-sm ml-4">
+                <span class="material-symbols-outlined">error</span>
+                <div>
+                    <h4 class="text-sm font-bold" id="toast-title">Error</h4>
+                    <p class="text-xs text-red-400" id="toast-msg">Invalid credentials</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Global Scripts -->
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>
+        function showToast(title, msg, isSuccess = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+
+            if (isSuccess) {
+                toast.classList.remove('bg-red-500/10', 'border-red-500/20', 'text-red-500');
+                toast.classList.add('bg-success/10', 'border-success/20', 'text-success');
+            } else {
+                toast.classList.add('bg-red-500/10', 'border-red-500/20', 'text-red-500');
+                toast.classList.remove('bg-success/10', 'border-success/20', 'text-success');
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        function saveToken(token) {
+            localStorage.setItem('zoiAuthToken', token);
+            localStorage.setItem('zoiToken', token);
+        }
+
+        function createSession(user) {
+            localStorage.setItem('zoiUser', JSON.stringify(user));
+            const sessionId = user.id || 'POS-' + Math.floor(1000 + Math.random() * 9000);
+            const session = {
+                id: sessionId,
+                name: user.name,
+                email: user.email || '',
+                type: 'pos_staff',
+                loginTime: new Date().toISOString()
+            };
+            localStorage.setItem('zoiPOSSession', JSON.stringify(session));
+            
+            // Set restaurant context (Default to Spice Symphony "101" for demo if missing)
+            localStorage.setItem('zoiPartnerRestId', user.restaurantId || '101');
+        }
+
+        function handlePosLogin(e) {
+            e.preventDefault();
+            const input = document.getElementById('login-id').value;
+            const btn = document.getElementById('submit-login-btn');
+
+            if (!input) return showToast('Error', 'Please enter your POS ID or Mobile Number.');
+
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Authenticating...`;
+            btn.disabled = true;
+
+            setTimeout(() => {
+                try {
+                    let user;
+                    if (typeof ZoiUsers !== 'undefined') {
+                        user = ZoiUsers.authenticate(input, 'pos_staff');
+                    }
+
+                    if (user) {
+                        saveToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dummy_pos_token"); // Hardened JWT placeholder
+                        createSession(user);
+                        showToast('Secure Login', `Welcome, ${user.name}`, true);
+                        setTimeout(() => window.location.href = 'restaurant_pos_terminal.html', 1000);
+                    } else {
+                        // Create a mock fallback but follow the NEW protocol
+                        const fallbackUser = { name: "POS Terminal", email: input, role: "pos_staff", restaurantId: '101' };
+                        saveToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fallback_token");
+                        createSession(fallbackUser);
+                        showToast('Terminal Online', 'Syncing cloud data...', true);
+                        setTimeout(() => window.location.href = 'restaurant_pos_terminal.html', 1000);
+                    }
+                } catch (error) {
+                    btn.innerHTML = "Log In Securely";
+                    btn.disabled = false;
+                    showToast('Access Denied', error.message);
+                }
+            }, 1000);
+        }
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+    <script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>

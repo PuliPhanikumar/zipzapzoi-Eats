@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi - Global Search</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        teal: "#00D4C5",
+                        bg: "#0a0314",
+                        surface: "#1a0b36",
+                        surfaceHover: "#2d1b54",
+                        input: "#22252C"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"] },
+                }
+            }
+        };
+    </script>
+    <style>
+        .skeleton {
+            background: linear-gradient(-45deg, #1a0b36, #2d1b54, #1a0b36, #22252C);
+            background-size: 400% 400%;
+            animation: gradient 3s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+
+<body class="bg-bg text-white font-sans overflow-x-hidden min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 bg-bg/80 backdrop-blur-md border-b border-white/10 transition-all shadow-md">
+        <div class="px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between gap-4">
+                <a href="index.html" class="flex items-center gap-2 lg:gap-3 group shrink-0">
+                    <div class="size-10 lg:size-12 rounded-xl bg-gradient-to-br from-primary to-teal flex items-center justify-center shadow-lg group-hover:shadow-primary/50 transition-all">
+                        <span class="material-symbols-outlined text-white text-2xl lg:text-3xl">bolt</span>
+                    </div>
+                    <span class="text-2xl lg:text-3xl font-extrabold tracking-tight hidden sm:block">ZipZapZoi</span>
+                </a>
+
+                <div class="flex-1 max-w-2xl hidden md:block relative">
+                    <form onsubmit="executeSearch(event)" class="relative">
+                        <input id="header-search" type="text" placeholder="Search across 50,000+ restaurants and menus..."
+                            class="w-full bg-surface border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all placeholder:text-gray-500 shadow-inner" />
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+                        <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-black px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-teal transition-colors">Find</button>
+                    </form>
+                </div>
+
+                <div class="flex items-center gap-2 lg:gap-4 shrink-0">
+                    <button class="md:hidden size-10 flex items-center justify-center rounded-xl bg-surface border border-white/10 text-gray-300">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
+                    <a href="shopping_cart.html" class="relative group size-10 lg:size-12 bg-surface hover:bg-surfaceHover border border-white/10 rounded-xl flex items-center justify-center transition-all">
+                        <span class="material-symbols-outlined text-gray-300 group-hover:text-primary transition-colors">shopping_bag</span>
+                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold size-5 flex items-center justify-center rounded-full border-2 border-bg shadow-sm hidden">0</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        <div class="mb-8">
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-2" id="search-title">Search Results</h1>
+            <p class="text-gray-400 text-sm md:text-base flex items-center gap-2">
+                Showing top matches for <span class="text-primary font-semibold block px-2 py-0.5 bg-primary/10 rounded-md" id="search-query-display">...</span>
+            </p>
+        </div>
+
+        <div id="loading-state" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="h-64 rounded-2xl skeleton border border-white/5"></div>
+            <div class="h-64 rounded-2xl skeleton border border-white/5"></div>
+            <div class="h-64 rounded-2xl skeleton border border-white/5"></div>
+            <div class="h-64 rounded-2xl skeleton border border-white/5"></div>
+        </div>
+
+        <div id="error-state" class="hidden text-center py-20 bg-surface border border-red-500/20 rounded-3xl">
+            <div class="size-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="material-symbols-outlined text-4xl text-red-400">error</span>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Could not fetch results</h3>
+            <p class="text-gray-400 text-sm max-w-md mx-auto">We encountered an error connecting to our search engine. Please check your connection or try again later.</p>
+        </div>
+
+        <div id="empty-state" class="hidden text-center py-20 bg-surface rounded-3xl border border-white/5">
+            <div class="size-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                <span class="material-symbols-outlined text-5xl text-gray-500">search_off</span>
+            </div>
+            <h3 class="text-2xl font-bold mb-3">No matches found</h3>
+            <p class="text-gray-400 text-sm max-w-md mx-auto mb-6">We couldn't find any restaurants or dishes matching your query. Try using different or broader keywords.</p>
+            <a href="index.html" class="inline-flex py-3 px-6 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium transition-colors text-sm items-center gap-2">
+                <span class="material-symbols-outlined text-sm">arrow_back</span> Return to Explore
+            </a>
+        </div>
+
+        <div id="results-container" class="hidden space-y-12">
+            
+            <!-- Restaurants Section -->
+            <section id="restaurants-section" class="hidden">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 rounded-lg bg-teal/10 text-teal">
+                        <span class="material-symbols-outlined">storefront</span>
+                    </div>
+                    <h2 class="text-2xl font-bold">Restaurants</h2>
+                    <span class="px-2.5 py-1 rounded-full bg-white/10 text-xs font-semibold" id="rest-count">0</span>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="restaurants-grid">
+                    <!-- Restaurant Cards -->
+                </div>
+            </section>
+
+            <!-- Dishes Section -->
+            <section id="dishes-section" class="hidden">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 rounded-lg bg-orange-500/10 text-orange-500">
+                        <span class="material-symbols-outlined">restaurant_menu</span>
+                    </div>
+                    <h2 class="text-2xl font-bold">Dishes & Menu Items</h2>
+                    <span class="px-2.5 py-1 rounded-full bg-white/10 text-xs font-semibold" id="dish-count">0</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="dishes-grid">
+                    <!-- Dish Cards -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="bg-surface border-t border-white/10 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 text-center text-sm text-gray-500">
+            <p>© 2026 ZipZapZoi Eats Ecosystem. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Universal Add to Cart Toast -->
+    <div id="toast" class="fixed top-5 right-5 bg-surface border border-teal/50 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transform translate-x-full transition-transform duration-300 z-[100]">
+        <span class="material-symbols-outlined text-teal">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Added to Cart</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">Item added successfully.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartBadge();
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('q');
+            
+            if (query) {
+                document.getElementById('header-search').value = query;
+                document.getElementById('search-query-display').innerText = `"${query}"`;
+                fetchResults(query);
+            } else {
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('empty-state').classList.remove('hidden');
+                document.getElementById('search-query-display').innerText = "nothing";
+            }
+        });
+
+        function executeSearch(e) {
+            e.preventDefault();
+            const q = document.getElementById('header-search').value.trim();
+            if (q) {
+                window.location.href = `search_results.html?q=${encodeURIComponent(q)}`;
+            }
+        }
+
+        async function fetchResults(query) {
+            const loader = document.getElementById('loading-state');
+            const errorView = document.getElementById('error-state');
+            const emptyView = document.getElementById('empty-state');
+            const container = document.getElementById('results-container');
+            
+            loader.classList.remove('hidden');
+            errorView.classList.add('hidden');
+            emptyView.classList.add('hidden');
+            container.classList.add('hidden');
+            
+            try {
+                // Fetch from Global App Backend Search Engine
+                const response = await fetch(`${ZOI_CONFIG.API_BASE_URL}/search?q=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('API down');
+                
+                const data = await response.json();
+                
+                loader.classList.add('hidden');
+                
+                if (data.restaurants.length === 0 && data.dishes.length === 0) {
+                    emptyView.classList.remove('hidden');
+                } else {
+                    renderRestaurants(data.restaurants);
+                    renderDishes(data.dishes);
+                    container.classList.remove('hidden');
+                }
+
+            } catch (err) {
+                console.error(err);
+                loader.classList.add('hidden');
+                errorView.classList.remove('hidden');
+                
+                // Fallback to local filtering for robustness if API is unreachable
+                fallbackLocalSearch(query);
+            }
+        }
+
+        function renderRestaurants(restaurants) {
+            const section = document.getElementById('restaurants-section');
+            const grid = document.getElementById('restaurants-grid');
+            const count = document.getElementById('rest-count');
+            
+            if (!restaurants || restaurants.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            section.classList.remove('hidden');
+            count.innerText = restaurants.length;
+            
+            grid.innerHTML = restaurants.map(r => `
+                <div class="bg-surface rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10 transition-all border border-white/5 hover:border-white/20 group cursor-pointer" onclick="goToRestaurant('${r.id}', '${r.name}')">
+                    <div class="h-40 bg-gray-800 relative overflow-hidden">
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKO5w3PjAegdWNtmjpyygcoqbWDbb1MMykp1Ra9F3QjtGred4ExZyv6xsp55ec6MQj__XypBAvDihrl8j2HS434CoBWARyYMu14hsj4d-q8o0eBQeff024K-JdssN8pZmm-E1eeoitvTeuVrygnhdtMXo7jW3emz7KKG7vMm4R465g2e1vlL4xNht0rGjjnY4p54Nw9xBRM90IqXs1c0wLTzZiBc-zJUsoX6K2G1uzBH_6v_WyaSD6kXP0dxGcogDA5B5Ck094Qsg" alt="${r.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                        <div class="absolute bottom-3 left-3 flex items-center gap-1 text-xs font-bold bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg">
+                            <span class="material-symbols-outlined text-sm text-yellow-400">star</span> 4.5
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1 truncate">${r.name}</h3>
+                        <p class="text-xs text-gray-400 mb-3 truncate">${r.plan || 'Standard Partner'}</p>
+                        <hr class="border-white/10 mb-3">
+                        <div class="flex items-center justify-between text-xs font-medium text-gray-300">
+                            <div class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-gray-500">schedule</span> 30 mins</div>
+                            <div class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-gray-500">location_on</span> 2.5 km</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDishes(dishes) {
+            const section = document.getElementById('dishes-section');
+            const grid = document.getElementById('dishes-grid');
+            const count = document.getElementById('dish-count');
+            
+            if (!dishes || dishes.length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            section.classList.remove('hidden');
+            count.innerText = dishes.length;
+            
+            grid.innerHTML = dishes.map(d => {
+                const isVeg = d.type === 'Veg' || !d.type;
+                const icon = isVeg ? '<span class="material-symbols-outlined text-green-500 text-sm">eco</span>' : '<span class="material-symbols-outlined text-red-500 text-sm">local_dining</span>';
+                const restName = d.restaurant?.name || 'ZipZapZoi Partner';
+                const restId = d.restaurant?.id || '1';
+                
+                return `
+                <div class="bg-surface rounded-xl p-3 border border-white/5 hover:border-white/20 transition-all flex gap-3 group">
+                    <div class="size-20 bg-gray-800 rounded-lg overflow-hidden shrink-0">
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3lsPgvpwXtnxK3K9t1j0Wou61_OdbqYwv3pyL5nETlcOgJXJ2g6GdFV0JUgyjvlC1nVmKHYUVapikcMbnwl7NSgukfj51gYjXfb44KXxCqMeDOWHLCZIy5GgEBjrhzXCofqSbK7edixAYOTaP3g5er3inMcfP-8CnPzWZ8b_xBmSqWTryDhHF1TB5udk0V1VWms4RkrnkF7XoTrvLLO48pXdz0KQoYOl_5AByW3GLS1_SZaOlRllWASXz758wndsDFpc5QVg-P7A" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 min-w-0 flex flex-col justify-between py-1">
+                        <div>
+                            <div class="flex items-start justify-between gap-1 mb-0.5">
+                                <h4 class="font-bold text-sm truncate" title="${d.itemName}">${d.itemName}</h4>
+                                ${icon}
+                            </div>
+                            <p class="text-[10px] text-gray-400 hover:text-primary cursor-pointer transition-colors truncate" onclick="goToRestaurant('${restId}', '${restName}')">By ${restName}</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-2">
+                            <span class="font-bold text-primary">₹${d.price}</span>
+                            <button onclick="addDishToCart(${d.id}, '${d.itemName}', ${d.price}, '${restId}', '${restName}')" class="bg-white/10 hover:bg-white text-white hover:text-black w-7 h-7 flex items-center justify-center rounded-lg transition-all shadow-sm">
+                                <span class="material-symbols-outlined text-sm">add</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // Action Handlers
+        function goToRestaurant(id, name) {
+            localStorage.setItem('zoiSelectedRestForMenu', JSON.stringify({ id, name }));
+            window.location.href = `restaurant_menu.html`;
+        }
+
+        function addDishToCart(id, name, price, rId, rName) {
+            let activeRest = JSON.parse(localStorage.getItem('zoiCartRestaurant'));
+            
+            if (activeRest && activeRest.id !== rId) {
+                if(!confirm(`You have items from ${activeRest.name}. Clear your cart to add items from ${rName}?`)) {
+                    return;
+                }
+                localStorage.removeItem('zoiCart');
+            }
+            
+            localStorage.setItem('zoiCartRestaurant', JSON.stringify({ id: rId, name: rName }));
+            
+            let cart = JSON.parse(localStorage.getItem('zoiCart') || '[]');
+            const existing = cart.find(x => x.id == id);
+            if (existing) {
+                existing.qty++;
+            } else {
+                cart.push({ id, name, price, qty: 1, type: "Dish" });
+            }
+            localStorage.setItem('zoiCart', JSON.stringify(cart));
+            
+            updateCartBadge();
+            
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = `${name} added to your cart.`;
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => toast.classList.add('translate-x-full'), 3000);
+        }
+
+        function updateCartBadge() {
+            try {
+                const cart = JSON.parse(localStorage.getItem('zoiCart') || '[]');
+                const badge = document.getElementById('cart-badge');
+                if (cart.length > 0) {
+                    badge.innerText = cart.reduce((acc, item) => acc + item.qty, 0);
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            } catch(e) {}
+        }
+        
+        function fallbackLocalSearch(query) {
+            // Very naive local fallback using db_simulation menus
+            document.getElementById('error-state').classList.add('hidden');
+            const q = query.toLowerCase();
+            const restaurants = (JSON.parse(localStorage.getItem('zoiRest')) || []).filter(r => r.name.toLowerCase().includes(q));
+            
+            // Search local menus object if loaded
+            let dishes = [];
+            if (typeof DB_MENUS !== 'undefined') {
+                Object.keys(DB_MENUS).forEach(rId => {
+                    const rDishes = DB_MENUS[rId].filter(m => m.name.toLowerCase().includes(q) || (m.desc && m.desc.toLowerCase().includes(q)));
+                    const matchedRest = restaurants.find(r => r.id === rId) || { id: rId, name: "Local Restaurant" };
+                    rDishes.forEach(d => {
+                        dishes.push({
+                            id: d.id,
+                            itemName: d.name,
+                            price: d.price,
+                            type: d.veg ? 'Veg' : 'Non-Veg',
+                            restaurant: { id: matchedRest.id, name: matchedRest.name }
+                        });
+                    });
+                });
+            }
+            
+            if (restaurants.length === 0 && dishes.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden');
+            } else {
+                renderRestaurants(restaurants);
+                renderDishes(dishes);
+                document.getElementById('results-container').classList.remove('hidden');
+            }
+        }
+    </script>
+    <script src="js/zoi_customer_engine.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+<script src="js/zoi_theme.js"></script>
+</body>
+</html>

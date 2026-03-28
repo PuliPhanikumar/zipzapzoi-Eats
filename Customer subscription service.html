@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi - Upgrade to Pro</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff", // Brand Orange
+                        "primary-hover": "#00d7e6",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#121212", // Deeper black for premium feel
+                        "surface-dark": "#1e1e1e",
+                        "border-dark": "#333333",
+                        "text-secondary": "#a1a1aa"
+                    },
+                    fontFamily: { display: "Manrope" },
+                    borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", "2xl": "1rem", full: "9999px" }
+                }
+            }
+        };
+    </script>
+    <style>
+        .glass-card {
+            background: rgba(30, 30, 30, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #00f0ff 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: skewX(-25deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            100% {
+                left: 200%;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-background-dark font-display text-white overflow-x-hidden selection:bg-primary selection:text-black">
+
+    <header class="sticky top-0 z-50 w-full border-b border-border-dark bg-background-dark/90 backdrop-blur-md">
+        <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center gap-2">
+                <div class="flex size-9 items-center justify-center rounded-lg bg-primary text-black">
+                    <span class="material-symbols-outlined text-2xl">bolt</span>
+                </div>
+                <h2 class="text-lg font-extrabold tracking-tight">ZipZapZoi</h2>
+            </div>
+            <nav class="hidden md:flex gap-6 text-sm font-medium text-text-secondary">
+                <a href="index.html" class="hover:text-white transition-colors">Home</a>
+                <a href="customer_restaurant_listing.html" class="hover:text-white transition-colors">Restaurants</a>
+                <a href="Customer subscription service.html" class="text-primary font-bold">Membership</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex flex-col items-end mr-2">
+                    <span class="text-xs text-text-secondary">Welcome back,</span>
+                    <span class="text-sm font-bold text-white leading-none" id="sub-user-name">Loading...</span>
+                </div>
+                <div id="sub-user-avatar" class="size-9 bg-primary/20 rounded-full border-2 border-primary flex items-center justify-center text-primary font-black text-base">U</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="relative pt-20 pb-16 overflow-hidden">
+            <div
+                class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full bg-primary/10 blur-[100px] pointer-events-none rounded-full">
+            </div>
+
+            <div class="relative z-10 mx-auto max-w-4xl text-center px-4">
+                <span
+                    class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider mb-6">
+                    <span class="size-2 rounded-full bg-primary animate-pulse"></span> New Pricing
+                </span>
+                <h1 class="text-5xl md:text-6xl font-black tracking-tight mb-6">
+                    Stop paying for <br> <span class="gradient-text">delivery & surge fees.</span>
+                </h1>
+                <p class="text-lg text-text-secondary max-w-2xl mx-auto mb-10">
+                    Join the club. Get free deliveries, flat discounts on every order, and exclusive <span
+                        class="text-white font-bold">Local Hero</span> perks.
+                </p>
+
+                <div class="inline-flex bg-surface-dark p-1 rounded-full border border-border-dark relative">
+                    <button id="tab-all" onclick="switchSubTab('all')"
+                        class="px-6 py-2 rounded-full bg-primary text-black font-bold text-sm shadow-lg z-10 relative transition-all">All
+                        Plans</button>
+                    <button id="tab-mine" onclick="switchSubTab('mine')"
+                        class="px-6 py-2 rounded-full text-text-secondary font-medium text-sm hover:text-white transition-colors z-10 relative">My
+                        Subscription</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="pb-24 px-4">
+            <div class="mx-auto max-w-7xl grid md:grid-cols-3 gap-8 items-start">
+
+                <div
+                    class="glass-card rounded-3xl p-8 relative hover:border-yellow-500/50 transition-all duration-300 group">
+                    <div
+                        class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface-dark border border-border-dark px-4 py-1 rounded-full text-xs font-bold text-text-secondary uppercase tracking-wider">
+                        Trial
+                    </div>
+                    <h3 class="text-yellow-500 font-bold text-xl mb-2 flex items-center gap-2">
+                        <span class="material-symbols-outlined">bolt</span> Starter
+                    </h3>
+                    <p class="text-text-secondary text-sm mb-6">Perfect for trying us out.</p>
+                    <div class="flex items-baseline gap-1 mb-6">
+                        <span class="text-4xl font-black text-white">₹99</span>
+                        <span class="text-text-secondary text-sm">/ 3 months</span>
+                    </div>
+
+                    <ul class="space-y-4 mb-8 text-sm text-gray-300">
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-yellow-500 text-lg">check</span>
+                            <span>Free Delivery (up to 3km)</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-yellow-500 text-lg">check</span>
+                            <span><strong>₹20 Off</strong> per order (10x/mo)</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-yellow-500 text-lg">check</span>
+                            <span>No Platform Fees</span>
+                        </li>
+                        <li class="flex items-start gap-3 opacity-50">
+                            <span class="material-symbols-outlined text-gray-600 text-lg">close</span>
+                            <span>Surge Waiver</span>
+                        </li>
+                    </ul>
+
+                    <button onclick="subscribePlan('starter', 99)"
+                        class="w-full py-3 rounded-xl border border-yellow-500/50 text-yellow-500 font-bold hover:bg-yellow-500 hover:text-black transition-all">
+                        Get Starter
+                    </button>
+                </div>
+
+                <div
+                    class="rounded-3xl p-1 bg-gradient-to-b from-primary to-orange-600 shadow-2xl shadow-primary/20 scale-105 relative z-10">
+                    <div class="bg-[#1a1a1a] rounded-[22px] p-8 h-full relative overflow-hidden">
+                        <div
+                            class="absolute top-0 right-0 p-3 bg-primary text-black text-xs font-black uppercase rounded-bl-xl">
+                            Best Value
+                        </div>
+
+                        <h3 class="text-primary font-bold text-2xl mb-2 flex items-center gap-2">
+                            <span class="material-symbols-outlined fill">stars</span> ZipZap Gold
+                        </h3>
+                        <p class="text-gray-400 text-sm mb-6">For the regular foodie.</p>
+                        <div class="flex items-baseline gap-1 mb-6">
+                            <span class="text-5xl font-black text-white">₹399</span>
+                            <span class="text-gray-400 text-sm">/ 6 months</span>
+                        </div>
+
+                        <div class="bg-primary/10 border border-primary/20 rounded-xl p-3 mb-6">
+                            <p class="text-xs font-bold text-primary flex items-center gap-1 mb-1">
+                                <span class="material-symbols-outlined text-sm">local_fire_department</span> LOCAL HERO
+                                PERK
+                            </p>
+                            <p class="text-xs text-white">Get extra <strong>₹20 OFF</strong> when ordering from
+                                restaurants within 2km.</p>
+                        </div>
+
+                        <ul class="space-y-4 mb-8 text-sm text-white font-medium">
+                            <li class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                                <span>Free Delivery (up to 5km)</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                                <span><strong>₹30 Off</strong> per order (20x/mo)</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                                <span>Priority Rider Allocation</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+                                <span>Surge Waived (up to ₹30)</span>
+                            </li>
+                        </ul>
+
+                        <button onclick="subscribePlan('gold', 399)"
+                            class="w-full py-4 rounded-xl bg-primary text-black font-black text-lg hover:bg-white hover:scale-[1.02] transition-all shadow-lg shine-effect">
+                            Join Gold
+                        </button>
+                        <p class="text-[10px] text-center text-gray-500 mt-3">Recover cost in just 6 orders!</p>
+                    </div>
+                </div>
+
+                <div
+                    class="glass-card rounded-3xl p-8 relative hover:border-blue-500/50 transition-all duration-300 group">
+                    <div
+                        class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface-dark border border-border-dark px-4 py-1 rounded-full text-xs font-bold text-text-secondary uppercase tracking-wider">
+                        VIP
+                    </div>
+                    <h3 class="text-blue-400 font-bold text-xl mb-2 flex items-center gap-2">
+                        <span class="material-symbols-outlined">diamond</span> Platinum
+                    </h3>
+                    <p class="text-text-secondary text-sm mb-6">Unlimited lifestyle.</p>
+                    <div class="flex items-baseline gap-1 mb-6">
+                        <span class="text-4xl font-black text-white">₹599</span>
+                        <span class="text-text-secondary text-sm">/ year</span>
+                    </div>
+
+                    <ul class="space-y-4 mb-8 text-sm text-gray-300">
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">check</span>
+                            <span>Free Delivery (up to 7km)</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">check</span>
+                            <span><strong>₹40 Off</strong> per order (25x/mo)</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">check</span>
+                            <span><strong>100% Rain Surge Waiver</strong></span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-blue-400 text-lg">check</span>
+                            <span>VIP Support Line</span>
+                        </li>
+                    </ul>
+
+                    <button onclick="subscribePlan('platinum', 599)"
+                        class="w-full py-3 rounded-xl border border-blue-500/50 text-blue-400 font-bold hover:bg-blue-500 hover:text-black transition-all">
+                        Go Platinum
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="bg-surface-dark border-y border-border-dark py-16 px-4">
+            <div
+                class="mx-auto max-w-4xl bg-background-dark rounded-2xl p-8 border border-border-dark shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] pointer-events-none">
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-12 items-center relative z-10">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-2">How much will you save?</h3>
+                        <p class="text-text-secondary text-sm mb-8">Calculate your annual savings with ZipZap Gold.</p>
+
+                        <div class="space-y-6">
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <label class="text-sm font-bold text-gray-400">Orders per month</label>
+                                    <span class="text-primary font-bold text-xl" id="order-count">5</span>
+                                </div>
+                                <input type="range" min="1" max="30" value="5"
+                                    class="w-full h-2 bg-surface-dark rounded-lg appearance-none cursor-pointer accent-primary"
+                                    oninput="calculateSavings(this.value)">
+                            </div>
+
+                            <div class="flex justify-between text-xs text-gray-500 font-mono">
+                                <span>Occasional</span>
+                                <span>Regular</span>
+                                <span>Power User</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface-dark rounded-xl p-6 text-center border border-border-dark">
+                        <p class="text-xs font-bold text-text-secondary uppercase mb-2">Estimated Yearly Savings</p>
+                        <div class="text-5xl font-black text-white mb-2 tracking-tight" id="savings-display">₹3,400
+                        </div>
+                        <p class="text-green-400 text-xs font-bold bg-green-900/20 py-1 px-3 rounded-full inline-block">
+                            Pays for itself in 1 month!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-20 px-4">
+            <div class="mx-auto max-w-3xl">
+                <h2 class="text-3xl font-bold text-white text-center mb-10">Common Questions</h2>
+                <div class="space-y-4">
+                    <details
+                        class="group bg-surface-dark border border-border-dark rounded-xl open:bg-surface-dark/80 transition-colors">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between p-6 font-bold text-white hover:text-primary transition-colors">
+                            <span>How does the "Local Hero" discount work?</span>
+                            <span
+                                class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+                        </summary>
+                        <div class="px-6 pb-6 text-gray-400 text-sm leading-relaxed">
+                            It's our way of supporting local businesses! If you order from a restaurant within
+                            <strong>2km</strong> of your location, we automatically apply an <strong>extra ₹20
+                                discount</strong> on top of your existing Gold benefits. Good for you, good for the
+                            neighborhood.
+                        </div>
+                    </details>
+                    <details class="group bg-surface-dark border border-border-dark rounded-xl">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between p-6 font-bold text-white hover:text-primary transition-colors">
+                            <span>Can I cancel anytime?</span>
+                            <span
+                                class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+                        </summary>
+                        <div class="px-6 pb-6 text-gray-400 text-sm leading-relaxed">
+                            Yes. You can cancel auto-renewal at any time from your account settings. Your benefits will
+                            continue until the end of your current billing period.
+                        </div>
+                    </details>
+                    <details class="group bg-surface-dark border border-border-dark rounded-xl">
+                        <summary
+                            class="flex cursor-pointer items-center justify-between p-6 font-bold text-white hover:text-primary transition-colors">
+                            <span>Is there a minimum order value?</span>
+                            <span
+                                class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+                        </summary>
+                        <div class="px-6 pb-6 text-gray-400 text-sm leading-relaxed">
+                            For <strong>ZipZap Gold</strong>, there is NO minimum order value for the flat ₹30 discount.
+                            However, free delivery applies to orders above ₹199 to ensure fair pay for our riders.
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-border-dark bg-background-dark py-12 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            <div>
+                <h4 class="text-white font-bold text-sm mb-4">Explore</h4>
+                <ul class="space-y-2 text-sm text-text-secondary">
+                    <li><a href="index.html" class="hover:text-primary transition-colors">Home</a></li>
+                    <li><a href="customer_restaurant_listing.html" class="hover:text-primary transition-colors">Restaurants</a>
+                    </li>
+                    <li><a href="promotions & offers.html" class="hover:text-primary transition-colors">Offers</a></li>
+                    <li><a href="customer_orders history.html" class="hover:text-primary transition-colors">My
+                            Orders</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-sm mb-4">Account</h4>
+                <ul class="space-y-2 text-sm text-text-secondary">
+                    <li><a href="customer profile.html" class="hover:text-primary transition-colors">Profile</a></li>
+                    <li><a href="customer gamification hub.html" class="hover:text-primary transition-colors">Loyalty
+                            Hub</a></li>
+                    <li><a href="customer referral program.html" class="hover:text-primary transition-colors">Refer &
+                            Earn</a></li>
+                    <li><a href="shopping_cart.html" class="hover:text-primary transition-colors">Cart</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-sm mb-4">Support</h4>
+                <ul class="space-y-2 text-sm text-text-secondary">
+                    <li><a href="customer support help.html" class="hover:text-primary transition-colors">Help
+                            Center</a></li>
+                    <li><a href="feedback.html" class="hover:text-primary transition-colors">Feedback</a></li>
+                    <li><a href="about us.html" class="hover:text-primary transition-colors">About Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-sm mb-4">Legal</h4>
+                <ul class="space-y-2 text-sm text-text-secondary">
+                    <li><a href="privacy policy.html" class="hover:text-primary transition-colors">Privacy Policy</a>
+                    </li>
+                    <li><a href="terms&conditions.html" class="hover:text-primary transition-colors">Terms &
+                            Conditions</a></li>
+                    <li><a href="gst disclaimer.html" class="hover:text-primary transition-colors">GST Info</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto border-t border-border-dark pt-6 text-center text-sm text-text-secondary">
+            <p>© 2026 ZipZapZoi Eats. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script src="js/zoi_config.js"></script>
+<script src="js/zoi_api.js"></script>
+<script src="js/db_simulation.js"></script>
+<script src="js/zoi_customer_engine.js"></script>
+<script>
+    function calculateSavings(orders) {
+        document.getElementById('order-count').innerText = orders;
+        const savingsPerOrder = 70;
+        const annualCost = 798;
+        const totalSavings = (orders * 12 * savingsPerOrder) - annualCost;
+        document.getElementById('savings-display').innerText = "₹" + Math.max(0, totalSavings).toLocaleString('en-IN');
+    }
+    calculateSavings(5);
+
+    // === SUBSCRIPTION LOGIC ===
+    function subscribePlan(plan, price) {
+        if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+            window.location.href = 'login & registration.html'; return;
+        }
+        showSubToast(`⚡ Redirecting to payment for ₹${price}...`);
+        setTimeout(() => {
+            // Store pending subscription in localStorage
+            localStorage.setItem('zoiPendingSub', JSON.stringify({ plan, price, ts: Date.now() }));
+            showSubToast(`🔒 Payment gateway would open here. Subscription noted: ${plan}`);
+        }, 1500);
+    }
+
+    function switchSubTab(tab) {
+        const allBtn = document.getElementById('tab-all');
+        const mineBtn = document.getElementById('tab-mine');
+        if (tab === 'all') {
+            allBtn.className = 'px-6 py-2 rounded-full bg-primary text-black font-bold text-sm shadow-lg z-10 relative transition-all';
+            mineBtn.className = 'px-6 py-2 rounded-full text-text-secondary font-medium text-sm hover:text-white transition-colors z-10 relative';
+        } else {
+            mineBtn.className = 'px-6 py-2 rounded-full bg-primary text-black font-bold text-sm shadow-lg z-10 relative transition-all';
+            allBtn.className = 'px-6 py-2 rounded-full text-text-secondary font-medium text-sm hover:text-white transition-colors z-10 relative';
+            const sub = JSON.parse(localStorage.getItem('zoiPendingSub') || 'null');
+            showSubToast(sub ? `Your plan: ${sub.plan} (₹${sub.price})` : 'No active subscription yet.');
+        }
+    }
+
+    function showSubToast(msg) {
+        let t = document.getElementById('sub-toast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'sub-toast';
+            t.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-surface-dark border border-primary text-white px-6 py-3 rounded-full text-sm font-bold shadow-2xl z-[9999]';
+            t.style.transition = 'all 0.3s ease'; document.body.appendChild(t);
+        }
+        t.textContent = msg; t.style.opacity = '1'; t.style.transform = 'translate(-50%, 0)';
+        clearTimeout(t._timer);
+        t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translate(-50%, 20px)'; }, 3500);
+    }
+
+    // === AUTH GUARD + USER BIND ===
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+            window.location.href = 'login & registration.html'; return;
+        }
+        const user = ZoiToken.getUser();
+        const nameEl = document.getElementById('sub-user-name');
+        const avatarEl = document.getElementById('sub-user-avatar');
+        if (nameEl) nameEl.textContent = user.name ? user.name.split(' ')[0] + '.' : 'Guest';
+        if (avatarEl) avatarEl.textContent = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+    });
+</script>
+<script src="js/zoi_ai_assistant.js?v=4"></script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>

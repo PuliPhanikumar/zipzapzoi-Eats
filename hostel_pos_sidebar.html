@@ -1,0 +1,207 @@
+<aside id="pos-nav-drawer"
+    class="w-64 glass-panel border-r border border-t-0 border-l-0 border-b-0 m-4 flex flex-col relative z-20 sticky top-0 h-[calc(100vh-2rem)] fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 shrink-0">
+    <!-- Logo Area -->
+    <div class="p-6 flex items-center justify-between border-b border-border">
+        <div class="flex items-center gap-3">
+            <div
+                class="h-10 w-10 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shadow-lg shadow-pink-500/20">
+                <span class="material-symbols-outlined text-white">apartment</span>
+            </div>
+            <div>
+                <h1 class="font-extrabold text-xl tracking-tight leading-tight">Zoi Hostel</h1>
+                <p class="text-[10px] text-pink-400 font-bold tracking-widest uppercase">POS Ecosystem</p>
+            </div>
+        </div>
+        <button onclick="if(typeof togglePosNav == 'function') togglePosNav();"
+            class="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white md:hidden"><span
+                class="material-symbols-outlined text-xl">close</span></button>
+    </div>
+
+    <!-- Property Selector -->
+    <div class="p-4 border-b border-border">
+        <button
+            class="w-full flex items-center justify-between glass-panel px-3 py-2 bg-white/5 hover:bg-white/10 transition-colors">
+            <div class="flex flex-col text-left">
+                <span class="text-xs text-gray-400">Current Branch</span>
+                <span class="text-sm font-bold text-white truncate max-w-[140px]" id="current-branch-name">Bengaluru
+                    Tech Park (Boys)</span>
+            </div>
+            <span class="material-symbols-outlined text-gray-400">expand_more</span>
+        </button>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1 custom-scrollbar">
+        <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2 mb-2">Core Operations</p>
+
+        <a href="hostel_pos_dashboard.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span
+                class="material-symbols-outlined status-icon group-hover:text-pink-400 transition-colors">grid_view</span>
+            Overview 3D
+        </a>
+
+        <a href="hostel_rooms.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-pink-400 transition-colors">bed</span>
+            Rooms & Beds
+            <span class="ml-auto bg-pink-500/20 text-pink-400 py-0.5 px-2 rounded-full text-[10px] font-bold">12
+                Vacant</span>
+        </a>
+
+        <a href="hostel_allocation.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-pink-400 transition-colors">grid_on</span>
+            Allocation Matrix
+        </a>
+
+        <a href="hostel_hostelers.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-pink-400 transition-colors">group</span>
+            Hostelers (KYC)
+        </a>
+
+        <a href="hostel_billing.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-pink-400 transition-colors">receipt_long</span>
+            Billing & Fees
+        </a>
+
+        <a href="hostel_expenses.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span
+                class="material-symbols-outlined group-hover:text-pink-400 transition-colors">account_balance_wallet</span>
+            Expense Tracker
+        </a>
+
+        <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-6 mb-2">Inventory & Mess</p>
+
+        <a href="hostel_mess.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-amber-400 transition-colors">restaurant</span>
+            Mess Attendance
+        </a>
+
+        <a href="hostel_inventory.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-amber-400 transition-colors">inventory_2</span>
+            Supply Inventory
+        </a>
+
+        <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-6 mb-2">Security & Staff</p>
+
+        <a href="hostel_visitors.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-violet-400 transition-colors">badge</span>
+            Visitor Log
+        </a>
+
+        <a href="hostel_complaints.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-violet-400 transition-colors">support_agent</span>
+            Complaint Tickets
+            <span class="ml-auto bg-red-500/20 text-red-400 py-0.5 px-2 rounded-full text-[10px] font-bold">2</span>
+        </a>
+
+        <a href="hostel_staff.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-violet-400 transition-colors">groups</span>
+            Staff & Salary
+        </a>
+
+        <a href="hostel_laundry.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span
+                class="material-symbols-outlined group-hover:text-violet-400 transition-colors">local_laundry_service</span>
+            Laundry & Parcels
+        </a>
+
+        <a href="hostel_gatepass.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-violet-400 transition-colors">qr_code_2</span>
+            Digital Gate Pass
+        </a>
+
+        <a href="hostel_maintenance.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-violet-400 transition-colors">engineering</span>
+            Maintenance
+        </a>
+
+        <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-6 mb-2">Engagement & Safety
+        </p>
+
+        <a href="hostel_noticeboard.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-amber-400 transition-colors">campaign</span>
+            Notice Board
+        </a>
+
+        <a href="hostel_communication.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-amber-400 transition-colors">sms</span>
+            Communication Hub
+        </a>
+
+        <a href="hostel_emergency.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-red-400 transition-colors">emergency</span>
+            Emergency SOS
+        </a>
+
+        <a href="hostel_feedback.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-teal transition-colors">rate_review</span>
+            Feedback
+        </a>
+
+        <p class="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-6 mb-2">Analytics & AI</p>
+
+        <a href="hostel_analytics.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-teal transition-colors">monitoring</span>
+            Power BI Analytics
+        </a>
+
+        <a href="hostel_gst.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <span class="material-symbols-outlined group-hover:text-teal transition-colors">receipt</span>
+            GST Reports
+        </a>
+
+        <a href="javascript:void(0)" onclick="if(typeof toggleZoiAI !== 'undefined') toggleZoiAI();"
+            class="flex items-center justify-between px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined group-hover:text-teal transition-colors">psychology</span>
+                Zoi AI Engine
+            </div>
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-teal"></span>
+            </span>
+        </a>
+
+        <a href="hostel_settings.html"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 font-medium group transition-all mt-4">
+            <span class="material-symbols-outlined group-hover:text-gray-200 transition-colors">settings</span>
+            Settings
+        </a>
+
+    </nav>
+
+    <!-- User Profile Area -->
+    <div class="p-4 border-t border-border mt-auto">
+        <div class="flex items-center gap-3 w-full">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=db2777&color=fff"
+                class="h-10 w-10 rounded-full border border-white/10" id="user-avatar">
+            <div class="flex-1 overflow-hidden">
+                <p class="text-sm font-bold text-white truncate" id="user-name">Owner User</p>
+                <p class="text-[10px] text-pink-400 font-bold uppercase" id="user-role">Hostel Owner</p>
+            </div>
+            <button onclick="if(typeof logout == 'function') logout();"
+                class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/5 transition-colors">
+                <span class="material-symbols-outlined text-xl">logout</span>
+            </button>
+        </div>
+    </div>
+</aside>

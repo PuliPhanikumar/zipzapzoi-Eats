@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Eats - Loyalty & Rewards</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0ff",
+                        "primary-hover": "#00d7e6",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#0a0314",
+                        "surface-dark": "#2f241a",
+                        "surface-light": "#ffffff",
+                        "text-secondary-dark": "#b4a5d8",
+                        "text-secondary-light": "#6b5c50",
+                    },
+                    fontFamily: { "display": ["Plus Jakarta Sans", "sans-serif"] },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "1.5rem", "xl": "2rem", "full": "9999px" },
+                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                },
+            },
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0314;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3c1e6e;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #684d31;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-white min-h-screen flex flex-col overflow-x-hidden transition-colors duration-300">
+
+    <header
+        class="sticky top-0 z-40 flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#e6e0db] dark:border-b-[#3c1e6e] bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md px-6 py-4 lg:px-10">
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-3 text-gray-900 dark:text-white">
+                <div class="size-8 text-primary"><span class="material-symbols-outlined !text-[32px]">bolt</span></div>
+                <h2 class="text-xl font-extrabold leading-tight tracking-[-0.015em]">ZipZapZoi Eats</h2>
+            </div>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary text-sm font-semibold transition-colors"
+                    href="index.html">Home</a>
+                <a class="text-primary text-sm font-bold" href="customer gamification hub.html">Loyalty Hub</a>
+                <a class="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary text-sm font-semibold transition-colors"
+                    href="customer_orders history.html">Orders</a>
+                <a class="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary text-sm font-semibold transition-colors"
+                    href="promotions & offers.html">Offers</a>
+                <a class="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary text-sm font-semibold transition-colors"
+                    href="customer support help.html">Help</a>
+            </nav>
+        </div>
+        <div class="flex flex-1 justify-end gap-6 items-center">
+            <div class="flex gap-3 relative">
+                <div class="relative">
+                    <button onclick="toggleNotifications()"
+                        class="flex items-center justify-center rounded-full size-10 bg-[#e6e0db] dark:bg-[#3c1e6e] hover:bg-primary/20 text-gray-900 dark:text-white transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">notifications</span>
+                        <span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full animate-pulse"
+                            id="notif-dot"></span>
+                    </button>
+                    <div id="notif-dropdown"
+                        class="absolute right-0 top-12 w-72 bg-surface-dark border border-[#3c1e6e] rounded-xl shadow-2xl p-4 hidden z-50 transform origin-top-right transition-all">
+                        <h4 class="text-sm font-bold text-white mb-3">Activity Log</h4>
+                        <div class="space-y-3 text-xs" id="notif-list">
+                            <div class="flex gap-2 items-start"><span class="text-green-400">●</span>
+                                <div>
+                                    <p class="text-white font-bold">Daily Login</p>
+                                    <p class="text-text-secondary-dark">+10 Pts</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 items-start"><span class="text-blue-400">●</span>
+                                <div>
+                                    <p class="text-white font-bold">Challenge Complete</p>
+                                    <p class="text-text-secondary-dark">Burger Boss Badge</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="shopping_cart.html"
+                    class="flex items-center justify-center rounded-full size-10 bg-[#e6e0db] dark:bg-[#3c1e6e] hover:bg-primary/20 text-gray-900 dark:text-white transition-colors relative">
+                    <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                    <span
+                        class="zoi-cart-badge absolute -top-1 -right-1 size-4 bg-primary text-white text-[10px] font-bold flex items-center justify-center rounded-full hidden"
+                        id="cart-badge">0</span>
+                </a>
+                <a href="customer profile.html"
+                    class="size-10 rounded-full bg-cover bg-center border-2 border-primary cursor-pointer block"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCeWunNOvVoi2YLiLVftAw15NlQnGN7muejlBEsZ3jOv8ZwpOXKbt0uCAo_15XEqc7-FhvYGuK-iiiKRfVppxG8vbio4cQJ3tADpI8w75df9HMlzMF-dPzJx8fqmbNGaFGVD4X32IW8nkc2xsiHF1xhq8nLVQ9XQzvG9N4NgfZnuMoCISn_njhHrD4baMxuRm4nBse49G_YUqj9csUE6KBnq0l_OZRRvtS-7-5rxMRzR1DULCTCW76g0bYtG2LajI1xo9nXA2T-Oa4");'>
+                </a>
+            </div>
+        </div>
+    </header>
+
+<div class="flex flex-1 max-w-[1600px] w-full mx-auto">
+<aside class="hidden lg:flex flex-col w-72 border-r border-border-[#3c1e6e] shrink-0 h-[calc(100vh-65px)] sticky top-[65px] overflow-y-auto p-4 gap-6">
+<div class="flex gap-3 p-3 rounded-xl bg-[#3c1e6e]/20 border border-[#3c1e6e]/50">
+<div id="sidebar-avatar" class="size-12 rounded-full shrink-0 border border-primary/50 bg-primary/20 flex items-center justify-center text-primary font-black text-xl">U</div>
+<div class="flex flex-col justify-center">
+<h1 id="sidebar-name" class="text-white text-base font-bold leading-normal">Loading...</h1>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-[14px] fill-1">verified</span>
+<p class="text-text-secondary-dark text-xs font-normal leading-normal">ZipZap Gold Member</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group text-text-secondary-dark hover:text-white" href="customer profile.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<p class="text-sm font-bold leading-normal">Overview</p>
+</a>
+<a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group text-text-secondary-dark hover:text-white" href="customer_orders history.html">
+<span class="material-symbols-outlined">receipt_long</span>
+<p class="text-sm font-medium leading-normal">My Orders</p>
+</a>
+<a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group text-text-secondary-dark hover:text-white" href="customer profile.html#favorites-section">
+<span class="material-symbols-outlined">favorite</span>
+<p class="text-sm font-medium leading-normal">Favorites</p>
+</a>
+<a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group text-text-secondary-dark hover:text-white" href="customer profile.html#zapwallet-section">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<p class="text-sm font-medium leading-normal">ZapWallet</p>
+</a>
+<a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group text-text-secondary-dark hover:text-white" href="customer gamification hub.html">
+<span class="material-symbols-outlined">stars</span>
+<p class="text-sm font-medium leading-normal">ZapPoints</p>
+</a>
+<a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group text-text-secondary-dark hover:text-white" href="customer profile.html#addresses-section">
+<span class="material-symbols-outlined">location_on</span>
+<p class="text-sm font-medium leading-normal">Addresses</p>
+</a>
+<div class="h-px w-full bg-[#3c1e6e] my-2"></div>
+<a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group text-text-secondary-dark hover:text-white" href="customer profile.html#settings-section">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+<a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors group text-text-secondary-dark hover:text-white" href="customer support help.html">
+<span class="material-symbols-outlined">support_agent</span>
+<p class="text-sm font-medium leading-normal">Support Help</p>
+</a>
+<a id="logout-btn" onclick="if(typeof ZoiCustomer !== 'undefined') ZoiCustomer.logout()" class="sidebar-nav-link flex items-center gap-3 px-3 py-3 mt-2 rounded-lg hover:bg-red-500/20 transition-colors group text-red-400 hover:text-red-300 cursor-pointer">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-bold leading-normal">Log Out</p>
+</a>
+</div>
+<div class="mt-auto p-4 rounded-xl bg-gradient-to-b from-[#3c1e6e]/20 to-transparent border border-[#3c1e6e]/50 relative overflow-hidden group cursor-pointer">
+<div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl rotate-12">lunch_dining</span>
+</div>
+<p class="text-text-secondary-dark text-xs uppercase tracking-wider font-bold mb-1">Weekly Offer</p>
+<p class="text-white font-bold text-sm mb-3">Get 20% off on all Biryanis this weekend!</p>
+<button onclick="window.location.href='promotions & offers.html'" class="w-full bg-primary text-background-dark font-bold text-xs py-2 rounded-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.4)] transition-all uppercase tracking-wider">Claim Offer</button>
+</div>
+</aside>
+    <main class="flex-1 flex justify-center py-8 px-4 md:px-8 lg:px-12">
+        <div class="flex flex-col max-w-[1200px] w-full gap-8">
+
+            <section class="flex flex-col lg:flex-row gap-6">
+                <div
+                    class="flex-1 rounded-2xl bg-surface-light dark:bg-surface-dark p-6 border border-[#e6e0db] dark:border-[#3c1e6e] flex items-center gap-6 shadow-sm relative overflow-hidden group">
+                    <button onclick="claimDailyBonus()" id="daily-bonus-btn"
+                        class="absolute top-0 right-0 p-3 bg-green-500/10 hover:bg-green-500/20 text-green-500 text-xs font-bold uppercase rounded-bl-xl border-l border-b border-green-500/20 flex items-center gap-2 transition-all cursor-pointer">
+                        <span class="material-symbols-outlined text-sm animate-bounce">local_fire_department</span>
+                        <span id="streak-text">Claim Daily Bonus</span>
+                    </button>
+
+                    <div class="relative">
+                        <div class="rounded-full size-24 bg-cover bg-center border-4 border-primary shadow-lg shadow-primary/20"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCeWunNOvVoi2YLiLVftAw15NlQnGN7muejlBEsZ3jOv8ZwpOXKbt0uCAo_15XEqc7-FhvYGuK-iiiKRfVppxG8vbio4cQJ3tADpI8w75df9HMlzMF-dPzJx8fqmbNGaFGVD4X32IW8nkc2xsiHF1xhq8nLVQ9XQzvG9N4NgfZnuMoCISn_njhHrD4baMxuRm4nBse49G_YUqj9csUE6KBnq0l_OZRRvtS-7-5rxMRzR1DULCTCW76g0bYtG2LajI1xo9nXA2T-Oa4");'>
+                        </div>
+                        <div
+                            class="absolute -bottom-2 -right-2 bg-background-dark rounded-full p-1.5 border border-[#3c1e6e]">
+                            <span class="material-symbols-outlined text-primary text-xl">military_tech</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h1 id="gamification-user-name" class="text-2xl font-extrabold text-gray-900 dark:text-white">Loading...</h1>
+                            <span
+                                class="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider border border-primary/20 cursor-help"
+                                onclick="openLevelModal()">Level 4</span>
+                        </div>
+                        <p class="text-primary text-base font-bold mb-1">Flavor Explorer</p>
+                        <p class="text-text-secondary-light dark:text-text-secondary-dark text-xs">Only <strong>500
+                                pts</strong> to 'Taste Titan'</p>
+                    </div>
+                </div>
+
+                <div class="flex-1 grid grid-cols-3 gap-4">
+                    <div onclick="openHistoryModal()"
+                        class="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl border border-[#e6e0db] dark:border-[#3c1e6e] flex flex-col justify-center items-center gap-1 shadow-sm cursor-pointer hover:border-primary/50 transition-all group">
+                        <div
+                            class="p-2 rounded-full bg-amber-500/10 text-amber-500 mb-1 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined">monetization_on</span>
+                        </div>
+                        <p class="text-xs font-bold uppercase tracking-wide text-text-secondary-dark">ZoiPoints</p>
+                        <p class="text-xl font-black text-gray-900 dark:text-white" id="user-points">2,450</p>
+                    </div>
+                    <div onclick="openLeaderboard()"
+                        class="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl border border-[#e6e0db] dark:border-[#3c1e6e] flex flex-col justify-center items-center gap-1 shadow-sm cursor-pointer hover:border-blue-500/50 transition-all group">
+                        <div
+                            class="p-2 rounded-full bg-blue-500/10 text-blue-500 mb-1 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined">leaderboard</span>
+                        </div>
+                        <p class="text-xs font-bold uppercase tracking-wide text-text-secondary-dark">Rank</p>
+                        <p class="text-xl font-black text-gray-900 dark:text-white">#12</p>
+                    </div>
+                    <div onclick="document.getElementById('store-section').scrollIntoView({behavior: 'smooth'})"
+                        class="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl border border-[#e6e0db] dark:border-[#3c1e6e] flex flex-col justify-center items-center gap-1 shadow-sm cursor-pointer hover:border-emerald-500/50 transition-all group">
+                        <div
+                            class="p-2 rounded-full bg-emerald-500/10 text-emerald-500 mb-1 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined">local_activity</span>
+                        </div>
+                        <p class="text-xs font-bold uppercase tracking-wide text-text-secondary-dark">Coupons</p>
+                        <p class="text-xl font-black text-gray-900 dark:text-white" id="coupon-count">3</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <section
+                    class="lg:col-span-2 bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-[#e6e0db] dark:border-[#3c1e6e] shadow-sm relative group cursor-pointer"
+                    onclick="openLevelModal()">
+                    <div class="absolute top-4 right-4 text-text-secondary-dark hover:text-white"><span
+                            class="material-symbols-outlined">info</span></div>
+                    <div class="flex justify-between items-end mb-3">
+                        <div>
+                            <p
+                                class="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark mb-1 uppercase tracking-wider">
+                                Current Progress</p>
+                            <p class="text-lg font-bold text-gray-900 dark:text-white">Taste Titan</p>
+                        </div>
+                        <span class="text-2xl font-black text-primary">85%</span>
+                    </div>
+                    <div class="h-3 w-full bg-[#e6e0db] dark:bg-[#3a2d20] rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-orange-400 to-primary rounded-full transition-all duration-1000 ease-out w-0"
+                            id="level-bar"></div>
+                    </div>
+                    <p class="text-xs text-text-secondary-dark mt-2">Unlock <strong>1.5x Points Multiplier</strong> at
+                        next level!</p>
+                </section>
+
+                <section
+                    class="bg-gradient-to-br from-purple-900/40 to-surface-dark p-6 rounded-2xl border border-purple-500/30 flex flex-col justify-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-purple-400">group_add</span>
+                        <h3 class="text-white font-bold">Invite & Earn</h3>
+                    </div>
+                    <p class="text-xs text-gray-400">Get <strong>500 Pts</strong> for every friend who orders.</p>
+                    <div class="flex gap-2">
+                        <code id="gamification-referral-code"
+                            class="flex-1 bg-black/30 border border-purple-500/30 rounded-lg flex items-center justify-center text-purple-300 font-mono text-sm tracking-widest">LOADING...</code>
+                        <button onclick="copyReferral()"
+                            class="bg-primary hover:bg-orange-600 text-background-dark font-bold p-3 rounded-lg transition-colors aspect-square flex items-center justify-center group">
+                            <span class="material-symbols-outlined text-sm">content_copy</span>
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-8 flex flex-col gap-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">flag</span> Active Challenges
+                        </h3>
+                    </div>
+
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark p-5 rounded-xl border border-[#e6e0db] dark:border-[#3c1e6e] hover:border-primary/50 transition-all flex flex-col sm:flex-row gap-5 relative overflow-hidden">
+                        <div
+                            class="size-16 rounded-xl bg-orange-100 dark:bg-[#3a2d20] shrink-0 flex items-center justify-center text-3xl">
+                            🍔</div>
+                        <div class="flex flex-col flex-1 justify-center gap-1">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-lg text-gray-900 dark:text-white">Burger Boss</h4>
+                                <span class="text-xs font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded">+200
+                                    Pts</span>
+                            </div>
+                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Order 3 different
+                                burgers this week</p>
+                            <div class="w-full bg-[#e6e0db] dark:bg-[#3a2d20] h-2 rounded-full mt-2">
+                                <div class="bg-primary h-2 rounded-full w-2/3"></div>
+                            </div>
+                            <div class="flex justify-between text-xs font-medium mt-1">
+                                <span class="text-primary">2/3 Completed</span>
+                                <span class="text-text-secondary-light dark:text-text-secondary-dark">Ends in 2
+                                    days</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark p-5 rounded-xl border border-[#e6e0db] dark:border-[#3c1e6e] hover:border-blue-500/50 transition-all flex flex-col sm:flex-row gap-5">
+                        <div
+                            class="size-16 rounded-xl bg-blue-100 dark:bg-[#1a2330] shrink-0 flex items-center justify-center text-3xl">
+                            🌙</div>
+                        <div class="flex flex-col flex-1 justify-center gap-1">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-lg text-gray-900 dark:text-white">Midnight Munchies</h4>
+                                <span class="text-xs font-bold text-purple-400 bg-purple-500/10 px-2 py-1 rounded">Free
+                                    Del.</span>
+                            </div>
+                            <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Place an order
+                                after 10 PM</p>
+                            <div class="w-full bg-[#e6e0db] dark:bg-[#3a2d20] h-2 rounded-full mt-2">
+                                <div class="bg-blue-500 h-2 rounded-full w-0"></div>
+                            </div>
+                            <div class="flex justify-between text-xs font-medium mt-1">
+                                <span class="text-text-secondary-light dark:text-text-secondary-dark">0/1
+                                    Completed</span>
+                                <span class="text-red-400">Ends tonight</span>
+                            </div>
+                        </div>
+                        <button onclick="window.location.href='customer_restaurant_listing.html'"
+                            class="self-center px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold">Order
+                            Now</button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 flex flex-col gap-8">
+
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">emoji_events</span> Trophy Case
+                        </h3>
+                        <div id="badge-grid"
+                            class="bg-surface-light dark:bg-surface-dark p-5 rounded-xl border border-[#e6e0db] dark:border-[#3c1e6e] grid grid-cols-3 gap-4">
+                            <!-- Badges injected dynamically -->
+                        </div>
+                    </div>
+
+                    <div id="store-section" class="flex flex-col gap-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">storefront</span> Rewards
+                            </h3>
+                            <span class="text-xs text-text-secondary-dark">Balance: <span id="store-balance"
+                                    class="text-white font-bold">2,450</span></span>
+                        </div>
+                        <div
+                            class="bg-surface-light dark:bg-surface-dark rounded-xl border border-[#e6e0db] dark:border-[#3c1e6e] overflow-hidden divide-y divide-[#3c1e6e]">
+                            <div class="p-4 flex items-center justify-between gap-3 hover:bg-white/5 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="size-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-xl">confirmation_number</span>
+                                    </div>
+                                    <div><span class="block text-sm font-bold text-white">₹100 Off Coupon</span><span
+                                            class="text-xs text-text-secondary-dark">1000 Pts</span></div>
+                                </div>
+                                <button onclick="redeemReward(1000, '₹100 Coupon')"
+                                    class="px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-primary hover:text-white text-xs font-bold transition-all">Redeem</button>
+                            </div>
+                            <div class="p-4 flex items-center justify-between gap-3 hover:bg-white/5 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="size-10 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-xl">local_shipping</span>
+                                    </div>
+                                    <div><span class="block text-sm font-bold text-white">Free Delivery</span><span
+                                            class="text-xs text-text-secondary-dark">500 Pts</span></div>
+                                </div>
+                                <button onclick="redeemReward(500, 'Free Delivery')"
+                                    class="px-3 py-1.5 rounded-lg border border-primary text-primary hover:bg-primary hover:text-white text-xs font-bold transition-all">Redeem</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+    <div id="level-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-surface-dark border border-[#3c1e6e] rounded-2xl w-full max-w-sm p-6 shadow-2xl relative">
+            <button onclick="closeModal('level-modal')"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white"><span
+                    class="material-symbols-outlined">close</span></button>
+            <div class="text-center mb-6">
+                <div
+                    class="size-16 mx-auto bg-primary/20 rounded-full flex items-center justify-center text-primary text-3xl mb-3">
+                    <span class="material-symbols-outlined">military_tech</span>
+                </div>
+                <h3 class="text-xl font-bold text-white">Taste Titan</h3>
+                <p class="text-xs text-text-secondary-dark">Level 5 (Coming Soon)</p>
+            </div>
+            <div class="space-y-3">
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                    <span class="material-symbols-outlined text-green-400">payments</span>
+                    <span class="text-sm text-white">1.5x Points Multiplier on orders</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                    <span class="material-symbols-outlined text-blue-400">local_shipping</span>
+                    <span class="text-sm text-white">Priority Delivery Allocation</span>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                    <span class="material-symbols-outlined text-purple-400">cake</span>
+                    <span class="text-sm text-white">Birthday Surprise</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="leaderboard-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-surface-dark border border-[#3c1e6e] rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-yellow-500">emoji_events</span> Weekly Top 10</h3>
+                <button onclick="closeModal('leaderboard-modal')" class="text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="space-y-4">
+                <div
+                    class="flex items-center justify-between p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
+                    <div class="flex items-center gap-3"><span class="text-lg font-bold text-yellow-500">1</span>
+                        <div class="size-8 rounded-full bg-gray-600"></div><span
+                            class="text-sm font-bold text-white">Sarah Jenkins</span>
+                    </div>
+                    <span class="text-sm font-bold text-yellow-500">5,200 pts</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-primary/20 border border-primary rounded-xl mt-4">
+                    <div class="flex items-center gap-3"><span class="text-lg font-bold text-primary">12</span>
+                        <div class="size-8 rounded-full bg-cover"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCeWunNOvVoi2YLiLVftAw15NlQnGN7muejlBEsZ3jOv8ZwpOXKbt0uCAo_15XEqc7-FhvYGuK-iiiKRfVppxG8vbio4cQJ3tADpI8w75df9HMlzMF-dPzJx8fqmbNGaFGVD4X32IW8nkc2xsiHF1xhq8nLVQ9XQzvG9N4NgfZnuMoCISn_njhHrD4baMxuRm4nBse49G_YUqj9csUE6KBnq0l_OZRRvtS-7-5rxMRzR1DULCTCW76g0bYtG2LajI1xo9nXA2T-Oa4");'>
+                        </div><span class="text-sm font-bold text-white">You</span>
+                    </div>
+                    <span class="text-sm font-bold text-white">2,450 pts</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="badge-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-surface-dark border border-[#3c1e6e] rounded-2xl w-full max-w-sm p-8 text-center shadow-2xl">
+            <div id="badge-icon-container"
+                class="size-24 mx-auto rounded-full bg-surface-dark border-4 border-primary flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-5xl text-primary">military_tech</span>
+            </div>
+            <h3 class="text-2xl font-black text-white mb-2" id="badge-title">Badge Name</h3>
+            <p class="text-text-secondary-dark mb-6" id="badge-desc">Description goes here.</p>
+            <button onclick="closeModal('badge-modal')"
+                class="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-white font-bold transition-colors">Close</button>
+        </div>
+    </div>
+
+    <div id="history-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-surface-dark border border-[#3c1e6e] rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-white">Points History</h3>
+                <button onclick="closeModal('history-modal')" class="text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="space-y-0" id="history-list">
+                <div class="flex justify-between items-center p-3 border-b border-[#3c1e6e]">
+                    <div>
+                        <p class="text-sm font-bold text-white">Order #8821</p>
+                        <p class="text-xs text-gray-500">Today</p>
+                    </div>
+                    <span class="text-green-400 font-bold font-mono">+150</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 z-[60] bg-surface-dark border border-primary text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary text-xl" id="toast-icon">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">Action completed.</p>
+        </div>
+    </div>
+
+    <script>
+        let user = { points: 2450, coupons: 3, streakClaimed: false, history: [] };
+        let activeUser = null;
+
+        window.onload = function () {
+            if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+                window.location.href = 'login & registration.html';
+                return;
+            }
+            activeUser = ZoiToken.getUser();
+
+            // Setup Header Avatar and Name
+            const headerAvatar = document.querySelector('.size-10.rounded-full.bg-cover.border-2.border-primary');
+            if (headerAvatar) {
+                headerAvatar.style.backgroundImage = 'none';
+                headerAvatar.innerHTML = `<span class="material-symbols-outlined text-white text-xl flex items-center justify-center h-full w-full">${activeUser.name ? activeUser.name.charAt(0).toUpperCase() : 'U'}</span>`;
+            }
+            const nameDisplay = document.querySelector('h1.font-extrabold.text-gray-900, h1.font-extrabold.dark\\:text-white');
+            if (nameDisplay) nameDisplay.innerText = activeUser.name || 'Flavor Explorer';
+
+            // Get deterministic points tied to user
+            const stats = typeof ZoiProfile !== 'undefined' ? ZoiProfile.getDeterministicStats(activeUser.id) : { points: 2450 };
+            
+            user = JSON.parse(localStorage.getItem('zoiUserPoints_' + activeUser.id)) || {
+                points: stats.points, coupons: 3, streakClaimed: false, history: []
+            };
+
+            // Reset streak daily
+            const todayStr = new Date().toDateString();
+            if (localStorage.getItem('zoiLastStreakDate_' + activeUser.id) !== todayStr) {
+                user.streakClaimed = false;
+            }
+
+            setTimeout(() => { 
+                const levelBar = document.getElementById('level-bar');
+                if(levelBar) levelBar.style.width = '85%'; 
+            }, 500);
+            
+            updateStats();
+
+            // Load badges dynamically
+            const badgeGrid = document.getElementById('badge-grid');
+            if (badgeGrid && typeof ZoiGamification !== 'undefined') {
+                const badges = ZoiGamification.getBadges();
+                let badgeHTML = '';
+                badges.forEach((b, i) => {
+                    if (i >= 3) return; // Show only top 3 on dashboard
+                    const isUnlocked = b.status === 'active';
+
+                    if (isUnlocked) {
+                        badgeHTML += `<div onclick="showBadge('${b.name}', '${b.desc}', true)" class="flex flex-col items-center gap-2 cursor-pointer group">
+                            <div class="size-14 rounded-full bg-gradient-to-br from-${b.color}-400 to-${b.color}-600 p-0.5 shadow-lg group-hover:scale-110 transition-transform">
+                                <div class="size-full rounded-full bg-surface-light dark:bg-surface-dark flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-2xl text-${b.color}-500">${b.icon}</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-bold text-center uppercase text-text-secondary-dark">${b.name}</span>
+                        </div>`;
+                    } else {
+                        badgeHTML += `<div onclick="showBadge('${b.name}', '${b.desc}', false)" class="flex flex-col items-center gap-2 cursor-pointer group grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all">
+                            <div class="size-14 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+                                <span class="material-symbols-outlined text-2xl text-gray-500">${b.icon}</span>
+                            </div>
+                            <span class="text-[10px] font-bold text-center uppercase text-gray-500">${b.name}</span>
+                        </div>`;
+                    }
+                });
+                badgeGrid.innerHTML = badgeHTML;
+            }
+
+            // Load history
+            document.getElementById('history-list').innerHTML = "";
+            if (user.history && user.history.length > 0) {
+                user.history.forEach(h => {
+                    const html = `<div class="flex justify-between items-center p-3 border-b border-[#3c1e6e]">
+                        <div><p class="text-sm font-bold text-white">${h.title}</p><p class="text-xs text-gray-500">${h.time}</p></div>
+                        <span class="${h.colorClass} font-bold font-mono">${h.amount}</span>
+                    </div>`;
+                    document.getElementById('history-list').insertAdjacentHTML('beforeend', html);
+                });
+            } else {
+                addHistory('Welcome Bonus', '+2000', 'text-green-400', false);
+            }
+
+            const dailyBonusBtn = document.getElementById('daily-bonus-btn');
+            const streakText = document.getElementById('streak-text');
+            if (user.streakClaimed && dailyBonusBtn && streakText) {
+                streakText.innerText = "Streak Active (5 Days)";
+                dailyBonusBtn.classList.remove('bg-green-500/10', 'text-green-500', 'hover:bg-green-500/20');
+                dailyBonusBtn.classList.add('bg-gray-700', 'text-gray-400', 'cursor-default');
+            }
+        }; // end window.onload
+
+        function saveUser() {
+            if (activeUser) localStorage.setItem('zoiUserPoints_' + activeUser.id, JSON.stringify(user));
+        }
+
+        function redeemReward(cost, name) {
+            if (user.points >= cost) {
+                user.points -= cost;
+                user.coupons++;
+                if (activeUser && typeof ZoiProfile !== 'undefined') {
+                    ZoiProfile.updateDeterministicStats(activeUser.id, 'points', -cost);
+                }
+                // Sync with global profile key
+                localStorage.setItem('zoiZapPoints', user.points.toString());
+                const profileData = JSON.parse(localStorage.getItem('zoiUserProfile') || '{}');
+                profileData.zapPoints = user.points;
+                localStorage.setItem('zoiUserProfile', JSON.stringify(profileData));
+                // Save redemption history
+                const redemptions = JSON.parse(localStorage.getItem('zoiRedemptions') || '[]');
+                redemptions.unshift({ reward: name, points: cost, date: new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}), time: new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'}) });
+                localStorage.setItem('zoiRedemptions', JSON.stringify(redemptions));
+                updateStats();
+                showToast('success', 'Reward Redeemed!', `You got ${name}.`);
+                addHistory(`Redeemed: ${name}`, `-${cost}`, 'text-red-400');
+            } else {
+                showToast('error', 'Insufficient Points', `You need ${cost - user.points} more points.`);
+            }
+        }
+
+        function claimDailyBonus() {
+            if (user.streakClaimed) return showToast('error', 'Already Claimed', 'Come back tomorrow!');
+            user.points += 50;
+            user.streakClaimed = true;
+            if (activeUser) localStorage.setItem('zoiLastStreakDate_' + activeUser.id, new Date().toDateString());
+            
+            if (activeUser && typeof ZoiProfile !== 'undefined') {
+                ZoiProfile.updateDeterministicStats(activeUser.id, 'points', 50);
+            }
+
+            updateStats();
+            document.getElementById('streak-text').innerText = "Streak Active (5 Days)";
+            document.getElementById('daily-bonus-btn').classList.remove('bg-green-500/10', 'text-green-500', 'hover:bg-green-500/20');
+            document.getElementById('daily-bonus-btn').classList.add('bg-gray-700', 'text-gray-400', 'cursor-default');
+            showToast('success', 'Bonus Claimed!', '+50 Points added.');
+            addHistory('Daily Login Bonus', '+50', 'text-green-400');
+            // Sync with global profile key
+            localStorage.setItem('zoiZapPoints', user.points.toString());
+            const profileData = JSON.parse(localStorage.getItem('zoiUserProfile') || '{}');
+            profileData.zapPoints = user.points;
+            localStorage.setItem('zoiUserProfile', JSON.stringify(profileData));
+        }
+
+        function copyReferral() {
+            const refCode = document.getElementById('gamification-referral-code').innerText;
+            navigator.clipboard.writeText(refCode);
+            showToast('success', 'Copied!', 'Referral code copied to clipboard');
+        }
+
+        function updateStats() {
+            document.getElementById('user-points').innerText = user.points.toLocaleString();
+            document.getElementById('store-balance').innerText = user.points.toLocaleString();
+            document.getElementById('coupon-count').innerText = user.coupons;
+            saveUser();
+        }
+
+        function addHistory(title, amount, colorClass, save = true) {
+            const time = "Just now";
+            const html = `<div class="flex justify-between items-center p-3 border-b border-[#3c1e6e] animate-pulse">
+                <div><p class="text-sm font-bold text-white">${title}</p><p class="text-xs text-gray-500">${time}</p></div>
+                <span class="${colorClass} font-bold font-mono">${amount}</span>
+            </div>`;
+            document.getElementById('history-list').insertAdjacentHTML('afterbegin', html);
+            document.getElementById('notif-list').insertAdjacentHTML('afterbegin', `<div class="flex gap-2 items-start"><span class="text-primary">●</span> <div><p class="text-white font-bold">${title}</p><p class="text-text-secondary-dark">${amount}</p></div></div>`);
+            document.getElementById('notif-dot').classList.remove('hidden');
+
+            if (save) {
+                if (!user.history) user.history = [];
+                user.history.unshift({ title, amount, colorClass, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+                if (user.history.length > 20) user.history.pop();
+                saveUser();
+            }
+        }
+
+        function toggleNotifications() {
+            document.getElementById('notif-dropdown').classList.toggle('hidden');
+            document.getElementById('notif-dot').classList.add('hidden');
+        }
+
+        function openLevelModal() { openModal('level-modal'); }
+        function openLeaderboard() { openModal('leaderboard-modal'); }
+        function openHistoryModal() { openModal('history-modal'); }
+
+        function showBadge(title, desc, unlocked) {
+            document.getElementById('badge-title').innerText = title;
+            document.getElementById('badge-desc').innerText = desc;
+            const icon = document.getElementById('badge-icon-container');
+            if (!unlocked) {
+                icon.classList.add('grayscale', 'opacity-50', 'border-gray-600');
+                icon.classList.remove('border-primary');
+            } else {
+                icon.classList.remove('grayscale', 'opacity-50', 'border-gray-600');
+                icon.classList.add('border-primary');
+            }
+            openModal('badge-modal');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+
+        function showToast(type, title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            const icon = document.getElementById('toast-icon');
+            icon.innerText = type === 'success' ? 'check_circle' : 'error';
+            icon.className = type === 'success' ? 'material-symbols-outlined text-primary text-xl' : 'material-symbols-outlined text-red-500 text-xl';
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 3000);
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer class="border-t border-[#3c1e6e] bg-[#0a0314] mt-auto">
+        <div class="max-w-[1200px] mx-auto px-6 py-10 lg:px-10">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-4">Explore</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary-dark">
+                        <li><a href="index.html" class="hover:text-primary transition-colors">Home</a></li>
+                        <li><a href="customer_restaurant_listing.html" class="hover:text-primary transition-colors">Restaurants</a></li>
+                        <li><a href="promotions %26 offers.html" class="hover:text-primary transition-colors">Offers</a></li>
+                        <li><a href="customer_orders history.html" class="hover:text-primary transition-colors">My Orders</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-4">Account</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary-dark">
+                        <li><a href="customer profile.html" class="hover:text-primary transition-colors">Profile</a></li>
+                        <li><a href="customer gamification hub.html" class="hover:text-primary transition-colors">Loyalty Hub</a></li>
+                        <li><a href="customer referral program.html" class="hover:text-primary transition-colors">Refer &amp; Earn</a></li>
+                        <li><a href="Customer subscription service.html" class="hover:text-primary transition-colors">ZoiPass</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-4">Support</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary-dark">
+                        <li><a href="customer support help.html" class="hover:text-primary transition-colors">Help Center</a></li>
+                        <li><a href="feedback.html" class="hover:text-primary transition-colors">Feedback</a></li>
+                        <li><a href="about us.html" class="hover:text-primary transition-colors">About Us</a></li>
+                        <li><a href="careerspage.html" class="hover:text-primary transition-colors">Careers</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm text-text-secondary-dark">
+                        <li><a href="privacy policy.html" class="hover:text-primary transition-colors">Privacy Policy</a></li>
+                        <li><a href="terms&conditions.html" class="hover:text-primary transition-colors">Terms &amp; Conditions</a></li>
+                        <li><a href="gst disclaimer.html" class="hover:text-primary transition-colors">GST Info</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-[#3c1e6e] mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-text-secondary-dark text-xs">&copy; 2026 ZipZapZoi Eats. All rights reserved.</p>
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-lg">bolt</span>
+                    <span class="text-white text-sm font-bold">Zoi<span class="text-primary">Eats</span></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+<script src="js/zoi_customer_engine.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+            window.location.href = 'login & registration.html';
+            return;
+        }
+        const activeUser = ZoiToken.getUser();
+
+        // --- Bind user info ---
+        const sidebarName = document.getElementById('sidebar-name');
+        if (sidebarName) sidebarName.textContent = activeUser.name || 'Guest';
+        const sidebarAvatar = document.getElementById('sidebar-avatar');
+        if (sidebarAvatar) sidebarAvatar.textContent = activeUser.name ? activeUser.name.charAt(0).toUpperCase() : 'U';
+        
+        const gUserName = document.getElementById('gamification-user-name');
+        if (gUserName) gUserName.textContent = activeUser.name || 'Flavor Explorer';
+
+        const gReferral = document.getElementById('gamification-referral-code');
+        if (gReferral) {
+            const fallbackCode = activeUser.name ? activeUser.name.split(' ')[0].toUpperCase() + '2026' : 'ZOI2026';
+            const refData = typeof ZoiReferral !== 'undefined' ? ZoiReferral.getData() : { code: fallbackCode };
+            gReferral.textContent = refData.code;
+        }
+
+        // --- Initialize gamification state ---
+        window.activeUser = activeUser;
+        const stats = typeof ZoiProfile !== 'undefined' ? ZoiProfile.getDeterministicStats(activeUser.id) : { points: 2450 };
+        window.user = JSON.parse(localStorage.getItem('zoiUserPoints_' + activeUser.id)) || {
+            points: stats.points, coupons: 3, streakClaimed: false, history: []
+        };
+
+        const todayStr = new Date().toDateString();
+        if (localStorage.getItem('zoiLastStreakDate_' + activeUser.id) !== todayStr) {
+            window.user.streakClaimed = false;
+        }
+
+        setTimeout(() => {
+            const levelBar = document.getElementById('level-bar');
+            if (levelBar) levelBar.style.width = '85%';
+        }, 500);
+
+        updateStats();
+
+        // --- Load badges ---
+        const badgeGrid = document.getElementById('badge-grid');
+        if (badgeGrid) {
+            let badgeHTML = '';
+            const badges = (typeof ZoiGamification !== 'undefined') ? ZoiGamification.getBadges() : [
+                { name: 'First Order', desc: 'You placed your first order!', icon: 'star', color: 'amber', status: 'active' },
+                { name: 'Burger Boss', desc: 'Order 3 burgers', icon: 'lunch_dining', color: 'orange', status: 'inactive' },
+                { name: 'Night Owl', desc: 'Order after 10PM', icon: 'dark_mode', color: 'purple', status: 'inactive' }
+            ];
+            badges.slice(0, 6).forEach((b) => {
+                const unlocked = b.status === 'active';
+                if (unlocked) {
+                    badgeHTML += `<div onclick="showBadge('${b.name}', '${b.desc}', true)" class="flex flex-col items-center gap-2 cursor-pointer group">
+                        <div class="size-14 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 p-0.5 shadow-lg group-hover:scale-110 transition-transform">
+                            <div class="size-full rounded-full bg-surface-dark flex items-center justify-center">
+                                <span class="material-symbols-outlined text-2xl text-amber-400">${b.icon}</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold text-center uppercase text-text-secondary-dark">${b.name}</span>
+                    </div>`;
+                } else {
+                    badgeHTML += `<div onclick="showBadge('${b.name}', '${b.desc}', false)" class="flex flex-col items-center gap-2 cursor-pointer group grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all">
+                        <div class="size-14 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
+                            <span class="material-symbols-outlined text-2xl text-gray-500">${b.icon}</span>
+                        </div>
+                        <span class="text-[10px] font-bold text-center uppercase text-gray-500">${b.name}</span>
+                    </div>`;
+                }
+            });
+            badgeGrid.innerHTML = badgeHTML || '<p class="text-gray-500 col-span-3 text-xs text-center">Keep ordering to unlock badges!</p>';
+        }
+
+        // --- Load history ---
+        const historyList = document.getElementById('history-list');
+        if (historyList) historyList.innerHTML = '';
+        if (window.user.history && window.user.history.length > 0) {
+            window.user.history.forEach(h => addHistory(h.title, h.amount, h.colorClass, false));
+        } else {
+            addHistory('Welcome Bonus', '+2000', 'text-green-400', false);
+        }
+
+        // --- Streak state ---
+        const dailyBonusBtn = document.getElementById('daily-bonus-btn');
+        const streakText = document.getElementById('streak-text');
+        if (window.user.streakClaimed && dailyBonusBtn && streakText) {
+            streakText.innerText = 'Streak Active (5 Days)';
+            dailyBonusBtn.className = 'absolute top-0 right-0 p-3 bg-gray-700 text-gray-400 cursor-default text-xs font-bold uppercase rounded-bl-xl border-l border-b border-gray-600 flex items-center gap-2';
+        }
+
+        // --- Logout button ---
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) logoutBtn.addEventListener('click', () => { if (typeof ZoiCustomer !== 'undefined') ZoiCustomer.logout(); });
+    });
+</script>
+
+<script src="js/zoi_ai_assistant.js?v=4"></script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>

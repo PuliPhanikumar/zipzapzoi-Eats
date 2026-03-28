@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hosteler Feedback - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1));
+            color: #ec4899;
+            border-color: rgba(236, 72, 153, 0.3);
+            font-weight: 700;
+        }
+
+        .star {
+            cursor: pointer;
+            font-size: 28px;
+            color: #374151;
+            transition: all 0.2s;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #f59e0b;
+            transform: scale(1.15);
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Hosteler Feedback <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">rate_review</span></h2>
+                <p class="text-gray-400 text-sm">5-star ratings, anonymous feedback, satisfaction trends, and Net
+                    Promoter Score.</p>
+            </div>
+        </header>
+
+        <!-- NPS + Rating Summary -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-6 py-4 flex items-center gap-4 bouncy-card">
+                <div class="text-center">
+                    <p class="text-4xl font-extrabold text-green-400">72</p>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">NPS Score</p>
+                </div>
+                <div class="h-10 w-px bg-border"></div>
+                <div class="text-xs text-gray-400 leading-relaxed">Promoters: <span
+                        class="text-green-400 font-bold">78%</span><br>Passives: <span
+                        class="text-amber-400 font-bold">16%</span><br>Detractors: <span
+                        class="text-red-400 font-bold">6%</span></div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">star</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Avg Rating</p>
+                    <p class="text-xl font-extrabold text-amber-400" id="avg-rating">0.0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-pink-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-pink-400">forum</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Feedback</p>
+                    <p class="text-xl font-extrabold text-white" id="total-fb">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-green-400">sentiment_satisfied</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Positive</p>
+                    <p class="text-xl font-extrabold text-green-400" id="positive-pct">0%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="px-8 pt-4 flex gap-2 flex-shrink-0">
+            <button class="tab-btn active px-4 py-2 text-xs rounded-xl border border-white/10" data-tab="overview"
+                onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-tab="feedbacks" onclick="switchTab('feedbacks')">All Feedback</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400" data-tab="survey"
+                onclick="switchTab('survey')">Submit Survey</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+            <!-- OVERVIEW -->
+            <div id="tab-overview" class="tab-content">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Category Ratings -->
+                    <div class="glass-panel p-6 bouncy-card">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-amber-400 text-lg">bar_chart</span> Category
+                            Ratings</h3>
+                        <div class="space-y-4" id="cat-ratings"></div>
+                    </div>
+                    <!-- Satisfaction Trend -->
+                    <div class="glass-panel p-6 bouncy-card">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-teal text-lg">trending_up</span> Monthly
+                            Satisfaction Trend</h3>
+                        <canvas id="trend-chart" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Sentiment Distribution -->
+                    <div class="glass-panel p-6 bouncy-card">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-pink-400 text-lg">pie_chart</span> Sentiment
+                            Distribution</h3>
+                        <canvas id="sentiment-chart" height="200"></canvas>
+                    </div>
+                    <!-- Recent Highlights -->
+                    <div class="glass-panel p-6 bouncy-card">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-violet-400 text-lg">auto_awesome</span> AI
+                            Feedback Highlights</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 bg-green-500/5 rounded-xl border border-green-500/10">
+                                <p class="text-xs text-gray-300"><span class="text-green-400 font-bold">Praise:</span>
+                                    "Mess food quality has improved significantly in Feb. Multiple hostelers mentioned
+                                    the new breakfast menu."</p>
+                            </div>
+                            <div class="p-3 bg-red-500/5 rounded-xl border border-red-500/10">
+                                <p class="text-xs text-gray-300"><span class="text-red-400 font-bold">Concern:</span> "3
+                                    hostelers flagged Wi-Fi issues on Floor 3. Consider bandwidth upgrade for that
+                                    wing."</p>
+                            </div>
+                            <div class="p-3 bg-amber-500/5 rounded-xl border border-amber-500/10">
+                                <p class="text-xs text-gray-300"><span
+                                        class="text-amber-400 font-bold">Suggestion:</span> "Request for gaming room or
+                                    recreation area received 4 times this month."</p>
+                            </div>
+                            <div class="p-3 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                                <p class="text-xs text-gray-300"><span class="text-blue-400 font-bold">Trend:</span>
+                                    "Overall satisfaction up 8% from Jan → Feb. Cleanliness score improved the most
+                                    (+15%)."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALL FEEDBACK -->
+            <div id="tab-feedbacks" class="tab-content hidden">
+                <div class="flex items-center gap-3 mb-4">
+                    <select id="fb-filter" onchange="renderFeedback()"
+                        class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-2 text-gray-300">
+                        <option value="all">All Sentiment</option>
+                        <option value="positive">😊 Positive</option>
+                        <option value="neutral">😐 Neutral</option>
+                        <option value="negative">😞 Negative</option>
+                    </select>
+                    <input type="text" id="fb-search" oninput="renderFeedback()" placeholder="Search feedback..."
+                        class="bg-surface/50 border border-white/10 rounded-full py-2 pl-4 pr-4 text-xs text-white focus:outline-none focus:border-pink-500 w-48">
+                </div>
+                <div class="space-y-4" id="feedback-list"></div>
+            </div>
+
+            <!-- SUBMIT SURVEY -->
+            <div id="tab-survey" class="tab-content hidden">
+                <div class="max-w-lg mx-auto">
+                    <div class="glass-panel p-6 mb-6">
+                        <h3 class="font-bold text-white text-lg mb-2 text-center">Rate Your Experience</h3>
+                        <p class="text-sm text-gray-400 text-center mb-6">Help us improve. Your feedback is valuable!
+                        </p>
+                        <div class="space-y-5" id="survey-categories"></div>
+                    </div>
+                    <div class="glass-panel p-6 mb-6">
+                        <h3 class="font-bold text-white text-sm mb-3">Additional Comments</h3>
+                        <textarea id="survey-comment" rows="3"
+                            placeholder="Tell us what you liked, or what we can improve..."
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none resize-none"></textarea>
+                        <label class="flex items-center gap-2 cursor-pointer mt-3"><input type="checkbox"
+                                id="survey-anon" class="accent-pink-500 w-4 h-4"><span
+                                class="text-sm text-gray-300">Submit anonymously</span></label>
+                    </div>
+                    <button onclick="submitSurvey()"
+                        class="w-full py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] flex items-center justify-center gap-2"><span
+                            class="material-symbols-outlined text-sm">send</span> Submit Feedback</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const CATEGORIES = ['Room Cleanliness', 'Mess Food', 'Staff Behavior', 'Wi-Fi & Facilities', 'Security'];
+        const CAT_RATINGS_DATA = [4.2, 3.8, 4.5, 3.3, 4.1];
+        const surveyRatings = [0, 0, 0, 0, 0];
+
+        const FEEDBACKS = [
+            { name: 'Ravi Kumar', room: '101', date: '2026-03-04', rating: 5, sentiment: 'positive', comment: 'Excellent food quality this month! The new breakfast menu with idli-vada is amazing. Staff is very helpful, especially the housekeeping team.', anonymous: false, responded: true, response: 'Thank you Ravi! We\'re glad you enjoy the new menu.' },
+            { name: 'Deepak S.', room: '102', date: '2026-03-03', rating: 4, sentiment: 'positive', comment: 'Rooms are clean and well maintained. Only issue is Wi-Fi on Floor 1 is a bit slow during peak hours (9-11 PM).', anonymous: false, responded: false, response: null },
+            { name: 'Anonymous', room: '—', date: '2026-03-03', rating: 2, sentiment: 'negative', comment: 'Hot water supply is inconsistent in the morning. Sometimes no hot water at all even at 6 AM. This needs urgent fixing.', anonymous: true, responded: true, response: 'We\'ve scheduled a geyser inspection for March 5. Sorry for the inconvenience.' },
+            { name: 'Priya S.', room: '301', date: '2026-03-02', rating: 4, sentiment: 'positive', comment: 'Love the Holi celebration initiative! Also, the new laundry service is very convenient. Would love a gaming room too!', anonymous: false, responded: false, response: null },
+            { name: 'Sanjay V.', room: '201', date: '2026-03-01', rating: 3, sentiment: 'neutral', comment: 'Everything is average. Dinner variety could be better — too much rice-based. Would appreciate more roti/chapati options.', anonymous: false, responded: true, response: 'Noted! We\'ll add more roti options starting next week.' },
+            { name: 'Anonymous', room: '—', date: '2026-02-28', rating: 1, sentiment: 'negative', comment: 'Night security guard sleeping on duty multiple times. Very concerning for safety. Please address this immediately.', anonymous: true, responded: true, response: 'This has been reported to the owner. Strict action will be taken. Thank you for reporting.' },
+            { name: 'Kiran R.', room: '103', date: '2026-02-27', rating: 5, sentiment: 'positive', comment: 'Best hostel I\'ve stayed in! The management is very responsive to complaints. Rent is fair for the facilities provided.', anonymous: false, responded: false, response: null },
+            { name: 'Sneha Sharma', room: '301', date: '2026-02-25', rating: 4, sentiment: 'positive', comment: 'Good facilities overall. Parking area could be better organized. Also, please add a water purifier on Floor 3.', anonymous: false, responded: true, response: 'Water purifier for Floor 3 has been ordered. Should be installed by March 10.' },
+        ];
+
+        const SENTIMENT_MAP = { positive: { icon: '😊', color: 'green', label: 'Positive' }, neutral: { icon: '😐', color: 'amber', label: 'Neutral' }, negative: { icon: '😞', color: 'red', label: 'Negative' } };
+
+        function renderCategoryRatings() {
+            document.getElementById('cat-ratings').innerHTML = CATEGORIES.map((cat, i) => {
+                const r = CAT_RATINGS_DATA[i];
+                const w = (r / 5) * 100;
+                const clr = r >= 4 ? 'green' : r >= 3 ? 'amber' : 'red';
+                return `<div><div class="flex justify-between text-xs mb-1"><span class="text-gray-300">${cat}</span><span class="text-${clr}-400 font-bold">${r.toFixed(1)} ★</span></div><div class="h-2 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-${clr}-500 to-${clr}-400 rounded-full transition-all" style="width:${w}%"></div></div></div>`;
+            }).join('');
+        }
+
+        function initCharts() {
+            new Chart(document.getElementById('trend-chart'), { type: 'line', data: { labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'], datasets: [{ label: 'Satisfaction', data: [3.5, 3.7, 3.6, 3.9, 4.0, 4.2, 4.1], borderColor: '#00D4C5', backgroundColor: 'rgba(0,212,197,0.08)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#00D4C5' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 9 } } }, y: { min: 1, max: 5, grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 9 } } } }, plugins: { legend: { display: false } } } });
+            new Chart(document.getElementById('sentiment-chart'), { type: 'doughnut', data: { labels: ['Positive', 'Neutral', 'Negative'], datasets: [{ data: [65, 20, 15], backgroundColor: ['rgba(34,197,94,0.5)', 'rgba(251,191,36,0.5)', 'rgba(239,68,68,0.5)'], borderWidth: 0, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 10 }, padding: 12 } } } } });
+        }
+
+        function renderFeedback() {
+            const q = (document.getElementById('fb-search').value || '').toLowerCase();
+            const sf = document.getElementById('fb-filter').value;
+            let items = [...FEEDBACKS];
+            if (sf !== 'all') items = items.filter(f => f.sentiment === sf);
+            if (q) items = items.filter(f => f.comment.toLowerCase().includes(q) || f.name.toLowerCase().includes(q));
+
+            document.getElementById('feedback-list').innerHTML = items.map((f, i) => {
+                const s = SENTIMENT_MAP[f.sentiment];
+                const stars = '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating);
+                return `<div class="glass-panel p-0 overflow-hidden bouncy-card fade-row" style="animation-delay:${i * 50}ms">
+                    <div class="p-5 flex items-start gap-4">
+                        <div class="h-10 w-10 rounded-full ${f.anonymous ? 'bg-gray-500/20' : 'bg-pink-500/20'} flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined ${f.anonymous ? 'text-gray-400' : 'text-pink-400'}">${f.anonymous ? 'visibility_off' : 'person'}</span></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <span class="font-bold text-white text-sm">${f.name}</span>
+                                ${f.room !== '—' ? `<span class="text-[10px] text-gray-500">Room ${f.room}</span>` : ''}
+                                <span class="bg-${s.color}-500/20 text-${s.color}-400 px-2 py-0.5 rounded text-[10px] font-bold">${s.icon} ${s.label}</span>
+                                <span class="text-amber-400 text-xs font-bold ml-auto">${stars}</span>
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">${f.comment}</p>
+                            <p class="text-[10px] text-gray-500 mt-2">${f.date}</p>
+                            ${f.responded ? `<div class="mt-3 p-3 bg-teal/5 border border-teal/15 rounded-lg"><p class="text-[10px] text-teal font-bold mb-0.5">↪ Management Response:</p><p class="text-xs text-gray-300">${f.response}</p></div>` : `<button onclick="this.parentElement.innerHTML+='<div class=\\'mt-3 p-3 bg-white/5 border border-white/10 rounded-lg\\'><textarea class=\\'w-full bg-transparent text-xs text-white resize-none\\' rows=\\'2\\' placeholder=\\'Write a response...\\'></textarea><button class=\\'mt-1 text-[10px] text-pink-400 font-bold\\'>Send Response</button></div>';this.remove()" class="mt-2 text-[10px] text-pink-400 bg-pink-500/10 px-3 py-1 rounded font-bold hover:bg-pink-500/20">Reply</button>`}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderSurvey() {
+            document.getElementById('survey-categories').innerHTML = CATEGORIES.map((cat, i) => `<div class="flex items-center justify-between py-2 border-b border-border last:border-0">
+                <span class="text-sm text-gray-300 font-medium">${cat}</span>
+                <div class="flex gap-1" id="survey-stars-${i}">${[1, 2, 3, 4, 5].map(s => `<span class="star material-symbols-outlined" onclick="rateSurvey(${i},${s})" onmouseenter="hoverStar(${i},${s})" onmouseleave="unhoverStar(${i})">star</span>`).join('')}</div>
+            </div>`).join('');
+        }
+
+        function rateSurvey(cat, val) { surveyRatings[cat] = val; updateSurveyStars(cat); }
+        function hoverStar(cat, val) { const stars = document.querySelectorAll(`#survey-stars-${cat} .star`); stars.forEach((s, i) => { s.classList.toggle('active', i < val); }); }
+        function unhoverStar(cat) { updateSurveyStars(cat); }
+        function updateSurveyStars(cat) { const stars = document.querySelectorAll(`#survey-stars-${cat} .star`); stars.forEach((s, i) => { s.classList.toggle('active', i < surveyRatings[cat]); }); }
+
+        function submitSurvey() {
+            const avg = surveyRatings.reduce((a, b) => a + b, 0) / surveyRatings.length;
+            if (avg === 0) { alert('Please rate at least one category.'); return; }
+            const comment = document.getElementById('survey-comment').value || '—';
+            const anon = document.getElementById('survey-anon').checked;
+            const sentiment = avg >= 4 ? 'positive' : avg >= 3 ? 'neutral' : 'negative';
+            FEEDBACKS.unshift({ name: anon ? 'Anonymous' : 'Hostel Admin', room: anon ? '—' : '—', date: new Date().toISOString().split('T')[0], rating: Math.round(avg), sentiment, comment, anonymous: anon, responded: false, response: null });
+            alert('✅ Thank you! Feedback submitted successfully.');
+            switchTab('feedbacks'); renderFeedback(); updateStats();
+        }
+
+        function updateStats() {
+            const avg = FEEDBACKS.reduce((s, f) => s + f.rating, 0) / FEEDBACKS.length;
+            document.getElementById('avg-rating').innerText = avg.toFixed(1) + ' ★';
+            document.getElementById('total-fb').innerText = FEEDBACKS.length;
+            const pos = Math.round(FEEDBACKS.filter(f => f.sentiment === 'positive').length / FEEDBACKS.length * 100);
+            document.getElementById('positive-pct').innerText = pos + '%';
+        }
+
+        function switchTab(t) { document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.getElementById('tab-' + t).classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); }); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.add('active'); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.remove('text-gray-400'); }
+
+        document.addEventListener('DOMContentLoaded', () => { renderCategoryRatings(); initCharts(); renderFeedback(); renderSurvey(); updateStats(); });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

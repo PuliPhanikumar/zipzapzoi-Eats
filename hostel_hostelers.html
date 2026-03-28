@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostelers (KYC) - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { primary: "#00f0ff", teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" },
+                    fontFamily: { sans: ["Manrope", "sans-serif"] },
+                    animation: { 'bounce-subtle': 'bounceSubtle 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards' },
+                    keyframes: { bounceSubtle: { '0%': { transform: 'scale(0.95)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } } }
+                }
+            }
+        };
+    </script>
+    <script src="hostel_shared.js"></script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ec4899;
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1));
+            color: #ec4899;
+            border-color: rgba(236, 72, 153, 0.3);
+            font-weight: 700;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        .kyc-verified {
+            box-shadow: 0 0 0 2px rgba(0, 212, 197, 0.3);
+        }
+
+        .kyc-pending {
+            box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3);
+        }
+
+        .kyc-rejected {
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+
+    <!-- SIDEBAR -->
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- Header -->
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Hostelers <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">badge</span></h2>
+                <p class="text-gray-400 text-sm">Manage hosteler profiles, KYC documents, and check-in/check-out
+                    records.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span
+                            class="material-symbols-outlined text-gray-500">search</span></div>
+                    <input type="text" id="search-hostelers" oninput="renderHostelers()"
+                        class="bg-surface/50 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-pink-500 w-56 transition-all"
+                        placeholder="Search hostelers...">
+                </div>
+                <button onclick="openAdmitModal()"
+                    class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-shadow">
+                    <span class="material-symbols-outlined text-sm">person_add</span> New Admission
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-pink-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-pink-400">groups</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Hostelers</p>
+                    <p class="text-xl font-extrabold text-white" id="stat-total">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-teal/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-teal">verified</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">KYC Verified</p>
+                    <p class="text-xl font-extrabold text-teal" id="stat-verified">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">pending</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">KYC Pending</p>
+                    <p class="text-xl font-extrabold text-amber-400" id="stat-pending">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-green-400">login</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Checked-In</p>
+                    <p class="text-xl font-extrabold text-green-400" id="stat-checkedin">0</p>
+                </div>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+                <select id="filter-kyc" onchange="renderHostelers()"
+                    class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-1.5 text-gray-300 focus:outline-none focus:border-pink-500">
+                    <option value="all">All KYC</option>
+                    <option value="verified">Verified</option>
+                    <option value="pending">Pending</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <select id="filter-status" onchange="renderHostelers()"
+                    class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-1.5 text-gray-300 focus:outline-none focus:border-pink-500">
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="checked-out">Checked Out</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="px-8 pt-4 flex gap-2 flex-shrink-0">
+            <button class="tab-btn active px-4 py-2 text-xs rounded-xl border border-white/10" data-tab="profiles"
+                onclick="switchTab('profiles')">Hosteler Profiles</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-tab="checkinout" onclick="switchTab('checkinout')">Check-In / Check-Out Log</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-tab="documents" onclick="switchTab('documents')">Document Vault</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+
+            <!-- PROFILES TAB -->
+            <div id="tab-profiles" class="tab-content">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="hosteler-grid">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+
+            <!-- CHECK-IN/OUT LOG TAB -->
+            <div id="tab-checkinout" class="tab-content hidden">
+                <div class="glass-panel p-0 overflow-hidden">
+                    <div class="p-4 border-b border-border flex items-center justify-between">
+                        <h3 class="font-bold text-white text-sm">Recent Check-In / Check-Out Activity</h3>
+                        <select class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-1.5 text-gray-300">
+                            <option>All Time</option>
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                        </select>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Hosteler</th>
+                                <th class="py-3 px-4">Room</th>
+                                <th class="py-3 px-4">Type</th>
+                                <th class="py-3 px-4">Date</th>
+                                <th class="py-3 px-4">Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody id="log-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- DOCUMENT VAULT TAB -->
+            <div id="tab-documents" class="tab-content hidden">
+                <div class="glass-panel p-0 overflow-hidden">
+                    <div class="p-4 border-b border-border flex items-center justify-between">
+                        <h3 class="font-bold text-white text-sm flex items-center gap-2"><span
+                                class="material-symbols-outlined text-pink-400 text-lg">folder_open</span> Uploaded KYC
+                            Documents</h3>
+                        <p class="text-xs text-gray-500">All documents are encrypted with AES-256 at rest</p>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Hosteler</th>
+                                <th class="py-3 px-4">Document Type</th>
+                                <th class="py-3 px-4">ID Number</th>
+                                <th class="py-3 px-4">Uploaded</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="docs-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ADMIT HOSTELER MODAL -->
+    <div id="admit-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg p-0 animate-bounce-subtle">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-500">person_add</span> New Hosteler Admission</h3>
+                <button onclick="closeAdmitModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5 max-h-[65vh] overflow-y-auto">
+                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Personal Details</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="adm-name" type="text" placeholder="Full Name *"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <input id="adm-mobile" type="tel" placeholder="Mobile *"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="adm-email" type="email" placeholder="Email"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <select id="adm-gender"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">Gender *</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="adm-dob" type="date"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    <select id="adm-blood"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">Blood Group</option>
+                        <option>A+</option>
+                        <option>A-</option>
+                        <option>B+</option>
+                        <option>B-</option>
+                        <option>O+</option>
+                        <option>O-</option>
+                        <option>AB+</option>
+                        <option>AB-</option>
+                    </select>
+                </div>
+                <input id="adm-address" type="text" placeholder="Permanent Address *"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="adm-college" type="text" placeholder="College / Company"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <input id="adm-purpose" type="text" placeholder="Purpose of Stay"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+
+                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2">Guardian / Emergency</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="adm-guardian" type="text" placeholder="Guardian Name *"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <input id="adm-guardian-phone" type="tel" placeholder="Guardian Mobile *"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+                <input id="adm-emergency" type="tel" placeholder="Emergency Contact (if different)"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+
+                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2">KYC / ID Verification</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="adm-idtype"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">ID Type *</option>
+                        <option>Aadhaar Card</option>
+                        <option>PAN Card</option>
+                        <option>Voter ID</option>
+                        <option>Driving License</option>
+                        <option>Passport</option>
+                    </select>
+                    <input id="adm-idnum" type="text" placeholder="ID Number *"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+                <!-- ID Document Upload Field -->
+                <div
+                    class="border border-dashed border-white/20 rounded-xl p-4 text-center bg-bg relative hover:border-pink-500/50 transition-colors group">
+                    <input type="file" id="adm-iddoc" accept=".pdf,image/*"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                    <div class="pointer-events-none">
+                        <span
+                            class="material-symbols-outlined text-gray-400 group-hover:text-pink-400 text-3xl mb-1 transition-colors">upload_file</span>
+                        <p class="text-xs text-gray-300 font-bold">Upload ID Document *</p>
+                        <p class="text-[10px] text-gray-500 mt-1">JPEG, PNG, or PDF. Max 5MB.</p>
+                        <div id="adm-filename" class="text-xs font-bold text-teal mt-2 hidden"></div>
+                    </div>
+                </div>
+                <div
+                    class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-300 flex items-start gap-2">
+                    <span class="material-symbols-outlined text-sm mt-0.5">info</span>
+                    <span>Physical ID proof copies should be collected and filed. Digital upload can be done from the
+                        Document Vault tab after admission.</span>
+                </div>
+
+                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-2">Room Assignment</p>
+                <div class="grid grid-cols-3 gap-3">
+                    <select id="adm-room"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">Room *</option>
+                        <option>101</option>
+                        <option>102</option>
+                        <option>103</option>
+                        <option>201</option>
+                        <option>202</option>
+                        <option>203</option>
+                        <option>301</option>
+                        <option>302</option>
+                    </select>
+                    <select id="adm-bed"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">Bed *</option>
+                        <option>A</option>
+                        <option>B</option>
+                        <option>C</option>
+                        <option>D</option>
+                    </select>
+                    <input id="adm-checkin" type="date"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="adm-messplan"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">Mess Plan</option>
+                        <option>With Mess (₹3,500/mo)</option>
+                        <option>Without Mess</option>
+                    </select>
+                    <select id="adm-duration"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">Stay Duration</option>
+                        <option>1 Month</option>
+                        <option>3 Months</option>
+                        <option>6 Months</option>
+                        <option>12 Months</option>
+                    </select>
+                </div>
+            </div>
+            <div class="p-5 border-t border-border flex gap-3">
+                <button onclick="closeAdmitModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">Cancel</button>
+                <button onclick="admitHosteler()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-shadow flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-sm">how_to_reg</span> Admit Hosteler
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE DETAIL MODAL -->
+    <div id="profile-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0 animate-bounce-subtle">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white" id="profile-modal-title">Profile</h3>
+                <button onclick="closeProfileModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5" id="profile-modal-body"></div>
+            <div class="p-4 border-t border-border flex gap-2" id="profile-modal-actions"></div>
+        </div>
+    </div>
+
+    <!-- DOCUMENT MODAL -->
+    <div id="doc-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-2xl p-0 animate-bounce-subtle">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white" id="doc-modal-title">Document Viewer</h3>
+                <button onclick="closeDocModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 flex flex-col items-center justify-center bg-black/50 min-h-[400px]">
+                <span class="material-symbols-outlined text-6xl text-pink-500/50 mb-4">description</span>
+                <p class="text-gray-300 font-bold" id="doc-modal-filename">document.pdf</p>
+                <p class="text-xs text-gray-500 mt-2 text-center max-w-md">In a real environment, this would display the
+                    uploaded PDF or high-resolution image.<br>For this demo ecosystem, the file metadata is securely
+                    stored.</p>
+            </div>
+            <div class="p-4 border-t border-border flex justify-end gap-2">
+                <button onclick="closeDocModal()"
+                    class="py-2.5 px-6 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] transition-shadow">Close
+                    Document</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === HOSTELER DATA ===
+        let HOSTELERS = ZoiDB.get('hostelers', [
+            { id: 1, name: 'Ravi Kumar', mobile: '9876543210', email: 'ravi@email.com', gender: 'Male', dob: '2002-05-12', blood: 'B+', address: 'Vijayawada, AP', college: 'RVCE Bengaluru', purpose: 'Studies', guardian: 'Suresh Kumar', guardianPhone: '9876000001', emergency: '9876000002', idType: 'Aadhaar Card', idNum: 'XXXX-XXXX-4521', kyc: 'verified', room: '101', bed: 'A', checkin: '2025-08-15', status: 'active', messPlan: 'With Mess', duration: '12 Months', photo: null, documentName: 'aadhaar_front.pdf' },
+            { id: 2, name: 'Deepak S.', mobile: '9988776655', email: 'deepak@email.com', gender: 'Male', dob: '2001-11-03', blood: 'O+', address: 'Hyderabad, TS', college: 'IIIT Bengaluru', purpose: 'Studies', guardian: 'Srinivas D.', guardianPhone: '9988000001', emergency: '9988000002', idType: 'Aadhaar Card', idNum: 'XXXX-XXXX-7832', kyc: 'verified', room: '102', bed: 'A', checkin: '2025-11-01', status: 'active', messPlan: 'With Mess', duration: '6 Months', photo: null, documentName: 'id_proof.jpg' },
+            { id: 3, name: 'Rahul Kumar', mobile: '9123456780', email: 'rahul.k@email.com', gender: 'Male', dob: '2003-02-28', blood: 'A+', address: 'Patna, Bihar', college: 'PES University', purpose: 'Studies', guardian: 'Rajesh Kumar', guardianPhone: '9123000001', emergency: null, idType: 'Aadhaar Card', idNum: 'XXXX-XXXX-9145', kyc: 'pending', room: '102', bed: 'B', checkin: '2026-01-10', status: 'active', messPlan: 'With Mess', duration: '6 Months', photo: null, documentName: 'rahul_id_scan.png' },
+            { id: 4, name: 'Manoj P.', mobile: '9001122334', email: 'manoj@work.com', gender: 'Male', dob: '1998-07-15', blood: 'AB-', address: 'Chennai, TN', college: 'Infosys', purpose: 'Working Professional', guardian: 'Perumal M.', guardianPhone: '9001000001', emergency: '9001000002', idType: 'PAN Card', idNum: 'ABCDE1234F', kyc: 'verified', room: '103', bed: 'A', checkin: '2025-06-01', status: 'active', messPlan: 'Without Mess', duration: '12 Months', photo: null, documentName: 'pan_card.jpg' },
+            { id: 5, name: 'Kiran R.', mobile: '9112233445', email: 'kiran.r@email.com', gender: 'Male', dob: '2002-09-20', blood: 'B-', address: 'Vizag, AP', college: 'MSRIT', purpose: 'Studies', guardian: 'Ramesh R.', guardianPhone: '9112000001', emergency: null, idType: 'Aadhaar Card', idNum: 'XXXX-XXXX-3367', kyc: 'verified', room: '103', bed: 'B', checkin: '2025-09-20', status: 'active', messPlan: 'With Mess', duration: '12 Months', photo: null, documentName: 'aadhaar_doc.pdf' },
+            { id: 6, name: 'Sanjay V.', mobile: '9223344556', email: 'sanjay@email.com', gender: 'Male', dob: '2000-01-08', blood: 'O-', address: 'Mangalore, KA', college: 'TCS', purpose: 'Working Professional', guardian: 'Venkatesh S.', guardianPhone: '9223000001', emergency: '9223000002', idType: 'Driving License', idNum: 'KA-19-2020-0045621', kyc: 'verified', room: '201', bed: 'B', checkin: '2025-12-01', status: 'active', messPlan: 'With Mess', duration: '6 Months', photo: null, documentName: 'dl_front.jpg' },
+            { id: 7, name: 'Anil K.', mobile: '9334455667', email: 'anil@email.com', gender: 'Male', dob: '2003-06-14', blood: 'A-', address: 'Kurnool, AP', college: 'BMS College', purpose: 'Studies', guardian: 'Krishna K.', guardianPhone: '9334000001', emergency: null, idType: 'Aadhaar Card', idNum: 'XXXX-XXXX-6678', kyc: 'pending', room: '202', bed: 'A', checkin: '2026-01-15', status: 'active', messPlan: 'With Mess', duration: '3 Months', photo: null, documentName: null },
+            { id: 8, name: 'Priya S.', mobile: '9667788990', email: 'priya.s@email.com', gender: 'Female', dob: '2001-03-22', blood: 'B+', address: 'Mysore, KA', college: 'Christ University', purpose: 'Studies', guardian: 'Shivakumar S.', guardianPhone: '9667000001', emergency: '9667000002', idType: 'Aadhaar Card', idNum: 'XXXX-XXXX-1154', kyc: 'verified', room: '301', bed: 'A', checkin: '2025-07-01', status: 'active', messPlan: 'With Mess', duration: '12 Months', photo: null, documentName: 'aadhaar.jpg' },
+            { id: 9, name: 'Sneha Sharma', mobile: '9778899001', email: 'sneha@email.com', gender: 'Female', dob: '2002-12-05', blood: 'O+', address: 'Jaipur, RJ', college: 'NMIT', purpose: 'Studies', guardian: 'Mohan Sharma', guardianPhone: '9778000001', emergency: null, idType: 'Voter ID', idNum: 'ABD1234567', kyc: 'rejected', room: '301', bed: 'C', checkin: '2026-02-01', status: 'active', messPlan: 'With Mess', duration: '6 Months', photo: null, documentName: 'voter_id_copy.pdf' },
+            { id: 10, name: 'Lakshmi N.', mobile: '9889900112', email: 'lakshmi@email.com', gender: 'Female', dob: '2000-08-30', blood: 'A+', address: 'Tirupati, AP', college: 'Wipro', purpose: 'Working Professional', guardian: 'Narayana N.', guardianPhone: '9889000001', emergency: '9889000002', idType: 'Aadhaar Card', idNum: 'XXXX-XXXX-8823', kyc: 'verified', room: '302', bed: 'B', checkin: '2025-05-01', status: 'active', messPlan: 'Without Mess', duration: '12 Months', photo: null, documentName: 'id_doc_lakshmi.pdf' },
+            { id: 11, name: 'Vijay D.', mobile: '9445566778', email: 'vijay@email.com', gender: 'Male', dob: '2003-04-18', blood: 'AB+', address: 'Coimbatore, TN', college: 'RV University', purpose: 'Studies', guardian: 'Duraiswamy V.', guardianPhone: '9445000001', emergency: null, idType: 'Aadhaar Card', idNum: 'XXXX-XXXX-5590', kyc: 'verified', room: '202', bed: 'B', checkin: '2026-01-15', status: 'active', messPlan: 'With Mess', duration: '3 Months', photo: null, documentName: 'vijay_id.jpg' },
+            { id: 12, name: 'Arjun M.', mobile: '9556600001', email: 'arjun@email.com', gender: 'Male', dob: '2002-07-25', blood: 'O+', address: 'Hubli, KA', college: 'DSCE', purpose: 'Studies', guardian: 'Mohan M.', guardianPhone: '9556000001', emergency: null, idType: 'Aadhaar Card', idNum: 'XXXX-XXXX-7701', kyc: 'pending', room: null, bed: null, checkin: null, status: 'checked-out', messPlan: null, duration: null, photo: null, documentName: null },
+        ]);
+
+        let CHECK_LOG = ZoiDB.get('checklog', [
+            { name: 'Ravi Kumar', room: '101', type: 'check-in', date: '2025-08-15', reason: 'New Admission' },
+            { name: 'Deepak S.', room: '102', type: 'check-in', date: '2025-11-01', reason: 'New Admission' },
+            { name: 'Manoj P.', room: '103', type: 'check-in', date: '2025-06-01', reason: 'New Admission' },
+            { name: 'Priya S.', room: '301', type: 'check-in', date: '2025-07-01', reason: 'New Admission' },
+            { name: 'Lakshmi N.', room: '302', type: 'check-in', date: '2025-05-01', reason: 'New Admission' },
+            { name: 'Sanjay V.', room: '201', type: 'check-in', date: '2025-12-01', reason: 'Transfer from Room 105' },
+            { name: 'Rahul Kumar', room: '102', type: 'check-in', date: '2026-01-10', reason: 'New Admission' },
+            { name: 'Anil K.', room: '202', type: 'check-in', date: '2026-01-15', reason: 'New Admission' },
+            { name: 'Sneha Sharma', room: '301', type: 'check-in', date: '2026-02-01', reason: 'New Admission' },
+            { name: 'Arjun M.', room: '103', type: 'check-out', date: '2026-02-20', reason: 'Course Completed' },
+        ]);
+
+        const KYC_COLORS = { verified: 'teal', pending: 'amber', rejected: 'red' };
+        const KYC_ICONS = { verified: 'verified', pending: 'schedule', rejected: 'cancel' };
+
+        // === RENDER ===
+        function renderHostelers() {
+            const search = (document.getElementById('search-hostelers').value || '').toLowerCase();
+            const kycFilter = document.getElementById('filter-kyc').value;
+            const statusFilter = document.getElementById('filter-status').value;
+
+            let filtered = HOSTELERS.filter(h => {
+                if (search && !h.name.toLowerCase().includes(search) && !h.room?.includes(search) && !h.mobile.includes(search)) return false;
+                if (kycFilter !== 'all' && h.kyc !== kycFilter) return false;
+                if (statusFilter !== 'all' && h.status !== statusFilter) return false;
+                return true;
+            });
+
+            const grid = document.getElementById('hosteler-grid');
+            grid.innerHTML = filtered.map((h, i) => {
+                const initials = h.name.split(' ').map(w => w[0]).join('');
+                const kc = KYC_COLORS[h.kyc];
+                const ki = KYC_ICONS[h.kyc];
+                const age = h.dob ? Math.floor((Date.now() - new Date(h.dob)) / (365.25 * 24 * 60 * 60 * 1000)) : '—';
+                return `<div class="glass-panel p-0 overflow-hidden bouncy-card kyc-${h.kyc} fade-row" style="animation-delay:${i * 60}ms">
+                    <div class="p-4 flex items-start gap-3">
+                        <div class="h-12 w-12 rounded-full bg-gradient-to-br from-pink-500/30 to-purple-500/30 flex items-center justify-center text-pink-300 font-bold text-lg flex-shrink-0 border border-white/10">${initials}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <h4 class="font-bold text-white text-sm truncate">${h.name}</h4>
+                                <span class="material-symbols-outlined text-${kc}-400 text-sm" title="KYC ${h.kyc}">${ki}</span>
+                            </div>
+                            <p class="text-xs text-gray-400">${h.room ? `Room ${h.room} • Bed ${h.bed}` : 'No room assigned'}</p>
+                            <div class="flex items-center gap-3 mt-1.5 text-[10px] text-gray-500">
+                                <span>${h.gender} • ${age}y</span>
+                                <span>${h.blood || '—'}</span>
+                                ${h.status === 'active' ? '<span class="text-green-400 font-bold">● Active</span>' : '<span class="text-gray-500">○ Checked Out</span>'}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-4 pb-3 grid grid-cols-2 gap-2 text-[10px]">
+                        <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Mobile</span><span class="text-gray-300 font-bold">${h.mobile}</span></div>
+                        <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Guardian</span><span class="text-gray-300 font-bold truncate block">${h.guardian}</span></div>
+                        <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">ID</span><span class="text-gray-300 font-bold">${h.idType}</span></div>
+                        <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Since</span><span class="text-gray-300 font-bold">${h.checkin || '—'}</span></div>
+                    </div>
+                    <div class="p-3 border-t border-border flex gap-2">
+                        <button onclick="viewProfile(${h.id})" class="flex-1 py-2 text-xs font-bold text-pink-400 bg-pink-500/10 rounded-lg hover:bg-pink-500/20 transition-colors flex items-center justify-center gap-1"><span class="material-symbols-outlined text-xs">visibility</span>View</button>
+                        ${h.kyc === 'pending' ? `<button onclick="verifyKYC(${h.id})" class="flex-1 py-2 text-xs font-bold text-teal bg-teal/10 rounded-lg hover:bg-teal/20 transition-colors flex items-center justify-center gap-1"><span class="material-symbols-outlined text-xs">verified</span>Verify KYC</button>` : ''}
+                        ${h.status === 'active' ? `<button onclick="checkOut(${h.id})" class="py-2 px-3 text-xs font-bold text-red-400 bg-red-500/10 rounded-lg hover:bg-red-500/20 transition-colors" title="Check Out"><span class="material-symbols-outlined text-xs">logout</span></button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+
+            if (!filtered.length) grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-20"><span class="material-symbols-outlined text-6xl mb-3 block">person_search</span><p class="text-lg font-bold">No hostelers found</p></div>';
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total').innerText = HOSTELERS.length;
+            document.getElementById('stat-verified').innerText = HOSTELERS.filter(h => h.kyc === 'verified').length;
+            document.getElementById('stat-pending').innerText = HOSTELERS.filter(h => h.kyc === 'pending').length;
+            document.getElementById('stat-checkedin').innerText = HOSTELERS.filter(h => h.status === 'active').length;
+        }
+
+        function renderCheckLog() {
+            const tbody = document.getElementById('log-tbody');
+            tbody.innerHTML = [...CHECK_LOG].reverse().map((l, i) => `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+                <td class="py-3 px-4 font-bold text-white text-sm">${l.name}</td>
+                <td class="py-3 px-4 text-gray-300">${l.room}</td>
+                <td class="py-3 px-4">${l.type === 'check-in'
+                    ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 w-fit"><span class="material-symbols-outlined text-xs">login</span>Check-In</span>'
+                    : '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 w-fit"><span class="material-symbols-outlined text-xs">logout</span>Check-Out</span>'}</td>
+                <td class="py-3 px-4 text-gray-400 text-xs">${l.date}</td>
+                <td class="py-3 px-4 text-gray-400 text-xs">${l.reason}</td>
+            </tr>`).join('');
+        }
+
+        function renderDocuments() {
+            const tbody = document.getElementById('docs-tbody');
+            tbody.innerHTML = HOSTELERS.map((h, i) => {
+                const kc = KYC_COLORS[h.kyc];
+                return `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+                    <td class="py-3 px-4 font-bold text-white text-sm">${h.name}</td>
+                    <td class="py-3 px-4 text-gray-300">${h.idType}</td>
+                    <td class="py-3 px-4 text-gray-400 font-mono text-xs">${h.idNum}</td>
+                    <td class="py-3 px-4 text-gray-400 text-xs">${h.checkin || '—'}</td>
+                    <td class="py-3 px-4"><span class="bg-${kc}-500/20 text-${kc}-400 px-2 py-0.5 rounded text-[10px] font-bold capitalize">${h.kyc}</span></td>
+                    <td class="py-3 px-4 flex gap-1">
+                        ${h.documentName ? `<button onclick="viewDoc(${h.id})" class="text-xs text-pink-400 hover:bg-pink-500/10 px-2 py-1 rounded font-bold transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-xs">visibility</span>View</button>`
+                        : `<button onclick="uploadDoc(${h.id})" class="text-xs text-gray-400 hover:bg-white/10 px-2 py-1 rounded font-bold transition-colors flex items-center gap-1 border border-white/5"><span class="material-symbols-outlined text-xs">upload</span>Upload</button>`}
+                        ${h.kyc !== 'verified' ? `<button onclick="verifyKYC(${h.id})" class="text-xs text-teal hover:bg-teal/10 px-2 py-1 rounded font-bold transition-colors">Verify</button>` : ''}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // === TABS ===
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); });
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.remove('text-gray-400');
+        }
+
+        // === VIEW PROFILE ===
+        function viewProfile(id) {
+            const h = HOSTELERS.find(x => x.id === id);
+            const kc = KYC_COLORS[h.kyc];
+            const age = h.dob ? Math.floor((Date.now() - new Date(h.dob)) / (365.25 * 24 * 60 * 60 * 1000)) : '—';
+            document.getElementById('profile-modal-title').innerText = h.name;
+            document.getElementById('profile-modal-body').innerHTML = `
+                <div class="flex items-center gap-4 mb-5">
+                    <div class="h-16 w-16 rounded-full bg-gradient-to-br from-pink-500/30 to-purple-500/30 flex items-center justify-center text-pink-300 font-bold text-2xl border-2 border-white/10">${h.name.split(' ').map(w => w[0]).join('')}</div>
+                    <div>
+                        <p class="font-bold text-white text-lg">${h.name}</p>
+                        <p class="text-xs text-gray-400">${h.gender} • ${age}y • ${h.blood || '—'}</p>
+                        <div class="flex items-center gap-2 mt-1"><span class="bg-${kc}-500/20 text-${kc}-400 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1"><span class="material-symbols-outlined text-xs">${KYC_ICONS[h.kyc]}</span>KYC ${h.kyc}</span>
+                        ${h.status === 'active' ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">Active</span>' : '<span class="bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">Checked Out</span>'}</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2.5 text-xs">
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Mobile</span><span class="text-white font-bold">${h.mobile}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Email</span><span class="text-white font-bold truncate block">${h.email || '—'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Room</span><span class="text-white font-bold">${h.room ? h.room + ' / Bed ' + h.bed : '—'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Check-In</span><span class="text-white font-bold">${h.checkin || '—'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">College/Work</span><span class="text-white font-bold truncate block">${h.college || '—'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Purpose</span><span class="text-white font-bold">${h.purpose || '—'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">ID Type</span><span class="text-white font-bold">${h.idType}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">ID Number</span><span class="text-white font-bold font-mono">${h.idNum}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Mess Plan</span><span class="text-white font-bold">${h.messPlan || '—'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Duration</span><span class="text-white font-bold">${h.duration || '—'}</span></div>
+                </div>
+                <div class="mt-4 p-3 bg-violet-500/10 border border-violet-500/15 rounded-xl">
+                    <p class="text-[10px] font-bold text-violet-400 uppercase mb-1">Guardian / Emergency</p>
+                    <p class="text-xs text-gray-300"><strong class="text-white">${h.guardian}</strong> — ${h.guardianPhone}</p>
+                    ${h.emergency ? `<p class="text-xs text-gray-400 mt-0.5">Emergency: ${h.emergency}</p>` : ''}
+                </div>
+                <div class="mt-3 p-3 bg-white/[0.03] rounded-xl">
+                    <p class="text-[10px] font-bold text-gray-500 uppercase mb-1">Permanent Address</p>
+                    <p class="text-xs text-gray-300">${h.address}</p>
+                </div>`;
+            document.getElementById('profile-modal-actions').innerHTML = `
+                <button onclick="closeProfileModal()" class="flex-1 py-2.5 text-xs font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">Close</button>
+                ${h.kyc !== 'verified' ? `<button onclick="verifyKYC(${h.id});closeProfileModal();" class="flex-1 py-2.5 text-xs font-bold text-teal bg-teal/10 border border-teal/30 rounded-xl hover:bg-teal/20 transition-colors">Verify KYC</button>` : ''}
+                ${h.status === 'active' ? `<button onclick="checkOut(${h.id});closeProfileModal();" class="py-2.5 px-4 text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl hover:bg-red-500/20 transition-colors">Check Out</button>` : ''}`;
+            document.getElementById('profile-modal').classList.remove('hidden'); document.getElementById('profile-modal').classList.add('flex');
+        }
+        function closeProfileModal() { document.getElementById('profile-modal').classList.add('hidden'); document.getElementById('profile-modal').classList.remove('flex'); }
+
+        // === ACTIONS ===
+        function verifyKYC(id) {
+            const h = HOSTELERS.find(x => x.id === id);
+            h.kyc = 'verified';
+            ZoiDB.set('hostelers', HOSTELERS);
+            renderHostelers(); renderDocuments();
+            showToast(`KYC Verified for ${h.name}!`, 'success');
+        }
+
+        function checkOut(id) {
+            if (!confirm('Confirm check-out for this hosteler?')) return;
+            const h = HOSTELERS.find(x => x.id === id);
+            h.status = 'checked-out';
+            h.room = null; // Important: Clear their room
+            CHECK_LOG.push({ name: h.name, room: h.room, type: 'check-out', date: new Date().toISOString().split('T')[0], reason: 'Manual Check-Out' });
+            ZoiDB.set('hostelers', HOSTELERS);
+            ZoiDB.set('checklog', CHECK_LOG);
+            renderHostelers(); renderCheckLog();
+            showToast(`${h.name} checked out successfully.`, 'success');
+        }
+
+        // === DOCUMENT VAULT EVENTS ===
+        function viewDoc(id) {
+            const h = HOSTELERS.find(x => x.id === id);
+            document.getElementById('doc-modal-title').innerText = `${h.name} - ${h.idType}`;
+            document.getElementById('doc-modal-filename').innerText = h.documentName;
+            document.getElementById('doc-modal').classList.remove('hidden');
+            document.getElementById('doc-modal').classList.add('flex');
+        }
+        function closeDocModal() { document.getElementById('doc-modal').classList.add('hidden'); document.getElementById('doc-modal').classList.remove('flex'); }
+
+        function uploadDoc(id) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.pdf,image/*';
+            input.onchange = e => {
+                if (e.target.files.length) {
+                    const h = HOSTELERS.find(x => x.id === id);
+                    if (h) h.documentName = e.target.files[0].name;
+                    ZoiDB.set('hostelers', HOSTELERS);
+                    renderDocuments();
+                    showToast('Document uploaded securely.', 'success');
+                }
+            };
+            input.click();
+        }
+
+        // === ADMIT MODAL ===
+        function openAdmitModal() {
+            document.getElementById('admit-modal').classList.remove('hidden');
+            document.getElementById('admit-modal').classList.add('flex');
+            document.getElementById('adm-checkin').value = new Date().toISOString().split('T')[0];
+            // Reset fields
+            document.getElementById('adm-iddoc').value = '';
+            document.getElementById('adm-filename').classList.add('hidden');
+            document.getElementById('adm-filename').innerText = '';
+        }
+        function closeAdmitModal() { document.getElementById('admit-modal').classList.add('hidden'); document.getElementById('admit-modal').classList.remove('flex'); }
+
+        // Preview file upload
+        document.getElementById('adm-iddoc').addEventListener('change', function (e) {
+            const label = document.getElementById('adm-filename');
+            if (this.files && this.files.length > 0) {
+                label.innerText = 'File: ' + this.files[0].name;
+                label.classList.remove('hidden');
+            } else {
+                label.classList.add('hidden');
+            }
+        });
+
+        function admitHosteler() {
+            const name = document.getElementById('adm-name').value.trim();
+            const mobile = document.getElementById('adm-mobile').value.trim();
+            const idType = document.getElementById('adm-idtype').value;
+            const idNum = document.getElementById('adm-idnum').value.trim();
+            const idDoc = document.getElementById('adm-iddoc').files[0];
+
+            if (!name || !mobile) { showToast('Name and mobile are required.', 'error'); return; }
+            if (!idType || !idNum || !idDoc) { showToast('ID Type, Number, and Document Upload are required for KYC.', 'error'); return; }
+
+            const newH = {
+                id: Date.now(),
+                name, mobile,
+                email: document.getElementById('adm-email').value || '',
+                gender: document.getElementById('adm-gender').value || 'Male',
+                dob: document.getElementById('adm-dob').value || null,
+                blood: document.getElementById('adm-blood').value || '',
+                address: document.getElementById('adm-address').value || '',
+                college: document.getElementById('adm-college').value || '',
+                purpose: document.getElementById('adm-purpose').value || '',
+                guardian: document.getElementById('adm-guardian').value || '',
+                guardianPhone: document.getElementById('adm-guardian-phone').value || '',
+                emergency: document.getElementById('adm-emergency').value || null,
+                idType: idType,
+                idNum: idNum,
+                kyc: 'pending', // Pending because manual verification is required
+                room: document.getElementById('adm-room').value || null,
+                bed: document.getElementById('adm-bed').value || null,
+                checkin: document.getElementById('adm-checkin').value || new Date().toISOString().split('T')[0],
+                status: 'active',
+                messPlan: document.getElementById('adm-messplan').value || null,
+                duration: document.getElementById('adm-duration').value || null,
+                photo: null,
+                documentName: idDoc.name
+            };
+            HOSTELERS.unshift(newH);
+            CHECK_LOG.unshift({ name: newH.name, room: newH.room || '—', type: 'check-in', date: newH.checkin, reason: 'New Admission' });
+
+            ZoiDB.set('hostelers', HOSTELERS);
+            ZoiDB.set('checklog', CHECK_LOG);
+
+            closeAdmitModal();
+            renderHostelers(); renderCheckLog(); renderDocuments();
+            showToast('Hosteler admitted successfully! KYC is pending review.', 'success');
+        }
+
+        // === INIT ===
+        document.addEventListener('DOMContentLoaded', () => {
+            const u = localStorage.getItem('zoiUser');
+            if (u) {
+                const user = JSON.parse(u);
+                document.getElementById('user-name').innerText = user.name || 'Hostel Admin';
+                document.getElementById('user-role-label').innerText = user.role === 'warden' ? 'Warden' : 'Owner';
+            }
+            renderHostelers();
+            renderCheckLog();
+            renderDocuments();
+        });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

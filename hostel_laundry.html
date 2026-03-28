@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laundry & Parcels - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="hostel_shared.js"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1));
+            color: #ec4899;
+            border-color: rgba(236, 72, 153, 0.3);
+            font-weight: 700;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Laundry & Parcels <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">local_laundry_service</span></h2>
+                <p class="text-gray-400 text-sm">Manage laundry pickups, parcel deliveries, and courier tracking.</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="openLaundryModal()"
+                    class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)] transition-shadow"><span
+                        class="material-symbols-outlined text-sm">add</span> Laundry Request</button>
+                <button onclick="openParcelModal()"
+                    class="flex items-center gap-2 px-4 py-2 bg-teal/15 border border-teal/30 rounded-full font-bold text-sm text-teal hover:bg-teal/25 transition-colors"><span
+                        class="material-symbols-outlined text-sm">package_2</span> Log Parcel</button>
+            </div>
+        </header>
+
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-blue-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-blue-400">local_laundry_service</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Active Laundry</p>
+                    <p class="text-xl font-extrabold text-blue-400" id="st-laundry">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">package_2</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Pending Parcels</p>
+                    <p class="text-xl font-extrabold text-amber-400" id="st-parcels">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-green-400">check_circle</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Delivered Today</p>
+                    <p class="text-xl font-extrabold text-green-400" id="st-delivered">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-8 pt-4 flex gap-2 flex-shrink-0">
+            <button class="tab-btn active px-4 py-2 text-xs rounded-xl border border-white/10" data-tab="laundry"
+                onclick="switchTab('laundry')">Laundry Queue</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400" data-tab="parcels"
+                onclick="switchTab('parcels')">Parcel Tracking</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+            <div id="tab-laundry" class="tab-content">
+                <div class="glass-panel p-0 overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Request #</th>
+                                <th class="py-3 px-4">Hosteler</th>
+                                <th class="py-3 px-4">Items</th>
+                                <th class="py-3 px-4">Pickup</th>
+                                <th class="py-3 px-4">Delivery</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="laundry-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="tab-parcels" class="tab-content hidden">
+                <div class="glass-panel p-0 overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Parcel #</th>
+                                <th class="py-3 px-4">Hosteler</th>
+                                <th class="py-3 px-4">Courier</th>
+                                <th class="py-3 px-4">Tracking ID</th>
+                                <th class="py-3 px-4">Received</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="parcels-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- LAUNDRY MODAL -->
+    <div id="laundry-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-blue-400">local_laundry_service</span> New Laundry Request
+                </h3><button onclick="closeLaundryModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <select id="l-hosteler"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    <option value="">Hosteler *</option>
+                    <option>Ravi Kumar (101)</option>
+                    <option>Deepak S. (102)</option>
+                    <option>Priya S. (301)</option>
+                    <option>Sanjay V. (201)</option>
+                    <option>Kiran R. (103)</option>
+                    <option>Sneha Sharma (301)</option>
+                </select>
+                <div class="grid grid-cols-3 gap-3">
+                    <input id="l-shirts" type="number" placeholder="Shirts" value="0"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <input id="l-pants" type="number" placeholder="Pants" value="0"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <input id="l-others" type="number" placeholder="Others" value="0"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+                <select id="l-service"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    <option>Regular (2 days)</option>
+                    <option>Express (1 day)</option>
+                    <option>Dry Clean (3 days)</option>
+                </select>
+            </div>
+            <div class="p-5 border-t border-border flex gap-3"><button onclick="closeLaundryModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10">Cancel</button><button
+                    onclick="submitLaundry()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)]">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PARCEL MODAL -->
+    <div id="parcel-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-amber-400">package_2</span> Log Incoming Parcel</h3>
+                <button onclick="closeParcelModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <select id="p-hosteler"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    <option value="">Hosteler *</option>
+                    <option>Ravi Kumar (101)</option>
+                    <option>Deepak S. (102)</option>
+                    <option>Priya S. (301)</option>
+                    <option>Sanjay V. (201)</option>
+                    <option>Kiran R. (103)</option>
+                </select>
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="p-courier"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">Courier *</option>
+                        <option>Amazon</option>
+                        <option>Flipkart</option>
+                        <option>Delhivery</option>
+                        <option>BlueDart</option>
+                        <option>DTDC</option>
+                        <option>India Post</option>
+                        <option>Other</option>
+                    </select>
+                    <input id="p-tracking" type="text" placeholder="Tracking ID"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+                <input id="p-desc" type="text" placeholder="Description (e.g. Small box)"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+            </div>
+            <div class="p-5 border-t border-border flex gap-3"><button onclick="closeParcelModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10">Cancel</button><button
+                    onclick="logParcel()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-teal to-emerald-500 rounded-xl shadow-[0_0_15px_rgba(0,212,197,0.3)]">Log
+                    Parcel</button></div>
+        </div>
+    </div>
+
+    <script>
+        const LAUNDRY = ZoiDB.get('laundry', [
+            { id: 'LDR-001', hosteler: 'Ravi Kumar (101)', items: '3 Shirts, 2 Pants', service: 'Regular', pickup: '2026-03-03', delivery: '2026-03-05', status: 'in-wash' },
+            { id: 'LDR-002', hosteler: 'Priya S. (301)', items: '5 Tops, 1 Jacket', service: 'Express', pickup: '2026-03-04', delivery: '2026-03-05', status: 'picked-up' },
+            { id: 'LDR-003', hosteler: 'Deepak S. (102)', items: '2 Shirts, 3 Pants, 1 Bedsheet', service: 'Regular', pickup: '2026-03-02', delivery: '2026-03-04', status: 'ready' },
+            { id: 'LDR-004', hosteler: 'Sanjay V. (201)', items: '1 Suit (Dry Clean)', service: 'Dry Clean', pickup: '2026-03-01', delivery: '2026-03-04', status: 'delivered' },
+            { id: 'LDR-005', hosteler: 'Kiran R. (103)', items: '4 Shirts, 2 Pants', service: 'Regular', pickup: '2026-02-28', delivery: '2026-03-02', status: 'delivered' },
+        ]);
+
+        const PARCELS = ZoiDB.get('parcels', [
+            { id: 'PKL-001', hosteler: 'Ravi Kumar (101)', courier: 'Amazon', tracking: 'AMZ-9287364521', received: '2026-03-04 10:30', desc: 'Medium box', status: 'pending' },
+            { id: 'PKL-002', hosteler: 'Deepak S. (102)', courier: 'Flipkart', tracking: 'FKT-1122334455', received: '2026-03-04 09:15', desc: 'Small envelope', status: 'pending' },
+            { id: 'PKL-003', hosteler: 'Priya S. (301)', courier: 'BlueDart', tracking: 'BD-7788990011', received: '2026-03-03 16:20', desc: 'Large carton', status: 'collected' },
+            { id: 'PKL-004', hosteler: 'Sanjay V. (201)', courier: 'Delhivery', tracking: 'DLV-5566778899', received: '2026-03-03 11:45', desc: 'Small box', status: 'collected' },
+            { id: 'PKL-005', hosteler: 'Kiran R. (103)', courier: 'India Post', tracking: 'EE123456789IN', received: '2026-03-02 14:00', desc: 'Registered post', status: 'collected' },
+            { id: 'PKL-006', hosteler: 'Sneha Sharma (301)', courier: 'Amazon', tracking: 'AMZ-6655443322', received: '2026-03-04 12:10', desc: 'Small box', status: 'pending' },
+        ]);
+
+        const LAUNDRY_STATUS = { 'picked-up': '<span class="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[10px] font-bold">Picked Up</span>', 'in-wash': '<span class="bg-violet-500/20 text-violet-400 px-2 py-0.5 rounded text-[10px] font-bold">In Wash</span>', 'ready': '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">Ready</span>', 'delivered': '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">Delivered</span>' };
+        const PARCEL_STATUS = { pending: '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">Awaiting Pickup</span>', collected: '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">Collected</span>' };
+
+        function renderLaundry() {
+            document.getElementById('laundry-tbody').innerHTML = LAUNDRY.map((l, i) => `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+                <td class="py-3 px-4 font-mono text-xs text-gray-400">${l.id}</td>
+                <td class="py-3 px-4 font-bold text-white text-sm">${l.hosteler}</td>
+                <td class="py-3 px-4 text-gray-300 text-xs">${l.items}</td>
+                <td class="py-3 px-4 text-gray-400 text-xs">${l.pickup}</td>
+                <td class="py-3 px-4 text-gray-400 text-xs">${l.delivery}</td>
+                <td class="py-3 px-4">${LAUNDRY_STATUS[l.status]}</td>
+                <td class="py-3 px-4">${l.status !== 'delivered' ? `<button onclick="advanceLaundry('${l.id}')" class="text-xs text-teal bg-teal/10 px-3 py-1.5 rounded-lg font-bold hover:bg-teal/20 transition-colors">Next →</button>` : '<span class="text-xs text-gray-500">✓</span>'}</td>
+            </tr>`).join('');
+            updateStats();
+        }
+
+        function renderParcels() {
+            document.getElementById('parcels-tbody').innerHTML = PARCELS.map((p, i) => `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+                <td class="py-3 px-4 font-mono text-xs text-gray-400">${p.id}</td>
+                <td class="py-3 px-4 font-bold text-white text-sm">${p.hosteler}</td>
+                <td class="py-3 px-4"><span class="bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold text-gray-300">${p.courier}</span></td>
+                <td class="py-3 px-4 font-mono text-[10px] text-gray-400">${p.tracking}</td>
+                <td class="py-3 px-4 text-gray-400 text-xs">${p.received}</td>
+                <td class="py-3 px-4">${PARCEL_STATUS[p.status]}</td>
+                <td class="py-3 px-4">${p.status === 'pending' ? `<button onclick="collectParcel('${p.id}')" class="text-xs text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg font-bold hover:bg-green-500/20 transition-colors">Mark Collected</button>` : '<span class="text-xs text-gray-500">✓</span>'}</td>
+            </tr>`).join('');
+        }
+
+        function advanceLaundry(id) {
+            const l = LAUNDRY.find(x => x.id === id);
+            const flow = ['picked-up', 'in-wash', 'ready', 'delivered'];
+            const idx = flow.indexOf(l.status);
+            if (idx < flow.length - 1) l.status = flow[idx + 1];
+            ZoiDB.set('laundry', LAUNDRY);
+            renderLaundry();
+            showToast(`Laundry ${l.id} moved to ${l.status.replace('-', ' ').toUpperCase()}`, 'info');
+        }
+        function collectParcel(id) {
+            const p = PARCELS.find(x => x.id === id);
+            p.status = 'collected';
+            ZoiDB.set('parcels', PARCELS);
+            renderParcels(); updateStats();
+            showToast(`Parcel ${p.id} marked as collected`, 'success');
+        }
+
+        function updateStats() {
+            document.getElementById('st-laundry').innerText = LAUNDRY.filter(l => l.status !== 'delivered').length;
+            document.getElementById('st-parcels').innerText = PARCELS.filter(p => p.status === 'pending').length;
+            document.getElementById('st-delivered').innerText = LAUNDRY.filter(l => l.status === 'delivered').length + PARCELS.filter(p => p.status === 'collected').length;
+        }
+
+        function switchTab(t) { document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.getElementById('tab-' + t).classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); }); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.add('active'); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.remove('text-gray-400'); }
+
+        function openLaundryModal() { document.getElementById('laundry-modal').classList.remove('hidden'); document.getElementById('laundry-modal').classList.add('flex'); }
+        function closeLaundryModal() { document.getElementById('laundry-modal').classList.add('hidden'); document.getElementById('laundry-modal').classList.remove('flex'); }
+        function openParcelModal() { document.getElementById('parcel-modal').classList.remove('hidden'); document.getElementById('parcel-modal').classList.add('flex'); }
+        function closeParcelModal() { document.getElementById('parcel-modal').classList.add('hidden'); document.getElementById('parcel-modal').classList.remove('flex'); }
+
+        function submitLaundry() {
+            const h = document.getElementById('l-hosteler').value;
+            if (!h) { showToast('Select hosteler.', 'error'); return; }
+            const shirts = parseInt(document.getElementById('l-shirts').value) || 0; const pants = parseInt(document.getElementById('l-pants').value) || 0; const others = parseInt(document.getElementById('l-others').value) || 0;
+            const items = []; if (shirts) items.push(shirts + ' Shirts'); if (pants) items.push(pants + ' Pants'); if (others) items.push(others + ' Others');
+            LAUNDRY.unshift({ id: 'LDR-' + String(LAUNDRY.length + 1).padStart(3, '0'), hosteler: h, items: items.join(', ') || 'Mixed', service: document.getElementById('l-service').value.split('(')[0].trim(), pickup: new Date().toISOString().split('T')[0], delivery: '—', status: 'picked-up' });
+            ZoiDB.set('laundry', LAUNDRY);
+            closeLaundryModal(); renderLaundry();
+            showToast('Laundry request submitted', 'success');
+        }
+
+        function logParcel() {
+            const h = document.getElementById('p-hosteler').value;
+            if (!h) { showToast('Select hosteler.', 'error'); return; }
+            PARCELS.unshift({ id: 'PKL-' + String(PARCELS.length + 1).padStart(3, '0'), hosteler: h, courier: document.getElementById('p-courier').value || 'Other', tracking: document.getElementById('p-tracking').value || '—', received: new Date().toLocaleString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }), desc: document.getElementById('p-desc').value || 'Package', status: 'pending' });
+            ZoiDB.set('parcels', PARCELS);
+            closeParcelModal(); renderParcels(); updateStats();
+            showToast('New parcel logged', 'success');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { renderLaundry(); renderParcels(); });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

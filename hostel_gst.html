@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Reports - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1));
+            color: #ec4899;
+            border-color: rgba(236, 72, 153, 0.3);
+            font-weight: 700;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">GST Reports <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">description</span></h2>
+                <p class="text-gray-400 text-sm">GSTR-1 & GSTR-3B filings, tax ledger, invoice management, and
+                    compliance tracking.</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="downloadGSTR()"
+                    class="flex items-center gap-2 px-4 py-2 bg-pink-500/10 border border-pink-500/30 rounded-full font-bold text-sm text-pink-400 hover:bg-pink-500/20 transition-colors"><span
+                        class="material-symbols-outlined text-sm">download</span> Download GSTR</button>
+                <button onclick="openInvoiceModal()"
+                    class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)] transition-shadow"><span
+                        class="material-symbols-outlined text-sm">add</span> Generate Invoice</button>
+            </div>
+        </header>
+
+        <!-- GST Summary Cards -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-green-400">account_balance</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Tax Collected</p>
+                    <p class="text-xl font-extrabold text-green-400">₹75,600</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-blue-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-blue-400">arrow_upward</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">CGST</p>
+                    <p class="text-xl font-extrabold text-blue-400">₹37,800</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-violet-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-violet-400">arrow_downward</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">SGST</p>
+                    <p class="text-xl font-extrabold text-violet-400">₹37,800</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card ml-auto">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">event</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Next Filing Due</p>
+                    <p class="text-xl font-extrabold text-amber-400">11 Apr</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="px-8 pt-4 flex gap-2 flex-shrink-0">
+            <button class="tab-btn active px-4 py-2 text-xs rounded-xl border border-white/10" data-tab="summary"
+                onclick="switchTab('summary')">Tax Summary</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-tab="invoices" onclick="switchTab('invoices')">Invoices</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400" data-tab="filings"
+                onclick="switchTab('filings')">GSTR Filings</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400" data-tab="ledger"
+                onclick="switchTab('ledger')">Tax Ledger</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+            <!-- TAX SUMMARY -->
+            <div id="tab-summary" class="tab-content">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="glass-panel p-6 bouncy-card">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-teal text-lg">trending_up</span> Monthly GST
+                            Collection</h3><canvas id="gst-trend" height="200"></canvas>
+                    </div>
+                    <div class="glass-panel p-6 bouncy-card">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-pink-400 text-lg">pie_chart</span> Tax by Service
+                        </h3><canvas id="gst-pie" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="glass-panel p-6">
+                    <h3 class="font-bold text-white text-sm mb-4">GST Rate Breakup — FY 2025-26</h3>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Service</th>
+                                <th class="py-3 px-4">HSN/SAC</th>
+                                <th class="py-3 px-4">GST Rate</th>
+                                <th class="py-3 px-4">Taxable Value</th>
+                                <th class="py-3 px-4">CGST</th>
+                                <th class="py-3 px-4">SGST</th>
+                                <th class="py-3 px-4">Total Tax</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t border-border">
+                                <td class="py-3 px-4 text-white font-bold">Room Rent (AC)</td>
+                                <td class="py-3 px-4 text-gray-400 font-mono text-xs">9963</td>
+                                <td class="py-3 px-4 text-amber-400 font-bold">12%</td>
+                                <td class="py-3 px-4">₹3,20,000</td>
+                                <td class="py-3 px-4 text-blue-400">₹19,200</td>
+                                <td class="py-3 px-4 text-violet-400">₹19,200</td>
+                                <td class="py-3 px-4 text-green-400 font-bold">₹38,400</td>
+                            </tr>
+                            <tr class="border-t border-border">
+                                <td class="py-3 px-4 text-white font-bold">Room Rent (Non-AC)</td>
+                                <td class="py-3 px-4 text-gray-400 font-mono text-xs">9963</td>
+                                <td class="py-3 px-4 text-amber-400 font-bold">12%</td>
+                                <td class="py-3 px-4">₹1,80,000</td>
+                                <td class="py-3 px-4 text-blue-400">₹10,800</td>
+                                <td class="py-3 px-4 text-violet-400">₹10,800</td>
+                                <td class="py-3 px-4 text-green-400 font-bold">₹21,600</td>
+                            </tr>
+                            <tr class="border-t border-border">
+                                <td class="py-3 px-4 text-white font-bold">Mess/Food</td>
+                                <td class="py-3 px-4 text-gray-400 font-mono text-xs">9963</td>
+                                <td class="py-3 px-4 text-amber-400 font-bold">5%</td>
+                                <td class="py-3 px-4">₹1,20,000</td>
+                                <td class="py-3 px-4 text-blue-400">₹3,000</td>
+                                <td class="py-3 px-4 text-violet-400">₹3,000</td>
+                                <td class="py-3 px-4 text-green-400 font-bold">₹6,000</td>
+                            </tr>
+                            <tr class="border-t border-border">
+                                <td class="py-3 px-4 text-white font-bold">Laundry Service</td>
+                                <td class="py-3 px-4 text-gray-400 font-mono text-xs">9997</td>
+                                <td class="py-3 px-4 text-amber-400 font-bold">18%</td>
+                                <td class="py-3 px-4">₹30,000</td>
+                                <td class="py-3 px-4 text-blue-400">₹2,700</td>
+                                <td class="py-3 px-4 text-violet-400">₹2,700</td>
+                                <td class="py-3 px-4 text-green-400 font-bold">₹5,400</td>
+                            </tr>
+                            <tr class="border-t border-border">
+                                <td class="py-3 px-4 text-white font-bold">Other Services</td>
+                                <td class="py-3 px-4 text-gray-400 font-mono text-xs">9997</td>
+                                <td class="py-3 px-4 text-amber-400 font-bold">18%</td>
+                                <td class="py-3 px-4">₹23,333</td>
+                                <td class="py-3 px-4 text-blue-400">₹2,100</td>
+                                <td class="py-3 px-4 text-violet-400">₹2,100</td>
+                                <td class="py-3 px-4 text-green-400 font-bold">₹4,200</td>
+                            </tr>
+                            <tr class="border-t border-border bg-white/[0.03]">
+                                <td class="py-3 px-4 text-pink-400 font-extrabold" colspan="3">TOTAL</td>
+                                <td class="py-3 px-4 text-white font-extrabold">₹6,73,333</td>
+                                <td class="py-3 px-4 text-blue-400 font-extrabold">₹37,800</td>
+                                <td class="py-3 px-4 text-violet-400 font-extrabold">₹37,800</td>
+                                <td class="py-3 px-4 text-green-400 font-extrabold">₹75,600</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- INVOICES TAB -->
+            <div id="tab-invoices" class="tab-content hidden">
+                <div class="glass-panel p-0 overflow-hidden">
+                    <div class="p-4 border-b border-border flex items-center justify-between">
+                        <h3 class="font-bold text-white text-sm">Tax Invoices</h3><input type="text" id="inv-search"
+                            oninput="renderInvoices()" placeholder="Search invoices..."
+                            class="bg-surface/50 border border-white/10 rounded-full py-1.5 pl-4 pr-4 text-xs text-white focus:outline-none focus:border-pink-500 w-48">
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Invoice #</th>
+                                <th class="py-3 px-4">Hosteler</th>
+                                <th class="py-3 px-4">Service</th>
+                                <th class="py-3 px-4">Amount</th>
+                                <th class="py-3 px-4">GST</th>
+                                <th class="py-3 px-4">Total</th>
+                                <th class="py-3 px-4">Date</th>
+                                <th class="py-3 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inv-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- GSTR FILINGS TAB -->
+            <div id="tab-filings" class="tab-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                    <div class="glass-panel p-5 border-green-500/20 bouncy-card">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                                    class="material-symbols-outlined text-green-400">task_alt</span></div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">GSTR-1 (Outward Supplies)</h4>
+                                <p class="text-xs text-gray-400">B2C and B2B outward supply details</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Last
+                                    Filed</span><span class="text-green-400 font-bold">Feb 2026</span></div>
+                            <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Due
+                                    Date</span><span class="text-white font-bold">11 Apr 2026</span></div>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 border-amber-500/20 bouncy-card">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                                    class="material-symbols-outlined text-amber-400">pending</span></div>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">GSTR-3B (Monthly Return)</h4>
+                                <p class="text-xs text-gray-400">Summary return with ITC and liability</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Last
+                                    Filed</span><span class="text-green-400 font-bold">Feb 2026</span></div>
+                            <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Due
+                                    Date</span><span class="text-amber-400 font-bold">20 Apr 2026</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-panel p-0 overflow-hidden">
+                    <div class="p-4 border-b border-border">
+                        <h3 class="font-bold text-white text-sm">Filing History</h3>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Return</th>
+                                <th class="py-3 px-4">Period</th>
+                                <th class="py-3 px-4">Filed On</th>
+                                <th class="py-3 px-4">Tax Paid</th>
+                                <th class="py-3 px-4">ARN</th>
+                                <th class="py-3 px-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="filing-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAX LEDGER TAB -->
+            <div id="tab-ledger" class="tab-content hidden">
+                <div class="glass-panel p-0 overflow-hidden">
+                    <div class="p-4 border-b border-border flex items-center justify-between">
+                        <h3 class="font-bold text-white text-sm">Electronic Tax Ledger</h3><select
+                            class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-1.5 text-gray-300">
+                            <option>FY 2025-26</option>
+                            <option>FY 2024-25</option>
+                        </select>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Month</th>
+                                <th class="py-3 px-4">Output CGST</th>
+                                <th class="py-3 px-4">Output SGST</th>
+                                <th class="py-3 px-4">Input ITC</th>
+                                <th class="py-3 px-4">Net Payable</th>
+                                <th class="py-3 px-4">Paid</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledger-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- INVOICE MODAL -->
+    <div id="inv-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-500">receipt</span> Generate Tax Invoice</h3><button
+                    onclick="closeInvoiceModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <select id="gi-hosteler"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    <option value="">Hosteler *</option>
+                    <option>Ravi Kumar</option>
+                    <option>Deepak S.</option>
+                    <option>Priya S.</option>
+                    <option>Sanjay V.</option>
+                    <option>Kiran R.</option>
+                </select>
+                <select id="gi-service"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    <option value="">Service *</option>
+                    <option>Room Rent (AC) - 12%</option>
+                    <option>Room Rent (Non-AC) - 12%</option>
+                    <option>Mess Fees - 5%</option>
+                    <option>Laundry - 18%</option>
+                </select>
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="gi-amount" type="number" placeholder="Base Amount ₹ *" oninput="calcGST()"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <div class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm"><span
+                            class="text-gray-500 text-[10px] block">GST Amount</span><span
+                            class="text-green-400 font-bold" id="gi-gst">₹0</span></div>
+                </div>
+                <div
+                    class="bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 rounded-xl px-4 py-3 text-center">
+                    <p class="text-[10px] text-gray-400">Total Payable</p>
+                    <p class="text-xl font-extrabold text-pink-400" id="gi-total">₹0</p>
+                </div>
+            </div>
+            <div class="p-5 border-t border-border flex gap-3"><button onclick="closeInvoiceModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10">Cancel</button><button
+                    onclick="createInvoice()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)]">Generate</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const INVOICES = [
+            { id: 'INV-2603-001', hosteler: 'Ravi Kumar', service: 'Room Rent (AC)', amount: 8000, gstRate: 12, date: '2026-03-01' },
+            { id: 'INV-2603-002', hosteler: 'Deepak S.', service: 'Room Rent (AC)', amount: 8000, gstRate: 12, date: '2026-03-01' },
+            { id: 'INV-2603-003', hosteler: 'Priya S.', service: 'Room Rent (Non-AC)', amount: 5500, gstRate: 12, date: '2026-03-01' },
+            { id: 'INV-2603-004', hosteler: 'Sanjay V.', service: 'Mess Fees', amount: 3500, gstRate: 5, date: '2026-03-01' },
+            { id: 'INV-2603-005', hosteler: 'Kiran R.', service: 'Room Rent (Non-AC)', amount: 5500, gstRate: 12, date: '2026-03-01' },
+            { id: 'INV-2603-006', hosteler: 'Ravi Kumar', service: 'Mess Fees', amount: 3500, gstRate: 5, date: '2026-03-01' },
+            { id: 'INV-2603-007', hosteler: 'Sneha Sharma', service: 'Laundry', amount: 500, gstRate: 18, date: '2026-03-03' },
+            { id: 'INV-2602-008', hosteler: 'Deepak S.', service: 'Room Rent (AC)', amount: 8000, gstRate: 12, date: '2026-02-01' },
+        ];
+
+        const FILINGS = [
+            { ret: 'GSTR-1', period: 'Feb 2026', filed: '2026-03-10', tax: '₹32,400', arn: 'AA210226104561', status: 'filed' },
+            { ret: 'GSTR-3B', period: 'Feb 2026', filed: '2026-03-18', tax: '₹28,900', arn: 'AA210226109876', status: 'filed' },
+            { ret: 'GSTR-1', period: 'Jan 2026', filed: '2026-02-10', tax: '₹30,200', arn: 'AA210126087654', status: 'filed' },
+            { ret: 'GSTR-3B', period: 'Jan 2026', filed: '2026-02-19', tax: '₹27,100', arn: 'AA210126091234', status: 'filed' },
+            { ret: 'GSTR-1', period: 'Dec 2025', filed: '2026-01-10', tax: '₹29,800', arn: 'AA211225076543', status: 'filed' },
+            { ret: 'GSTR-3B', period: 'Dec 2025', filed: '2026-01-18', tax: '₹26,500', arn: 'AA211225078901', status: 'filed' },
+        ];
+
+        const LEDGER = [
+            { month: 'Mar 2026', cgst: 37800, sgst: 37800, itc: 8200, paid: true },
+            { month: 'Feb 2026', cgst: 32400, sgst: 32400, itc: 7500, paid: true },
+            { month: 'Jan 2026', cgst: 30200, sgst: 30200, itc: 7100, paid: true },
+            { month: 'Dec 2025', cgst: 29800, sgst: 29800, itc: 6800, paid: true },
+            { month: 'Nov 2025', cgst: 31000, sgst: 31000, itc: 7000, paid: true },
+            { month: 'Oct 2025', cgst: 28500, sgst: 28500, itc: 6500, paid: true },
+        ];
+
+        function renderInvoices() {
+            const q = (document.getElementById('inv-search')?.value || '').toLowerCase();
+            let rows = INVOICES;
+            if (q) rows = rows.filter(i => i.hosteler.toLowerCase().includes(q) || i.id.toLowerCase().includes(q));
+            document.getElementById('inv-tbody').innerHTML = rows.map((inv, i) => {
+                const gst = Math.round(inv.amount * inv.gstRate / 100);
+                return `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 35}ms">
+                    <td class="py-3 px-4 font-mono text-xs text-gray-400">${inv.id}</td>
+                    <td class="py-3 px-4 font-bold text-white text-sm">${inv.hosteler}</td>
+                    <td class="py-3 px-4 text-gray-300 text-xs">${inv.service}</td>
+                    <td class="py-3 px-4 text-white">₹${inv.amount.toLocaleString()}</td>
+                    <td class="py-3 px-4 text-green-400 font-bold">₹${gst.toLocaleString()} <span class="text-gray-500 text-[10px]">(${inv.gstRate}%)</span></td>
+                    <td class="py-3 px-4 text-pink-400 font-bold">₹${(inv.amount + gst).toLocaleString()}</td>
+                    <td class="py-3 px-4 text-gray-400 text-xs">${inv.date}</td>
+                    <td class="py-3 px-4"><button class="text-xs text-pink-400 bg-pink-500/10 px-3 py-1.5 rounded-lg font-bold hover:bg-pink-500/20 transition-colors">PDF</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderFilings() {
+            document.getElementById('filing-tbody').innerHTML = FILINGS.map((f, i) => `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+                <td class="py-3 px-4"><span class="bg-${f.ret === 'GSTR-1' ? 'blue' : 'violet'}-500/20 text-${f.ret === 'GSTR-1' ? 'blue' : 'violet'}-400 px-2 py-0.5 rounded text-[10px] font-bold">${f.ret}</span></td>
+                <td class="py-3 px-4 text-white font-bold text-sm">${f.period}</td>
+                <td class="py-3 px-4 text-gray-400 text-xs">${f.filed}</td>
+                <td class="py-3 px-4 text-green-400 font-bold">${f.tax}</td>
+                <td class="py-3 px-4 font-mono text-[10px] text-gray-500">${f.arn}</td>
+                <td class="py-3 px-4"><span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">✓ Filed</span></td>
+            </tr>`).join('');
+        }
+
+        function renderLedger() {
+            document.getElementById('ledger-tbody').innerHTML = LEDGER.map((l, i) => {
+                const net = l.cgst + l.sgst - l.itc;
+                return `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+                    <td class="py-3 px-4 text-white font-bold text-sm">${l.month}</td>
+                    <td class="py-3 px-4 text-blue-400 font-bold">₹${l.cgst.toLocaleString()}</td>
+                    <td class="py-3 px-4 text-violet-400 font-bold">₹${l.sgst.toLocaleString()}</td>
+                    <td class="py-3 px-4 text-amber-400 font-bold">-₹${l.itc.toLocaleString()}</td>
+                    <td class="py-3 px-4 text-pink-400 font-extrabold">₹${net.toLocaleString()}</td>
+                    <td class="py-3 px-4">${l.paid ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">✓ Paid</span>' : '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">Pending</span>'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function initCharts() {
+            new Chart(document.getElementById('gst-trend'), { type: 'bar', data: { labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'], datasets: [{ label: 'CGST', data: [28500, 31000, 29800, 30200, 32400, 37800], backgroundColor: 'rgba(59,130,246,0.4)', borderRadius: 4 }, { label: 'SGST', data: [28500, 31000, 29800, 30200, 32400, 37800], backgroundColor: 'rgba(139,92,246,0.4)', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 9 } }, stacked: true }, y: { stacked: true, grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 9 }, callback: v => '₹' + (v / 1000) + 'K' } } }, plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } } } });
+            new Chart(document.getElementById('gst-pie'), { type: 'doughnut', data: { labels: ['Room Rent', 'Mess', 'Laundry', 'Other'], datasets: [{ data: [60000, 6000, 5400, 4200], backgroundColor: ['rgba(236,72,153,0.6)', 'rgba(251,191,36,0.6)', 'rgba(0,212,197,0.6)', 'rgba(107,114,128,0.4)'], borderWidth: 0, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 10 }, padding: 12 } } } } });
+        }
+
+        function calcGST() {
+            const amt = parseInt(document.getElementById('gi-amount').value) || 0;
+            const svc = document.getElementById('gi-service').value;
+            let rate = 12; if (svc.includes('5%')) rate = 5; if (svc.includes('18%')) rate = 18;
+            const gst = Math.round(amt * rate / 100);
+            document.getElementById('gi-gst').innerText = '₹' + gst.toLocaleString();
+            document.getElementById('gi-total').innerText = '₹' + (amt + gst).toLocaleString();
+        }
+
+        function openInvoiceModal() { document.getElementById('inv-modal').classList.remove('hidden'); document.getElementById('inv-modal').classList.add('flex'); }
+        function closeInvoiceModal() { document.getElementById('inv-modal').classList.add('hidden'); document.getElementById('inv-modal').classList.remove('flex'); }
+        function downloadGSTR() { alert('📥 GSTR-1 for March 2026 downloaded as PDF.'); }
+
+        function createInvoice() {
+            const h = document.getElementById('gi-hosteler').value; if (!h) { alert('Select hosteler.'); return; }
+            const svc = document.getElementById('gi-service').value || 'Room Rent (AC)';
+            let rate = 12; if (svc.includes('5%')) rate = 5; if (svc.includes('18%')) rate = 18;
+            const amt = parseInt(document.getElementById('gi-amount').value) || 0;
+            INVOICES.unshift({ id: 'INV-' + Date.now().toString().slice(-8), hosteler: h, service: svc.split(' - ')[0], amount: amt, gstRate: rate, date: new Date().toISOString().split('T')[0] });
+            closeInvoiceModal(); renderInvoices();
+        }
+
+        function switchTab(t) { document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.getElementById('tab-' + t).classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); }); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.add('active'); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.remove('text-gray-400'); }
+
+        document.addEventListener('DOMContentLoaded', () => { renderInvoices(); renderFilings(); renderLedger(); initCharts(); });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

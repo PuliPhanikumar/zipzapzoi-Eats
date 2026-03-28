@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply Inventory - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="hostel_shared.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" },
+                    fontFamily: { sans: ["Manrope", "sans-serif"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1));
+            color: #ec4899;
+            border-color: rgba(236, 72, 153, 0.3);
+            font-weight: 700;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+
+    <!-- SIDEBAR -->
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <!-- MAIN -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Supply Inventory <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">inventory_2</span></h2>
+                <p class="text-gray-400 text-sm">Track groceries, supplies, purchase orders, and vendor management.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="openAddItemModal()"
+                    class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-shadow">
+                    <span class="material-symbols-outlined text-sm">add</span> Add Item
+                </button>
+                <button onclick="openPOModal()"
+                    class="flex items-center gap-2 px-4 py-2 bg-teal/15 border border-teal/30 rounded-full font-bold text-sm text-teal hover:bg-teal/25 transition-colors">
+                    <span class="material-symbols-outlined text-sm">shopping_cart</span> New Purchase Order
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-pink-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-pink-400">category</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Items</p>
+                    <p class="text-xl font-extrabold text-white" id="stat-total">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-red-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-red-400">warning</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Low Stock</p>
+                    <p class="text-xl font-extrabold text-red-400" id="stat-low">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">local_shipping</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Pending Orders</p>
+                    <p class="text-xl font-extrabold text-amber-400" id="stat-orders">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card ml-auto">
+                <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-green-400">payments</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Monthly Spend</p>
+                    <p class="text-xl font-extrabold text-green-400" id="stat-spend">₹0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="px-8 pt-4 flex gap-2 flex-shrink-0">
+            <button class="tab-btn active px-4 py-2 text-xs rounded-xl border border-white/10" data-tab="stock"
+                onclick="switchTab('stock')">Current Stock</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400" data-tab="orders"
+                onclick="switchTab('orders')">Purchase Orders</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-tab="suppliers" onclick="switchTab('suppliers')">Suppliers</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400" data-tab="spend"
+                onclick="switchTab('spend')">Spend Analytics</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+
+            <!-- STOCK TAB -->
+            <div id="tab-stock" class="tab-content">
+                <div class="glass-panel p-0 overflow-hidden">
+                    <div class="p-4 border-b border-border flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <h3 class="font-bold text-white text-sm">Inventory Items</h3>
+                            <select id="cat-filter" onchange="renderStock()"
+                                class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-1.5 text-gray-300">
+                                <option value="all">All Categories</option>
+                                <option value="grocery">Grocery</option>
+                                <option value="cleaning">Cleaning</option>
+                                <option value="kitchen">Kitchen</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="stationery">Stationery</option>
+                            </select>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span
+                                    class="material-symbols-outlined text-gray-500 text-sm">search</span></div>
+                            <input type="text" id="search-stock" oninput="renderStock()"
+                                class="bg-surface/50 border border-white/10 rounded-full py-1.5 pl-9 pr-4 text-xs text-white focus:outline-none focus:border-pink-500 w-48"
+                                placeholder="Search items...">
+                        </div>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Item</th>
+                                <th class="py-3 px-4">Category</th>
+                                <th class="py-3 px-4">Stock</th>
+                                <th class="py-3 px-4">Min Level</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4">Last Restocked</th>
+                                <th class="py-3 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ORDERS TAB -->
+            <div id="tab-orders" class="tab-content hidden">
+                <div class="glass-panel p-0 overflow-hidden">
+                    <div class="p-4 border-b border-border">
+                        <h3 class="font-bold text-white text-sm">Purchase Orders</h3>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">PO #</th>
+                                <th class="py-3 px-4">Supplier</th>
+                                <th class="py-3 px-4">Items</th>
+                                <th class="py-3 px-4">Total</th>
+                                <th class="py-3 px-4">Date</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SUPPLIERS TAB -->
+            <div id="tab-suppliers" class="tab-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="supplier-grid"></div>
+            </div>
+
+            <!-- SPEND ANALYTICS TAB -->
+            <div id="tab-spend" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-teal text-lg">trending_up</span> Monthly Spend
+                            Trend</h3><canvas id="spend-chart" height="240"></canvas>
+                    </div>
+                    <div class="glass-panel p-6">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-pink-400 text-lg">donut_large</span> Spend by
+                            Category</h3><canvas id="cat-chart" height="240"></canvas>
+                    </div>
+                    <div class="glass-panel p-6 lg:col-span-2">
+                        <h3 class="font-bold text-white text-sm mb-4">Top 5 Highest Spend Items — March 2026</h3>
+                        <div class="space-y-3" id="top-spend-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ADD ITEM MODAL -->
+    <div id="add-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-500">add_circle</span> Add Inventory Item</h3>
+                <button onclick="closeAddItemModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <input id="new-name" type="text" placeholder="Item Name *"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="new-cat"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">Category *</option>
+                        <option>grocery</option>
+                        <option>cleaning</option>
+                        <option>kitchen</option>
+                        <option>maintenance</option>
+                        <option>stationery</option>
+                    </select>
+                    <input id="new-unit" type="text" placeholder="Unit (kg, L, pcs) *"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="new-qty" type="number" placeholder="Current Qty *"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <input id="new-min" type="number" placeholder="Min Level *"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+                <input id="new-price" type="number" placeholder="Price per Unit ₹"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+            </div>
+            <div class="p-5 border-t border-border flex gap-3">
+                <button onclick="closeAddItemModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">Cancel</button>
+                <button onclick="addItem()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] transition-shadow flex items-center justify-center gap-2"><span
+                        class="material-symbols-outlined text-sm">check</span> Add Item</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PURCHASE ORDER MODAL -->
+    <div id="po-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-teal">shopping_cart</span> New Purchase Order</h3>
+                <button onclick="closePOModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <select id="po-supplier"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    <option value="">Select Supplier *</option>
+                    <option>Reliance Fresh</option>
+                    <option>Metro Cash & Carry</option>
+                    <option>Local Kirana - Ramesh</option>
+                    <option>BigBasket B2B</option>
+                </select>
+                <input id="po-items" type="text" placeholder="Items (comma separated) *"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="po-amount" type="number" placeholder="Total Amount ₹"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <input id="po-date" type="date"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                </div>
+            </div>
+            <div class="p-5 border-t border-border flex gap-3">
+                <button onclick="closePOModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">Cancel</button>
+                <button onclick="createPO()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-teal to-emerald-500 rounded-xl shadow-[0_0_15px_rgba(0,212,197,0.3)] transition-shadow flex items-center justify-center gap-2"><span
+                        class="material-symbols-outlined text-sm">send</span> Create Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESTOCK MODAL -->
+    <div id="restock-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white" id="restock-title">Restock</h3>
+                <button onclick="closeRestockModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <p class="text-sm text-gray-400" id="restock-info">—</p>
+                <input id="restock-qty" type="number" placeholder="Quantity to add"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+            </div>
+            <div class="p-5 border-t border-border flex gap-3">
+                <button onclick="closeRestockModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">Cancel</button>
+                <button onclick="confirmRestock()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-teal to-emerald-500 rounded-xl transition-shadow flex items-center justify-center gap-2"><span
+                        class="material-symbols-outlined text-sm">check</span> Restock</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === DATA ===
+        const INVENTORY = ZoiDB.get('inventory', [
+            { id: 1, name: 'Rice (Sona Masoori)', cat: 'grocery', qty: 45, unit: 'kg', min: 20, price: 55, lastRestock: '2026-02-28' },
+            { id: 2, name: 'Toor Dal', cat: 'grocery', qty: 12, unit: 'kg', min: 10, price: 130, lastRestock: '2026-02-25' },
+            { id: 3, name: 'Cooking Oil (Sunflower)', cat: 'grocery', qty: 8, unit: 'L', min: 15, price: 150, lastRestock: '2026-02-20' },
+            { id: 4, name: 'Wheat Flour (Atta)', cat: 'grocery', qty: 30, unit: 'kg', min: 15, price: 42, lastRestock: '2026-03-01' },
+            { id: 5, name: 'Onions', cat: 'grocery', qty: 18, unit: 'kg', min: 20, price: 35, lastRestock: '2026-03-02' },
+            { id: 6, name: 'Potatoes', cat: 'grocery', qty: 22, unit: 'kg', min: 15, price: 28, lastRestock: '2026-03-02' },
+            { id: 7, name: 'Tomatoes', cat: 'grocery', qty: 5, unit: 'kg', min: 10, price: 40, lastRestock: '2026-03-01' },
+            { id: 8, name: 'Sugar', cat: 'grocery', qty: 9, unit: 'kg', min: 10, price: 45, lastRestock: '2026-02-27' },
+            { id: 9, name: 'Tea Powder (Brooke Bond)', cat: 'grocery', qty: 3, unit: 'kg', min: 5, price: 420, lastRestock: '2026-02-15' },
+            { id: 10, name: 'Milk', cat: 'grocery', qty: 15, unit: 'L', min: 20, price: 56, lastRestock: '2026-03-04' },
+            { id: 11, name: 'Floor Cleaner (Lizol)', cat: 'cleaning', qty: 4, unit: 'L', min: 3, price: 120, lastRestock: '2026-02-20' },
+            { id: 12, name: 'Toilet Cleaner (Harpic)', cat: 'cleaning', qty: 6, unit: 'bottles', min: 4, price: 95, lastRestock: '2026-02-20' },
+            { id: 13, name: 'Dishwash Liquid', cat: 'cleaning', qty: 2, unit: 'L', min: 3, price: 110, lastRestock: '2026-02-18' },
+            { id: 14, name: 'Broom & Mop Set', cat: 'cleaning', qty: 5, unit: 'pcs', min: 3, price: 250, lastRestock: '2026-01-15' },
+            { id: 15, name: 'LPG Cylinder', cat: 'kitchen', qty: 2, unit: 'pcs', min: 2, price: 900, lastRestock: '2026-02-28' },
+            { id: 16, name: 'Paper Plates', cat: 'kitchen', qty: 200, unit: 'pcs', min: 100, price: 3, lastRestock: '2026-03-01' },
+            { id: 17, name: 'Light Bulbs (LED)', cat: 'maintenance', qty: 8, unit: 'pcs', min: 5, price: 85, lastRestock: '2026-02-10' },
+            { id: 18, name: 'Bed Sheets', cat: 'maintenance', qty: 6, unit: 'pcs', min: 10, price: 350, lastRestock: '2026-01-20' },
+            { id: 19, name: 'Pillow Covers', cat: 'maintenance', qty: 4, unit: 'pcs', min: 10, price: 120, lastRestock: '2026-01-20' },
+            { id: 20, name: 'Register Books', cat: 'stationery', qty: 10, unit: 'pcs', min: 5, price: 40, lastRestock: '2026-02-01' },
+        ]);
+
+        const PURCHASE_ORDERS = ZoiDB.get('purchase_orders', [
+            { po: 'PO-2603-001', supplier: 'Reliance Fresh', items: 'Rice, Dal, Oil, Onions', total: 4850, date: '2026-03-04', status: 'ordered' },
+            { po: 'PO-2603-002', supplier: 'Metro Cash & Carry', items: 'Cleaning supplies, Kitchen', total: 2200, date: '2026-03-03', status: 'delivered' },
+            { po: 'PO-2602-003', supplier: 'Local Kirana - Ramesh', items: 'Vegetables, Milk, Sugar', total: 1800, date: '2026-02-28', status: 'delivered' },
+            { po: 'PO-2602-004', supplier: 'BigBasket B2B', items: 'Tea, Wheat Flour, Spices', total: 3500, date: '2026-02-25', status: 'delivered' },
+            { po: 'PO-2602-005', supplier: 'Reliance Fresh', items: 'Groceries bulk order', total: 6200, date: '2026-02-20', status: 'delivered' },
+        ]);
+
+        const SUPPLIERS = ZoiDB.get('suppliers', [
+            { name: 'Reliance Fresh', contact: '080-40001234', email: 'b2b@reliancefresh.in', items: 'Groceries, FMCG', rating: 4.5, orders: 12, totalSpend: 45000 },
+            { name: 'Metro Cash & Carry', contact: '080-40005678', email: 'wholesale@metro.in', items: 'Bulk Groceries, Cleaning', rating: 4.2, orders: 8, totalSpend: 32000 },
+            { name: 'Local Kirana - Ramesh', contact: '9876512345', email: '—', items: 'Vegetables, Dairy', rating: 4.8, orders: 22, totalSpend: 28000 },
+            { name: 'BigBasket B2B', contact: '1800-200-1000', email: 'business@bigbasket.com', items: 'Pantry, Spices, Beverages', rating: 4.0, orders: 5, totalSpend: 15000 },
+        ]);
+
+        let spendChartInstance = null;
+        let catChartInstance = null;
+
+        const STATUS_MAP = {
+            ordered: '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">Ordered</span>',
+            delivered: '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">Delivered</span>',
+            cancelled: '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">Cancelled</span>'
+        };
+
+        // === RENDER ===
+        function renderStock() {
+            const q = (document.getElementById('search-stock').value || '').toLowerCase();
+            const cat = document.getElementById('cat-filter').value;
+            let items = INVENTORY;
+            if (q) items = items.filter(i => i.name.toLowerCase().includes(q));
+            if (cat !== 'all') items = items.filter(i => i.cat === cat);
+
+            document.getElementById('stock-tbody').innerHTML = items.map((it, i) => {
+                const isLow = it.qty <= it.min;
+                const pct = Math.min(100, Math.round((it.qty / (it.min * 2)) * 100));
+                return `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 35}ms">
+                    <td class="py-3 px-4">
+                        <div class="flex items-center gap-2.5">
+                            <div class="h-8 w-8 rounded-lg bg-pink-500/15 flex items-center justify-center"><span class="material-symbols-outlined text-pink-400 text-sm">${it.cat === 'grocery' ? 'grocery' : it.cat === 'cleaning' ? 'cleaning_services' : it.cat === 'kitchen' ? 'skillet' : it.cat === 'maintenance' ? 'build' : 'edit_note'}</span></div>
+                            <div><span class="font-bold text-white text-sm">${it.name}</span><p class="text-[10px] text-gray-500">₹${it.price}/${it.unit}</p></div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4"><span class="bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold text-gray-300 capitalize">${it.cat}</span></td>
+                    <td class="py-3 px-4"><div class="flex items-center gap-2"><div class="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="h-full rounded-full ${isLow ? 'bg-red-400' : 'bg-teal'}" style="width:${pct}%"></div></div><span class="font-bold ${isLow ? 'text-red-400' : 'text-white'} text-sm">${it.qty} ${it.unit}</span></div></td>
+                    <td class="py-3 px-4 text-gray-400 text-xs">${it.min} ${it.unit}</td>
+                    <td class="py-3 px-4">${isLow ? '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 w-fit"><span class="material-symbols-outlined text-xs">warning</span>Low</span>' : '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">OK</span>'}</td>
+                    <td class="py-3 px-4 text-gray-400 text-xs">${it.lastRestock}</td>
+                    <td class="py-3 px-4"><button onclick="openRestockModal(${it.id})" class="text-xs text-teal hover:text-white bg-teal/10 px-3 py-1.5 rounded-lg hover:bg-teal/20 font-bold transition-colors">Restock</button></td>
+                </tr>`;
+            }).join('');
+            updateStats();
+        }
+
+        function renderOrders() {
+            document.getElementById('orders-tbody').innerHTML = PURCHASE_ORDERS.map((o, i) => `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+                <td class="py-3 px-4 font-mono text-xs text-gray-400">${o.po}</td>
+                <td class="py-3 px-4 font-bold text-white text-sm">${o.supplier}</td>
+                <td class="py-3 px-4 text-gray-300 text-xs">${o.items}</td>
+                <td class="py-3 px-4 font-bold text-white">₹${o.total.toLocaleString()}</td>
+                <td class="py-3 px-4 text-gray-400 text-xs">${o.date}</td>
+                <td class="py-3 px-4">${STATUS_MAP[o.status]}</td>
+                <td class="py-3 px-4">${o.status === 'ordered' ? `<button onclick="markDelivered('${o.po}')" class="text-xs text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg font-bold hover:bg-green-500/20 transition-colors">Mark Delivered</button>` : '<span class="text-xs text-gray-500">—</span>'}</td>
+            </tr>`).join('');
+        }
+
+        function renderSuppliers() {
+            document.getElementById('supplier-grid').innerHTML = SUPPLIERS.map((s, i) => `<div class="glass-panel p-5 bouncy-card fade-row" style="animation-delay:${i * 60}ms">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="h-12 w-12 rounded-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center border border-white/10"><span class="material-symbols-outlined text-pink-400">storefront</span></div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-bold text-white text-sm truncate">${s.name}</h4>
+                        <p class="text-xs text-gray-400">${s.items}</p>
+                    </div>
+                    <div class="flex items-center gap-0.5">${'★'.repeat(Math.floor(s.rating))}<span class="text-xs text-amber-400 font-bold ml-1">${s.rating}</span></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-[10px] mb-3">
+                    <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Contact</span><span class="text-gray-300 font-bold">${s.contact}</span></div>
+                    <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Orders</span><span class="text-gray-300 font-bold">${s.orders} orders</span></div>
+                    <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Email</span><span class="text-gray-300 font-bold truncate block">${s.email}</span></div>
+                    <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Total Spend</span><span class="text-green-400 font-bold">₹${(s.totalSpend / 1000).toFixed(0)}K</span></div>
+                </div>
+                <button class="w-full py-2 text-xs font-bold text-pink-400 bg-pink-500/10 rounded-lg hover:bg-pink-500/20 transition-colors">View Orders →</button>
+            </div>`).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total').innerText = INVENTORY.length;
+            document.getElementById('stat-low').innerText = INVENTORY.filter(i => i.qty <= i.min).length;
+            document.getElementById('stat-orders').innerText = PURCHASE_ORDERS.filter(o => o.status === 'ordered').length;
+            const currentMonth = new Date().toISOString().substring(0, 7);
+            const spend = PURCHASE_ORDERS.filter(o => o.status === 'delivered' && o.date.startsWith(currentMonth)).reduce((s, o) => s + o.total, 0);
+            document.getElementById('stat-spend').innerText = '₹' + spend.toLocaleString();
+
+            if (document.getElementById('tab-spend').classList.contains('hidden') === false) {
+                initCharts();
+                renderTopSpend();
+            }
+        }
+
+        // === MODALS ===
+        function openAddItemModal() { document.getElementById('add-modal').classList.remove('hidden'); document.getElementById('add-modal').classList.add('flex'); }
+        function closeAddItemModal() { document.getElementById('add-modal').classList.add('hidden'); document.getElementById('add-modal').classList.remove('flex'); }
+        function openPOModal() { document.getElementById('po-modal').classList.remove('hidden'); document.getElementById('po-modal').classList.add('flex'); document.getElementById('po-date').value = new Date().toISOString().split('T')[0]; }
+        function closePOModal() { document.getElementById('po-modal').classList.add('hidden'); document.getElementById('po-modal').classList.remove('flex'); }
+
+        let restockId = null;
+        function openRestockModal(id) { restockId = id; const it = INVENTORY.find(x => x.id === id); document.getElementById('restock-title').innerText = 'Restock: ' + it.name; document.getElementById('restock-info').innerText = `Current: ${it.qty} ${it.unit} • Min: ${it.min} ${it.unit}`; document.getElementById('restock-qty').value = ''; document.getElementById('restock-modal').classList.remove('hidden'); document.getElementById('restock-modal').classList.add('flex'); }
+        function closeRestockModal() { document.getElementById('restock-modal').classList.add('hidden'); document.getElementById('restock-modal').classList.remove('flex'); }
+
+        function addItem() {
+            const name = document.getElementById('new-name').value.trim();
+            if (!name) { showToast('Item name is required.', 'error'); return; }
+            INVENTORY.push({ id: Date.now(), name, cat: document.getElementById('new-cat').value || 'grocery', qty: parseInt(document.getElementById('new-qty').value) || 0, unit: document.getElementById('new-unit').value || 'pcs', min: parseInt(document.getElementById('new-min').value) || 5, price: parseInt(document.getElementById('new-price').value) || 0, lastRestock: new Date().toISOString().split('T')[0] });
+            ZoiDB.set('inventory', INVENTORY);
+            closeAddItemModal(); renderStock();
+            showToast('New item added to inventory', 'success');
+        }
+
+        function confirmRestock() {
+            const qty = parseInt(document.getElementById('restock-qty').value) || 0;
+            if (qty <= 0) return;
+            const it = INVENTORY.find(x => x.id === restockId);
+            it.qty += qty; it.lastRestock = new Date().toISOString().split('T')[0];
+            ZoiDB.set('inventory', INVENTORY);
+            closeRestockModal(); renderStock();
+            showToast(`${qty} ${it.unit} of ${it.name} restocked`, 'success');
+        }
+
+        function createPO() {
+            const supplier = document.getElementById('po-supplier').value;
+            if (!supplier) { showToast('Select a supplier.', 'error'); return; }
+            PURCHASE_ORDERS.unshift({ po: 'PO-' + Date.now().toString().slice(-8), supplier, items: document.getElementById('po-items').value || '—', total: parseInt(document.getElementById('po-amount').value) || 0, date: document.getElementById('po-date').value, status: 'ordered' });
+            ZoiDB.set('purchase_orders', PURCHASE_ORDERS);
+            closePOModal(); renderOrders(); updateStats();
+            showToast('Purchase order created', 'success');
+        }
+
+        function markDelivered(po) {
+            const o = PURCHASE_ORDERS.find(x => x.po === po);
+            if (o) o.status = 'delivered';
+            ZoiDB.set('purchase_orders', PURCHASE_ORDERS);
+            renderOrders(); updateStats();
+            showToast('Purchase order marked as delivered', 'success');
+        }
+
+        // === CHARTS ===
+        function initCharts() {
+            if (spendChartInstance) spendChartInstance.destroy();
+            if (catChartInstance) catChartInstance.destroy();
+
+            // Calculate Monthly Spend
+            const spendByMonth = {};
+            PURCHASE_ORDERS.filter(o => o.status === 'delivered').forEach(o => {
+                const monthYear = o.date.substring(0, 7); // YYYY-MM
+                spendByMonth[monthYear] = (spendByMonth[monthYear] || 0) + o.total;
+            });
+            const sortedMonths = Object.keys(spendByMonth).sort().slice(-6); // Last 6 months with data
+            const labels = sortedMonths.map(m => {
+                const d = new Date(m + '-01');
+                return d.toLocaleString('default', { month: 'short', year: '2-digit' });
+            });
+            const data = sortedMonths.map(m => spendByMonth[m]);
+            if (labels.length === 0) { labels.push('No Data'); data.push(0); }
+
+            spendChartInstance = new Chart(document.getElementById('spend-chart'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Monthly Spend (₹)', data: data, backgroundColor: 'rgba(0,212,197,0.3)', borderColor: 'rgba(0,212,197,0.7)', borderWidth: 1, borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 10 }, callback: v => '₹' + (v / 1000) + 'K' } } }, plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } } } });
+
+            // Calculate Category Distribution
+            const catData = {};
+            INVENTORY.forEach(it => {
+                catData[it.cat] = (catData[it.cat] || 0) + (it.qty * it.price);
+            });
+
+            catChartInstance = new Chart(document.getElementById('cat-chart'), { type: 'doughnut', data: { labels: Object.keys(catData).map(c => c.charAt(0).toUpperCase() + c.slice(1)), datasets: [{ data: Object.values(catData), backgroundColor: ['rgba(236,72,153,0.6)', 'rgba(0,212,197,0.6)', 'rgba(251,191,36,0.6)', 'rgba(139,92,246,0.6)', 'rgba(107,114,128,0.5)'], borderWidth: 0, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 11 }, padding: 15 } } } } });
+        }
+
+        function renderTopSpend() {
+            const sorted = [...INVENTORY].sort((a, b) => (b.qty * b.price) - (a.qty * a.price)).slice(0, 5);
+            const maxVal = sorted[0] ? sorted[0].qty * sorted[0].price : 1;
+            document.getElementById('top-spend-list').innerHTML = sorted.map((it, i) => {
+                const val = it.qty * it.price;
+                return `<div class="flex items-center gap-4 p-3 bg-white/[0.03] rounded-xl fade-row" style="animation-delay:${i * 60}ms">
+                    <span class="text-xs font-bold text-gray-500 w-5">#${i + 1}</span>
+                    <div class="flex-1"><p class="text-sm font-bold text-white">${it.name}</p><div class="mt-1 h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full" style="width:${(val / maxVal) * 100}%"></div></div></div>
+                    <span class="text-sm font-bold text-pink-400">₹${val.toLocaleString()}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // === TABS ===
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); });
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.remove('text-gray-400');
+            if (tab === 'spend') {
+                initCharts();
+                renderTopSpend();
+            }
+        }
+
+        // === INIT ===
+        document.addEventListener('DOMContentLoaded', () => {
+            const u = localStorage.getItem('zoiUser');
+            if (u) { const user = JSON.parse(u); document.getElementById('user-name').innerText = user.name || 'Hostel Admin'; document.getElementById('user-role-label').innerText = user.role === 'warden' ? 'Warden' : 'Owner'; }
+            renderStock(); renderOrders(); renderSuppliers(); renderTopSpend(); initCharts();
+        });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

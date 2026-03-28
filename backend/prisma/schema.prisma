@@ -1,0 +1,411 @@
+// ZipZapZoi Eats — Production Prisma Schema
+// PostgreSQL Database
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── USERS ──────────────────────────────────────────────
+model User {
+  id           Int      @id @default(autoincrement())
+  zoiId        String   @unique // e.g., CUST-552, PART-102, RIDE-991, ADM-01
+  name         String
+  email        String?  @unique
+  phone        String?
+  role         String   @default("Customer") // Customer, partner, rider, pos_staff, Super Admin, admin
+  passwordHash String?
+  avatar       String?
+  status       String   @default("Active") // Active, Suspended, Banned, Pending
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orders            Order[]
+  feedbacks         Feedback[]
+  disputes          Dispute[]
+  supportTickets    SupportTicket[]
+  subscriptions     UserSubscription[]
+  pushSubscriptions PushSubscription[]
+
+  @@index([role])
+  @@index([status])
+}
+
+// ─── RESTAURANTS ────────────────────────────────────────
+model Restaurant {
+  id             Int       @id @default(autoincrement())
+  zoiId          String    @unique // e.g., REST-01
+  name           String
+  ownerName      String?
+  ownerEmail     String?
+  phone          String?
+  address        String?
+  image          String?
+  tags           String[]  @default([]) // North Indian, Pizza, etc.
+  status         String    @default("Pending") // Pending, Active, Suspended
+  rating         Float     @default(0.0)
+  revenue        Float     @default(0.0)
+  plan           String?   // Starter, Gold, Platinum
+  isPosOnly      Boolean   @default(false)
+  zone           String?
+  deliveryTime   String?   @default("30 min")
+  costForTwo     String?
+  promoted       Boolean   @default(false)
+  offer          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  menus          Menu[]
+  orders         Order[]
+  tables         Table[]
+  reviews        Review[]
+  inventory      InventoryItem[]
+  staff          RestaurantStaff[]
+
+  @@index([status])
+  @@index([zone])
+}
+
+// ─── MENUS ──────────────────────────────────────────────
+model Menu {
+  id           Int        @id @default(autoincrement())
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  itemName     String
+  price        Float
+  description  String?
+  image        String?
+  category     String     // Recommended, Mains, Desserts, Beverages
+  type         String?    // Veg, Non-Veg
+  isAvailable  Boolean    @default(true)
+  isBestseller Boolean    @default(false)
+  nutrition    Json?      // { cal, protein, carbs, fat, fiber }
+  createdAt    DateTime   @default(now())
+
+  @@index([restaurantId])
+  @@index([category])
+}
+
+// ─── ORDERS ─────────────────────────────────────────────
+model Order {
+  id              Int        @id @default(autoincrement())
+  zoiId           String     @unique // e.g., ORD-1001
+  userId          Int?
+  user            User?      @relation(fields: [userId], references: [id])
+  restaurantId    Int
+  restaurant      Restaurant @relation(fields: [restaurantId], references: [id])
+  total           Float
+  status          String     @default("Pending") // Pending, Confirmed, Preparing, Ready, Dispatched, Delivered, Cancelled
+  type            String     @default("Delivery") // Delivery, Dine-In, Takeaway
+  items           String?    // Stringified JSON of order items
+  deliveryAddress String?
+  zone            String?
+  riderId         Int?       // Rider user id
+  tableId         String?    // For Dine-In orders
+  paymentMethod   String?    // UPI, Card, Cash, Wallet
+  paymentStatus   String     @default("Pending") // Pending, Paid, Failed, Refunded
+  razorpayOrderId String?
+  razorpayPaymentId String?
+  tracking        Json?      // Array of {status, time, desc}
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([userId])
+  @@index([restaurantId])
+  @@index([riderId])
+  @@index([status])
+  @@index([zone])
+  @@index([tableId])
+}
+
+// ─── TABLES ─────────────────────────────────────────────
+model Table {
+  id           Int        @id @default(autoincrement())
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  tableNumber  String
+  capacity     Int
+  status       String     @default("Available") // Available, Occupied, Reserved, OutOfService
+  qrCode       String?    @unique
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([restaurantId, tableNumber])
+  @@index([restaurantId])
+  @@index([status])
+}
+
+// ─── ZONES ──────────────────────────────────────────────
+model Zone {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  lat             Float
+  lng             Float
+  radius          Int      @default(5000) // meters
+  isActive        Boolean  @default(true)
+  surgeMultiplier Float    @default(1.0)
+  createdAt       DateTime @default(now())
+}
+
+// ─── WALLETS & TRANSACTIONS ─────────────────────────────
+model Wallet {
+  id           Int           @id @default(autoincrement())
+  entityId     String        @unique // e.g., REST-01, RIDE-991, ADMIN
+  entityType   String        // Restaurant, Rider, Admin
+  balance      Float         @default(0.0)
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  walletId    Int
+  wallet      Wallet   @relation(fields: [walletId], references: [id])
+  type        String   // CREDIT, DEBIT
+  amount      Float
+  description String
+  orderId     Int?
+  createdAt   DateTime @default(now())
+
+  @@index([walletId])
+}
+
+// ─── FEEDBACK ───────────────────────────────────────────
+model Feedback {
+  id         Int      @id @default(autoincrement())
+  userId     Int?
+  user       User?    @relation(fields: [userId], references: [id])
+  category   String   @default("General") // General, Food Quality, Delivery, App
+  subject    String?
+  message    String
+  rating     Int      @default(5) // 1-5
+  status     String   @default("Open") // Open, In Progress, Resolved, Closed
+  priority   String   @default("Medium") // Low, Medium, High, Critical
+  assignedTo String?
+  responses  Json?    // Array of {author, message, date}
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([status])
+  @@index([userId])
+}
+
+// ─── REVIEWS ────────────────────────────────────────────
+model Review {
+  id           Int        @id @default(autoincrement())
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  authorName   String
+  authorEmail  String?
+  rating       Int        @default(5) // 1-5
+  title        String?
+  text         String?
+  helpful      Int        @default(0)
+  photos       String[]   @default([])
+  createdAt    DateTime   @default(now())
+
+  @@index([restaurantId])
+}
+
+// ─── DISPUTES ───────────────────────────────────────────
+model Dispute {
+  id          Int      @id @default(autoincrement())
+  ticketId    String   @unique // e.g., TKT-8992
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id])
+  orderId     String?
+  title       String
+  description String?
+  type        String   @default("Standard") // Standard, Critical, Escalated
+  status      String   @default("Active") // Active, Escalated, Resolved, Closed
+  assignedTo  String?
+  aiSummary   String?
+  log         Json?    // Array of {role, msg, timestamp}
+  items       Json?    // Array of {name, price}
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([userId])
+}
+
+// ─── SUPPORT TICKETS ────────────────────────────────────
+model SupportTicket {
+  id       Int      @id @default(autoincrement())
+  ticketId String   @unique // e.g., TKT-12345
+  userId   Int?
+  user     User?    @relation(fields: [userId], references: [id])
+  subject  String
+  category String   @default("Other")
+  message  String
+  status   String   @default("Open") // Open, In Progress, Resolved, Closed
+  priority String   @default("Medium")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ─── PROMOTIONS ─────────────────────────────────────────
+model Promotion {
+  id       Int      @id @default(autoincrement())
+  code     String   @unique
+  type     String   // percentage, flat
+  value    Float    // discount value
+  cap      Float?   // max discount cap (for percentage)
+  used     Int      @default(0)
+  maxUsage Int      @default(1000)
+  status   String   @default("Active") // Active, Scheduled, Expired, Paused
+  expiresAt DateTime?
+  description String?
+  createdAt DateTime @default(now())
+
+  @@index([code])
+  @@index([status])
+}
+
+// ─── USER SUBSCRIPTIONS ─────────────────────────────────
+model UserSubscription {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  plan      String   // ZipZap Starter, ZipZap Gold, Zoi Platinum
+  price     Float
+  status    String   @default("Active") // Active, Past Due, Cancelled, Paused
+  autoRenew Boolean  @default(true)
+  startDate DateTime @default(now())
+  endDate   DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ─── PUSH SUBSCRIPTIONS ─────────────────────────────────
+model PushSubscription {
+  id       Int    @id @default(autoincrement())
+  userId   Int?
+  user     User?  @relation(fields: [userId], references: [id])
+  endpoint String @unique
+  keys     Json   // {p256dh, auth}
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ─── INVENTORY ──────────────────────────────────────────
+model InventoryItem {
+  id           Int        @id @default(autoincrement())
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  name         String
+  category     String     // Raw Material, Dairy, Beverage
+  stock        Float      @default(0)
+  unit         String     @default("pcs") // pcs, kg, liters, cans
+  minStock     Float      @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([restaurantId])
+}
+
+// ─── RESTAURANT STAFF ───────────────────────────────────
+model RestaurantStaff {
+  id           Int        @id @default(autoincrement())
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  name         String
+  role         String     @default("Staff") // Manager, Chef, Cashier, Waiter, Staff
+  phone        String?
+  email        String?
+  status       String     @default("Active")
+  createdAt    DateTime   @default(now())
+
+  @@index([restaurantId])
+}
+
+// ─── RIDER APPLICATIONS ─────────────────────────────────
+model RiderApplication {
+  id       Int      @id @default(autoincrement())
+  appId    String   @unique // e.g., APP-9001
+  name     String
+  phone    String?
+  city     String?
+  vehicle  String?  // Bike, Scooter, Bicycle
+  status   String   @default("New") // New, Verification, Approved, Rejected, Deployed
+  score    Int      @default(0)
+  docs     Json?    // {license, rc, aadhar}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── RESTAURANT APPLICATIONS ────────────────────────────
+model RestaurantApplication {
+  id        Int      @id @default(autoincrement())
+  appId     String   @unique // e.g., REQ-8821
+  name      String
+  ownerName String?
+  phone     String?
+  zone      String?
+  category  String?
+  plan      String?
+  isPosOnly Boolean  @default(false)
+  docs      Json?    // {fssai, gst, bank}
+  image     String?
+  status    String   @default("Pending") // Pending, Approved, Rejected
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── CMS ASSETS ─────────────────────────────────────────
+model CmsAsset {
+  id       Int      @id @default(autoincrement())
+  title    String
+  type     String   // Home Banner, Restaurant Promo, Notification
+  region   String?
+  description String?
+  image    String?
+  score    Int      @default(0)
+  status   String   @default("Active") // Active, Scheduled, Archived
+  author   String?
+  segment  String?  // All Users, Gold Members, etc.
+  sortOrder Int     @default(0)
+  createdAt DateTime @default(now())
+}
+
+// ─── GAMIFICATION BADGES ────────────────────────────────
+model Badge {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  icon        String?
+  description String?
+  color       String?
+  status      String   @default("active") // active, library
+  createdAt   DateTime @default(now())
+}
+
+// ─── REFUNDS ────────────────────────────────────────────
+model Refund {
+  id            Int      @id @default(autoincrement())
+  refundId      String   @unique // e.g., R-1092
+  orderId       String?
+  restaurantName String?
+  customerName  String?
+  reason        String
+  amount        Float
+  riskScore     Int      @default(0) // 0-100
+  status        String   @default("Pending") // Pending, Approved, Rejected, Auto-Rejected
+  paymentMethod String?
+  description   String?
+  items         Json?    // receipt items
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+}

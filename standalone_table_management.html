@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Standalone POS - Floor Plan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: { extend: { colors: { primary: "#00f0ff", bg: "#0f1115", surface: "#181a20", border: "#2a2d35", success: "#22c55e", danger: "#ef4444" }, fontFamily: { sans: ["Inter", "sans-serif"] } } }
+        };
+    </script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 0px;
+        }
+
+        .table-card {
+            transition: all 0.2s ease;
+        }
+
+        .zone-btn.active {
+            background-color: #00f0ff;
+            color: black;
+            border-color: #00f0ff;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans selection:bg-primary selection:text-black"
+    id="app-body">
+
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative transition-all">
+        <header class="h-16 border-b border-border bg-surface flex items-center justify-between px-6 z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-bold">Floor Manager</h1>
+                <div
+                    class="flex gap-4 text-xs font-bold ml-6 bg-black/20 p-1.5 rounded-lg border border-white/5 overflow-x-auto">
+                    <div class="flex items-center gap-2 px-2"><span class="size-3 bg-gray-600 rounded-full"></span>
+                        Vacant</div>
+                    <div class="flex items-center gap-2 px-2"><span class="size-3 bg-blue-500 rounded-full"></span> POS
+                        Active</div>
+                    <div class="flex items-center gap-2 px-2"><span class="size-3 bg-yellow-500 rounded-full"></span>
+                        Kitchen Prep</div>
+                    <div class="flex items-center gap-2 px-2"><span
+                            class="size-3 bg-teal-400 rounded-full shadow-[0_0_10px_#2dd4bf] animate-pulse"></span> Food
+                        Ready</div>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="openModal('add-table-modal')"
+                    class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-xs font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">add_box</span> Add Table
+                </button>
+                <button onclick="toggleFullScreen()"
+                    class="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-white transition-all border border-white/10"
+                    title="Toggle Fullscreen">
+                    <span class="material-symbols-outlined">fullscreen</span>
+                </button>
+            </div>
+        </header>
+
+        <div
+            class="flex-1 p-8 overflow-y-auto bg-[radial-gradient(#2a2d35_1px,transparent_1px)] [background-size:20px_20px]">
+
+            <div class="mb-6 flex gap-4 overflow-x-auto pb-2" id="zone-container">
+                <button onclick="filterZone('Main Hall')"
+                    class="zone-btn active px-4 py-2 bg-primary text-black font-bold rounded-lg text-xs shadow-lg shadow-primary/20 transition-all border border-primary">Main
+                    Hall</button>
+                <button onclick="filterZone('Patio')"
+                    class="zone-btn px-4 py-2 bg-surface text-gray-400 border border-border font-bold rounded-lg text-xs hover:text-white transition-all">Patio</button>
+                <button onclick="filterZone('VIP')"
+                    class="zone-btn px-4 py-2 bg-surface text-gray-400 border border-border font-bold rounded-lg text-xs hover:text-white transition-all">VIP</button>
+
+                <button onclick="addZone()"
+                    class="px-4 py-2 bg-black/40 text-gray-500 border border-dashed border-gray-600 font-bold rounded-lg text-xs hover:text-white hover:border-white">+
+                    New Floor</button>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6" id="table-grid">
+            </div>
+        </div>
+    </main>
+
+    <div id="table-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-1" id="modal-title">Table T-01</h3>
+            <p class="text-xs text-gray-400 mb-6" id="modal-status">Status: Occupied</p>
+
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <button onclick="goToActivePOS()"
+                    class="p-3 bg-primary text-black font-bold rounded-lg text-sm hover:bg-orange-600 flex flex-col items-center gap-1">
+                    <span class="material-symbols-outlined">shopping_cart</span> Open POS
+                </button>
+                <button onclick="openWaiterModal()"
+                    class="p-3 bg-white/10 text-white font-bold rounded-lg text-sm hover:bg-white/20 flex flex-col items-center gap-1">
+                    <span class="material-symbols-outlined">person_add</span> Assign Waiter
+                </button>
+                <button onclick="deleteTable()"
+                    class="p-3 bg-red-500/10 text-red-500 border border-red-500/30 font-bold rounded-lg text-sm hover:bg-red-500 hover:text-white flex flex-col items-center gap-1 col-span-2">
+                    <span class="material-symbols-outlined">delete</span> Remove Table
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="seatGuest()"
+                    class="py-2 bg-green-600/20 text-green-400 border border-green-500/30 rounded-lg text-xs font-bold hover:bg-green-600 hover:text-white">🪑
+                    Seat Guest</button>
+                <button onclick="vacateTable()"
+                    class="py-2 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white">✅
+                    Vacate Table</button>
+            </div>
+            <button onclick="closeModal('table-modal')"
+                class="w-full py-3 border border-border text-gray-400 rounded-lg text-xs font-bold hover:text-white">Close</button>
+        </div>
+    </div>
+
+    <div id="waiter-modal" class="fixed inset-0 z-[60] bg-black/90 hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Assign Staff</h3>
+            <div class="space-y-2">
+                <button onclick="assignWaiter('Rahul S.')"
+                    class="w-full p-3 bg-white/5 hover:bg-white/10 rounded-lg text-left text-sm text-white flex justify-between">Rahul
+                    S. <span class="text-xs text-green-500">Available</span></button>
+                <button onclick="assignWaiter('Amit V.')"
+                    class="w-full p-3 bg-white/5 hover:bg-white/10 rounded-lg text-left text-sm text-white flex justify-between">Amit
+                    V. <span class="text-xs text-green-500">Available</span></button>
+                <button onclick="assignWaiter('Sarah K.')"
+                    class="w-full p-3 bg-white/5 hover:bg-white/10 rounded-lg text-left text-sm text-white flex justify-between">Sarah
+                    K. <span class="text-xs text-yellow-500">Busy</span></button>
+            </div>
+            <button onclick="closeModal('waiter-modal')"
+                class="w-full mt-4 py-2 border border-border text-gray-400 rounded-lg text-xs">Cancel</button>
+        </div>
+    </div>
+
+    <div id="add-table-modal" class="fixed inset-0 z-[70] bg-black/90 hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Add Table</h3>
+            <div class="space-y-4">
+                <input type="text" id="new-tbl-name" placeholder="Table Name (e.g. T-20)"
+                    class="w-full bg-black/30 border border-border rounded-lg p-3 text-white text-sm">
+                <select id="new-tbl-zone"
+                    class="w-full bg-black/30 border border-border rounded-lg p-3 text-white text-sm">
+                    <option value="Main Hall">Main Hall</option>
+                    <option value="Patio">Patio</option>
+                    <option value="VIP">VIP</option>
+                </select>
+                <input type="number" id="new-tbl-seats" placeholder="Seats (e.g. 4)"
+                    class="w-full bg-black/30 border border-border rounded-lg p-3 text-white text-sm">
+            </div>
+            <button onclick="confirmAddTable()"
+                class="w-full mt-6 py-3 bg-primary text-black font-bold rounded-lg text-sm">Create Table</button>
+            <button onclick="closeModal('add-table-modal')"
+                class="w-full mt-2 py-2 text-gray-400 text-xs">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const REST_ID = localStorage.getItem('zoiPartnerRestId') || "101";
+
+        const DEFAULT_TABLES = [
+            { id: "T-01", zone: "Main Hall", status: "Vacant", seats: 4, waiter: "Rahul S." },
+            { id: "T-02", zone: "Main Hall", status: "Vacant", seats: 2, waiter: "" },
+            { id: "P-01", zone: "Patio", status: "Vacant", seats: 6, waiter: "" }
+        ];
+        const DEFAULT_ZONES = ["Main Hall", "Patio", "VIP"];
+
+        // Load from localStorage or seed defaults
+        let tables = JSON.parse(localStorage.getItem(`zoiTables_${REST_ID}`)) || DEFAULT_TABLES;
+        let zones = JSON.parse(localStorage.getItem(`zoiZones_${REST_ID}`)) || DEFAULT_ZONES;
+        let currentFilter = zones[0] || "Main Hall";
+        let activeTableId = null;
+
+        function saveTables() { localStorage.setItem(`zoiTables_${REST_ID}`, JSON.stringify(tables)); }
+        function saveZones() { localStorage.setItem(`zoiZones_${REST_ID}`, JSON.stringify(zones)); }
+
+        window.onload = () => {
+            renderZoneButtons();
+            renderTables();
+            ZoiRestaurantSync.listen((e) => {
+                if (e.restId === REST_ID && (e.type === 'TABS_UPDATED' || e.type === 'KDS_UPDATED')) {
+                    renderTables();
+                }
+            });
+        };
+
+        function renderZoneButtons() {
+            const container = document.getElementById('zone-container');
+            // Keep the "+ New Floor" button
+            const addBtn = container.querySelector('button:last-child');
+            container.innerHTML = '';
+
+            zones.forEach(z => {
+                const isActive = z === currentFilter;
+                const btn = document.createElement('button');
+                btn.className = isActive
+                    ? 'zone-btn active px-4 py-2 bg-primary text-black font-bold rounded-lg text-xs shadow-lg shadow-primary/20 transition-all border border-primary'
+                    : 'zone-btn px-4 py-2 bg-surface text-gray-400 border border-border font-bold rounded-lg text-xs hover:text-white transition-all';
+                btn.innerText = z;
+                btn.onclick = () => filterZone(z);
+                container.appendChild(btn);
+            });
+
+            // Re-add the "+ New Floor" button
+            const newBtn = document.createElement('button');
+            newBtn.className = 'px-4 py-2 bg-black/40 text-gray-500 border border-dashed border-gray-600 font-bold rounded-lg text-xs hover:text-white hover:border-white';
+            newBtn.innerText = '+ New Floor';
+            newBtn.onclick = addZone;
+            container.appendChild(newBtn);
+
+            // Also update the "Add Table" zone dropdown
+            const select = document.getElementById('new-tbl-zone');
+            select.innerHTML = '';
+            zones.forEach(z => {
+                const opt = document.createElement('option');
+                opt.value = z; opt.innerText = z;
+                select.appendChild(opt);
+            });
+        }
+
+        function renderTables() {
+            const activeTabs = ZoiRestaurantSync.getActiveTabs(REST_ID) || [];
+
+            const grid = document.getElementById('table-grid');
+            grid.innerHTML = "";
+            const filtered = tables.filter(t => t.zone === currentFilter);
+
+            filtered.forEach(t => {
+                const tabLabelMatch = `Table: ${t.id}`;
+                const activeTab = activeTabs.find(tab => tab.meta === tabLabelMatch || tab.tableId === t.id);
+
+                let displayStatus = t.status;
+                let border = "border-gray-600";
+                let statusBadge = "bg-gray-700 text-white";
+                let overlay = "hidden";
+                let pulseClass = "";
+                let billAmt = "";
+
+                if (activeTab) {
+                    displayStatus = 'Ordering'; // Active POS Session
+                    if (activeTab.status === 'Sent to Kitchen') displayStatus = 'Waiting Food';
+                    else if (activeTab.status === 'Cooking') displayStatus = 'Food Prep';
+                    else if (activeTab.status === 'Ready') displayStatus = 'Food Ready';
+
+                    billAmt = `<div class="text-[10px] text-primary font-mono mt-1 font-bold bg-white/10 px-1 inline-block rounded">${activeTab.total}</div>`;
+                } else if (displayStatus === "Occupied") {
+                    displayStatus = "Seated"; // Just seated, no POS active yet
+                }
+
+                if (displayStatus === "Seated") {
+                    border = "border-red-500";
+                    statusBadge = "bg-red-500 text-black";
+                    overlay = "bg-red-500/5";
+                } else if (displayStatus === "Ordering") {
+                    border = "border-blue-500";
+                    statusBadge = "bg-blue-500 text-white";
+                    overlay = "bg-blue-500/5";
+                } else if (displayStatus === "Waiting Food" || displayStatus === "Food Prep") {
+                    border = "border-yellow-500";
+                    statusBadge = "bg-yellow-500 text-black";
+                    overlay = "bg-yellow-500/5";
+                } else if (displayStatus === "Food Ready") {
+                    border = "border-teal-400";
+                    statusBadge = "bg-teal-400 text-black shadow-[0_0_10px_#2dd4bf]";
+                    overlay = "bg-teal-400/10";
+                    pulseClass = "animate-pulse";
+                }
+
+                let subtext = t.waiter ? `<span class="text-[10px] text-primary flex items-center gap-1 mt-1"><span class="material-symbols-outlined text-[10px]">person</span> ${t.waiter}</span>` : `<span class="text-[10px] text-gray-500 mt-1 block">No Waiter</span>`;
+
+                grid.innerHTML += `
+                    <div onclick="handleTableClick('${t.id}', '${displayStatus}')" class="table-card bg-surface border-t-4 ${border} rounded-xl p-4 h-36 flex flex-col justify-between shadow-xl cursor-pointer hover:-translate-y-1 relative overflow-hidden group ${pulseClass}">
+                        <div class="absolute inset-0 ${overlay}"></div>
+                        <div class="flex justify-between items-start z-10">
+                            <span class="text-2xl font-black text-white">${t.id}</span>
+                            <span class="text-[9px] ${statusBadge} px-1.5 py-0.5 rounded font-bold uppercase tracking-wide">${displayStatus}</span>
+                        </div>
+                        <div class="z-10">
+                            <div class="flex items-center gap-1 text-xs text-gray-400"><span class="material-symbols-outlined text-[14px]">event_seat</span> ${t.seats} Seats</div>
+                            ${subtext}
+                            ${billAmt}
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function filterZone(zone) {
+            currentFilter = zone;
+            document.querySelectorAll('.zone-btn').forEach(b => {
+                b.classList.remove('active', 'bg-primary', 'text-black', 'border-primary');
+                b.classList.add('bg-surface', 'text-gray-400', 'border-border');
+            });
+            const clickedBtn = Array.from(document.querySelectorAll('.zone-btn')).find(b => b.innerText === zone);
+            if (clickedBtn) {
+                clickedBtn.classList.remove('bg-surface', 'text-gray-400', 'border-border');
+                clickedBtn.classList.add('active', 'bg-primary', 'text-black', 'border-primary');
+            }
+            renderTables();
+        }
+
+        function handleTableClick(id, status) {
+            if (status === "Vacant" || status === "Seated") {
+                // If no active POS session, directly jump to pos
+                window.location.href = `standalone_pos_terminal.html?table=${id}`;
+            } else {
+                activeTableId = id;
+                document.getElementById('modal-title').innerText = "Table " + id;
+                document.getElementById('modal-status').innerText = "Status: " + status;
+                openModal('table-modal');
+            }
+        }
+
+        // ACTIONS
+        function goToActivePOS() {
+            if (activeTableId) window.location.href = `standalone_pos_terminal.html?table=${activeTableId}`;
+        }
+        function confirmAddTable() {
+            const name = document.getElementById('new-tbl-name').value;
+            const zone = document.getElementById('new-tbl-zone').value;
+            const seats = document.getElementById('new-tbl-seats').value;
+            if (name) {
+                tables.push({ id: name, zone: zone, status: "Vacant", seats: seats || 4, waiter: "" });
+                saveTables();
+                filterZone(zone);
+                closeModal('add-table-modal');
+            }
+        }
+
+        function assignWaiter(name) {
+            const table = tables.find(t => t.id === activeTableId);
+            table.waiter = name;
+            saveTables();
+            renderTables();
+            closeModal('waiter-modal');
+            closeModal('table-modal');
+        }
+
+        function deleteTable() {
+            if (confirm("Remove this table?")) {
+                tables = tables.filter(t => t.id !== activeTableId);
+                saveTables();
+                renderTables();
+                closeModal('table-modal');
+            }
+        }
+
+        function seatGuest() {
+            const table = tables.find(t => t.id === activeTableId);
+            if (table) {
+                table.status = 'Occupied';
+                saveTables();
+                renderTables();
+                closeModal('table-modal');
+                showToast('Success', `${activeTableId} is now Seated`);
+            }
+        }
+
+        function vacateTable() {
+            const table = tables.find(t => t.id === activeTableId);
+            if (table) {
+                table.status = 'Vacant';
+                saveTables();
+                // Also clean up any active tabs for this table
+                const tabs = ZoiRestaurantSync.getActiveTabs(REST_ID);
+                const tab = tabs.find(t => t.tableId === activeTableId);
+                if (tab) { ZoiRestaurantSync.removeTab(REST_ID, tab.id); }
+                renderTables();
+                closeModal('table-modal');
+                showToast('Success', `${activeTableId} is now Vacant`);
+            }
+        }
+
+        function addZone() {
+            const name = prompt("Enter Floor Name (e.g. Roof Top):");
+            if (name && !zones.includes(name)) {
+                zones.push(name);
+                saveZones();
+                renderZoneButtons();
+                showToast("Success", "Zone Added: " + name);
+            }
+        }
+
+        function goToPOS() {
+            window.location.href = `standalone_pos_terminal.html?table=${activeTableId}`;
+        }
+
+        // UTILS
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+        function openWaiterModal() { openModal('waiter-modal'); }
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); document.getElementById('sidebar').classList.add('hidden'); }
+            else { if (document.exitFullscreen) { document.exitFullscreen(); document.getElementById('sidebar').classList.remove('hidden'); } }
+        }
+
+        // === TOAST NOTIFICATION ===
+        function showToast(title, message) {
+            let toast = document.getElementById('table-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'table-toast';
+                toast.className = 'fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-[0_10px_40px_rgba(0, 240, 255,0.3)] z-[9999] flex items-center gap-3 transition-all duration-300 translate-y-20 opacity-0 pointer-events-none';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<span class="material-symbols-outlined text-primary text-2xl">check_circle</span> 
+                               <div>
+                                 <h4 class="font-bold text-sm text-white">${title}</h4>
+                                 <p class="text-xs text-gray-400">${message}</p>
+                               </div>`;
+
+            // Force reflow
+            void toast.offsetWidth;
+
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+
+            if (window._tableToastTimeout) clearTimeout(window._tableToastTimeout);
+
+            window._tableToastTimeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+            }, 3000);
+        }
+    </script>
+    <script>
+        // POS-ONLY SESSION GUARD
+        (function () {
+            try {
+                const u = JSON.parse(localStorage.getItem('zoiUser') || '{}');
+                if (u.role === 'pos_staff' || u.isPosOnly) {
+                    // Change header to POS Hub
+                    const hubTitle = document.querySelector('aside h1');
+                    if (hubTitle) hubTitle.textContent = 'POS Hub';
+                    // Redirect sidebar logo click to POS terminal
+                    const logoDiv = document.querySelector('aside > div[onclick]');
+                    if (logoDiv) logoDiv.setAttribute('onclick', "window.location.href='standalone_pos_terminal.html'");
+                    // Hide online-only links and redirect Dashboard
+                    document.querySelectorAll('aside nav a').forEach(link => {
+                        const text = link.textContent.trim();
+                        if (['Promotions', 'Loyalty', 'Reviews'].includes(text)) link.style.display = 'none';
+                        if (text === 'Dashboard') { link.href = 'standalone_pos_terminal.html'; link.innerHTML = '<span class="material-symbols-outlined">point_of_sale</span> POS Terminal'; }
+                    });
+                    document.querySelectorAll('aside nav div').forEach(el => { if (el.textContent.trim() === 'Growth') el.style.display = 'none'; });
+                }
+            } catch (e) { }
+        })();
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+    <script src="js/zoi_partner_engine.js"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+

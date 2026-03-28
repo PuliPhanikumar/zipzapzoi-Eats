@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Admin - Subscriptions</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>
+        // Enforce RBAC Access Before Rendering
+        ZoiAuth.enforceAccess("Subscriptions");
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #00f0ff;
+            color: white;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-inactive {
+            border-bottom: 2px solid transparent;
+            color: #9ca3af;
+        }
+    .glass { background: rgba(24, 26, 32, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white font-sans h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-bg">
+
+        <header class="h-16 flex items-center justify-between px-6 border-b border-border bg-surface z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold text-white flex items-center gap-2">
+                    Customer Subscriptions <span
+                        class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30"
+                        id="total-count">Loading...</span>
+                </h1>
+                <div class="h-6 w-[1px] bg-border"></div>
+                <div class="flex items-center gap-2 text-xs text-gray-400">
+                    <span class="material-symbols-outlined text-sm text-yellow-500">star</span>
+                    <span>Focus: Retention & Local Growth</span>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="openGrantModal()"
+                    class="bg-[#2a1e12] border border-primary/30 text-primary px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 hover:bg-primary/10">
+                    <span class="material-symbols-outlined text-sm">card_giftcard</span> Grant Membership
+                </button>
+                <button onclick="exportCSV()"
+                    class="bg-surface border border-border hover:border-white text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">download</span> Export List
+                </button>
+            </div>
+        </header>
+
+        <div class="px-6 pt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-surface border border-border p-4 rounded-xl">
+                <p class="text-xs text-gray-500 uppercase font-bold">Total Subscribers</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-white">12,450</h3>
+                    <span class="text-xs text-success bg-success/10 px-1.5 rounded">+5%</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border p-4 rounded-xl">
+                <p class="text-xs text-gray-500 uppercase font-bold">Recurring Rev (MRR)</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-white">₹45.2L</h3>
+                    <span class="text-xs text-success bg-success/10 px-1.5 rounded">+2.1%</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border p-4 rounded-xl">
+                <p class="text-xs text-gray-500 uppercase font-bold">ZipZap Starter (New)</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-yellow-400">4,200</h3>
+                    <span class="text-xs text-gray-400">Entry Level</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border p-4 rounded-xl">
+                <p class="text-xs text-gray-500 uppercase font-bold">Projected Rev</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-blue-400">₹52.8L</h3>
+                    <span class="text-xs text-gray-400">Next Month</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6 flex flex-col h-full overflow-hidden">
+
+            <div class="flex items-center gap-1 border-b border-border mb-4">
+                <button onclick="switchView('subscribers')" id="tab-subscribers"
+                    class="tab-active px-6 py-3 text-sm font-bold flex items-center gap-2">Subscribers</button>
+                <button onclick="switchView('plans')" id="tab-plans"
+                    class="tab-inactive px-6 py-3 text-sm font-bold flex items-center gap-2"><span
+                        class="material-symbols-outlined text-sm text-primary">settings</span> Plan Config</button>
+            </div>
+
+            <div id="view-subscribers" class="flex flex-col flex-1 overflow-hidden">
+                <div class="flex justify-between items-center bg-surface border border-border rounded-t-xl p-3">
+                    <div class="flex gap-2">
+                        <div id="bulk-actions"
+                            class="hidden items-center gap-2 mr-4 border-r border-border pr-4 animate-fade-in-right">
+                            <span class="text-xs text-white font-bold" id="selection-count">0 Selected</span>
+                            <button onclick="bulkAction('reminder')"
+                                class="bg-white/10 hover:bg-white/20 text-white px-2 py-1 rounded text-xs">Send
+                                Reminder</button>
+                        </div>
+                        <div class="relative">
+                            <input type="text" id="search-input" onkeyup="renderTable()"
+                                placeholder="Search User, Email..."
+                                class="bg-bg border border-border rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:border-primary w-64">
+                            <span
+                                class="material-symbols-outlined absolute left-2 top-1.5 text-gray-500 text-sm">search</span>
+                        </div>
+                        <select id="filter-plan" onchange="renderTable()"
+                            class="bg-bg border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary">
+                            <option value="all">All Plans</option>
+                            <option value="ZipZap Starter">Starter (₹99)</option>
+                            <option value="ZipZap Gold">Gold (₹399)</option>
+                            <option value="Zoi Platinum">Platinum (₹599)</option>
+                        </select>
+                        <select id="filter-status" onchange="renderTable()"
+                            class="bg-bg border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary">
+                            <option value="all">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Past Due">Past Due</option>
+                            <option value="Paused">Paused</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-500" id="page-indicator">Page 1 of 1</span>
+                        <button onclick="changePage(-1)"
+                            class="p-1.5 rounded-lg border border-border text-gray-400 hover:text-white hover:bg-white/5"><span
+                                class="material-symbols-outlined text-sm">chevron_left</span></button>
+                        <button onclick="changePage(1)"
+                            class="p-1.5 rounded-lg border border-border text-gray-400 hover:text-white hover:bg-white/5"><span
+                                class="material-symbols-outlined text-sm">chevron_right</span></button>
+                    </div>
+                </div>
+
+                <div class="bg-surface border-x border-b border-border rounded-b-xl flex-1 overflow-auto relative">
+                    <table class="w-full text-left text-xs">
+                        <thead
+                            class="bg-black/20 text-gray-500 uppercase font-semibold sticky top-0 z-10 backdrop-blur-sm">
+                            <tr>
+                                <th class="px-4 py-3 w-10"><input type="checkbox" id="select-all"
+                                        onclick="toggleSelectAll()"
+                                        class="rounded border-gray-600 bg-bg focus:ring-primary text-primary"></th>
+                                <th class="px-4 py-3">Customer</th>
+                                <th class="px-4 py-3">Plan</th>
+                                <th class="px-4 py-3">Status</th>
+                                <th class="px-4 py-3 text-right">Cost</th>
+                                <th class="px-4 py-3">Renewal</th>
+                                <th class="px-4 py-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border text-gray-300" id="sub-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-plans" class="hidden flex-1 overflow-y-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                    <div
+                        class="bg-surface border border-yellow-500/30 rounded-xl p-6 relative group hover:border-yellow-500 transition-all">
+                        <div class="absolute top-4 right-4">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked onchange="togglePlanStatus(this, 'Starter')"
+                                    class="sr-only peer">
+                                <div
+                                    class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:bg-yellow-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all">
+                                </div>
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div
+                                class="size-10 bg-yellow-500/10 rounded-lg flex items-center justify-center text-yellow-500 border border-yellow-500/20">
+                                <span class="material-symbols-outlined">bolt</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">ZipZap Starter</h3>
+                                <p class="text-xs text-gray-400">Entry Hook</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex gap-2">
+                                <div class="flex-1"><label class="text-[10px] text-gray-500 uppercase font-bold">Price
+                                        (₹)</label><input type="number" value="99" id="price-starter"
+                                        class="w-full bg-black/20 border border-border rounded p-2 text-white text-xs">
+                                </div>
+                                <div class="flex-1"><label
+                                        class="text-[10px] text-gray-500 uppercase font-bold">Duration</label><input
+                                        type="text" value="3 Months" id="dur-starter"
+                                        class="w-full bg-black/20 border border-border rounded p-2 text-white text-xs">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase font-bold">Constraints</label>
+                                <div class="space-y-2 mt-1">
+                                    <label class="flex items-center gap-2 text-xs text-gray-300"><input type="checkbox"
+                                            checked class="rounded bg-black border-gray-600 text-yellow-500"> Free
+                                        Delivery (3 km)</label>
+                                    <label class="flex items-center gap-2 text-xs text-gray-300"><input type="checkbox"
+                                            checked class="rounded bg-black border-gray-600 text-yellow-500"> Flat ₹20
+                                        Off (10 orders/mo)</label>
+                                    <label class="flex items-center gap-2 text-xs text-gray-300"><input type="checkbox"
+                                            checked class="rounded bg-black border-gray-600 text-yellow-500"> No
+                                        Platform Fee</label>
+                                </div>
+                            </div>
+                            <button onclick="savePlanConfig('Starter')"
+                                class="w-full py-2 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-500 text-xs font-bold rounded border border-yellow-500/30">Save
+                                Config</button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-surface border border-orange-500/30 rounded-xl p-6 relative group hover:border-orange-500 transition-all">
+                        <div class="absolute top-4 right-4"><label
+                                class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked
+                                    onchange="togglePlanStatus(this, 'Gold')" class="sr-only peer">
+                                <div
+                                    class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:bg-orange-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all">
+                                </div>
+                            </label></div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div
+                                class="size-10 bg-orange-500/10 rounded-lg flex items-center justify-center text-orange-500 border border-orange-500/20">
+                                <span class="material-symbols-outlined">stars</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">ZipZap Gold</h3>
+                                <p class="text-xs text-gray-400">Core Plan</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex gap-2">
+                                <div class="flex-1"><label class="text-[10px] text-gray-500 uppercase font-bold">Price
+                                        (₹)</label><input type="number" value="399" id="price-gold"
+                                        class="w-full bg-black/20 border border-border rounded p-2 text-white text-xs">
+                                </div>
+                                <div class="flex-1"><label
+                                        class="text-[10px] text-gray-500 uppercase font-bold">Duration</label><input
+                                        type="text" value="6 Months" id="dur-gold"
+                                        class="w-full bg-black/20 border border-border rounded p-2 text-white text-xs">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase font-bold">Benefits</label>
+                                <div class="space-y-2 mt-1">
+                                    <label class="flex items-center gap-2 text-xs text-gray-300"><input type="checkbox"
+                                            checked class="rounded bg-black border-gray-600 text-orange-500"> Free
+                                        Delivery (5 km)</label>
+                                    <label class="flex items-center gap-2 text-xs text-gray-300"><input type="checkbox"
+                                            checked class="rounded bg-black border-gray-600 text-orange-500"> Flat ₹30
+                                        Off (20 orders/mo)</label>
+                                    <div
+                                        class="flex items-center gap-2 p-1.5 bg-orange-500/10 border border-orange-500/20 rounded text-xs text-orange-400 font-bold">
+                                        <span class="material-symbols-outlined text-xs">local_fire_department</span>
+                                        <div class="flex-1"><label class="flex items-center gap-1 cursor-pointer"><input
+                                                    type="checkbox" checked id="local-hero-chk-gold"
+                                                    class="rounded bg-black border-orange-500 text-orange-500"> Local
+                                                Hero: Extra ₹</label></div>
+                                        <input type="number" value="20" id="local-hero-gold"
+                                            class="w-10 h-5 bg-black border border-orange-500 rounded text-center text-[10px] text-white">
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="savePlanConfig('Gold')"
+                                class="w-full py-2 bg-orange-500/10 hover:bg-orange-500/20 text-orange-500 text-xs font-bold rounded border border-orange-500/30">Save
+                                Config</button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-surface border border-blue-500/30 rounded-xl p-6 relative group hover:border-blue-500 transition-all">
+                        <div class="absolute top-4 right-4"><label
+                                class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked
+                                    onchange="togglePlanStatus(this, 'Platinum')" class="sr-only peer">
+                                <div
+                                    class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:bg-blue-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all">
+                                </div>
+                            </label></div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div
+                                class="size-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500 border border-blue-500/20">
+                                <span class="material-symbols-outlined">diamond</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Zoi Platinum</h3>
+                                <p class="text-xs text-gray-400">Flagship</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex gap-2">
+                                <div class="flex-1"><label class="text-[10px] text-gray-500 uppercase font-bold">Price
+                                        (₹)</label><input type="number" value="599" id="price-plat"
+                                        class="w-full bg-black/20 border border-border rounded p-2 text-white text-xs">
+                                </div>
+                                <div class="flex-1"><label
+                                        class="text-[10px] text-gray-500 uppercase font-bold">Duration</label><input
+                                        type="text" value="12 Months" id="dur-plat"
+                                        class="w-full bg-black/20 border border-border rounded p-2 text-white text-xs">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-500 uppercase font-bold">Benefits</label>
+                                <div class="space-y-2 mt-1">
+                                    <label class="flex items-center gap-2 text-xs text-gray-300"><input type="checkbox"
+                                            checked class="rounded bg-black border-gray-600 text-blue-500"> Free
+                                        Delivery (7 km, Min Order ₹199)</label>
+                                    <label class="flex items-center gap-2 text-xs text-gray-300"><input type="checkbox"
+                                            checked class="rounded bg-black border-gray-600 text-blue-500"> Flat ₹40 Off
+                                        (25 orders/mo)</label>
+                                    <label class="flex items-center gap-2 text-xs text-gray-300"><input type="checkbox"
+                                            checked class="rounded bg-black border-gray-600 text-blue-500"> Rain Surge
+                                        Waived</label>
+                                </div>
+                            </div>
+                            <button onclick="savePlanConfig('Platinum')"
+                                class="w-full py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-500 text-xs font-bold rounded border border-blue-500/30">Save
+                                Config</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="grant-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Grant Membership</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">User Name</label>
+                    <input type="text" id="grant-name"
+                        class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm focus:border-primary focus:ring-0"
+                        placeholder="e.g. Rahul Kumar">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">User Email</label>
+                    <input type="text" id="grant-email"
+                        class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm focus:border-primary focus:ring-0"
+                        placeholder="e.g. user@zipzap.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Select Plan</label>
+                    <select id="grant-plan"
+                        class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm">
+                        <option value="ZipZap Starter">ZipZap Starter (3 Months)</option>
+                        <option value="ZipZap Gold">ZipZap Gold (6 Months)</option>
+                        <option value="Zoi Platinum">Zoi Platinum (1 Year)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Reason</label>
+                    <select class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm">
+                        <option>Service Apology (Complaint)</option>
+                        <option>VIP Goodwill</option>
+                        <option>Employee Testing</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeGrantModal()"
+                    class="flex-1 py-2 rounded-lg border border-border text-gray-400 text-sm font-bold">Cancel</button>
+                <button onclick="confirmGrant()"
+                    class="flex-1 py-2 rounded-lg bg-primary hover:bg-orange-600 text-black text-sm font-bold">Grant
+                    Access</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. DATA
+        let subscribers = ZoiSubscriptions.getAll();
+        let plans = ZoiSubscriptions.getPlans();
+        let currentId = null;
+        let selectedIds = [];
+        let currentPage = 1;
+        const itemsPerPage = 8;
+
+        // INIT
+        window.onload = () => {
+            fetch('sidebar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sidebar-container').innerHTML = data;
+                    setTimeout(() => {
+                        const links = document.querySelectorAll('#sidebar-container nav a');
+                        links.forEach(l => {
+                            if (l.innerText.includes('Subscriptions')) {
+                                l.className = "flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg font-bold transition-all";
+                                l.querySelector('span').classList.add('text-primary');
+                            } else {
+                                l.className = "flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group";
+                            }
+                        });
+                        ZoiAuth.renderSimLogin();
+                    }, 100);
+                });
+            renderTable();
+        };
+
+        // 2. RENDER SUBSCRIBERS
+        function renderTable() {
+            const tbody = document.getElementById('sub-table-body');
+            tbody.innerHTML = "";
+
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const planFilter = document.getElementById('filter-plan').value;
+            const statusFilter = document.getElementById('filter-status').value;
+            const start = (currentPage - 1) * itemsPerPage;
+
+            // Filter
+            const filtered = subscribers.filter(s => {
+                const matchSearch = s.name.toLowerCase().includes(search) || s.email.toLowerCase().includes(search);
+                const matchPlan = planFilter === 'all' || s.plan === planFilter;
+                const matchStatus = statusFilter === 'all' || s.status === statusFilter;
+                return matchSearch && matchPlan && matchStatus;
+            });
+
+            // Paginate
+            const paginated = filtered.slice(start, start + itemsPerPage);
+
+            document.getElementById('page-indicator').innerText = `Page ${currentPage} of ${Math.ceil(filtered.length / itemsPerPage) || 1}`;
+            document.getElementById('selection-count').innerText = `${selectedIds.length} Selected`;
+            document.getElementById('total-count').innerText = `${subscribers.length} Members`;
+
+            if (paginated.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-500">No subscribers found</td></tr>`;
+                return;
+            }
+
+            paginated.forEach(s => {
+                const isSelected = selectedIds.includes(s.id);
+                // Status Color
+                let statusColor = "text-gray-400";
+                if (s.status === 'Active') statusColor = "text-green-500";
+                if (s.status === 'Past Due') statusColor = "text-red-400";
+                if (s.status === 'Paused') statusColor = "text-yellow-500";
+
+                const row = `
+                <tr class="hover:bg-white/5 transition-colors group" onclick="openDrawer(${s.id})">
+                    <td class="px-4 py-3" onclick="event.stopPropagation()"><input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleSelect(${s.id})" class="rounded border-gray-600 bg-bg focus:ring-primary text-primary"></td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-3">
+                            <div class="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">${s.name.charAt(0)}</div>
+                            <div>
+                                <div class="font-bold text-white text-sm">${s.name}</div>
+                                <div class="text-[10px] text-gray-500">${s.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] border border-gray-700 bg-gray-800 text-gray-300">${s.plan}</span></td>
+                    <td class="px-4 py-3"><span class="${statusColor} font-bold flex items-center gap-1 text-xs">● ${s.status}</span></td>
+                    <td class="px-4 py-3 text-right font-mono text-gray-400">${s.amt}</td>
+                    <td class="px-4 py-3 text-gray-500">${s.renewal}</td>
+                    <td class="px-4 py-3 text-right">
+                        <button class="text-gray-500 hover:text-white"><span class="material-symbols-outlined text-lg">more_vert</span></button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+            updateSelection();
+        }
+
+        // 3. RENDER PLANS
+        function renderPlans() {
+            const container = document.querySelector('#view-plans .grid');
+            container.innerHTML = "";
+
+            plans.forEach(p => {
+                const html = `
+                <div class="bg-surface border border-${p.color}-500/30 rounded-xl p-6 relative group hover:border-${p.color}-500 transition-all">
+                    <div class="absolute top-4 right-4">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" ${p.active ? 'checked' : ''} onchange="togglePlanStatus(this, '${p.id}')" class="sr-only peer">
+                            <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:bg-${p.color}-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="size-10 rounded-lg bg-${p.color}-500/20 flex items-center justify-center text-${p.color}-500">
+                            <span class="material-symbols-outlined">stars</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-white">${p.name}</h3>
+                            <p class="text-xs text-gray-400">${p.period}</p>
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <span class="text-3xl font-bold text-white">₹${p.price}</span><span class="text-gray-500 text-sm">/mo</span>
+                        <input type="range" min="49" max="999" value="${p.price}" onchange="updatePlanPrice('${p.id}', this.value)" class="w-full mt-2 accent-${p.color}-500 h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <ul class="space-y-2 mb-6">
+                        ${p.benefits.map(b => `<li class="flex items-center gap-2 text-sm text-gray-300"><span class="material-symbols-outlined text-${p.color}-500 text-sm">check</span> ${b}</li>`).join('')}
+                    </ul>
+                    <button class="w-full py-2 rounded-lg border border-${p.color}-500/50 text-${p.color}-500 hover:bg-${p.color}-500 hover:text-white font-bold text-sm transition-all">Edit Features</button>
+                </div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function togglePlanStatus(el, id) {
+            const p = plans.find(x => x.id === id);
+            p.active = el.checked;
+            ZoiSubscriptions.savePlan(p);
+            // showToast(`${p.name} is now ${p.active ? 'Active' : 'Hidden'}`); // Toast not impl in this file, ignoring
+        }
+
+        function updatePlanPrice(id, val) {
+            const p = plans.find(x => x.id === id);
+            p.price = parseInt(val);
+            ZoiSubscriptions.savePlan(p);
+            renderPlans(); // Re-render to show updated price text
+        }
+
+        // TABS
+        function switchView(view) {
+            document.getElementById('view-subscribers').classList.add('hidden');
+            document.getElementById('view-plans').classList.add('hidden');
+            document.getElementById('tab-subscribers').className = "tab-inactive px-6 py-3 text-sm font-bold flex items-center gap-2";
+            document.getElementById('tab-plans').className = "tab-inactive px-6 py-3 text-sm font-bold flex items-center gap-2";
+
+            if (view === 'subscribers') {
+                document.getElementById('view-subscribers').classList.remove('hidden');
+                document.getElementById('tab-subscribers').className = "tab-active px-6 py-3 text-sm font-bold flex items-center gap-2";
+            } else {
+                document.getElementById('view-plans').classList.remove('hidden');
+                document.getElementById('tab-plans').className = "tab-active px-6 py-3 text-sm font-bold flex items-center gap-2";
+                renderPlans(); // Render plans when switching
+            }
+        }
+
+        // DRAWER
+        function openDrawer(id) {
+            const s = subscribers.find(x => x.id === id);
+            currentId = id;
+            document.getElementById('drawer-name').innerText = s.name;
+            document.getElementById('drawer-email').innerText = s.email;
+            document.getElementById('drawer-plan').innerText = s.plan;
+            document.getElementById('drawer-ltv').innerText = `₹${s.ltv.toLocaleString()}`;
+
+            // Status Badge in Header
+            const statusBadge = document.getElementById('drawer-status-badge');
+            statusBadge.innerText = s.status;
+            statusBadge.className = `ml-2 px-2 py-0.5 rounded text-[10px] font-bold border ${s.status === 'Active' ? 'text-green-500 border-green-500/50 bg-green-500/10' : 'text-red-500 border-red-500/50 bg-red-500/10'}`;
+
+            // Smart Pause/Resume Button Logic
+            const pauseBtn = document.getElementById('btn-pause-resume');
+            if (s.status === 'Active') {
+                pauseBtn.innerText = "Pause";
+                pauseBtn.className = "text-xs text-yellow-400 hover:underline";
+            } else if (s.status === 'Paused') {
+                pauseBtn.innerText = "Resume";
+                pauseBtn.className = "text-xs text-green-400 hover:underline";
+            } else {
+                pauseBtn.innerText = "Reactivate";
+                pauseBtn.className = "text-xs text-blue-400 hover:underline";
+            }
+
+            document.getElementById('drawer-edit-mode').classList.add('hidden');
+            document.getElementById('detail-drawer').classList.remove('translate-x-full');
+        }
+        function closeDrawer() { document.getElementById('detail-drawer').classList.add('translate-x-full'); }
+
+        // EDIT MODE
+        function toggleEditMode() {
+            const s = subs.find(x => x.id === currentId);
+            document.getElementById('edit-email-input').value = s.email;
+            document.getElementById('drawer-edit-mode').classList.toggle('hidden');
+        }
+        function saveUserEdit() {
+            const s = subs.find(x => x.id === currentId);
+            s.email = document.getElementById('edit-email-input').value;
+            renderTable();
+            document.getElementById('drawer-email').innerText = s.email;
+            toggleEditMode();
+            showToast("Success", "User details updated.");
+        }
+
+        // REFUND LOGIC
+        function processRefund() {
+            const s = subs.find(x => x.id === currentId);
+            const refundAmt = parseInt(s.amt.replace('₹', ''));
+            s.ltv -= refundAmt; // Deduct from LTV
+            document.getElementById('drawer-ltv').innerText = `₹${s.ltv.toLocaleString()}`;
+
+            // Log to History
+            const history = document.getElementById('billing-history');
+            const newLog = `<div class="flex justify-between p-2 border-b border-border bg-red-500/10"><span>Today</span> <span class="text-red-400">Refunded ${s.amt}</span></div>`;
+            history.insertAdjacentHTML('afterbegin', newLog);
+
+            showToast("Refund Processed", `${s.amt} returned to source.`);
+        }
+
+        // PLAN CONFIG SAVE
+        function savePlanConfig(planName) {
+            let price, duration, extras = "";
+            if (planName === 'Starter') { price = document.getElementById('price-starter').value; duration = document.getElementById('dur-starter').value; }
+            else if (planName === 'Gold') {
+                price = document.getElementById('price-gold').value;
+                duration = document.getElementById('dur-gold').value;
+                const lhVal = document.getElementById('local-hero-gold').value;
+                const lhChk = document.getElementById('local-hero-chk-gold').checked;
+                if (lhChk) extras = ` (Local Hero: ₹${lhVal} Off)`;
+            }
+            else { price = document.getElementById('price-plat').value; duration = document.getElementById('dur-plat').value; }
+
+            showToast("Configuration Saved", `${planName}: ₹${price} / ${duration}${extras}`);
+        }
+
+        function togglePlanStatus(el, planName) {
+            const status = el.checked ? "Active" : "Inactive";
+            showToast("Plan Updated", `${planName} is now ${status}.`);
+        }
+
+        // GRANT MODAL
+        function openGrantModal() { document.getElementById('grant-modal').classList.remove('hidden'); document.getElementById('grant-modal').classList.add('flex'); }
+        function closeGrantModal() { document.getElementById('grant-modal').classList.add('hidden'); document.getElementById('grant-modal').classList.remove('flex'); }
+
+        function confirmGrant() {
+            const name = document.getElementById('grant-name').value || "New Member";
+            const email = document.getElementById('grant-email').value || "new@member.com";
+            const planSelect = document.getElementById('grant-plan');
+            const planText = planSelect.options[planSelect.selectedIndex].text.split(' (')[0];
+
+            const newSub = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                plan: planText,
+                status: "Active",
+                amt: "₹0 (Gift)",
+                renewal: "1 Month",
+                ltv: 0
+            };
+
+            subs.unshift(newSub);
+            // Save to "Backend"
+            const currentSubs = ZoiSubscriptions.getAll();
+            currentSubs.unshift(newSub);
+            localStorage.setItem('zoiSubs', JSON.stringify(currentSubs));
+
+            renderTable();
+            closeGrantModal();
+            showToast("Granted", `Membership activated for ${name}.`);
+        }
+
+        // PAUSE / RESUME LOGIC
+        function togglePauseResume() {
+            const s = subs.find(x => x.id === currentId);
+            if (s.status === 'Active') toggleSubStatus('Paused');
+            else toggleSubStatus('Active');
+        }
+
+        function toggleSubStatus(status) {
+            const s = subs.find(x => x.id === currentId);
+            s.status = status;
+            // Persist to Backend
+            ZoiSubscriptions.update(currentId, { status: status });
+            renderTable();
+            openDrawer(currentId); // Refresh drawer UI
+            showToast("Updated", `Subscription ${status}`);
+        }
+
+        // BULK ACTIONS
+        function toggleSelectAll() {
+            const master = document.getElementById('select-all');
+            document.querySelectorAll('.row-check').forEach(b => b.checked = master.checked);
+            updateSelection();
+        }
+        function updateSelection() {
+            const checked = document.querySelectorAll('.row-check:checked');
+            selectedRows = Array.from(checked).map(c => c.value);
+            const bulk = document.getElementById('bulk-actions');
+            if (selectedRows.length > 0) {
+                bulk.classList.remove('hidden');
+                bulk.classList.add('flex');
+                document.getElementById('selection-count').innerText = `${selectedRows.length} Selected`;
+            } else {
+                bulk.classList.add('hidden');
+                bulk.classList.remove('flex');
+            }
+        }
+        function bulkAction(type) {
+            showToast("Bulk Action", `${type} triggered for ${selectedRows.length} users.`);
+            document.getElementById('select-all').checked = false;
+            renderTable();
+        }
+
+        function changePage(dir) {
+            currentPage += dir;
+            renderTable();
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+        function exportCSV() { showToast("Exporting", "Downloading .csv file..."); }
+
+    </script>
+
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+
+

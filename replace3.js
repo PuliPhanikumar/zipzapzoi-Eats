@@ -1,0 +1,143 @@
+const fs = require('fs');
+
+let content = fs.readFileSync('restaurant management dashboard.html', 'utf8');
+
+// Replace updateDashboardMetrics
+const updateDash_replacement =         function updateDashboardMetrics() {
+            if (typeof ZoiPartnerDashboard === 'undefined') return;
+
+            const metrics = ZoiPartnerDashboard.getMetrics();
+            
+            const salesEl = document.getElementById('stat-sales');
+            const prevSales = salesEl.innerText;
+            const newSales = "₹" + metrics.revenueToday.toLocaleString();
+
+            if (prevSales !== newSales) {
+                salesEl.innerText = newSales;
+                salesEl.classList.add('text-success');
+                setTimeout(() => salesEl.classList.remove('text-success'), 1000);
+            }
+
+            // Total active orders + past today
+            const totalOrders = metrics.completedToday + metrics.liveOrders;
+            document.getElementById('stat-orders').innerText = totalOrders;
+            document.getElementById('stat-active-orders-text').innerText = metrics.liveOrders + " Live Orders";
+
+            renderDashboardOrders();
+        };
+
+const startUpd = content.indexOf('        function updateDashboardMetrics() {');
+const endUpd = content.indexOf('        // === 3. NOTIFICATIONS ===');
+if (startUpd !== -1 && endUpd !== -1) {
+    content = content.substring(0, startUpd) + updateDash_replacement + '\n\n' + content.substring(endUpd);
+}
+
+// Replace checkLiveOrders
+const checkLiveOrders_replacement =         function checkLiveOrders() {
+            if (typeof ZoiPartnerOrders === 'undefined') return;
+            const liveOrders = ZoiPartnerOrders.getLiveOrders();
+
+            const newOrder = liveOrders.find(o => o.status === 'Pending' || o.status === 'placed');
+            if (newOrder && !_seenNewOrders.has(newOrder.id)) {
+                _seenNewOrders.add(newOrder.id);
+                showIncomingOrderModal(newOrder);
+            }
+            renderDashboardOrders();
+        }
+        let _seenNewOrders = new Set();;
+
+const startCheck = content.indexOf('        function checkLiveOrders() {');
+const endCheck = content.indexOf('        // Inject Modal HTML dynamically if not present');
+if (startCheck !== -1 && endCheck !== -1) {
+    content = content.substring(0, startCheck) + checkLiveOrders_replacement + '\n\n' + content.substring(endCheck);
+}
+
+
+// Replace renderDashboardOrders and friends
+const renderDashOrders_replacement =         // 3. UI UPDATES
+        function renderDashboardOrders() {
+            if (typeof ZoiPartnerOrders === 'undefined') return;
+            const liveOrders = ZoiPartnerOrders.getLiveOrders();
+            const liveContainer = document.getElementById('live-orders-container');
+            
+            if (!liveContainer) return;
+
+            if (liveOrders.length === 0) {
+                liveContainer.innerHTML = '<div class="text-gray-500 text-sm italic py-4 text-center border border-dashed border-gray-700 rounded-xl">No live orders at the moment.</div>';
+                return;
+            }
+
+            liveContainer.innerHTML = "";
+            liveOrders.forEach(order => {
+                let statusText = order.status;
+                let statusColor = "blue-400";
+                let iconColor = "primary";
+                let bgIconColor = "primary/20";
+                
+                if (['Ready', 'Out for Delivery'].includes(order.status)) {
+                    statusColor = "green-500";
+                    iconColor = "green-500";
+                    bgIconColor = "green-500/20";
+                } else if (['Pending', 'placed'].includes(order.status)) {
+                    statusText = "New Order";
+                    statusColor = "orange-500";
+                }
+
+                const itemsStr = (order.items || []).map(i => i.qty + 'x ' + i.name).join(', ');
+
+                liveContainer.innerHTML += '<div class="flex items-center justify-between p-4 bg-surface border border-border rounded-xl hover:border-primary/50 transition-colors cursor-pointer group mb-2" onclick="window.location.href=\\'restaurant_live_orders_kds.html\\'">\\n' +
+                        '<div class="flex items-center gap-4">\\n' +
+                            '<div class="size-10 rounded-lg bg-' + bgIconColor + ' text-' + iconColor + ' flex items-center justify-center font-bold text-xs">' +
+                                (order.id.split('-')[1] || order.id) + '</div>\\n' +
+                            '<div>\\n' +
+                                '<h4 class="text-sm font-bold text-white truncate max-w-[200px] sm:max-w-[400px]">' + itemsStr + '</h4>\\n' +
+                                '<p class="text-xs text-gray-500">' + (order.mode || "Online") + ' • <span class="text-' + statusColor + '">' + statusText + '</span></p>\\n' +
+                            '</div>\\n' +
+                        '</div>\\n' +
+                        '<span class="material-symbols-outlined text-gray-600 group-hover:text-white">chevron_right</span>\\n' +
+                    '</div>';
+            });
+        }
+
+        function acceptOrder() {
+            if (typeof ZoiPartnerOrders !== 'undefined' && currentModalOrder) {
+                ZoiPartnerOrders.updateOrderStatus(currentModalOrder.id, 'Preparing');
+            }
+            document.getElementById('incoming-order-modal').classList.add('hidden');
+            window.location.href = 'restaurant_live_orders_kds.html';
+        }
+
+        function markReady(orderId) {
+            if (typeof ZoiPartnerOrders !== 'undefined') {
+                ZoiPartnerOrders.updateOrderStatus(orderId, 'Ready');
+            }
+            renderDashboardOrders();
+        }
+
+        function rejectOrder() {
+            if (typeof ZoiPartnerOrders !== 'undefined' && currentModalOrder) {
+                ZoiPartnerOrders.updateOrderStatus(currentModalOrder.id, 'Cancelled');
+            }
+            document.getElementById('incoming-order-modal').classList.add('hidden');
+            renderDashboardOrders();
+        }
+        let currentModalOrder = null;;
+
+const startRenderDash = content.indexOf('        // 3. UI UPDATES');
+const endRenderDash = content.indexOf('    </script>\n\n\n\n    <script src="js/zoi_ai_assistant.js"></script>');
+if (startRenderDash !== -1 && endRenderDash !== -1) {
+    content = content.substring(0, startRenderDash) + renderDashOrders_replacement + '\n' + content.substring(endRenderDash);
+}
+
+// Ensure showIncomingOrderModal sets currentModalOrder
+content = content.replace(
+    "document.getElementById('modal-order-total').innerText = order.total;",
+    "document.getElementById('modal-order-total').innerText = order.total;\n            currentModalOrder = order;"
+);
+
+try {
+    fs.writeFileSync('restaurant management dashboard.html', content, 'utf8');
+    console.log("Restaurant Management Dashboard updated successfully!");
+} catch (e) {
+    console.error("Failed writing", e);
+}

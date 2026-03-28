@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html class="dark scroll-smooth" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Standalone POS - Aggregator Hub</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0a0c10",
+                        surface: "#161b22",
+                        border: "#30363d",
+                        swiggy: "#fc8019",
+                        zomato: "#cb202d",
+                        uber: "#06C167"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] },
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b3f4a;
+        }
+
+        .glass-panel {
+            background: rgba(22, 27, 34, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans selection:bg-primary selection:text-black">
+
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+    <div id="pos-nav-overlay" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="togglePosNav()"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <!-- Top App Bar -->
+        <header
+            class="h-20 bg-surface border-b border-border flex items-center justify-between px-6 shrink-0 sticky top-0 z-20">
+            <div class="flex items-center gap-4">
+                <button onclick="togglePosNav()"
+                    class="p-2 rounded-xl bg-white/5 hover:bg-white/10 md:hidden flex items-center justify-center text-gray-400">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div>
+                    <h1 class="text-2xl font-black text-white flex items-center gap-2">
+                        Omni-Channel <span class="text-primary">Order Hub</span>
+                    </h1>
+                    <p class="text-[11px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">Unified Aggregator
+                        Dashboard</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg p-1.5 font-bold text-xs"
+                    id="master-toggle-container">
+                    <span class="text-gray-400 pl-2">Master Outlet Switch</span>
+                    <button id="master-switch" onclick="toggleMasterSwitch()"
+                        class="w-12 h-6 bg-green-500 rounded-full relative transition-colors shadow-[0_0_10px_rgba(34,197,94,0.3)]">
+                        <div class="size-5 bg-white rounded-full absolute top-0.5 right-0.5 transition-transform"
+                            id="master-knob"></div>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar bg-bg" id="main-content">
+
+            <!-- Integrations Status Row -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+                <!-- ZZZ Eats -->
+                <div
+                    class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <div class="size-12 rounded-full bg-primary/20 flex items-center justify-center mb-2">
+                        <span class="text-primary font-black text-xl">Z</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-white">ZipZapZoi Eats</h3>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="relative flex h-2 w-2"><span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span
+                                class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>
+                        <span class="text-[10px] text-green-400 font-bold uppercase tracking-wider">Online</span>
+                    </div>
+                </div>
+
+                <!-- Swiggy -->
+                <div
+                    class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-swiggy/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <div class="size-12 rounded-full bg-[#fc8019]/20 flex items-center justify-center mb-2">
+                        <span class="text-[#fc8019] font-black text-xl material-symbols-outlined">delivery_dining</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-white">Swiggy</h3>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="relative flex h-2 w-2"><span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span
+                                class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>
+                        <span class="text-[10px] text-green-400 font-bold uppercase tracking-wider">Online</span>
+                    </div>
+                </div>
+
+                <!-- Zomato -->
+                <div
+                    class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-zomato/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <div class="size-12 rounded-full bg-[#cb202d]/20 flex items-center justify-center mb-2">
+                        <span class="text-[#cb202d] font-black text-xl material-symbols-outlined">restaurant</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-white">Zomato</h3>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="relative flex h-2 w-2"><span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span
+                                class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>
+                        <span class="text-[10px] text-green-400 font-bold uppercase tracking-wider">Online</span>
+                    </div>
+                </div>
+
+                <!-- Uber Eats (Mock Offline) -->
+                <div
+                    class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center text-center relative overflow-hidden opacity-50 grayscale cursor-not-allowed">
+                    <div class="size-12 rounded-full bg-gray-500/20 flex items-center justify-center mb-2">
+                        <span class="text-gray-400 font-black text-xl material-symbols-outlined">two_wheeler</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-gray-400">UberEats</h3>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="size-2 rounded-full bg-gray-500"></span>
+                        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Unlinked</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Main Order Grid layout: Incoming on left, KDS/Preparing on right -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-280px)] min-h-[500px]">
+
+                <!-- NEW ORDERS POOL -->
+                <div class="bg-surface border border-border rounded-2xl flex flex-col overflow-hidden shadow-2xl">
+                    <div
+                        class="p-4 border-b border-border bg-black/20 flex items-center justify-between pointer-events-none (visual only)">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-green-400 animate-pulse">ring_volume</span>
+                            <h2 class="font-bold text-lg text-white">New Incoming</h2>
+                        </div>
+                        <span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold"
+                            id="new-count">0</span>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-4 space-y-3" id="incoming-orders-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- PREPARING / KDS POOL -->
+                <div class="bg-surface border border-border rounded-2xl flex flex-col overflow-hidden shadow-2xl">
+                    <div class="p-4 border-b border-border bg-black/20 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-orange-400">skillet</span>
+                            <h2 class="font-bold text-lg text-white">Preparing (Sent to KDS)</h2>
+                        </div>
+                        <span class="bg-orange-500/20 text-orange-400 px-3 py-1 rounded-full text-xs font-bold"
+                            id="prep-count">0</span>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-4 space-y-3" id="preparing-orders-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Global Toast -->
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-[0_10px_40px_rgba(0, 240, 255,0.3)] z-[9999] flex items-center gap-3 transition-all duration-300 translate-y-20 opacity-0 pointer-events-none">
+        <span class="material-symbols-outlined text-primary text-2xl" id="toast-icon">info</span>
+        <div>
+            <h4 class="font-bold text-sm text-white" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+
+    <script>
+        // --- 1. MOCK MULTI-CHANNEL DATA ENGINE ---
+        const PARTNER_ID = localStorage.getItem('zoiPartnerRestId') || '101';
+        let aggOrders = JSON.parse(localStorage.getItem('zoiAggregatorOrders') || '[]');
+
+        const PLATFORM_THEMES = {
+            'ZipZapZoi': { color: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/20', icon: 'Z' },
+            'Swiggy': { color: 'text-[#fc8019]', bg: 'bg-[#fc8019]/10', border: 'border-[#fc8019]/20', icon: 'delivery_dining' },
+            'Zomato': { color: 'text-[#cb202d]', bg: 'bg-[#cb202d]/10', border: 'border-[#cb202d]/20', icon: 'restaurant' }
+        };
+
+        // --- 2. RENDER LOGIC ---
+        function renderOrderHub() {
+            const incomingList = document.getElementById('incoming-orders-list');
+            const prepList = document.getElementById('preparing-orders-list');
+
+            const incoming = aggOrders.filter(o => o.status === 'New');
+            const preparing = aggOrders.filter(o => o.status === 'Preparing');
+
+            document.getElementById('new-count').innerText = incoming.length;
+            document.getElementById('prep-count').innerText = preparing.length;
+
+            incomingList.innerHTML = incoming.length === 0 ? '<p class="text-xs text-gray-500 text-center py-4">No incoming orders.</p>' : incoming.map(o => createOrderCard(o)).join('');
+            prepList.innerHTML = preparing.length === 0 ? '<p class="text-xs text-gray-500 text-center py-4">No active local preparations.</p>' : preparing.map(o => createOrderCard(o)).join('');
+        }
+
+        function createOrderCard(order) {
+            const p = PLATFORM_THEMES[order.platform];
+            const isPrep = order.status === 'Preparing';
+            return `
+                <div class="bg-black/30 border border-white/5 rounded-xl p-4 hover:border-white/10 transition-colors">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="size-8 rounded-lg ${p.bg} flex items-center justify-center">
+                                ${order.platform === 'ZipZapZoi' ? `<span class="${p.color} font-black text-xs">Z</span>` : `<span class="material-symbols-outlined ${p.color} text-sm">${p.icon}</span>`}
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm text-white">#${order.id}</h4>
+                                <p class="text-[10px] ${p.color} font-bold tracking-widest uppercase">${order.platform}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-mono font-bold text-primary">₹${order.total}</span>
+                            <p class="text-[10px] text-gray-500 mt-0.5">${order.time}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1 mb-4">
+                        ${order.items.map(i => `<div class="flex justify-between text-xs text-gray-300"><span>${i.qty}x ${i.name}</span><span>₹${i.price}</span></div>`).join('')}
+                    </div>
+
+                    <div class="flex items-center gap-2 mt-4 pt-3 border-t border-border">
+                        ${!isPrep ? `
+                            <button onclick="acceptOrder('${order.id}')" class="flex-1 py-2 bg-green-500 text-black font-bold text-xs rounded-lg hover:bg-green-400 transition-colors shadow-[0_0_15px_rgba(34,197,94,0.3)]">Accept & Send to KDS</button>
+                            <button onclick="rejectOrder('${order.id}')" class="px-4 py-2 border border-red-500/50 text-red-400 font-bold text-xs rounded-lg hover:bg-red-500/10 transition-colors">Reject</button>
+                        ` : `
+                            <button onclick="markReady('${order.id}')" class="flex-1 py-2 bg-white/10 border border-white/20 text-white font-bold text-xs rounded-lg hover:bg-white/20 transition-colors"><span class="material-symbols-outlined text-sm align-middle mr-1">check_circle</span> Mark Ready For Pickup</button>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 3. ACTIONS & SYNC ---
+        function acceptOrder(id) {
+            let order = aggOrders.find(o => o.id === id);
+            if (order) {
+                order.status = 'Preparing';
+                localStorage.setItem('zoiAggregatorOrders', JSON.stringify(aggOrders));
+
+                // Blast to central KDS 
+                if (typeof ZoiRestaurantSync !== 'undefined') {
+                    ZoiRestaurantSync.publishKDS(PARTNER_ID, {
+                        ...order,
+                        meta: \`\${order.platform} Online\`
+                    });
+                }
+                
+                showToast('Order Accepted', \`Sent \${order.platform} order #\${id} to Kitchen.\`);
+                renderOrderHub();
+            }
+        }
+
+        function rejectOrder(id) {
+            aggOrders = aggOrders.filter(o => o.id !== id);
+            localStorage.setItem('zoiAggregatorOrders', JSON.stringify(aggOrders));
+            showToast('Order Rejected', \`Declined #\${id}. Notifying platform.\`);
+            renderOrderHub();
+        }
+
+        function markReady(id) {
+            let order = aggOrders.find(o => o.id === id);
+            if (order) {
+                // Remove from local aggregator tracking
+                aggOrders = aggOrders.filter(o => o.id !== id);
+                localStorage.setItem('zoiAggregatorOrders', JSON.stringify(aggOrders));
+
+                // Update ZoiRestaurantSync KDS status if it was sent there
+                if (typeof ZoiRestaurantSync !== 'undefined') {
+                     let kdsOrders = ZoiRestaurantSync.getKDSTickets(PARTNER_ID);
+                     const ko = kdsOrders.find(k => k.id === id);
+                     if (ko) {
+                         ko.status = 'Ready';
+                         ZoiRestaurantSync.publishKDS(PARTNER_ID, ko);
+                     }
+                }
+
+                showToast('Food Ready', \`Marked \${order.platform} order #\${id} ready for delivery partner pickup.\`);
+                renderOrderHub();
+            }
+        }
+
+        // Master Switch Handling
+        let isMasterOn = true;
+        function toggleMasterSwitch() {
+            isMasterOn = !isMasterOn;
+            const btn = document.getElementById('master-switch');
+            const knob = document.getElementById('master-knob');
+            
+            if (isMasterOn) {
+                btn.classList.add('bg-green-500', 'shadow-[0_0_10px_rgba(34,197,94,0.3)]');
+                btn.classList.remove('bg-gray-600', 'shadow-none');
+                knob.classList.add('right-0.5');
+                knob.classList.remove('translate-x-[-24px]');
+                showToast('Outlet Online', 'Accepting orders across all platforms.');
+            } else {
+                btn.classList.remove('bg-green-500', 'shadow-[0_0_10px_rgba(34,197,94,0.3)]');
+                btn.classList.add('bg-gray-600', 'shadow-none');
+                knob.classList.remove('right-0.5');
+                knob.classList.add('translate-x-[-24px]');
+                showToast('Outlet Offline', 'Paused incoming orders on Swiggy, Zomato, and ZipZapZoi.');
+            }
+        }
+
+        // Toast logic
+        function showToast(title, message) {
+            let toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = message;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+            if (window._toastTimeout) clearTimeout(window._toastTimeout);
+            window._toastTimeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+            }, 3000);
+        }
+
+        // --- 4. DATA SIMULATION SEEDING ---
+        function seedAggregatorMockData() {
+            if (aggOrders.length === 0) {
+                aggOrders = [
+                    { id: '10293', platform: 'Swiggy', status: 'New', time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), items: [{qty:1, name:'Butter Chicken', price:350}, {qty:2, name:'Garlic Naan', price:90}], total: 530 },
+                    { id: 'ZOM-441', platform: 'Zomato', status: 'New', time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), items: [{qty:1, name:'Paneer Tikka', price:250}], total: 250 },
+                    { id: 'ZZB-A93', platform: 'ZipZapZoi', status: 'New', time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), items: [{qty:1, name:'Family Pack Biryani', price:850}], total: 850 }
+                ];
+                localStorage.setItem('zoiAggregatorOrders', JSON.stringify(aggOrders));
+            }
+        }
+
+        // Initialize
+        window.onload = () => {
+            seedAggregatorMockData();
+            renderOrderHub();
+        };
+
+        // Open POS nav manually
+        function togglePosNav() {
+            const drawer = document.getElementById('global-sidebar-container').firstElementChild;
+            const overlay = document.getElementById('pos-nav-overlay');
+            if(drawer) {
+                if (drawer.classList.contains('-translate-x-full')) {
+                    drawer.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                } else {
+                    drawer.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                }
+            }
+        }
+    </script>
+
+    <script src="js/zoi_partner_engine.js"></script>
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>

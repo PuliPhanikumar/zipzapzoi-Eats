@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Admin - Financial Ops</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>
+        // Enforce RBAC Access Before Rendering
+        ZoiAuth.enforceAccess("Refunds");
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .risk-bar-bg {
+            background: #2a2d35;
+            height: 6px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .risk-bar-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .chat-bubble-user {
+            background: #2a2d35;
+            color: white;
+            border-radius: 12px 12px 12px 0;
+        }
+
+        .chat-bubble-admin {
+            background: #00f0ff;
+            color: black;
+            border-radius: 12px 12px 0 12px;
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #00f0ff;
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-inactive {
+            border-bottom: 2px solid transparent;
+            color: #9ca3af;
+        }
+
+        .tab-inactive:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.02);
+        }
+    .glass { background: rgba(24, 26, 32, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white font-sans h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-bg">
+
+        <header class="h-16 flex items-center justify-between px-6 border-b border-border bg-surface z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold text-white flex items-center gap-2">
+                    Refunds <span
+                        class="text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded border border-red-500/20"
+                        id="pending-badge">--</span>
+                </h1>
+                <div class="h-6 w-[1px] bg-border"></div>
+
+                <div class="relative">
+                    <input type="date" id="date-picker" onchange="renderTable()"
+                        class="bg-black/20 border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary focus:ring-0">
+                </div>
+
+                <div class="flex items-center gap-2 bg-black/20 border border-border px-3 py-1.5 rounded-lg">
+                    <span class="text-[10px] uppercase font-bold text-primary flex items-center gap-1"><span
+                            class="material-symbols-outlined text-sm">smart_toy</span> AI Auto-Resolve</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="auto-resolve-toggle" onchange="toggleAutoResolve()"
+                            class="sr-only peer">
+                        <div
+                            class="w-8 h-4 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary">
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="exportCSV()"
+                    class="bg-surface border border-border hover:border-white text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">download</span> Export
+                </button>
+                <button onclick="openManualRefund()"
+                    class="bg-primary hover:bg-orange-600 text-black px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-primary/20 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">add</span> Manual Refund
+                </button>
+            </div>
+        </header>
+
+        <div class="px-6 pt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-surface border border-border p-4 rounded-xl">
+                <p class="text-xs text-gray-500 uppercase font-bold">Pending Review</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-white" id="stat-pending">--</h3>
+                    <span class="text-xs text-orange-400 bg-orange-500/10 px-1.5 rounded">Action Req.</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border p-4 rounded-xl">
+                <p class="text-xs text-gray-500 uppercase font-bold">Escalated (Manager)</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-white" id="stat-escalated">0</h3>
+                    <span class="text-xs text-purple-400 bg-purple-500/10 px-1.5 rounded">Priority</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border p-4 rounded-xl">
+                <p class="text-xs text-gray-500 uppercase font-bold">AI Auto-Rejections</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-white">42</h3>
+                    <span class="text-xs text-danger bg-danger/10 px-1.5 rounded">Saved ₹8.5k</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border p-4 rounded-xl">
+                <p class="text-xs text-gray-500 uppercase font-bold">Rest. Disputes</p>
+                <div class="flex items-end justify-between">
+                    <h3 class="text-2xl font-bold text-white">8</h3>
+                    <span class="text-xs text-info bg-info/10 px-1.5 rounded">Needs Audit</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-hidden p-6 flex flex-col">
+
+            <div class="flex items-center gap-1 border-b border-border mb-0">
+                <button onclick="switchTab('queue')" id="tab-queue"
+                    class="tab-active px-6 py-3 text-sm font-bold flex items-center gap-2">Active Queue</button>
+                <button onclick="switchTab('escalated')" id="tab-escalated"
+                    class="tab-inactive px-6 py-3 text-sm font-bold flex items-center gap-2 text-purple-400">Escalations
+                    <span class="bg-purple-500/10 text-[10px] px-1.5 rounded border border-purple-500/20"
+                        id="badge-escalated">0</span></button>
+                <button onclick="switchTab('history')" id="tab-history"
+                    class="tab-inactive px-6 py-3 text-sm font-bold">Processed History</button>
+                <button onclick="switchTab('ai')" id="tab-ai"
+                    class="tab-inactive px-6 py-3 text-sm font-bold flex items-center gap-2"><span
+                        class="material-symbols-outlined text-sm text-primary">smart_toy</span> AI Logs</button>
+            </div>
+
+            <div class="bg-surface border-x border-border p-3 flex justify-between items-center">
+                <div class="flex gap-2">
+                    <div id="bulk-actions" class="hidden items-center gap-2 animate-fade-in-right">
+                        <button onclick="bulkProcess('Approve')"
+                            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-xs font-bold">Approve
+                            Selected</button>
+                        <button onclick="bulkProcess('Reject')"
+                            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-bold">Reject
+                            Selected</button>
+                    </div>
+                    <span class="text-xs text-gray-500 self-center" id="selection-count"></span>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="search-input" onkeyup="renderTable()" placeholder="Search Order/Cust..."
+                        class="bg-bg border border-border rounded-lg pl-3 pr-3 py-1.5 text-xs text-white focus:border-primary w-64">
+                    <select id="filter-risk" onchange="renderTable()"
+                        class="bg-bg border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary">
+                        <option value="all">All Risks</option>
+                        <option value="High Risk">High Risk Only</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-surface border-x border-b border-border rounded-b-xl flex-1 overflow-auto relative">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-black/20 text-gray-500 uppercase font-semibold sticky top-0 z-10 backdrop-blur-sm">
+                        <tr>
+                            <th class="px-4 py-3 w-10"><input type="checkbox" id="select-all"
+                                    onclick="toggleSelectAll()"
+                                    class="rounded border-gray-600 bg-bg focus:ring-primary text-primary"></th>
+                            <th class="px-4 py-3">Status</th>
+                            <th class="px-4 py-3">Restaurant</th>
+                            <th class="px-4 py-3">Order/Item</th>
+                            <th class="px-4 py-3">Customer</th>
+                            <th class="px-4 py-3">Claim</th>
+                            <th class="px-4 py-3 text-right">Amount</th>
+                            <th class="px-4 py-3">Risk</th>
+                            <th class="px-4 py-3 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border text-gray-300" id="refund-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <div id="rest-log-modal"
+        class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-md p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-white">Restaurant History</h3>
+                <button onclick="closeRestLog()" class="text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="space-y-3 max-h-60 overflow-y-auto">
+                <div class="p-3 bg-black/20 rounded border border-border">
+                    <p class="text-xs text-white font-bold">Missing Item (Fries)</p>
+                    <p class="text-[10px] text-gray-500">2 days ago • Order #8821</p>
+                </div>
+                <div class="p-3 bg-black/20 rounded border border-border">
+                    <p class="text-xs text-white font-bold">Wrong Item (Veg vs Non-Veg)</p>
+                    <p class="text-[10px] text-gray-500">5 days ago • Order #7712</p>
+                </div>
+                <div class="p-3 bg-black/20 rounded border border-border">
+                    <p class="text-xs text-white font-bold">Spilled Drink</p>
+                    <p class="text-[10px] text-gray-500">Last week • Order #6652</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="manual-refund-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Manual Refund</h3>
+            <div class="space-y-4">
+                <input type="text" class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm"
+                    placeholder="Order ID (e.g. #ORD-123)">
+                <select class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm">
+                    <option>Service Error</option>
+                    <option>Customer Complaint</option>
+                    <option>Goodwill</option>
+                </select>
+                <input type="number" class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm"
+                    placeholder="Amount (₹)">
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeManualRefund()"
+                    class="flex-1 py-2 rounded-lg border border-border text-gray-400 text-sm font-bold">Cancel</button>
+                <button onclick="confirmManualRefund()"
+                    class="flex-1 py-2 rounded-lg bg-primary text-black text-sm font-bold">Process</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-modal"
+        class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div
+            class="bg-surface border border-border rounded-xl w-full max-w-md h-[500px] flex flex-col shadow-2xl relative">
+            <div class="p-4 border-b border-border flex justify-between items-center bg-[#15171c] rounded-t-xl">
+                <div>
+                    <h3 class="font-bold text-white text-sm">Customer Support</h3>
+                    <p class="text-[10px] text-gray-400" id="chat-user">...</p>
+                </div>
+                <button onclick="closeChat()" class="text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-bg" id="chat-body"></div>
+            <div class="p-3 border-t border-border bg-surface rounded-b-xl flex gap-2">
+                <input type="text" id="chat-input"
+                    class="flex-1 bg-bg border border-border rounded-lg px-3 py-2 text-sm text-white"
+                    placeholder="Type a message...">
+                <button onclick="sendMessage()" class="p-2 bg-primary text-black rounded-lg"><span
+                        class="material-symbols-outlined text-lg">send</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">Operation completed</p>
+        </div>
+    </div>
+
+    <script>
+        // DATA
+        let activeTab = 'queue';
+        const today = new Date().toISOString().split('T')[0];
+
+        let refunds = ZoiRefunds.getAll();
+        let currentRefundId = null;
+        let selectedRows = [];
+
+        // INIT
+        window.onload = () => {
+            fetch('sidebar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sidebar-container').innerHTML = data;
+                    setTimeout(() => {
+                        const links = document.querySelectorAll('#sidebar-container nav a');
+                        links.forEach(l => {
+                            if (l.innerText.includes('Refunds')) {
+                                l.className = "flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg font-bold transition-all";
+                                l.querySelector('span').classList.add('text-primary');
+                            } else {
+                                l.className = "flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group";
+                            }
+                        });
+                        ZoiAuth.renderSimLogin();
+                    }, 100);
+                });
+            document.getElementById('date-picker').value = today;
+            renderTable();
+        };
+
+        function renderTable() {
+            const tbody = document.getElementById('refund-table-body');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const riskFilter = document.getElementById('filter-risk').value;
+            const dateFilter = document.getElementById('date-picker').value;
+
+            tbody.innerHTML = "";
+            let pendingCount = 0;
+            let escalatedCount = 0;
+
+            refunds.forEach(r => {
+                if (r.status === 'Pending') pendingCount++;
+                if (r.status === 'Escalated') escalatedCount++;
+
+                // Filtering
+                if (activeTab === 'queue' && r.status !== 'Pending') return;
+                if (activeTab === 'history' && (r.status === 'Pending' || r.status === 'Escalated' || r.status.includes('Auto'))) return;
+                if (activeTab === 'ai' && !r.status.includes('Auto')) return;
+                if (activeTab === 'escalated' && r.status !== 'Escalated') return;
+
+                if (dateFilter && r.date !== dateFilter) return;
+                if (riskFilter === 'High Risk' && r.risk < 80) return;
+                if (search && !r.cust.toLowerCase().includes(search) && !r.order.toLowerCase().includes(search)) return;
+
+                const riskColor = r.risk < 20 ? 'bg-green-500' : (r.risk < 70 ? 'bg-yellow-500' : 'bg-red-500');
+                const statusBadge = r.status.includes('Approved') ? 'text-green-500 bg-green-500/10' : (r.status.includes('Rejected') ? 'text-red-500 bg-red-500/10' : (r.status === 'Escalated' ? 'text-purple-400 bg-purple-500/10' : 'text-primary bg-primary/10'));
+
+                const row = `
+                    <tr class="hover:bg-white/5 transition-colors border-b border-border/50 cursor-pointer group" onclick="openDrawer('${r.id}')">
+                        <td class="px-4 py-3 text-center" onclick="event.stopPropagation()">
+                            <input type="checkbox" class="rounded border-gray-600 bg-bg text-primary focus:ring-0 row-check" value="${r.id}" onchange="updateSelection()">
+                        </td>
+                        <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold border border-current ${statusBadge}">${r.status}</span></td>
+                        <td class="px-4 py-3 text-white font-bold">${r.rest}</td>
+                        <td class="px-4 py-3"><div class="flex flex-col"><span class="text-white">${r.order}</span><span class="text-[10px] text-gray-500">${r.items}</span></div></td>
+                        <td class="px-4 py-3 text-white">${r.cust}</td>
+                        <td class="px-4 py-3 text-gray-400">${r.reason}</td>
+                        <td class="px-4 py-3 text-right font-mono text-white">${r.amt}</td>
+                        <td class="px-4 py-3"><div class="flex items-center gap-2"><div class="risk-bar-bg w-16"><div class="risk-bar-fill ${riskColor}" style="width: ${r.risk}%"></div></div><span class="text-[10px] text-gray-400">${r.risk}%</span></div></td>
+                        <td class="px-4 py-3 text-right"><button class="text-primary font-bold hover:underline opacity-0 group-hover:opacity-100">Review</button></td>
+                    </tr>`;
+                tbody.innerHTML += row;
+            });
+
+            document.getElementById('stat-pending').innerText = pendingCount;
+            document.getElementById('pending-badge').innerText = `${pendingCount} Pending`;
+            document.getElementById('stat-escalated').innerText = escalatedCount;
+            document.getElementById('badge-escalated').innerText = escalatedCount;
+            updateSelection(); // Reset bulk
+        }
+
+        // --- BULK ACTION LOGIC ---
+        function toggleSelectAll() {
+            const boxes = document.querySelectorAll('.row-check');
+            const master = document.getElementById('select-all');
+            boxes.forEach(b => b.checked = master.checked);
+            updateSelection();
+        }
+
+        function updateSelection() {
+            const checked = document.querySelectorAll('.row-check:checked');
+            selectedRows = Array.from(checked).map(c => c.value);
+            const bulkDiv = document.getElementById('bulk-actions');
+
+            if (selectedRows.length > 0) {
+                bulkDiv.classList.remove('hidden');
+                bulkDiv.classList.add('flex');
+                document.getElementById('selection-count').innerText = `${selectedRows.length} selected`;
+            } else {
+                bulkDiv.classList.add('hidden');
+                bulkDiv.classList.remove('flex');
+                document.getElementById('selection-count').innerText = '';
+            }
+        }
+
+        function bulkProcess(action) {
+            if (!confirm(`Are you sure you want to ${action} ${selectedRows.length} requests?`)) return;
+
+            const status = action === 'Approve' ? 'Approved' : 'Rejected';
+            selectedRows.forEach(id => {
+                ZoiRefunds.updateStatus(id, status);
+            });
+
+            refunds = ZoiRefunds.getAll(); // Refresh
+            renderTable();
+            showToast(`${action} Completed`, `${selectedRows.length} items processed.`);
+            document.getElementById('select-all').checked = false;
+            updateSelection();
+        }
+
+        // --- DRAWER & TABS ---
+        function switchTab(tab) {
+            activeTab = tab;
+            ['queue', 'history', 'ai', 'escalated'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (el) el.className = t === tab ? "tab-active px-6 py-3 text-sm font-bold flex items-center gap-2" : "tab-inactive px-6 py-3 text-sm font-bold flex items-center gap-2";
+            });
+            renderTable();
+        }
+
+        function openDrawer(id) {
+            const r = refunds.find(x => x.id === id);
+            currentRefundId = id;
+            document.getElementById('drawer-id').innerText = `${r.order} • ${r.cust}`;
+            document.getElementById('drawer-status').innerText = r.status;
+            document.getElementById('drawer-amt-full').innerText = r.amt;
+            document.getElementById('drawer-score').innerText = r.risk + '%';
+            document.getElementById('drawer-pay').innerText = r.pay;
+            document.getElementById('drawer-reason').innerText = r.reason;
+            document.getElementById('drawer-items').innerText = r.items;
+            document.getElementById('drawer-note').innerText = `"${r.desc}"`;
+            document.getElementById('drawer-rest-name').innerText = r.rest;
+
+            const receiptBody = document.getElementById('drawer-receipt');
+            receiptBody.innerHTML = "";
+            r.receipt.forEach(i => receiptBody.innerHTML += `<tr><td class="p-3 text-white">${i.n}</td><td class="p-3 text-right text-gray-400 font-mono">${i.p}</td></tr>`);
+
+            let msg = "Claim valid. Consistent with history.";
+            if (r.risk > 80) msg = "⚠️ HIGH RISK: User abuse detected.";
+            document.getElementById('drawer-ai-msg').innerText = msg;
+
+            document.getElementById('detail-drawer').classList.remove('translate-x-full');
+        }
+
+        function closeDrawer() { document.getElementById('detail-drawer').classList.add('translate-x-full'); }
+        function toggleCustomInput() {
+            const isPartial = document.querySelector('input[name="refund_type"][value="partial"]').checked;
+            document.getElementById('custom-amount-container').classList.toggle('hidden', !isPartial);
+        }
+
+        function escalateTicket() {
+            ZoiRefunds.updateStatus(currentRefundId, 'Escalated');
+            refunds = ZoiRefunds.getAll();
+            renderTable();
+            closeDrawer();
+            showToast("Escalated", "Moved to manager queue.");
+        }
+
+        function processDecision(decision) {
+            const isPartial = document.querySelector('input[name="refund_type"][value="partial"]').checked;
+            const customAmt = document.getElementById('custom-refund-amount').value;
+            let status = decision === 'Approve' ? 'Approved' : 'Rejected';
+
+            // Logic for partial could be handled here if backend supported updating amount
+            // For now just update status
+
+            ZoiRefunds.updateStatus(currentRefundId, status);
+            refunds = ZoiRefunds.getAll();
+
+            renderTable();
+            closeDrawer();
+            showToast(status === 'Approved' ? 'Refund Processed' : 'Rejected');
+        }
+
+        // --- MODALS ---
+        function openRestLog() { document.getElementById('rest-log-modal').classList.remove('hidden'); document.getElementById('rest-log-modal').classList.add('flex'); }
+        function closeRestLog() { document.getElementById('rest-log-modal').classList.add('hidden'); document.getElementById('rest-log-modal').classList.remove('flex'); }
+
+        function openChat() {
+            const r = refunds.find(x => x.id === currentRefundId);
+            document.getElementById('chat-user').innerText = `Chatting with ${r.cust}`;
+            document.getElementById('chat-body').innerHTML = `<div class="flex justify-start"><div class="chat-bubble-user px-4 py-2 text-sm max-w-[80%]">${r.desc}</div></div>`;
+            document.getElementById('chat-modal').classList.remove('hidden');
+            document.getElementById('chat-modal').classList.add('flex');
+        }
+        function closeChat() { document.getElementById('chat-modal').classList.add('hidden'); document.getElementById('chat-modal').classList.remove('flex'); }
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            if (!input.value.trim()) return;
+            document.getElementById('chat-body').insertAdjacentHTML('beforeend', `<div class="flex justify-end"><div class="chat-bubble-admin px-4 py-2 text-sm max-w-[80%]">${input.value}</div></div>`);
+            input.value = "";
+        }
+
+        function openManualRefund() { document.getElementById('manual-refund-modal').classList.remove('hidden'); document.getElementById('manual-refund-modal').classList.add('flex'); }
+        function closeManualRefund() { document.getElementById('manual-refund-modal').classList.add('hidden'); document.getElementById('manual-refund-modal').classList.remove('flex'); }
+        function confirmManualRefund() {
+            const orderId = document.querySelector('#manual-refund-modal input[type="text"]').value;
+            const reason = document.querySelector('#manual-refund-modal select').value;
+            const amt = document.querySelector('#manual-refund-modal input[type="number"]').value;
+
+            if (!orderId || !amt) return showToast("Error", "Please fill details");
+
+            const newRefund = {
+                id: "R-" + Math.floor(Math.random() * 10000),
+                date: new Date().toISOString().split('T')[0],
+                rest: "Manual Entry",
+                order: orderId,
+                cust: "Guest User",
+                reason: reason,
+                amt: "₹" + amt,
+                risk: 10,
+                status: "Approved",
+                items: "Manual Manual",
+                desc: "Manually processed by admin.",
+                pay: "Credited",
+                receipt: []
+            };
+
+            ZoiRefunds.addRefund(newRefund);
+            refunds = ZoiRefunds.getAll();
+            renderTable();
+
+            closeManualRefund();
+            showToast("Success", "Refund initiated manually.");
+        }
+
+        function showToast(title, msg = "") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+        function exportCSV() { showToast("Export Started", "Downloading refunds.csv..."); }
+
+        function toggleAutoResolve() {
+            const checked = document.getElementById('auto-resolve-toggle').checked;
+            if (checked) {
+                const count = ZoiRefunds.autoResolve();
+                refunds = ZoiRefunds.getAll(); // Fix: Update local array so UI reflects changes
+                renderTable();
+                showToast("AI Auto-Resolve", `Processed ${count} tickets instantly.`);
+            }
+        }
+
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+
+

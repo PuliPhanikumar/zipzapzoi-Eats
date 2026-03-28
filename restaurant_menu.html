@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="theme-color" content="#00f0ff">
+    <link rel="manifest" href="manifest.json" />
+    <title>ZipZapZoi Eats - Ultimate AI Culinary Experience</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0ff",
+                        "background-light": "#f6f8f7",
+                        "background-dark": "#0a0314",
+                        "surface-dark": "#1A2C22",
+                        "surface-darker": "#0D1812",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "1.5rem",
+                        "xl": "2rem",
+                        "2xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #112217;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #234831;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+
+        .text-glow {
+            text-shadow: 0 0 10px rgba(43, 238, 117, 0.3);
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased overflow-x-hidden">
+    <div class="relative flex min-h-screen flex-col">
+
+        <header
+            class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 bg-background-dark/95 backdrop-blur-md px-4 py-3 lg:px-10">
+            <div class="flex items-center gap-8">
+                <a href="customer_restaurant_listing.html"
+                    class="flex items-center gap-3 text-white hover:opacity-80 transition-opacity">
+                    <div class="size-8 flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined text-3xl">bolt</span>
+                    </div>
+                    <h2 class="text-white text-xl font-bold leading-tight tracking-[-0.015em]">ZipZapZoi <span
+                            class="text-primary">Eats</span></h2>
+                </a>
+                <label class="hidden md:flex flex-col min-w-40 !h-10 w-96">
+                    <div
+                        class="flex w-full flex-1 items-stretch rounded-full h-full bg-[#234831]/50 border border-white/5 focus-within:border-primary/50 transition-colors">
+                        <div class="text-[#92c9a7] flex items-center justify-center pl-4 rounded-l-full">
+                            <span class="material-symbols-outlined">search</span>
+                        </div>
+                        <input id="menu-search"
+                            class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-full text-white focus:outline-0 focus:ring-0 border-none bg-transparent placeholder:text-[#92c9a7] px-4 pl-2 text-sm font-normal leading-normal"
+                            placeholder="Search menu via AI..." value="" />
+                    </div>
+                </label>
+            </div>
+            <div class="flex items-center justify-end gap-6">
+                <div class="hidden lg:flex items-center gap-8">
+                    <a class="text-white text-sm font-medium hover:text-primary transition-colors flex items-center gap-1"
+                        href="index.html">
+                        <span class="material-symbols-outlined text-[20px]">home</span> Home
+                    </a>
+                    <a class="text-white text-sm font-medium hover:text-primary transition-colors flex items-center gap-1"
+                        href="#">
+                        <span class="material-symbols-outlined text-[20px]">receipt_long</span> Orders
+                    </a>
+                    <a class="text-white text-sm font-medium hover:text-primary transition-colors flex items-center gap-1"
+                        href="#">
+                        <span class="material-symbols-outlined text-[20px]">smart_toy</span> AI Assistant
+                    </a>
+                </div>
+                <div class="flex items-center gap-3 pl-4 border-l border-white/10">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-xs text-[#92c9a7]">Points</p>
+                        <p class="text-sm font-bold text-primary">2,450 Zaps</p>
+                    </div>
+                    <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20"
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAxtqaVP7tM3Y-vCJILj_2vbcTV6TXlcFRgj4gvySKsWSCtPoA8JFbKk3YcBsCojSZ_u0Uy5a7FrvqUxNgkrRppqpYGLXZ-fhi8BWWR4c1QWUt0MjPEaGoc8hkUn6w0tAXyRM8U6Vg0HrmyrM21zVbuj79E2xHLeUZJaAWqUvJERo1pfgJdUI9MPrVX_E5mDCizQYK3r-0QPbigPYY_MdSafml0UW4cddEGqsSCpZXPJyXQbmM89UwrrrR6y5L7xsphSnVGaIRzmls");'>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 layout-container flex flex-col max-w-[1600px] mx-auto w-full px-4 lg:px-8 pb-10">
+
+            <section class="relative mt-6 mb-8 rounded-2xl overflow-hidden border border-white/5 bg-surface-dark group">
+                <div id="rest-hero-bg" class="absolute inset-0 bg-center bg-cover z-0 transition-all duration-700"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB1O2QL8NVnKeOWqWg3r03IROreX9TzTqlnr491N7zTg-SK3wGs0937jsJUs_ciwfu7MOgDBSoSXPjMV_h_MeDJ1xucqXqmOxgGQ743J_0SHdkLrKvEvD5d16TEwU6GCY7klZf8o_cSYHTqiUpJaaueglNJbdlfQxinx88H6FkZiKhlMQf4wYCN5vLPWS-9lbItGbyUzYF-Ty5SIjkEA9kL-I0CyPwEcqcN0FBOsgnMZ22wMvp3dc69hKgdO8HU2no-6w8tV2zfMAc");'>
+                </div>
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-background-dark via-background-dark/90 to-transparent z-0">
+                </div>
+
+                <div
+                    class="relative z-10 p-6 lg:p-10 flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
+                    <div class="flex gap-6 items-center">
+                        <div class="relative shrink-0">
+                            <div id="rest-logo"
+                                class="bg-center bg-no-repeat aspect-square bg-cover rounded-xl size-24 md:size-32 border border-white/10 shadow-2xl"
+                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDjqRLHpzJlBccN50xmZi81VNLKkgKFrRKhzXh0suxe2qeA3nKNkEgJu40Ivxu3gJsJsh-XkoNrR344KJrvRW1gMzohlQO7deKKT1be0y5g1V5ROtm7OA38gzX7xODECtbLmAuP9LnhKES32lnTqxZ60amVvUUmJbgooVdk68LMJm_4se2xtV13gczHJ2CSlDQhvruzvz6evLeO7-B8XHxOVFNNwuo3hTw8RIRV7jz7qrDs5-poCWDxCxcqxof3PBpoR9HyvEzZZnI");'>
+                            </div>
+                            <div
+                                class="absolute -bottom-3 -right-3 bg-primary text-black text-xs font-bold px-2 py-1 rounded-full border-2 border-background-dark flex items-center gap-1">
+                                <span class="material-symbols-outlined text-[14px]">verified</span> AI Verified
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <h1 id="rest-title"
+                                class="text-3xl md:text-5xl font-bold text-white tracking-tight text-glow">Cyber Sushi
+                                Hub</h1>
+                            <div class="flex flex-wrap items-center gap-3 text-[#92c9a7] text-sm md:text-base mt-1">
+                                <span id="rest-tag-1">Japanese</span>
+                                <span class="size-1 bg-primary rounded-full"></span>
+                                <span id="rest-tag-2">Sushi</span>
+                                <span class="size-1 bg-primary rounded-full"></span>
+                                <span id="rest-tag-3">Future Fusion</span>
+                                <a href="restaurant_reviews.html"
+                                    class="ml-2 flex items-center gap-1 text-white bg-white/10 px-2 py-0.5 rounded-full text-xs">
+                                    <span class="material-symbols-outlined text-sm text-yellow-400">star</span>
+                                    <span id="rest-rating">4.8</span>
+                                </a>
+
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 mt-3">
+                            <span class="animate-pulse size-2 bg-green-500 rounded-full"></span>
+                            <span class="text-green-400 text-sm font-medium">Open Now • Kitchen Live</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto scrollbar-hide">
+                    <div
+                        class="flex min-w-[120px] flex-col gap-1 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 p-4 hover:border-primary/50 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#92c9a7] text-xs uppercase tracking-wider">Kitchen Load</span>
+                            <span class="material-symbols-outlined text-primary text-lg">speed</span>
+                        </div>
+                        <p class="text-white text-2xl font-bold">Optimal</p>
+                    </div>
+                    <div
+                        class="flex min-w-[120px] flex-col gap-1 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 p-4 hover:border-primary/50 transition-colors">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#92c9a7] text-xs uppercase tracking-wider">Prep Time</span>
+                            <span class="material-symbols-outlined text-primary text-lg">schedule</span>
+                        </div>
+                        <p id="rest-prep-time" class="text-white text-2xl font-bold">25m</p>
+                    </div>
+                </div>
+    </div>
+    </section>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+
+
+        <div class="col-span-1 lg:col-span-7 flex flex-col gap-10">
+
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                    <h3 class="text-white text-lg font-bold">Because you ordered recently...</h3>
+                </div>
+                <div id="rec-scroll" class="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide snap-x">
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-6" id="menu-container">
+                <div class="flex items-center justify-between border-b border-white/10 pb-2">
+                    <h2 class="text-2xl font-bold text-white">Full Menu</h2>
+                    <div class="flex gap-2">
+                        <button
+                            class="size-8 rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-white/10"><span
+                                class="material-symbols-outlined text-sm">grid_view</span></button>
+                        <button class="size-8 rounded-full bg-primary text-black flex items-center justify-center"><span
+                                class="material-symbols-outlined text-sm">view_list</span></button>
+                    </div>
+                </div>
+
+                <div id="menu-items-feed" class="flex flex-col gap-4"></div>
+            </div>
+        </div>
+
+
+    </div>
+    </main>
+    </div>
+
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script>
+        // 1. DATASETS (Now Loaded from ZoiDB)
+        const currentId = new URLSearchParams(window.location.search).get('id') || "101";
+
+        // Always check the hardcoded DB_RESTAURANTS first (source of truth),
+        // then fall back to localStorage via ZoiRestaurants.getAll()
+        let currentRest = null;
+        if (typeof DB_RESTAURANTS !== 'undefined') {
+            currentRest = DB_RESTAURANTS.find(r => r.id === currentId);
+        }
+        if (!currentRest) {
+            const allRestaurants = ZoiRestaurants.getAll();
+            currentRest = allRestaurants.find(r => r.id === currentId) || allRestaurants[0];
+        }
+
+        let currentMenu = [];
+        if (typeof DB_MENUS !== 'undefined') {
+            currentMenu = DB_MENUS[currentId] || DB_MENUS['default'] || [];
+        }
+        // Try to load any overridden menu from local storage (partner menu sync)
+        const storedMenus = JSON.parse(localStorage.getItem('zoiMenus') || '{}');
+        if (storedMenus[currentId]) {
+            // Flatten partner's categories into one array for customer page
+            currentMenu = [];
+            for (const cat in storedMenus[currentId]) {
+                currentMenu = currentMenu.concat(storedMenus[currentId][cat]);
+            }
+        }
+
+        // 2. INITIALIZATION
+
+
+        // Update Header Info
+        document.getElementById('rest-title').innerText = currentRest.name;
+        document.getElementById('rest-hero-bg').style.backgroundImage = `url('${currentRest.image}')`;
+        document.getElementById('rest-logo').style.backgroundImage = `url('${currentRest.image}')`;
+        document.getElementById('rest-rating').innerText = currentRest.rating;
+        document.getElementById('rest-prep-time').innerText = currentRest.time || currentRest.prep || '30 min';
+
+        if (currentRest.tags[0]) document.getElementById('rest-tag-1').innerText = currentRest.tags[0];
+        if (currentRest.tags[1]) document.getElementById('rest-tag-2').innerText = currentRest.tags[1];
+        if (currentRest.tags[2]) {
+            let el3 = document.getElementById('rest-tag-3');
+            if (el3) el3.innerText = currentRest.tags[2];
+        } else {
+            let el3 = document.getElementById('rest-tag-3');
+            if (el3) el3.style.display = 'none';
+        }
+
+        // 3. RENDER MENU
+        function renderMenu(filterType = null) {
+            const feed = document.getElementById('menu-items-feed');
+            feed.innerHTML = "";
+
+            currentMenu.forEach((item, idx) => {
+                if (filterType === 'veg' && !item.veg) return;
+                if (filterType === 'spicy' && !item.spicy) return;
+                if (filterType === 'protein' && !item.protein) return;
+
+                // Popularity badges based on simulated order data
+                let popularBadge = '';
+                if (idx < 2) {
+                    popularBadge = '<span class="text-[10px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full font-bold border border-orange-500/30 flex items-center gap-1"><span class="material-symbols-outlined text-[10px]">local_fire_department</span>Bestseller</span>';
+                } else if (idx < 4) {
+                    popularBadge = '<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-bold border border-primary/30 flex items-center gap-1"><span class="material-symbols-outlined text-[10px]">trending_up</span>Most Ordered</span>';
+                }
+
+                const card = `
+                <article class="group relative flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 rounded-2xl bg-surface-dark border border-white/5 hover:border-primary/40 transition-all duration-300">
+                    <div class="w-full sm:w-48 h-48 sm:h-auto shrink-0 rounded-xl bg-cover bg-center" style='background-image: url("${item.img}");'></div>
+                    <div class="flex flex-col flex-1 justify-between gap-4">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <div class="flex flex-col gap-1">
+                                    <h3 class="text-xl font-bold text-white group-hover:text-primary transition-colors">${item.name}</h3>
+                                    ${popularBadge ? '<div class="flex gap-2 mt-0.5">' + popularBadge + '</div>' : ''}
+                                </div>
+                                <span class="text-lg font-mono font-bold text-white">₹${item.price}</span>
+                            </div>
+                            <p class="text-gray-400 text-sm mt-2">${item.desc}</p>
+                            <div class="flex flex-wrap gap-2 mt-3">
+                                ${item.spicy ? '<span class="text-xs bg-red-900/30 text-red-400 px-2 py-1 rounded border border-red-500/20">Spicy</span>' : ''}
+                                ${item.veg ? '<span class="text-xs bg-green-900/30 text-green-400 px-2 py-1 rounded border border-green-500/20">Veg</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-white/5">
+                            <span class="text-xs text-[#92c9a7]">${idx < 2 ? '🔥 Popular Choice' : 'AI Recommended'}</span>
+                            <button onclick="addToCart('${item.name}', ${item.price}, '${item.img}')" class="bg-primary hover:bg-green-400 text-black font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all transform hover:scale-105 shadow-[0_0_15px_rgba(43,238,117,0.3)]">
+                                Add <span class="material-symbols-outlined text-sm">add</span>
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            `;
+                feed.innerHTML += card;
+            });
+        }
+
+        // 4. CART LOGIC (CRITICAL FIX: LocalStorage Integration)
+        // Load existing cart from memory immediately
+        let cart = JSON.parse(localStorage.getItem('zoiCart')) || [];
+        let cartRest = JSON.parse(localStorage.getItem('zoiCartRestaurant')) || null;
+
+        function addToCart(name, price, image) {
+            // Check if adding from a different restaurant
+            if (cartRest && cartRest.id !== currentRest.id) {
+                if (!confirm(`Start new basket? Your cart contains items from ${cartRest.name}.`)) return;
+                cart = []; // Clear if user agrees
+            }
+
+            // Set current restaurant context
+            if (cart.length === 0) {
+                cartRest = { id: currentRest.id, name: currentRest.name, image: currentRest.image };
+                localStorage.setItem('zoiCartRestaurant', JSON.stringify(cartRest));
+            }
+
+            // Check if item exists
+            const existingItem = cart.find(i => i.name === name);
+            if (existingItem) {
+                existingItem.qty = (existingItem.qty || 1) + 1;
+            } else {
+                cart.push({ name, price, image, qty: 1 });
+            }
+
+            saveCart(); // Save immediately
+            updateCartUI();
+        }
+
+        function saveCart() {
+            localStorage.setItem('zoiCart', JSON.stringify(cart));
+            // Sync with global badge system
+            if (typeof ZoiCart !== 'undefined') ZoiCart.updateBadges();
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items-container');
+            const badge = document.getElementById('cart-badge');
+            const subtotalEl = document.getElementById('cart-subtotal');
+            const totalEl = document.getElementById('cart-total');
+            const healthBar = document.getElementById('cart-health-bar');
+            const healthText = document.getElementById('cart-health-text');
+            const aiTip = document.getElementById('ai-tip');
+
+            // Update Badge
+            const totalCount = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+            badge.innerText = `${totalCount} items`;
+
+            // Render Items
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="text-gray-500 text-sm text-center py-10">Cart is empty.<br>Start Zapping!</div>`;
+                healthBar.style.width = "5%";
+                healthText.innerText = "Empty";
+                aiTip.innerHTML = `<span class="text-primary font-bold">Tip:</span> Start adding items to unlock AI discounts!`;
+                subtotalEl.innerText = `₹0`;
+                totalEl.innerText = `₹0`;
+            } else {
+                container.innerHTML = "";
+                let total = 0;
+                cart.forEach(item => {
+                    total += item.price * (item.qty || 1);
+                    container.innerHTML += `
+                    <div class="flex justify-between items-center bg-black/20 p-2 rounded-lg mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded bg-cover bg-center" style="background-image: url('${item.image}')"></div>
+                            <div class="flex flex-col">
+                                <span class="text-white text-xs">${item.name}</span>
+                                <span class="text-gray-500 text-[10px]">Qty: ${item.qty || 1}</span>
+                            </div>
+                        </div>
+                        <span class="text-primary font-mono text-sm">₹${item.price * (item.qty || 1)}</span>
+                    </div>
+                `;
+                });
+                subtotalEl.innerText = `₹${total}`;
+                totalEl.innerText = `₹${total + 40}`; // + Delivery
+
+                // AI Optimizer Logic
+                if (total > 500) {
+                    healthBar.style.width = "100%";
+                    healthBar.classList.add("bg-neon-pink");
+                    healthText.innerText = "Supercharged!";
+                    aiTip.innerHTML = `<span class="text-neon-pink font-bold">AI Bonus:</span> Free Delivery Unlocked!`;
+                } else {
+                    healthBar.style.width = "60%";
+                    healthText.innerText = "Good";
+                    aiTip.innerHTML = `<span class="text-primary font-bold">Tip:</span> Add ₹${500 - total} more for free delivery.`;
+                }
+            }
+        }
+
+        // Filter Trigger
+        function filterMenu(type) {
+            renderMenu(type);
+        }
+
+        // Initial Render
+        renderMenu();
+        updateCartUI();
+
+    </script>
+    <script src="js/zoi_customer_engine.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+    <script src="js/zoi_partner_engine.js"></script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>

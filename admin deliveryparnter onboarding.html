@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Admin - Rider Verification Center</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>
+        // Enforce RBAC Access Before Rendering
+        ZoiAuth.enforceAccess("Fleet Metrics");
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+                }
+            }
+        }
+
+        // --- TOAST NOTIFICATION ---
+        function showToast(title, message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-surface border border-gray-700 text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex flex-col gap-1 fade-in';
+            toast.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-sm">notifications</span>
+                    <strong class="text-sm font-bold">${title}</strong>
+                </div>
+                <p class="text-xs text-gray-400 pl-6">${message}</p>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .doc-preview {
+            transition: transform 0.2s;
+        }
+
+        .doc-preview:hover {
+            transform: scale(1.5);
+            z-index: 10;
+            position: relative;
+            border-color: #00f0ff;
+        }
+    .glass { background: rgba(24, 26, 32, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white font-sans h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+
+        <header
+            class="h-16 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-6 z-10">
+            <h1 class="text-lg font-bold flex items-center gap-2">
+                Verification Center <span
+                    class="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30"
+                    id="pending-count">Loading...</span>
+            </h1>
+            <div class="flex items-center gap-3">
+                <div
+                    class="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-bold">
+                    <span class="material-symbols-outlined text-sm">verified_user</span>
+                    Auto-KYC Enabled
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-x-auto p-6">
+            <div class="flex gap-6 h-full min-w-[1000px]">
+
+                <div class="w-1/3 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <h3 class="font-bold text-gray-400 uppercase text-xs tracking-wider">New Applicants</h3>
+                        <span
+                            class="bg-surface border border-border px-2 py-0.5 rounded text-xs font-mono text-gray-400">Step
+                            1</span>
+                    </div>
+                    <div class="flex-1 bg-black/20 rounded-xl border border-border p-3 space-y-3 overflow-y-auto"
+                        id="col-pending">
+                    </div>
+                </div>
+
+                <div class="w-1/3 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <h3 class="font-bold text-blue-400 uppercase text-xs tracking-wider">Under Verification</h3>
+                        <span
+                            class="bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-xs font-mono">Step
+                            2</span>
+                    </div>
+                    <div class="flex-1 bg-blue-500/5 rounded-xl border border-blue-500/10 p-3 space-y-3 overflow-y-auto"
+                        id="col-review">
+                        <div class="bg-surface border border-border p-4 rounded-xl shadow-lg group">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="size-8 rounded-full bg-gray-700 flex items-center justify-center font-bold text-xs text-white">
+                                        AM</div>
+                                    <div>
+                                        <h4 class="font-bold text-sm text-white">Amit Mishra</h4>
+                                        <p class="text-[10px] text-gray-400">Bike • Delhi</p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] bg-yellow-500/10 text-yellow-500 px-1.5 py-0.5 rounded">Docs
+                                    Pending</span>
+                            </div>
+                            <div class="text-[9px] text-gray-500 mb-2">Referred by: <strong>Rider #4421</strong></div>
+                            <button onclick="openVerifyModal('Amit Mishra', 'Bike')"
+                                class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded transition-colors flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20">
+                                <span class="material-symbols-outlined text-sm">fact_check</span> Start Verification
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-1/3 flex flex-col h-full">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <h3 class="font-bold text-success uppercase text-xs tracking-wider">Ready for Activation</h3>
+                        <span
+                            class="bg-success/10 border border-success/20 text-success px-2 py-0.5 rounded text-xs font-mono">Final
+                            Step</span>
+                    </div>
+                    <div class="flex-1 bg-success/5 rounded-xl border border-success/10 p-3 space-y-3 overflow-y-auto"
+                        id="col-ready">
+                        <div class="text-center py-10 text-gray-600 italic text-sm">No verified applicants waiting.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="verify-modal"
+        class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div
+            class="bg-surface border border-border rounded-xl w-full max-w-6xl h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+
+            <div class="flex justify-between items-center p-6 border-b border-border bg-[#15171c]">
+                <div class="flex items-center gap-4">
+                    <div class="size-12 rounded-full bg-gray-700 bg-cover border border-gray-600"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBjygcH4pDMYfkmwWBNpTgUkhpiAXxgpDs6_M9s1fJvFT8js3JnS4OMasK5q1IUFBfbxkKB4orU_YEeJfECT8AqSCKZ807o_Ae4wuYp0IaExTH3XtGEwlGSPrJAiND5Y86UzTdPFtXvbWohMJd1hzNGpbbkvtGx6ZkbDeFiteSzD7lZ9MsULwNiWSNQDrExoelH0GZzrulVqEh4fWLWprBZE1XmL56S5YDFWDNcyz5ZMgVL1o2syopItjCKsdKj1ekcHRwmNVCp4jE')">
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2" id="modal-user-name">--</h2>
+                        <div class="flex gap-2 text-xs text-gray-400">
+                            <span class="flex items-center gap-1"><span
+                                    class="material-symbols-outlined text-sm">two_wheeler</span> <span
+                                    id="modal-vehicle">--</span></span>
+                            <span>•</span>
+                            <span>Ref: #R-2024-X9</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4 items-center">
+                    <div class="text-right">
+                        <p class="text-[10px] text-gray-500 uppercase font-bold">Verification Progress</p>
+                        <div class="w-32 h-2 bg-gray-800 rounded-full mt-1 overflow-hidden">
+                            <div id="progress-bar" class="h-full bg-primary w-[5%] transition-all duration-500"></div>
+                        </div>
+                    </div>
+                    <button onclick="closeModal('verify-modal')"
+                        class="text-gray-400 hover:text-white p-2 hover:bg-white/10 rounded-full"><span
+                            class="material-symbols-outlined">close</span></button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+
+                <section>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">face</span> Identity Verification (Face
+                        Match)
+                    </h3>
+                    <div class="bg-black/20 border border-border rounded-xl p-6 flex items-center gap-8">
+                        <div class="flex gap-4 items-center">
+                            <div class="text-center">
+                                <div class="size-24 rounded-lg bg-gray-700 bg-cover mb-2 border-2 border-border"
+                                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBjygcH4pDMYfkmwWBNpTgUkhpiAXxgpDs6_M9s1fJvFT8js3JnS4OMasK5q1IUFBfbxkKB4orU_YEeJfECT8AqSCKZ807o_Ae4wuYp0IaExTH3XtGEwlGSPrJAiND5Y86UzTdPFtXvbWohMJd1hzNGpbbkvtGx6ZkbDeFiteSzD7lZ9MsULwNiWSNQDrExoelH0GZzrulVqEh4fWLWprBZE1XmL56S5YDFWDNcyz5ZMgVL1o2syopItjCKsdKj1ekcHRwmNVCp4jE')">
+                                </div>
+                                <p class="text-xs text-gray-500">Live Selfie</p>
+                            </div>
+                            <span class="material-symbols-outlined text-gray-600 text-2xl">compare_arrows</span>
+                            <div class="text-center">
+                                <div class="size-24 rounded-lg bg-gray-700 bg-cover mb-2 border-2 border-border"
+                                    style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/f/fa/Driving_License_of_India_Smart_Card.png')">
+                                </div>
+                                <p class="text-xs text-gray-500">ID Photo</p>
+                            </div>
+                        </div>
+                        <div class="flex-1 border-l border-border pl-8">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="text-2xl font-bold text-success">98.5%</h4>
+                                <span
+                                    class="bg-success/10 text-success text-[10px] font-bold px-2 py-0.5 rounded border border-success/20">MATCH
+                                    CONFIRMED</span>
+                            </div>
+                            <p class="text-sm text-gray-400">AI Confidence Score is high. No impersonation detected.</p>
+                        </div>
+                        <div id="action-face">
+                            <button onclick="verifyItem('face')"
+                                class="px-4 py-2 bg-surface border border-border hover:border-success hover:text-success rounded-lg text-sm font-bold transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-lg">check_circle</span> Approve
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">folder_shared</span> Required Documents
+                    </h3>
+                    <div class="bg-surface border border-border rounded-xl overflow-hidden">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-black/20 text-gray-500 text-xs uppercase">
+                                <tr>
+                                    <th class="p-4">Document Name</th>
+                                    <th class="p-4">Preview</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-border">
+                                <tr class="hover:bg-white/5">
+                                    <td class="p-4 font-bold text-white">Driving License (Front)</td>
+                                    <td class="p-4"><img
+                                            src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Driving_License_of_India_Smart_Card.png"
+                                            class="h-10 rounded border border-border doc-preview cursor-pointer"
+                                            onclick="viewFullImage(this.src)"></td>
+                                    <td class="p-4" id="status-dl-front"><span class="text-warning text-xs">●
+                                            Pending</span></td>
+                                    <td class="p-4 text-right" id="action-dl-front">
+                                        <button onclick="verifyItem('dl-front')"
+                                            class="px-3 py-1.5 bg-gray-800 hover:bg-green-900/30 hover:text-green-400 border border-border rounded text-xs font-bold transition-colors">Approve</button>
+                                        <button onclick="openRejectModal('dl-front')"
+                                            class="px-3 py-1.5 bg-gray-800 hover:bg-red-900/30 hover:text-red-400 border border-border rounded text-xs font-bold transition-colors ml-2">Reject</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-white/5">
+                                    <td class="p-4 font-bold text-white">Driving License (Back)</td>
+                                    <td class="p-4"><img
+                                            src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Driving_License_of_India_Smart_Card.png"
+                                            class="h-10 rounded border border-border doc-preview cursor-pointer"
+                                            onclick="viewFullImage(this.src)"></td>
+                                    <td class="p-4" id="status-dl-back"><span class="text-warning text-xs">●
+                                            Pending</span></td>
+                                    <td class="p-4 text-right" id="action-dl-back">
+                                        <button onclick="verifyItem('dl-back')"
+                                            class="px-3 py-1.5 bg-gray-800 hover:bg-green-900/30 hover:text-green-400 border border-border rounded text-xs font-bold transition-colors">Approve</button>
+                                        <button onclick="openRejectModal('dl-back')"
+                                            class="px-3 py-1.5 bg-gray-800 hover:bg-red-900/30 hover:text-red-400 border border-border rounded text-xs font-bold transition-colors ml-2">Reject</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-white/5">
+                                    <td class="p-4 font-bold text-white">Vehicle RC</td>
+                                    <td class="p-4"><img
+                                            src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Driving_License_of_India_Smart_Card.png"
+                                            class="h-10 rounded border border-border doc-preview cursor-pointer"
+                                            onclick="viewFullImage(this.src)"></td>
+                                    <td class="p-4" id="status-rc"><span class="text-warning text-xs">● Pending</span>
+                                    </td>
+                                    <td class="p-4 text-right" id="action-rc">
+                                        <button onclick="verifyItem('rc')"
+                                            class="px-3 py-1.5 bg-gray-800 hover:bg-green-900/30 hover:text-green-400 border border-border rounded text-xs font-bold transition-colors">Approve</button>
+                                        <button onclick="openRejectModal('rc')"
+                                            class="px-3 py-1.5 bg-gray-800 hover:bg-red-900/30 hover:text-red-400 border border-border rounded text-xs font-bold transition-colors ml-2">Reject</button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-white/5">
+                                    <td class="p-4 font-bold text-white">Aadhar Card</td>
+                                    <td class="p-4"><img
+                                            src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Driving_License_of_India_Smart_Card.png"
+                                            class="h-10 rounded border border-border doc-preview cursor-pointer"
+                                            onclick="viewFullImage(this.src)"></td>
+                                    <td class="p-4" id="status-aadhar"><span class="text-warning text-xs">●
+                                            Pending</span></td>
+                                    <td class="p-4 text-right" id="action-aadhar">
+                                        <button onclick="verifyItem('aadhar')"
+                                            class="px-3 py-1.5 bg-gray-800 hover:bg-green-900/30 hover:text-green-400 border border-border rounded text-xs font-bold transition-colors">Approve</button>
+                                        <button onclick="openRejectModal('aadhar')"
+                                            class="px-3 py-1.5 bg-gray-800 hover:bg-red-900/30 hover:text-red-400 border border-border rounded text-xs font-bold transition-colors ml-2">Reject</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">school</span> Training & Equipment
+                    </h3>
+                    <div class="bg-surface border border-border rounded-xl p-6 grid grid-cols-2 gap-4">
+                        <label
+                            class="flex items-center gap-3 p-3 bg-black/20 rounded-lg cursor-pointer hover:bg-black/40">
+                            <input type="checkbox" id="chk-training"
+                                class="w-5 h-5 rounded border-gray-500 text-primary focus:ring-0"
+                                onchange="checkCompletion()">
+                            <span class="text-sm text-gray-300">Passed In-App Training Quiz</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-3 p-3 bg-black/20 rounded-lg cursor-pointer hover:bg-black/40">
+                            <input type="checkbox" id="chk-bag"
+                                class="w-5 h-5 rounded border-gray-500 text-primary focus:ring-0"
+                                onchange="checkCompletion()">
+                            <span class="text-sm text-gray-300">Delivery Bag Issued</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-3 p-3 bg-black/20 rounded-lg cursor-pointer hover:bg-black/40">
+                            <input type="checkbox" id="chk-shirt"
+                                class="w-5 h-5 rounded border-gray-500 text-primary focus:ring-0"
+                                onchange="checkCompletion()">
+                            <span class="text-sm text-gray-300">T-Shirt Issued</span>
+                        </label>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">account_balance</span> Banking Information
+                    </h3>
+                    <div class="bg-surface border border-border rounded-xl p-6">
+                        <div class="grid grid-cols-3 gap-6 mb-4">
+                            <div>
+                                <label class="text-xs text-gray-500 uppercase font-bold">Account Holder</label>
+                                <input type="text" id="modal-bank-name" value="" readonly
+                                    class="w-full mt-1 bg-black/20 border border-border rounded-lg text-sm text-gray-300 px-3 py-2">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 uppercase font-bold">Bank Name</label>
+                                <input type="text" id="modal-bank-bank" value="HDFC Bank" readonly
+                                    class="w-full mt-1 bg-black/20 border border-border rounded-lg text-sm text-gray-300 px-3 py-2">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 uppercase font-bold">IFSC Code</label>
+                                <input type="text" id="modal-bank-ifsc" value="HDFC0001234" readonly
+                                    class="w-full mt-1 bg-black/20 border border-border rounded-lg text-sm text-gray-300 px-3 py-2">
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center border-t border-border pt-4">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-blue-400 text-lg">check_circle</span>
+                                <span class="text-sm text-blue-400 font-bold">Penny Drop Verification Successful</span>
+                            </div>
+                            <div id="action-bank">
+                                <button onclick="verifyItem('bank')"
+                                    class="px-4 py-2 bg-gray-800 hover:bg-primary/20 hover:text-primary border border-border hover:border-primary rounded-lg text-sm font-bold transition-all">
+                                    Verify Bank Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">history</span> Communication History
+                    </h3>
+                    <div
+                        class="bg-black/20 border border-border rounded-xl p-4 text-xs font-mono space-y-2 h-32 overflow-y-auto">
+                        <p class="text-gray-400"><span class="text-blue-400">[SYSTEM]</span> OTP sent for mobile
+                            verification (Today, 10:00 AM)</p>
+                        <p class="text-gray-400"><span class="text-green-400">[EMAIL]</span> "Welcome to ZipZapZoi" sent
+                            (Today, 10:05 AM)</p>
+                        <p class="text-gray-400"><span class="text-blue-400">[SYSTEM]</span> Document upload started
+                            (Today, 10:10 AM)</p>
+                    </div>
+                </section>
+            </div>
+
+            <div class="p-6 border-t border-border bg-[#15171c] flex justify-between items-center">
+                <p class="text-xs text-gray-500">All steps (Docs, Bank, Training) must be verified.</p>
+                <div class="flex gap-4">
+                    <button onclick="closeModal('verify-modal')"
+                        class="px-6 py-3 rounded-xl border border-border text-gray-400 font-bold hover:text-white transition-colors">Close</button>
+                    <button id="btn-complete-verification" disabled onclick="completeVerification()"
+                        class="px-8 py-3 rounded-xl bg-gray-800 text-gray-500 font-bold transition-all cursor-not-allowed flex items-center gap-2">
+                        <span class="material-symbols-outlined">lock</span> Complete Verification
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="reject-modal"
+        class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Reject Document</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Reason</label>
+                    <select id="reject-reason"
+                        class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm">
+                        <option>Image Blurry / Unclear</option>
+                        <option>Name Mismatch</option>
+                        <option>Document Expired</option>
+                        <option>Invalid Document Type</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Note to Applicant</label>
+                    <textarea id="reject-note" rows="3"
+                        class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm"
+                        placeholder="Please upload a clearer photo..."></textarea>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeModal('reject-modal')"
+                    class="flex-1 py-2 rounded-lg border border-border text-gray-400 text-sm font-bold">Cancel</button>
+                <button onclick="confirmReject()"
+                    class="flex-1 py-2 rounded-lg bg-danger hover:bg-red-600 text-white text-sm font-bold shadow-lg shadow-danger/20">Confirm
+                    Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // STATE
+        let currentApplicant = null;
+        let rejectTarget = null;
+        let verificationState = {
+            face: false,
+            'dl-front': false,
+            'dl-back': false,
+            rc: false,
+            aadhar: false,
+            bank: false,
+            training: false,
+            bag: false,
+            shirt: false
+        };
+
+        // 1. LOAD APPLICANTS
+        let applications = [];
+
+        function loadApplicants() {
+            const colPending = document.getElementById('col-pending');
+            const colReview = document.getElementById('col-review');
+            const colReady = document.getElementById('col-ready');
+
+            colPending.innerHTML = "";
+            colReview.innerHTML = "";
+            colReady.innerHTML = "";
+
+            applications = ZoiRiderOnboarding.getApplications();
+
+            // Counters
+            const newApps = applications.filter(a => a.status === 'New');
+            document.getElementById('pending-count').innerText = `${newApps.length} Pending`;
+
+            if (applications.length === 0) {
+                colPending.innerHTML = `<div class="text-center py-10 text-gray-600 italic">No active applications</div>`;
+                colReview.innerHTML = `<div class="text-center py-10 text-gray-600 italic">No active applications</div>`;
+                colReady.innerHTML = `<div class="text-center py-10 text-gray-600 italic">No active applications</div>`;
+                return;
+            }
+
+            let hasPending = false, hasReview = false, hasReady = false;
+
+            applications.forEach(app => {
+                const card = `
+                    <div class="bg-surface border-l-4 ${getStatusColor(app.status)} p-4 rounded-r-xl shadow-lg relative group transition-all hover:bg-white/5 mb-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h4 class="font-bold text-sm text-white">${app.name}</h4>
+                                <p class="text-[10px] text-gray-400">${app.vehicle} • ${app.id}</p>
+                            </div>
+                            <span class="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-gray-400">${app.status}</span>
+                        </div>
+                        ${getActionButtons(app)}
+                    </div>`;
+
+                if (app.status === 'New') { colPending.innerHTML += card; hasPending = true; }
+                else if (app.status === 'Verification') { colReview.innerHTML += card; hasReview = true; }
+                else if (app.status === 'Ready') { colReady.innerHTML += card; hasReady = true; }
+            });
+
+            if (!hasPending) colPending.innerHTML = `<div class="text-center py-10 text-gray-600 italic">No new applications</div>`;
+            if (!hasReview) colReview.innerHTML = `<div class="text-center py-10 text-gray-600 italic">No applicants under verification</div>`;
+            if (!hasReady) colReady.innerHTML = `<div class="text-center py-10 text-gray-600 italic">No verified applicants waiting</div>`;
+        }
+
+        function getStatusColor(status) {
+            if (status === 'New') return 'border-gray-500';
+            if (status === 'Verification') return 'border-blue-500';
+            if (status === 'Ready') return 'border-success';
+            return 'border-gray-500';
+        }
+
+        function getActionButtons(app) {
+            if (app.status === 'New') {
+                return `<button onclick="startVerification('${app.id}')" class="w-full mt-2 py-1.5 bg-primary hover:bg-orange-600 text-black text-xs font-bold rounded shadow-lg shadow-primary/10">Start Verification</button>`;
+            } else if (app.status === 'Verification') {
+                return `<button onclick="openVerifyModal('${app.id}')" class="w-full mt-2 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded shadow-lg shadow-primary/10">Continue Verification</button>`;
+            } else if (app.status === 'Ready') {
+                return `<button onclick="activateRider('${app.id}')" class="w-full mt-2 py-1.5 bg-success hover:bg-green-600 text-white text-xs font-bold rounded shadow-lg shadow-success/10">Activate & Deploy</button>`;
+            }
+            return '';
+        }
+
+        function startVerification(id) {
+            ZoiRiderOnboarding.updateStatus(id, 'Verification');
+            loadApplicants();
+            openVerifyModal(id);
+        }
+
+        function activateRider(id) {
+            if (confirm("Deploy this rider to the active fleet?")) {
+                ZoiRiderOnboarding.deployRider(id);
+                loadApplicants();
+                showToast("Success", "Rider Deployed Successfully!");
+            }
+        }
+
+        // 2. OPEN VERIFY MODAL
+        function openVerifyModal(id) {
+            const app = applications.find(a => a.id === id);
+            if (!app) return;
+
+            currentApplicant = app;
+            document.getElementById('modal-user-name').innerText = app.name;
+            document.getElementById('modal-vehicle').innerText = app.vehicle;
+
+            // Dynamic bank details
+            document.getElementById('modal-bank-name').value = app.name;
+            document.getElementById('modal-bank-bank').value = "HDFC Bank (Verified)";
+            document.getElementById('modal-bank-ifsc').value = "HDFC0001234";
+
+            // Reset UI
+            resetUI();
+
+            document.getElementById('verify-modal').classList.remove('hidden');
+            document.getElementById('verify-modal').classList.add('flex');
+        }
+
+        // Methods duplicate logic removed
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        // 3. VERIFY ITEM LOGIC
+        function verifyItem(key) {
+            verificationState[key] = true;
+
+            // UI Update
+            const container = document.getElementById(`action-${key}`);
+            if (container) {
+                container.innerHTML = `<span class="px-4 py-2 bg-success/10 text-success border border-success/20 rounded-lg text-xs font-bold flex items-center justify-end gap-1 cursor-default"><span class="material-symbols-outlined text-sm">check_circle</span> Verified</span>`;
+            }
+            const statusEl = document.getElementById(`status-${key}`);
+            if (statusEl) statusEl.innerHTML = `<span class="text-success text-xs font-bold">● Approved</span>`;
+
+            updateProgressBar();
+            checkCompletion();
+        }
+
+        // 4. REJECT LOGIC
+        function openRejectModal(key) {
+            rejectTarget = key;
+            document.getElementById('reject-modal').classList.remove('hidden');
+            document.getElementById('reject-modal').classList.add('flex');
+        }
+
+        function confirmReject() {
+            verificationState[rejectTarget] = false;
+
+            // UI Update
+            const container = document.getElementById(`action-${rejectTarget}`);
+            if (container) {
+                container.innerHTML = `<button onclick="verifyItem('${rejectTarget}')" class="px-3 py-1.5 bg-gray-800 hover:bg-green-900/30 hover:text-green-400 border border-border rounded text-xs font-bold transition-colors">Re-Approve</button>`;
+            }
+            const statusEl = document.getElementById(`status-${rejectTarget}`);
+            if (statusEl) statusEl.innerHTML = `<span class="text-danger text-xs font-bold">● Re-upload Req.</span>`;
+
+            closeModal('reject-modal');
+            updateProgressBar();
+            checkCompletion();
+        }
+
+        // 5. COMPLETION LOGIC
+        function updateProgressBar() {
+            const total = Object.keys(verificationState).length;
+            const approved = Object.values(verificationState).filter(v => v).length;
+            const percent = (approved / total) * 100;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+        }
+
+        function checkCompletion() {
+            // Update state from checkboxes
+            verificationState.training = document.getElementById('chk-training').checked;
+            verificationState.bag = document.getElementById('chk-bag').checked;
+            verificationState.shirt = document.getElementById('chk-shirt').checked;
+
+            const allVerified = Object.values(verificationState).every(v => v === true);
+            const btn = document.getElementById('btn-complete-verification');
+
+            if (allVerified) {
+                btn.disabled = false;
+                btn.classList.remove('bg-gray-800', 'text-gray-500', 'cursor-not-allowed');
+                btn.classList.add('bg-primary', 'text-black', 'hover:bg-orange-600', 'shadow-lg', 'shadow-primary/20');
+                btn.innerHTML = `<span class="material-symbols-outlined">check_circle</span> Complete Verification`;
+            } else {
+                btn.disabled = true;
+                btn.classList.add('bg-gray-800', 'text-gray-500', 'cursor-not-allowed');
+                btn.classList.remove('bg-primary', 'text-black', 'hover:bg-orange-600', 'shadow-lg');
+            }
+            updateProgressBar();
+        }
+
+        // 6. FINAL MOVE TO "READY" COLUMN
+        function completeVerification() {
+            if (!currentApplicant) return;
+            ZoiRiderOnboarding.updateStatus(currentApplicant.id, 'Ready');
+            closeModal('verify-modal');
+            loadApplicants();
+            showToast("Success", "Verification Complete. Rider moved to Ready for Activation.");
+        }
+
+        // 7. FINAL ACTIVATION (DATABASE UPDATE)
+        function activateAccount(id) {
+            const app = applications.find(a => a.id === id);
+            if (confirm(`Confirm Activation for ${app.name}?`)) {
+                ZoiRiderOnboarding.approveApplication(id);
+                const btn = event.target;
+                btn.disabled = true;
+                btn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Activating...`;
+                setTimeout(() => {
+                    btn.innerHTML = `<span class="material-symbols-outlined">how_to_reg</span> Send Activation Link`;
+                    btn.disabled = false;
+                    closeModal();
+                    loadApplicants();
+                    showToast("Activated", `Account Activated! ${app.name} has been notified via SMS.`);
+                }, 1500);
+                document.getElementById('col-ready').innerHTML = `<div class="text-center py-10 text-gray-600 italic">No verified applicants waiting.</div>`;
+            }
+        }
+
+        function resetUI() {
+            verificationState = { face: false, 'dl-front': false, 'dl-back': false, rc: false, aadhar: false, bank: false, training: false, bag: false, shirt: false };
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('btn-complete-verification').disabled = true;
+            document.getElementById('btn-complete-verification').className = "px-8 py-3 rounded-xl bg-gray-800 text-gray-500 font-bold transition-all cursor-not-allowed flex items-center gap-2";
+
+            // Reset Checkboxes
+            ['chk-training', 'chk-bag', 'chk-shirt'].forEach(id => document.getElementById(id).checked = false);
+
+            // Reset individual buttons (Simplified reset)
+            const keys = ['dl-front', 'dl-back', 'rc', 'aadhar', 'bank', 'face'];
+            keys.forEach(k => {
+                const action = document.getElementById(`action-${k}`);
+                if (action) {
+                    if (k === 'bank') {
+                        action.innerHTML = `<button onclick="verifyItem('bank')" class="px-4 py-2 bg-gray-800 hover:bg-primary/20 hover:text-primary border border-border hover:border-primary rounded-lg text-sm font-bold transition-all">Verify Bank Details</button>`;
+                    } else if (k === 'face') {
+                        action.innerHTML = `<button onclick="verifyItem('face')" class="px-4 py-2 bg-surface border border-border hover:border-success hover:text-success rounded-lg text-sm font-bold transition-all flex items-center gap-2"><span class="material-symbols-outlined text-lg">check_circle</span> Approve</button>`;
+                    } else {
+                        action.innerHTML = `<button onclick="verifyItem('${k}')" class="px-3 py-1.5 bg-gray-800 hover:bg-green-900/30 hover:text-green-400 border border-border rounded text-xs font-bold transition-colors">Approve</button> <button onclick="openRejectModal('${k}')" class="px-3 py-1.5 bg-gray-800 hover:bg-red-900/30 hover:text-red-400 border border-border rounded text-xs font-bold transition-colors ml-2">Reject</button>`;
+                    }
+                }
+                const status = document.getElementById(`status-${k}`);
+                if (status) status.innerHTML = `<span class="text-warning text-xs">● Pending</span>`;
+            });
+        }
+
+        function viewFullImage(src) {
+            window.open(src, '_blank');
+        }
+
+        // Init
+        fetch('sidebar.html')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('sidebar-container').innerHTML = data;
+                // Highlight active nav block securely
+                setTimeout(() => {
+                    const links = document.querySelectorAll('#sidebar-container nav a');
+                    links.forEach(l => {
+                        if (l.innerText.includes('Rider Onboarding')) {
+                            l.className = "flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg font-bold transition-all";
+                            l.querySelector('span').classList.add('text-primary');
+                        } else {
+                            l.className = "flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group";
+                        }
+                    });
+
+                    // Inject Simulate Login dropdown if God Mode
+                    ZoiAuth.renderSimLogin();
+                }, 100);
+            });
+
+        loadApplicants();
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+
+

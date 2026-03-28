@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="hostel_shared.js"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1));
+            color: #ec4899;
+            border-color: rgba(236, 72, 153, 0.3);
+            font-weight: 700;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Expense Tracker <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">account_balance_wallet</span></h2>
+                <p class="text-gray-400 text-sm">Track all hostel operational expenses, utilities, and profit/loss
+                    analysis.</p>
+            </div>
+            <button onclick="openExpModal()"
+                class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)]"><span
+                    class="material-symbols-outlined text-sm">add</span> Add Expense</button>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-teal/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-teal">trending_up</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Revenue</p>
+                    <p class="text-xl font-extrabold text-teal">₹4,20,000</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-red-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-red-400">trending_down</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Expenses</p>
+                    <p class="text-xl font-extrabold text-red-400" id="st-expense">₹0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-green-400">savings</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Net Profit</p>
+                    <p class="text-xl font-extrabold text-green-400" id="st-profit">₹0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">percent</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Profit Margin</p>
+                    <p class="text-xl font-extrabold text-amber-400" id="st-margin">0%</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-8 pt-4 flex gap-2 flex-shrink-0">
+            <button class="tab-btn active px-4 py-2 text-xs rounded-xl border border-white/10" data-tab="expenses"
+                onclick="switchTab('expenses')">All Expenses</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-tab="analytics" onclick="switchTab('analytics')">Analytics</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+            <!-- ALL EXPENSES -->
+            <div id="tab-expenses" class="tab-content">
+                <div class="flex items-center gap-3 mb-4">
+                    <select id="exp-cat" onchange="renderExp()"
+                        class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-2 text-gray-300">
+                        <option value="all">All Categories</option>
+                        <option>Electricity</option>
+                        <option>Water</option>
+                        <option>Building Rent</option>
+                        <option>Repairs</option>
+                        <option>Staff Salary</option>
+                        <option>Groceries</option>
+                        <option>Gas</option>
+                        <option>Internet</option>
+                        <option>Insurance</option>
+                        <option>Miscellaneous</option>
+                    </select>
+                    <select id="exp-status" onchange="renderExp()"
+                        class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-2 text-gray-300">
+                        <option value="all">All Status</option>
+                        <option>Paid</option>
+                        <option>Pending</option>
+                    </select>
+                </div>
+                <div class="glass-panel p-0 overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Date</th>
+                                <th class="py-3 px-4">Category</th>
+                                <th class="py-3 px-4">Description</th>
+                                <th class="py-3 px-4">Vendor</th>
+                                <th class="py-3 px-4">Amount</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="exp-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ANALYTICS -->
+            <div id="tab-analytics" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="glass-panel p-6 bouncy-card">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-pink-400 text-lg">pie_chart</span> Expense
+                            Category Breakdown</h3><canvas id="cat-chart" height="220"></canvas>
+                    </div>
+                    <div class="glass-panel p-6 bouncy-card">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-teal text-lg">show_chart</span> Revenue vs
+                            Expenses — 6 Months</h3><canvas id="rev-chart" height="220"></canvas>
+                    </div>
+                </div>
+                <div class="glass-panel p-6 bouncy-card">
+                    <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                            class="material-symbols-outlined text-green-400 text-lg">savings</span> Monthly Profit/Loss
+                    </h3><canvas id="pl-chart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ADD EXPENSE MODAL -->
+    <div id="exp-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-500">add_card</span> Add Expense</h3><button
+                    onclick="closeExpModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <select id="ae-cat"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    <option value="">Category *</option>
+                    <option>Electricity</option>
+                    <option>Water</option>
+                    <option>Building Rent</option>
+                    <option>Repairs</option>
+                    <option>Staff Salary</option>
+                    <option>Groceries</option>
+                    <option>Gas</option>
+                    <option>Internet</option>
+                    <option>Insurance</option>
+                    <option>Miscellaneous</option>
+                </select>
+                <input id="ae-desc" type="text" placeholder="Description *"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="ae-vendor" type="text" placeholder="Vendor / Payee"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <input id="ae-amount" type="number" placeholder="Amount ₹ *"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="ae-date" type="date"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    <select id="ae-status"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option>Paid</option>
+                        <option>Pending</option>
+                    </select>
+                </div>
+            </div>
+            <div class="p-5 border-t border-border flex gap-3"><button onclick="closeExpModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10">Cancel</button><button
+                    onclick="addExpense()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)]">Save
+                    Expense</button></div>
+        </div>
+    </div>
+
+    <script>
+        const REVENUE = 420000;
+        const CAT_ICONS = { Electricity: 'bolt', Water: 'water_drop', 'Building Rent': 'home', Repairs: 'build', 'Staff Salary': 'groups', Groceries: 'shopping_cart', Gas: 'local_fire_department', Internet: 'wifi', Insurance: 'security', Miscellaneous: 'more_horiz' };
+        const CAT_COLORS = { Electricity: 'amber', Water: 'blue', 'Building Rent': 'violet', Repairs: 'orange', 'Staff Salary': 'pink', Groceries: 'green', Gas: 'red', Internet: 'teal', Insurance: 'indigo', Miscellaneous: 'gray' };
+
+        const EXPENSES = ZoiDB.get('expenses', [
+            { date: '2026-03-01', category: 'Electricity', desc: 'BESCOM bill — March', vendor: 'BESCOM', amount: 18500, status: 'Paid' },
+            { date: '2026-03-01', category: 'Water', desc: 'BWSSB water bill', vendor: 'BWSSB', amount: 4200, status: 'Paid' },
+            { date: '2026-03-01', category: 'Building Rent', desc: 'Monthly building rent', vendor: 'Lakshmi Properties', amount: 85000, status: 'Paid' },
+            { date: '2026-03-01', category: 'Staff Salary', desc: 'All staff salaries — March', vendor: 'Internal', amount: 55000, status: 'Paid' },
+            { date: '2026-03-01', category: 'Groceries', desc: 'Monthly grocery procurement', vendor: 'Reliance Fresh', amount: 32000, status: 'Paid' },
+            { date: '2026-03-01', category: 'Gas', desc: 'Cooking gas cylinders x8', vendor: 'HP Gas', amount: 5600, status: 'Paid' },
+            { date: '2026-03-01', category: 'Internet', desc: 'Broadband 500Mbps plan', vendor: 'JioFiber', amount: 3500, status: 'Paid' },
+            { date: '2026-03-02', category: 'Repairs', desc: 'Plumbing repair — Floor 1 bathroom', vendor: 'Sri Ganesh Plumbing', amount: 4500, status: 'Paid' },
+            { date: '2026-03-03', category: 'Repairs', desc: 'AC servicing — Room 204', vendor: 'Blue Star Service', amount: 2800, status: 'Pending' },
+            { date: '2026-03-04', category: 'Electricity', desc: 'Electrical wiring fix — Floor 3', vendor: 'Local Electrician', amount: 1500, status: 'Pending' },
+            { date: '2026-03-01', category: 'Insurance', desc: 'Quarterly fire insurance premium', vendor: 'ICICI Lombard', amount: 12000, status: 'Paid' },
+            { date: '2026-03-04', category: 'Miscellaneous', desc: 'Pest control service', vendor: 'Godrej Pest Control', amount: 3000, status: 'Paid' },
+        ]);
+
+        let catChartInstance = null;
+        let revChartInstance = null;
+        let plChartInstance = null;
+
+        function renderExp() {
+            const cf = document.getElementById('exp-cat').value;
+            const sf = document.getElementById('exp-status').value;
+            let items = [...EXPENSES];
+            if (cf !== 'all') items = items.filter(e => e.category === cf);
+            if (sf !== 'all') items = items.filter(e => e.status === sf);
+            document.getElementById('exp-tbody').innerHTML = items.map((e, i) => {
+                const c = CAT_COLORS[e.category] || 'gray';
+                return `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 30}ms">
+                    <td class="py-3 px-4 text-gray-400 text-xs">${e.date}</td>
+                    <td class="py-3 px-4"><span class="bg-${c}-500/20 text-${c}-400 px-2 py-0.5 rounded text-[10px] font-bold">${e.category}</span></td>
+                    <td class="py-3 px-4 text-white font-bold text-sm">${e.desc}</td>
+                    <td class="py-3 px-4 text-gray-400 text-xs">${e.vendor}</td>
+                    <td class="py-3 px-4 text-red-400 font-bold">₹${e.amount.toLocaleString()}</td>
+                    <td class="py-3 px-4">${e.status === 'Paid' ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">✓ Paid</span>' : '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">⏳ Pending</span>'}</td>
+                    <td class="py-3 px-4">${e.status === 'Pending' ? `<button onclick="markPaid(${i})" class="text-[10px] text-green-400 bg-green-500/10 px-2.5 py-1 rounded font-bold hover:bg-green-500/20">Mark Paid</button>` : ''}</td>
+                </tr>`;
+            }).join('');
+            updateStats();
+        }
+
+        function markPaid(i) {
+            EXPENSES[i].status = 'Paid';
+            ZoiDB.set('expenses', EXPENSES);
+            renderExp();
+            showToast('Expense marked as paid', 'success');
+        }
+
+        function updateStats() {
+            const currentMonth = new Date().toISOString().substring(0, 7);
+            const total = EXPENSES.filter(e => e.date.startsWith(currentMonth)).reduce((s, e) => s + e.amount, 0);
+            const profit = REVENUE - total;
+            const margin = Math.round((profit / REVENUE) * 100);
+            document.getElementById('st-expense').innerText = '₹' + total.toLocaleString();
+            document.getElementById('st-profit').innerText = '₹' + profit.toLocaleString();
+            document.getElementById('st-profit').className = `text-xl font-extrabold ${profit >= 0 ? 'text-green-400' : 'text-red-400'}`;
+            document.getElementById('st-margin').innerText = margin + '%';
+
+            if (!document.getElementById('tab-analytics').classList.contains('hidden')) {
+                initCharts();
+            }
+        }
+
+        function initCharts() {
+            if (catChartInstance) catChartInstance.destroy();
+            if (revChartInstance) revChartInstance.destroy();
+            if (plChartInstance) plChartInstance.destroy();
+
+            // Calculate Category Distribution
+            const catData = {};
+            EXPENSES.forEach(e => { catData[e.category] = (catData[e.category] || 0) + e.amount; });
+            catChartInstance = new Chart(document.getElementById('cat-chart'), { type: 'doughnut', data: { labels: Object.keys(catData), datasets: [{ data: Object.values(catData), backgroundColor: ['rgba(251,191,36,0.5)', 'rgba(59,130,246,0.5)', 'rgba(139,92,246,0.5)', 'rgba(249,115,22,0.5)', 'rgba(236,72,153,0.5)', 'rgba(34,197,94,0.5)', 'rgba(239,68,68,0.5)', 'rgba(0,212,197,0.5)', 'rgba(99,102,241,0.5)', 'rgba(107,114,128,0.4)'], borderWidth: 0, hoverOffset: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#9ca3af', font: { size: 10 }, padding: 8 } } } } });
+
+            // Calculate Monthly Data
+            const monthData = {};
+            EXPENSES.forEach(e => {
+                const m = e.date.substring(0, 7);
+                if (!monthData[m]) monthData[m] = { rev: REVENUE, exp: 0 };
+                monthData[m].exp += e.amount;
+            });
+            // Fixed historical revenue for demonstration
+            if (!monthData['2025-10']) monthData['2025-10'] = { rev: 380000, exp: 210000 };
+            if (!monthData['2025-11']) monthData['2025-11'] = { rev: 390000, exp: 225000 };
+            if (!monthData['2025-12']) monthData['2025-12'] = { rev: 400000, exp: 218000 };
+            if (!monthData['2026-01']) monthData['2026-01'] = { rev: 395000, exp: 230000 };
+            if (!monthData['2026-02']) monthData['2026-02'] = { rev: 410000, exp: 235000 };
+
+            const sortedMonths = Object.keys(monthData).sort().slice(-6);
+            const labels = sortedMonths.map(m => {
+                const d = new Date(m + '-01');
+                return d.toLocaleString('default', { month: 'short', year: '2-digit' });
+            });
+            const revData = sortedMonths.map(m => monthData[m].rev);
+            const expData = sortedMonths.map(m => monthData[m].exp);
+            const plData = sortedMonths.map(m => monthData[m].rev - monthData[m].exp);
+
+            if (labels.length === 0) { labels.push('No Data'); revData.push(0); expData.push(0); plData.push(0); }
+
+            revChartInstance = new Chart(document.getElementById('rev-chart'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Revenue', data: revData, backgroundColor: 'rgba(0,212,197,0.4)', borderRadius: 4 }, { label: 'Expenses', data: expData, backgroundColor: 'rgba(236,72,153,0.4)', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 9 } } }, y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 9 }, callback: v => '₹' + (v / 1000) + 'K' } } }, plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } } } });
+
+            plChartInstance = new Chart(document.getElementById('pl-chart'), { type: 'line', data: { labels: labels, datasets: [{ label: 'Profit', data: plData, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.08)', fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#22c55e' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 9 } } }, y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 9 }, callback: v => '₹' + (v / 1000) + 'K' } } }, plugins: { legend: { display: false } } } });
+        }
+
+        function openExpModal() { document.getElementById('exp-modal').classList.remove('hidden'); document.getElementById('exp-modal').classList.add('flex'); document.getElementById('ae-date').value = new Date().toISOString().split('T')[0]; }
+        function closeExpModal() { document.getElementById('exp-modal').classList.add('hidden'); document.getElementById('exp-modal').classList.remove('flex'); }
+        function addExpense() {
+            const c = document.getElementById('ae-cat').value;
+            if (!c) { showToast('Select category.', 'error'); return; }
+            EXPENSES.unshift({ date: document.getElementById('ae-date').value, category: c, desc: document.getElementById('ae-desc').value || '—', vendor: document.getElementById('ae-vendor').value || '—', amount: parseInt(document.getElementById('ae-amount').value) || 0, status: document.getElementById('ae-status').value });
+            ZoiDB.set('expenses', EXPENSES);
+            closeExpModal(); renderExp();
+            showToast('New expense added successfully', 'success');
+        }
+        function switchTab(t) { document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.getElementById('tab-' + t).classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); }); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.add('active'); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.remove('text-gray-400'); if (t === 'analytics') initCharts(); }
+        document.addEventListener('DOMContentLoaded', () => { renderExp(); });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

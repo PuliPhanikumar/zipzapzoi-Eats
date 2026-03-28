@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>ZipZapZoi - Reputation Command</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6",
+                        google: "#4285F4",
+                        zomato: "#CB202D",
+                        swiggy: "#FC8019"
+                    },
+                    fontFamily: { sans: ["Inter", "sans-serif"], mono: ["JetBrains Mono", "monospace"] },
+                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f1115; }
+        ::-webkit-scrollbar-thumb { background: #2a2d35; border-radius: 4px; }
+        .tab-active { border-bottom: 2px solid #00f0ff; color: white; background: rgba(255,255,255,0.02); }
+        .tab-inactive { border-bottom: 2px solid transparent; color: #9ca3af; }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans selection:bg-primary selection:text-black">
+
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        
+        <header class="h-16 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-6 z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-bold text-white tracking-tight">Reputation Manager</h1>
+                <div class="h-6 w-[1px] bg-border"></div>
+                <div class="flex items-center gap-2 bg-black/20 border border-border px-3 py-1 rounded-full">
+                    <span class="material-symbols-outlined text-sm text-google">public</span>
+                    <span class="material-symbols-outlined text-sm text-zomato">restaurant</span>
+                    <span class="text-xs font-bold text-gray-400">Sync Active</span>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <div class="flex items-center gap-2 bg-warning/10 border border-warning/20 px-4 py-1.5 rounded-lg">
+                    <span class="material-symbols-outlined text-warning text-lg filled">star</span>
+                    <div>
+                        <p class="text-xs text-warning font-bold">4.8 Rating</p>
+                        <p class="text-[10px] text-yellow-200">Top 5% in City</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="px-6 pt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-surface border border-border rounded-xl p-4 flex flex-col group hover:border-primary/50 transition-colors">
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Review Volume (7d)</p>
+                <div class="flex justify-between items-end mt-2">
+                    <h3 class="text-2xl font-black text-white">42</h3>
+                    <span class="text-xs text-green-500 bg-green-500/10 px-2 py-0.5 rounded font-bold">+8 vs last wk</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border rounded-xl p-4 flex flex-col group hover:border-blue-500/50 transition-colors">
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Response Rate</p>
+                <div class="flex justify-between items-end mt-2">
+                    <h3 class="text-2xl font-black text-white">92%</h3>
+                    <span class="text-[10px] text-blue-400">Avg time: 2h</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border rounded-xl p-4 flex flex-col group hover:border-green-500/50 transition-colors">
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Sentiment Score</p>
+                <div class="flex justify-between items-end mt-2">
+                    <h3 class="text-2xl font-black text-green-400">Positive</h3>
+                    <span class="material-symbols-outlined text-green-500">sentiment_satisfied</span>
+                </div>
+            </div>
+            <div class="bg-surface border border-border rounded-xl p-4 flex flex-col group hover:border-red-500/50 transition-colors">
+                <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Negative Topics</p>
+                <div class="flex justify-between items-end mt-2">
+                    <h3 class="text-sm font-bold text-white">"Portion Size"</h3>
+                    <span class="text-[10px] text-red-400 bg-red-500/10 px-2 py-0.5 rounded">3 Mentions</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 pt-6 pb-0 flex flex-col z-10">
+            <div class="flex border-b border-border gap-1">
+                <button onclick="switchTab('inbox')" id="tab-inbox" class="tab-active px-5 py-3 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all rounded-t-lg hover:bg-white/5">
+                    Review Inbox
+                </button>
+                <button onclick="switchTab('analytics')" id="tab-analytics" class="tab-inactive px-5 py-3 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all rounded-t-lg hover:bg-white/5">
+                    Sentiment Analytics
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 scroll-smooth bg-bg">
+            
+            <div id="view-inbox" class="space-y-4">
+                
+                <div class="flex flex-wrap gap-2 items-center justify-between bg-surface p-2 rounded-xl border border-border">
+                    <div class="flex gap-2">
+                        <button onclick="filterReviews('all')" class="px-3 py-1.5 rounded-lg bg-white/10 text-white text-xs font-bold hover:bg-white/20">All</button>
+                        <button onclick="filterReviews('unanswered')" class="px-3 py-1.5 rounded-lg text-gray-400 hover:text-white text-xs font-bold hover:bg-white/5">Unanswered</button>
+                        <button onclick="filterReviews('negative')" class="px-3 py-1.5 rounded-lg text-red-400 hover:text-red-300 text-xs font-bold hover:bg-red-500/10">Negative (1-3★)</button>
+                    </div>
+                    <div class="flex gap-2">
+                        <select class="bg-black/30 border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary">
+                            <option>Source: All</option>
+                            <option>Google Maps</option>
+                            <option>Zomato</option>
+                            <option>Swiggy</option>
+                        </select>
+                        <input type="date" class="bg-black/30 border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary">
+                    </div>
+                </div>
+
+                <div class="space-y-4" id="review-list">
+                    </div>
+            </div>
+
+            <div id="view-analytics" class="hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-surface border border-border rounded-xl p-5">
+                        <h3 class="text-sm font-bold text-white uppercase mb-4">Rating Breakdown</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs text-gray-400 w-8">5 ★</span>
+                                <div class="flex-1 h-2 bg-black/40 rounded-full overflow-hidden"><div class="h-full bg-green-500 w-[70%]"></div></div>
+                                <span class="text-xs text-white font-mono">70%</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs text-gray-400 w-8">4 ★</span>
+                                <div class="flex-1 h-2 bg-black/40 rounded-full overflow-hidden"><div class="h-full bg-primary w-[20%]"></div></div>
+                                <span class="text-xs text-white font-mono">20%</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs text-gray-400 w-8">1-3 ★</span>
+                                <div class="flex-1 h-2 bg-black/40 rounded-full overflow-hidden"><div class="h-full bg-red-500 w-[10%]"></div></div>
+                                <span class="text-xs text-white font-mono">10%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-surface border border-border rounded-xl p-5">
+                        <h3 class="text-sm font-bold text-white uppercase mb-4">Topic Sentiment</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-green-500/10 text-green-500 border border-green-500/20 rounded-full text-xs font-bold">Taste +42</span>
+                            <span class="px-3 py-1 bg-green-500/10 text-green-500 border border-green-500/20 rounded-full text-xs font-bold">Packaging +15</span>
+                            <span class="px-3 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-full text-xs font-bold">Portion Size -8</span>
+                            <span class="px-3 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-full text-xs font-bold">Late Delivery -5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="flag-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Report Review</h3>
+            <p class="text-xs text-gray-400 mb-4">Select reason for reporting this review to the platform.</p>
+            <div class="space-y-2 mb-6">
+                <label class="flex items-center gap-2 p-3 rounded-lg border border-border hover:bg-white/5 cursor-pointer">
+                    <input type="radio" name="report_reason" class="accent-primary">
+                    <span class="text-sm text-gray-300">Conflict of Interest (Competitor)</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 rounded-lg border border-border hover:bg-white/5 cursor-pointer">
+                    <input type="radio" name="report_reason" class="accent-primary">
+                    <span class="text-sm text-gray-300">Spam or Fake Content</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 rounded-lg border border-border hover:bg-white/5 cursor-pointer">
+                    <input type="radio" name="report_reason" class="accent-primary">
+                    <span class="text-sm text-gray-300">Off-Topic / Abusive Language</span>
+                </label>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeModal('flag-modal')" class="px-4 py-2 border border-border text-gray-400 rounded-lg text-xs font-bold">Cancel</button>
+                <button onclick="submitReport()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-bold">Submit Report</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div><h4 class="font-bold text-sm" id="toast-title">Success</h4><p class="text-xs text-gray-400" id="toast-msg">...</p></div>
+    </div>
+
+    <script>
+        // === DATA ===
+        const reviews = [
+            { id: 1, user: "Rahul Sharma", rating: 5, source: "Google", text: "Best Butter Chicken in town! The delivery was super fast too.", time: "2h ago", tags: ["#GreatTaste", "#FastDelivery"], reply: "" },
+            { id: 2, user: "Amit V.", rating: 2, source: "Zomato", text: "Food was cold and portion size was very small for the price.", time: "5h ago", tags: ["#ColdFood", "#SmallPortion"], reply: "" },
+            { id: 3, user: "Sarah K.", rating: 4, source: "Swiggy", text: "Good food but forgot the extra onions I asked for.", time: "1d ago", tags: ["#MissingItem"], reply: "Apologies Sarah! We will ensure double check next time." }
+        ];
+
+        // === INIT ===
+        window.onload = () => {
+            renderReviews();
+        };
+
+        // === RENDER LOGIC ===
+        function renderReviews(filter = 'all') {
+            const container = document.getElementById('review-list');
+            container.innerHTML = "";
+
+            reviews.forEach(r => {
+                if (filter === 'unanswered' && r.reply) return;
+                if (filter === 'negative' && r.rating > 3) return;
+
+                const stars = Array(5).fill(0).map((_, i) => `<span class="material-symbols-outlined text-[14px] ${i < r.rating ? 'text-warning filled' : 'text-gray-600'}">star</span>`).join('');
+                const sourceIcon = r.source === 'Google' ? 'public' : (r.source === 'Zomato' ? 'restaurant' : 'moped');
+                const sourceColor = r.source === 'Google' ? 'text-google' : (r.source === 'Zomato' ? 'text-zomato' : 'text-swiggy');
+                
+                const tagsHtml = r.tags.map(t => `<span class="text-[10px] bg-white/5 text-gray-400 px-1.5 py-0.5 rounded border border-white/10">${t}</span>`).join('');
+
+                const replySection = r.reply 
+                    ? `<div class="mt-3 pl-3 border-l-2 border-primary/30">
+                        <p class="text-[10px] text-primary font-bold mb-1">Your Reply:</p>
+                        <p class="text-xs text-gray-400 italic">"${r.reply}"</p>
+                       </div>`
+                    : `<div class="mt-3 pl-3 border-l-2 border-gray-700" id="reply-box-${r.id}">
+                        <div class="flex gap-2 mb-2">
+                            <button onclick="aiGenerateReply(${r.id}, 'apology')" class="px-2 py-1 bg-ai/10 text-ai border border-ai/20 rounded text-[10px] font-bold flex items-center gap-1 hover:bg-ai/20"><span class="material-symbols-outlined text-[10px]">auto_awesome</span> AI Apology</button>
+                            <button onclick="aiGenerateReply(${r.id}, 'thanks')" class="px-2 py-1 bg-white/5 text-gray-300 border border-white/10 rounded text-[10px] hover:bg-white/10">AI Thanks</button>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" id="input-${r.id}" placeholder="Type reply..." class="flex-1 bg-black/30 border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary">
+                            <button onclick="postReply(${r.id})" class="px-3 py-1.5 bg-primary text-black font-bold rounded-lg text-xs hover:bg-orange-600">Send</button>
+                        </div>
+                       </div>`;
+
+                container.innerHTML += `
+                    <div class="bg-surface border border-border rounded-xl p-5 transition-all hover:border-primary/30">
+                        <div class="flex justify-between items-start">
+                            <div class="flex gap-3">
+                                <div class="size-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center font-bold text-xs border border-white/10">${r.user[0]}</div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="font-bold text-white text-sm">${r.user}</h4>
+                                        <span class="flex items-center gap-1 text-[10px] ${sourceColor} font-bold bg-white/5 px-1.5 rounded border border-white/10"><span class="material-symbols-outlined text-[10px]">${sourceIcon}</span> ${r.source}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-0.5">
+                                        <div class="flex">${stars}</div>
+                                        <span class="text-[10px] text-gray-500">• ${r.time}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="openFlagModal(${r.id})" class="text-gray-500 hover:text-red-500" title="Report Review"><span class="material-symbols-outlined text-sm">flag</span></button>
+                        </div>
+                        <p class="mt-3 text-gray-300 text-sm leading-relaxed">${r.text}</p>
+                        <div class="flex gap-2 mt-2">${tagsHtml}</div>
+                        ${replySection}
+                    </div>`;
+            });
+        }
+
+        // === ACTIONS ===
+        function filterReviews(type) {
+            renderReviews(type);
+        }
+
+        function aiGenerateReply(id, type) {
+            const input = document.getElementById(`input-${id}`);
+            input.value = "Generating...";
+            input.classList.add("animate-pulse");
+            
+            setTimeout(() => {
+                input.classList.remove("animate-pulse");
+                if(type === 'apology') input.value = "We're so sorry to hear this! Please DM us so we can make it right with a refund.";
+                else input.value = "Thanks for the kind words! We hope to serve you again soon 🧡";
+            }, 800);
+        }
+
+        function postReply(id) {
+            const text = document.getElementById(`input-${id}`).value;
+            if(text) {
+                const review = reviews.find(r => r.id === id);
+                review.reply = text;
+                renderReviews();
+                showToast("Reply Sent", "Your response is live.");
+            }
+        }
+
+        function openFlagModal(id) {
+            document.getElementById('flag-modal').classList.remove('hidden');
+            document.getElementById('flag-modal').classList.add('flex');
+        }
+
+        function submitReport() {
+            document.getElementById('flag-modal').classList.add('hidden');
+            document.getElementById('flag-modal').classList.remove('flex');
+            showToast("Reported", "Review flagged for moderation.");
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        function switchTab(tab) {
+            ['inbox', 'analytics'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).className = "tab-inactive px-5 py-3 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all rounded-t-lg hover:bg-white/5";
+            });
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).className = "tab-active px-5 py-3 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all rounded-t-lg hover:bg-white/5";
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+    <script src="js/zoi_config.js"></script>
+    <script src="js/zoi_partner_engine.js"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+</html>
+
+

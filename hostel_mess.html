@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mess Attendance - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="hostel_shared.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { primary: "#00f0ff", teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" },
+                    fontFamily: { sans: ["Manrope", "sans-serif"] },
+                    animation: { 'bounce-subtle': 'bounceSubtle 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards' },
+                    keyframes: { bounceSubtle: { '0%': { transform: 'scale(0.95)', opacity: '0' }, '100%': { transform: 'scale(1)', opacity: '1' } } }
+                }
+            }
+        };
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1));
+            color: #ec4899;
+            border-color: rgba(236, 72, 153, 0.3);
+            font-weight: 700;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        .meal-btn {
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .meal-btn.marked {
+            transform: scale(1.1);
+        }
+
+        .meal-btn.present {
+            background: rgba(0, 212, 197, 0.2);
+            border-color: rgba(0, 212, 197, 0.5);
+            color: #00D4C5;
+        }
+
+        .meal-btn.absent {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .meal-btn.unmarked {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #6b7280;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+
+    <!-- SIDEBAR -->
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- Header -->
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Mess Attendance <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">restaurant</span></h2>
+                <p class="text-gray-400 text-sm">Track daily meals, manage the menu, and monitor food costs.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="glass-panel px-4 py-2 flex items-center gap-2 text-sm">
+                    <span class="material-symbols-outlined text-pink-400 text-lg">calendar_today</span>
+                    <span class="font-bold text-white" id="header-date">—</span>
+                </div>
+                <button onclick="markAllPresent()"
+                    class="flex items-center gap-2 px-4 py-2 bg-teal/15 border border-teal/30 rounded-full font-bold text-sm text-teal hover:bg-teal/25 transition-colors">
+                    <span class="material-symbols-outlined text-sm">done_all</span> Mark All Present
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-pink-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-pink-400">groups</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Mess Enrolled</p>
+                    <p class="text-xl font-extrabold text-white" id="stat-enrolled">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">wb_sunny</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Breakfast</p>
+                    <p class="text-xl font-extrabold text-amber-400" id="stat-breakfast">0/0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-orange-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-orange-400">lunch_dining</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Lunch</p>
+                    <p class="text-xl font-extrabold text-orange-400" id="stat-lunch">0/0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-violet-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-violet-400">dinner_dining</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Dinner</p>
+                    <p class="text-xl font-extrabold text-violet-400" id="stat-dinner">0/0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card ml-auto">
+                <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-green-400">savings</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Today's Cost</p>
+                    <p class="text-xl font-extrabold text-green-400" id="stat-cost">₹0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="px-8 pt-4 flex gap-2 flex-shrink-0">
+            <button class="tab-btn active px-4 py-2 text-xs rounded-xl border border-white/10" data-tab="attendance"
+                onclick="switchTab('attendance')">Daily Attendance</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400" data-tab="menu"
+                onclick="switchTab('menu')">Menu Planner</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-tab="analytics" onclick="switchTab('analytics')">Food Cost Analytics</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400" data-tab="history"
+                onclick="switchTab('history')">Monthly Report</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+
+            <!-- DAILY ATTENDANCE TAB -->
+            <div id="tab-attendance" class="tab-content">
+                <!-- Meal Time Selector -->
+                <div class="flex items-center gap-3 mb-5">
+                    <button
+                        class="meal-selector active px-5 py-2.5 rounded-xl text-sm font-bold border border-amber-500/30 bg-amber-500/15 text-amber-400 transition-all"
+                        data-meal="breakfast" onclick="selectMeal('breakfast')">
+                        <span class="material-symbols-outlined text-sm align-middle mr-1">wb_sunny</span>Breakfast <span
+                            class="text-[10px] font-normal">(7:30 – 9:00)</span>
+                    </button>
+                    <button
+                        class="meal-selector px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-gray-400 transition-all"
+                        data-meal="lunch" onclick="selectMeal('lunch')">
+                        <span class="material-symbols-outlined text-sm align-middle mr-1">lunch_dining</span>Lunch <span
+                            class="text-[10px] font-normal">(12:30 – 2:00)</span>
+                    </button>
+                    <button
+                        class="meal-selector px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-gray-400 transition-all"
+                        data-meal="dinner" onclick="selectMeal('dinner')">
+                        <span class="material-symbols-outlined text-sm align-middle mr-1">dinner_dining</span>Dinner
+                        <span class="text-[10px] font-normal">(7:30 – 9:00)</span>
+                    </button>
+                </div>
+
+                <!-- Attendance Grid -->
+                <div class="glass-panel p-0 overflow-hidden">
+                    <div class="p-4 border-b border-border flex items-center justify-between">
+                        <h3 class="font-bold text-white text-sm" id="grid-title">Breakfast Attendance — Today</h3>
+                        <div class="flex items-center gap-4 text-[10px] font-bold">
+                            <span class="flex items-center gap-1.5"><span
+                                    class="h-2.5 w-2.5 rounded-full bg-teal inline-block"></span> Present</span>
+                            <span class="flex items-center gap-1.5"><span
+                                    class="h-2.5 w-2.5 rounded-full bg-red-500 inline-block"></span> Absent</span>
+                            <span class="flex items-center gap-1.5"><span
+                                    class="h-2.5 w-2.5 rounded-full bg-gray-600 inline-block"></span> Not Marked</span>
+                        </div>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4 w-8"><input type="checkbox" id="select-all"
+                                        onchange="toggleSelectAll()" class="accent-pink-500"></th>
+                                <th class="py-3 px-4">Hosteler</th>
+                                <th class="py-3 px-4">Room</th>
+                                <th class="py-3 px-4 text-center">Breakfast</th>
+                                <th class="py-3 px-4 text-center">Lunch</th>
+                                <th class="py-3 px-4 text-center">Dinner</th>
+                                <th class="py-3 px-4">Meals Today</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- MENU PLANNER TAB -->
+            <div id="tab-menu" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-7 gap-4 mb-6">
+                    <div class="glass-panel p-4 lg:col-span-7 mb-2">
+                        <h3 class="font-bold text-sm text-white mb-1">Weekly Menu — <span id="week-label"
+                                class="text-pink-400">This Week</span></h3>
+                        <p class="text-xs text-gray-400">Plan & display the weekly mess menu. Click any item to edit.
+                        </p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3" id="menu-grid"></div>
+            </div>
+
+            <!-- FOOD COST ANALYTICS TAB -->
+            <div id="tab-analytics" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-green-400 text-lg">monitoring</span> Daily Cost
+                            per Plate</h3>
+                        <canvas id="cost-chart" height="240"></canvas>
+                    </div>
+                    <div class="glass-panel p-6">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-pink-400 text-lg">pie_chart</span> Meal
+                            Distribution</h3>
+                        <canvas id="meal-chart" height="240"></canvas>
+                    </div>
+                    <!-- Cost Summary Cards -->
+                    <div class="glass-panel p-6 lg:col-span-2">
+                        <h3 class="font-bold text-white text-sm mb-4">Monthly Cost Summary — March 2026</h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                            <div class="p-4 bg-white/[0.03] rounded-xl text-center border border-white/5">
+                                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Groceries</p>
+                                <p class="text-xl font-extrabold text-white">₹28,500</p>
+                                <p class="text-[10px] text-green-400 mt-1">↓ 5% from Feb</p>
+                            </div>
+                            <div class="p-4 bg-white/[0.03] rounded-xl text-center border border-white/5">
+                                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Cooking Gas</p>
+                                <p class="text-xl font-extrabold text-white">₹4,200</p>
+                                <p class="text-[10px] text-red-400 mt-1">↑ 3% from Feb</p>
+                            </div>
+                            <div class="p-4 bg-white/[0.03] rounded-xl text-center border border-white/5">
+                                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Staff Wages</p>
+                                <p class="text-xl font-extrabold text-white">₹18,000</p>
+                                <p class="text-[10px] text-gray-400 mt-1">— No change</p>
+                            </div>
+                            <div
+                                class="p-4 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-xl text-center border border-pink-500/20">
+                                <p class="text-[10px] text-pink-400 uppercase font-bold mb-1">Total Mess Cost</p>
+                                <p class="text-xl font-extrabold text-pink-400">₹50,700</p>
+                                <p class="text-[10px] text-gray-400 mt-1">Cost/plate: ₹62</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MONTHLY REPORT TAB -->
+            <div id="tab-history" class="tab-content hidden">
+                <div class="glass-panel p-0 overflow-hidden">
+                    <div class="p-4 border-b border-border flex items-center justify-between">
+                        <h3 class="font-bold text-white text-sm">Hosteler Attendance Summary — March 2026</h3>
+                        <div class="flex gap-2">
+                            <select
+                                class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-1.5 text-gray-300">
+                                <option>March 2026</option>
+                                <option>February 2026</option>
+                                <option>January 2026</option>
+                            </select>
+                            <button
+                                class="px-3 py-1.5 text-xs font-bold text-pink-400 bg-pink-500/10 border border-pink-500/30 rounded-lg hover:bg-pink-500/20 transition-colors flex items-center gap-1"><span
+                                    class="material-symbols-outlined text-xs">download</span>Export</button>
+                        </div>
+                    </div>
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Hosteler</th>
+                                <th class="py-3 px-4">Room</th>
+                                <th class="py-3 px-4 text-center">Breakfasts</th>
+                                <th class="py-3 px-4 text-center">Lunches</th>
+                                <th class="py-3 px-4 text-center">Dinners</th>
+                                <th class="py-3 px-4 text-center">Total Meals</th>
+                                <th class="py-3 px-4">Attendance %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // === DATA ===
+        const HOSTELERS = [
+            { id: 1, name: 'Ravi Kumar', room: '101', mess: true },
+            { id: 2, name: 'Deepak S.', room: '102', mess: true },
+            { id: 3, name: 'Rahul Kumar', room: '102', mess: true },
+            { id: 4, name: 'Manoj P.', room: '103', mess: false },
+            { id: 5, name: 'Kiran R.', room: '103', mess: true },
+            { id: 6, name: 'Sanjay V.', room: '201', mess: true },
+            { id: 7, name: 'Anil K.', room: '202', mess: true },
+            { id: 8, name: 'Vijay D.', room: '202', mess: true },
+            { id: 9, name: 'Priya S.', room: '301', mess: true },
+            { id: 10, name: 'Sneha Sharma', room: '301', mess: true },
+            { id: 11, name: 'Lakshmi N.', room: '302', mess: false },
+        ];
+
+        // Today's attendance: { hosteler_id: { breakfast:'present'|'absent'|'unmarked', lunch:..., dinner:... } }
+        let defaultToday = {};
+        HOSTELERS.filter(h => h.mess).forEach(h => {
+            defaultToday[h.id] = { breakfast: 'unmarked', lunch: 'unmarked', dinner: 'unmarked' };
+        });
+        // Pre-fill some data
+        defaultToday[1] = { breakfast: 'present', lunch: 'present', dinner: 'unmarked' };
+        defaultToday[2] = { breakfast: 'present', lunch: 'absent', dinner: 'unmarked' };
+        defaultToday[3] = { breakfast: 'absent', lunch: 'present', dinner: 'unmarked' };
+        defaultToday[5] = { breakfast: 'present', lunch: 'present', dinner: 'unmarked' };
+        defaultToday[6] = { breakfast: 'present', lunch: 'unmarked', dinner: 'unmarked' };
+        defaultToday[7] = { breakfast: 'absent', lunch: 'unmarked', dinner: 'unmarked' };
+
+        const TODAY = ZoiDB.get('mess_today', defaultToday);
+
+        let costChartInstance = null;
+        let mealChartInstance = null;
+        let currentMeal = 'breakfast';
+        const MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' };
+        const MEAL_ICONS = { breakfast: 'wb_sunny', lunch: 'lunch_dining', dinner: 'dinner_dining' };
+        const MEAL_COLORS = { breakfast: 'amber', lunch: 'orange', dinner: 'violet' };
+
+        const WEEKLY_MENU = ZoiDB.get('mess_menu', {
+            Mon: { breakfast: 'Idli, Sambar, Chutney', lunch: 'Rice, Dal, Aloo Curry, Curd', dinner: 'Chapati, Paneer Butter Masala, Salad' },
+            Tue: { breakfast: 'Poha, Boiled Egg, Chai', lunch: 'Rice, Rajma, Papad, Raita', dinner: 'Pulao, Chicken Curry, Raita' },
+            Wed: { breakfast: 'Dosa, Coconut Chutney', lunch: 'Rice, Sambar, Veg Fry, Pickle', dinner: 'Chapati, Dal Fry, Mix Veg' },
+            Thu: { breakfast: 'Upma, Medu Vada', lunch: 'Jeera Rice, Chole, Onion Salad', dinner: 'Biryani (Veg/Non-Veg), Raita' },
+            Fri: { breakfast: 'Bread, Omelette, Juice', lunch: 'Rice, Fish Curry/Paneer, Buttermilk', dinner: 'Fried Rice, Manchurian, Soup' },
+            Sat: { breakfast: 'Puri, Aloo Bhaji', lunch: 'Rice, Kadhi Pakora, Papad', dinner: 'Chapati, Egg Curry, Salad' },
+            Sun: { breakfast: 'Chole Bhature, Lassi', lunch: 'Special Biryani, Raita, Sweet', dinner: 'Chapati, Butter Dal, Ice Cream' }
+        });
+
+        // Monthly summary data (mock, but now mutable)
+        const MONTHLY = ZoiDB.get('mess_monthly', HOSTELERS.filter(h => h.mess).map(h => ({
+            id: h.id,
+            name: h.name, room: h.room,
+            breakfasts: Math.floor(Math.random() * 5 + 20),
+            lunches: Math.floor(Math.random() * 5 + 18),
+            dinners: Math.floor(Math.random() * 5 + 22)
+        })));
+
+        // === RENDER ===
+        function renderAttendance() {
+            const enrolled = HOSTELERS.filter(h => h.mess);
+            const tbody = document.getElementById('attendance-tbody');
+            tbody.innerHTML = enrolled.map((h, i) => {
+                const att = TODAY[h.id] || { breakfast: 'unmarked', lunch: 'unmarked', dinner: 'unmarked' };
+                const mealCount = ['breakfast', 'lunch', 'dinner'].filter(m => att[m] === 'present').length;
+                return `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+                    <td class="py-3 px-4"><input type="checkbox" class="row-check accent-pink-500" data-id="${h.id}"></td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center gap-2.5">
+                            <div class="h-8 w-8 rounded-full bg-pink-500/15 flex items-center justify-center text-pink-400 font-bold text-xs">${h.name.split(' ').map(w => w[0]).join('')}</div>
+                            <span class="font-bold text-white text-sm">${h.name}</span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 text-gray-300">${h.room}</td>
+                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'breakfast')" class="meal-btn ${att.breakfast} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Breakfast">${att.breakfast === 'present' ? '✓' : att.breakfast === 'absent' ? '✕' : '—'}</button></td>
+                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'lunch')" class="meal-btn ${att.lunch} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Lunch">${att.lunch === 'present' ? '✓' : att.lunch === 'absent' ? '✕' : '—'}</button></td>
+                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'dinner')" class="meal-btn ${att.dinner} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Dinner">${att.dinner === 'present' ? '✓' : att.dinner === 'absent' ? '✕' : '—'}</button></td>
+                    <td class="py-3 px-4"><div class="flex items-center gap-2"><div class="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-teal rounded-full" style="width:${(mealCount / 3) * 100}%"></div></div><span class="text-xs text-gray-400 font-bold">${mealCount}/3</span></div></td>
+                </tr>`;
+            }).join('');
+            updateStats();
+        }
+
+        function toggleMeal(id, meal) {
+            if (!TODAY[id]) return;
+            const states = ['unmarked', 'present', 'absent'];
+            const curState = TODAY[id][meal];
+            const nextState = states[(states.indexOf(curState) + 1) % 3];
+
+            TODAY[id][meal] = nextState;
+
+            // Update the monthly report backing data so analytics match realtime clicks
+            const monEntry = MONTHLY.find(m => m.id === id);
+            if (monEntry) {
+                const key = meal + 's'; // breakfasts, lunches, dinners
+                if (curState !== 'present' && nextState === 'present') {
+                    monEntry[key]++;
+                } else if (curState === 'present' && nextState !== 'present') {
+                    monEntry[key]--;
+                }
+            }
+
+            ZoiDB.set('mess_today', TODAY);
+            ZoiDB.set('mess_monthly', MONTHLY);
+
+            renderAttendance();
+            renderReport();
+        }
+
+        function markAllPresent() {
+            HOSTELERS.filter(h => h.mess).forEach(h => {
+                if (TODAY[h.id]) {
+                    if (TODAY[h.id][currentMeal] !== 'present') {
+                        TODAY[h.id][currentMeal] = 'present';
+                        const monEntry = MONTHLY.find(m => m.id === h.id);
+                        if (monEntry) {
+                            monEntry[currentMeal + 's']++;
+                        }
+                    }
+                }
+            });
+            ZoiDB.set('mess_today', TODAY);
+            ZoiDB.set('mess_monthly', MONTHLY);
+            renderAttendance();
+            renderReport();
+            showToast(`All hostelers marked present for ${MEAL_LABELS[currentMeal]}`, 'success');
+        }
+
+        function toggleSelectAll() {
+            const checked = document.getElementById('select-all').checked;
+            document.querySelectorAll('.row-check').forEach(c => c.checked = checked);
+        }
+
+        function selectMeal(meal) {
+            currentMeal = meal;
+            document.querySelectorAll('.meal-selector').forEach(b => {
+                const m = b.dataset.meal;
+                if (m === meal) { b.className = `meal-selector active px-5 py-2.5 rounded-xl text-sm font-bold border border-${MEAL_COLORS[m]}-500/30 bg-${MEAL_COLORS[m]}-500/15 text-${MEAL_COLORS[m]}-400 transition-all`; }
+                else { b.className = 'meal-selector px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-gray-400 transition-all'; }
+            });
+            document.getElementById('grid-title').innerText = MEAL_LABELS[meal] + ' Attendance — Today';
+        }
+
+        function updateStats() {
+            const enrolled = HOSTELERS.filter(h => h.mess);
+            const total = enrolled.length;
+            document.getElementById('stat-enrolled').innerText = total;
+            ['breakfast', 'lunch', 'dinner'].forEach(m => {
+                const present = enrolled.filter(h => TODAY[h.id] && TODAY[h.id][m] === 'present').length;
+                document.getElementById('stat-' + m).innerText = present + '/' + total;
+            });
+            const totalMeals = enrolled.reduce((s, h) => {
+                if (!TODAY[h.id]) return s;
+                return s + ['breakfast', 'lunch', 'dinner'].filter(m => TODAY[h.id][m] === 'present').length;
+            }, 0);
+            document.getElementById('stat-cost').innerText = '₹' + (totalMeals * 62).toLocaleString();
+
+            if (!document.getElementById('tab-analytics').classList.contains('hidden')) {
+                initCharts(); // update pie chart dynamically
+            }
+        }
+
+        // === MENU PLANNER ===
+        function renderMenu() {
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const today = new Date().getDay(); // 0=Sun
+            const todayIdx = today === 0 ? 6 : today - 1;
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = days.map((d, i) => {
+                const m = WEEKLY_MENU[d];
+                const isToday = i === todayIdx;
+                return `<div class="glass-panel p-4 ${isToday ? 'border-pink-500/30 shadow-[0_0_15px_rgba(236,72,153,0.1)]' : ''} bouncy-card" style="animation-delay:${i * 60}ms">
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-xs font-bold ${isToday ? 'text-pink-400' : 'text-gray-400'} uppercase">${dayNames[i]}</p>
+                        ${isToday ? '<span class="bg-pink-500/20 text-pink-400 px-2 py-0.5 rounded text-[8px] font-bold">TODAY</span>' : ''}
+                    </div>
+                    <div class="space-y-2.5">
+                        <div class="p-2.5 bg-amber-500/10 rounded-lg border border-amber-500/10">
+                            <p class="text-[9px] text-amber-400 font-bold mb-0.5 flex items-center gap-1"><span class="material-symbols-outlined text-xs">wb_sunny</span>BREAKFAST</p>
+                            <p class="text-xs text-gray-300 leading-relaxed">${m.breakfast}</p>
+                        </div>
+                        <div class="p-2.5 bg-orange-500/10 rounded-lg border border-orange-500/10">
+                            <p class="text-[9px] text-orange-400 font-bold mb-0.5 flex items-center gap-1"><span class="material-symbols-outlined text-xs">lunch_dining</span>LUNCH</p>
+                            <p class="text-xs text-gray-300 leading-relaxed">${m.lunch}</p>
+                        </div>
+                        <div class="p-2.5 bg-violet-500/10 rounded-lg border border-violet-500/10">
+                            <p class="text-[9px] text-violet-400 font-bold mb-0.5 flex items-center gap-1"><span class="material-symbols-outlined text-xs">dinner_dining</span>DINNER</p>
+                            <p class="text-xs text-gray-300 leading-relaxed">${m.dinner}</p>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // === MONTHLY REPORT ===
+        function renderReport() {
+            const tbody = document.getElementById('report-tbody');
+            tbody.innerHTML = MONTHLY.map((h, i) => {
+                const total = h.breakfasts + h.lunches + h.dinners;
+                const maxMeals = 31 * 3;
+                const pct = Math.round((total / maxMeals) * 100);
+                return `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+                    <td class="py-3 px-4 font-bold text-white text-sm">${h.name}</td>
+                    <td class="py-3 px-4 text-gray-300">${h.room}</td>
+                    <td class="py-3 px-4 text-center text-amber-400 font-bold">${h.breakfasts}</td>
+                    <td class="py-3 px-4 text-center text-orange-400 font-bold">${h.lunches}</td>
+                    <td class="py-3 px-4 text-center text-violet-400 font-bold">${h.dinners}</td>
+                    <td class="py-3 px-4 text-center text-white font-bold">${total}</td>
+                    <td class="py-3 px-4"><div class="flex items-center gap-2"><div class="flex-1 h-2 bg-white/10 rounded-full overflow-hidden"><div class="h-full rounded-full ${pct > 80 ? 'bg-teal' : pct > 50 ? 'bg-amber-400' : 'bg-red-400'}" style="width:${pct}%"></div></div><span class="text-xs text-gray-400 font-bold">${pct}%</span></div></td>
+                </tr>`;
+            }).join('');
+        }
+
+        // === CHARTS ===
+        function initCharts() {
+            if (costChartInstance) costChartInstance.destroy();
+            if (mealChartInstance) mealChartInstance.destroy();
+            if (typeof isLoading !== 'undefined' && isLoading) return;
+
+            // Cost per plate trend (Static for visual, could tie to dynamic purchases over time)
+            costChartInstance = new Chart(document.getElementById('cost-chart'), {
+                type: 'line',
+                data: {
+                    labels: ['1 Mar', '5 Mar', '10 Mar', '15 Mar', '20 Mar', '25 Mar', 'Today'],
+                    datasets: [{
+                        label: 'Cost per Plate (₹)',
+                        data: [58, 65, 60, 62, 68, 55, 62],
+                        borderColor: '#00D4C5', backgroundColor: 'rgba(0,212,197,0.1)',
+                        fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#00D4C5'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 10 }, callback: v => '₹' + v }, min: 40 } }, plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } } }
+            });
+
+            // Meal distribution dynamically calculated from MONTHLY report
+            let bTotal = 0, lTotal = 0, dTotal = 0;
+            MONTHLY.forEach(m => { bTotal += m.breakfasts; lTotal += m.lunches; dTotal += m.dinners; });
+
+            mealChartInstance = new Chart(document.getElementById('meal-chart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Breakfast', 'Lunch', 'Dinner'],
+                    datasets: [{ data: [bTotal, lTotal, dTotal], backgroundColor: ['rgba(251,191,36,0.6)', 'rgba(249,115,22,0.6)', 'rgba(139,92,246,0.6)'], borderWidth: 0, hoverOffset: 8 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 11 }, padding: 20 } } } }
+            });
+        }
+
+        // === TABS ===
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); });
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+            document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.remove('text-gray-400');
+            if (tab === 'analytics') {
+                initCharts();
+            }
+        }
+
+        
+        let isLoading = true;
+
+        function renderSkeleton() {
+            document.getElementById('attendance-tbody').innerHTML = Array(5).fill(0).map(() => `
+                <tr class="border-t border-border animate-pulse bg-white/[0.01]">
+                    <td class="py-3 px-4"><div class="size-4 bg-gray-700/50 rounded"></div></td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center gap-2.5">
+                            <div class="h-8 w-8 rounded-full bg-gray-700/50"></div>
+                            <div class="h-4 w-24 bg-gray-700/50 rounded"></div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4"><div class="h-4 w-12 bg-gray-700/50 rounded"></div></td>
+                    <td class="py-3 px-4"><div class="mx-auto h-9 w-9 bg-gray-700/50 rounded-lg"></div></td>
+                    <td class="py-3 px-4"><div class="mx-auto h-9 w-9 bg-gray-700/50 rounded-lg"></div></td>
+                    <td class="py-3 px-4"><div class="mx-auto h-9 w-9 bg-gray-700/50 rounded-lg"></div></td>
+                    <td class="py-3 px-4"><div class="h-2 w-full bg-gray-700/50 rounded-full mt-2"></div></td>
+                </tr>
+            `).join('');
+            
+            document.getElementById('menu-grid').innerHTML = Array(7).fill(0).map(() => `
+                <div class="glass-panel p-4 animate-pulse">
+                    <div class="flex items-center justify-between mb-3"><div class="h-3 w-16 bg-gray-700/50 rounded"></div></div>
+                    <div class="space-y-2.5">
+                        <div class="h-16 bg-gray-700/30 rounded-lg"></div>
+                        <div class="h-16 bg-gray-700/30 rounded-lg"></div>
+                        <div class="h-16 bg-gray-700/30 rounded-lg"></div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('report-tbody').innerHTML = Array(5).fill(0).map(() => `
+                <tr class="border-t border-border animate-pulse bg-white/[0.01]">
+                    <td class="py-3 px-4"><div class="h-4 w-24 bg-gray-700/50 rounded"></div></td>
+                    <td class="py-3 px-4"><div class="h-4 w-12 bg-gray-700/50 rounded"></div></td>
+                    <td class="py-3 px-4"><div class="h-4 w-8 mx-auto bg-gray-700/50 rounded"></div></td>
+                    <td class="py-3 px-4"><div class="h-4 w-8 mx-auto bg-gray-700/50 rounded"></div></td>
+                    <td class="py-3 px-4"><div class="h-4 w-8 mx-auto bg-gray-700/50 rounded"></div></td>
+                    <td class="py-3 px-4"><div class="h-4 w-8 mx-auto bg-gray-700/50 rounded"></div></td>
+                    <td class="py-3 px-4"><div class="h-2 w-full bg-gray-700/50 rounded-full mt-2"></div></td>
+                </tr>
+            `).join('');
+        }
+
+        async function fetchMessData() {
+            isLoading = true;
+            renderSkeleton();
+            
+            try {
+                await new Promise(resolve => setTimeout(resolve, 800)); // Simulated Network latency
+                renderAttendance();
+                renderMenu();
+                renderReport();
+                initCharts();
+            } catch (err) {
+                if(typeof showToast === 'function') showToast("Failed to load mess data", "danger");
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // === INIT ===
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('header-date').innerText = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+            const u = localStorage.getItem('zoiUser');
+            if (u) {
+                const user = JSON.parse(u);
+                document.getElementById('user-name').innerText = user.name || 'Hostel Admin';
+                document.getElementById('user-role-label').innerText = user.role === 'warden' ? 'Warden' : 'Owner';
+            }
+            fetchMessData();
+        });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+

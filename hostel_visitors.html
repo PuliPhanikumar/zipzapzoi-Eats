@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Log - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="hostel_shared.js"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <!-- SIDEBAR -->
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Visitor Log <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">badge</span></h2>
+                <p class="text-gray-400 text-sm">Track all visitor entries, exits, and generate visitor passes.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="glass-panel px-4 py-2 flex items-center gap-2 text-sm"><span
+                        class="material-symbols-outlined text-pink-400 text-lg">calendar_today</span><span
+                        class="font-bold text-white" id="hdr-date">—</span></div>
+                <button onclick="openVisitorModal()"
+                    class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-shadow"><span
+                        class="material-symbols-outlined text-sm">person_add</span> Log Visitor</button>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-pink-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-pink-400">groups</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Today's Visitors</p>
+                    <p class="text-xl font-extrabold text-white" id="stat-today">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-green-400">login</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Currently Inside</p>
+                    <p class="text-xl font-extrabold text-green-400" id="stat-inside">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-teal/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-teal">logout</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Exited</p>
+                    <p class="text-xl font-extrabold text-teal" id="stat-exited">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">warning</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Overstay (&gt;3h)</p>
+                    <p class="text-xl font-extrabold text-amber-400" id="stat-overstay">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="px-8 pt-4 flex items-center gap-3 flex-shrink-0">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span
+                        class="material-symbols-outlined text-gray-500 text-sm">search</span></div><input type="text"
+                    id="search-visitors" oninput="renderVisitors()"
+                    class="bg-surface/50 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-pink-500 w-56"
+                    placeholder="Search visitor...">
+            </div>
+            <select id="filter-status" onchange="renderVisitors()"
+                class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-2 text-gray-300">
+                <option value="all">All Status</option>
+                <option value="inside">Currently Inside</option>
+                <option value="exited">Exited</option>
+            </select>
+            <select id="filter-purpose" onchange="renderVisitors()"
+                class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-2 text-gray-300">
+                <option value="all">All Purposes</option>
+                <option value="Parent Visit">Parent Visit</option>
+                <option value="Friend Visit">Friend Visit</option>
+                <option value="Delivery">Delivery</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Official">Official</option>
+            </select>
+        </div>
+
+        <!-- Table -->
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+            <div class="glass-panel p-0 overflow-hidden">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                        <tr>
+                            <th class="py-3 px-4">Visitor</th>
+                            <th class="py-3 px-4">Purpose</th>
+                            <th class="py-3 px-4">Visiting</th>
+                            <th class="py-3 px-4">In Time</th>
+                            <th class="py-3 px-4">Out Time</th>
+                            <th class="py-3 px-4">ID</th>
+                            <th class="py-3 px-4">Status</th>
+                            <th class="py-3 px-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="visitor-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- LOG VISITOR MODAL -->
+    <div id="visitor-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-500">person_add</span> Log New Visitor</h3><button
+                    onclick="closeVisitorModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <input id="v-name" type="text" placeholder="Visitor Name *"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="v-phone" type="tel" placeholder="Phone *"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <select id="v-purpose"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">Purpose *</option>
+                        <option>Parent Visit</option>
+                        <option>Friend Visit</option>
+                        <option>Delivery</option>
+                        <option>Maintenance</option>
+                        <option>Official</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="v-hosteler"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">Visiting Hosteler *</option>
+                        <option>Ravi Kumar (101)</option>
+                        <option>Deepak S. (102)</option>
+                        <option>Rahul Kumar (102)</option>
+                        <option>Manoj P. (103)</option>
+                        <option>Kiran R. (103)</option>
+                        <option>Sanjay V. (201)</option>
+                        <option>Priya S. (301)</option>
+                        <option>Sneha Sharma (301)</option>
+                    </select>
+                    <input id="v-id" type="text" placeholder="ID Proof #"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="v-relation" type="text" placeholder="Relation"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <input id="v-items" type="text" placeholder="Items Carried"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+            </div>
+            <div class="p-5 border-t border-border flex gap-3">
+                <button onclick="closeVisitorModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">Cancel</button>
+                <button onclick="logVisitor()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] transition-shadow flex items-center justify-center gap-2"><span
+                        class="material-symbols-outlined text-sm">login</span> Check In</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const VISITORS = ZoiDB.get('visitors', [
+            { id: 1, name: 'Suresh Kumar', phone: '9876000001', purpose: 'Parent Visit', hosteler: 'Ravi Kumar (101)', inTime: '09:15', outTime: '11:30', idProof: 'Aadhaar-4521', status: 'exited', relation: 'Father', items: 'Food parcel' },
+            { id: 2, name: 'Meena Devi', phone: '9876000002', purpose: 'Parent Visit', hosteler: 'Priya S. (301)', inTime: '10:00', outTime: null, idProof: 'Voter-789012', status: 'inside', relation: 'Mother', items: 'Clothes, Snacks' },
+            { id: 3, name: 'Swiggy Delivery', phone: '9000112233', purpose: 'Delivery', hosteler: 'Deepak S. (102)', inTime: '12:45', outTime: '12:55', idProof: 'Delivery-ID-442', status: 'exited', relation: '—', items: 'Food order' },
+            { id: 4, name: 'Rajesh Plumber', phone: '9445001122', purpose: 'Maintenance', hosteler: 'Room 202 (Common)', inTime: '14:00', outTime: null, idProof: 'DL-KA19-9876', status: 'inside', relation: '—', items: 'Toolbox' },
+            { id: 5, name: 'Amit Sharma', phone: '9778001234', purpose: 'Friend Visit', hosteler: 'Sneha Sharma (301)', inTime: '15:30', outTime: null, idProof: 'Pan-ABCDE1234', status: 'inside', relation: 'Brother', items: '—' },
+            { id: 6, name: 'Duraiswamy V.', phone: '9445000001', purpose: 'Parent Visit', hosteler: 'Vijay D. (202)', inTime: '08:30', outTime: '10:15', idProof: 'Aadhaar-5590', status: 'exited', relation: 'Father', items: '—' },
+            { id: 7, name: 'Zomato Delivery', phone: '9000445566', purpose: 'Delivery', hosteler: 'Sanjay V. (201)', inTime: '13:10', outTime: '13:20', idProof: 'ZMT-88213', status: 'exited', relation: '—', items: 'Food' },
+            { id: 8, name: 'Inspector Raju', phone: '9887766554', purpose: 'Official', hosteler: 'Warden Office', inTime: '11:00', outTime: '12:00', idProof: 'Police-ID-4455', status: 'exited', relation: '—', items: 'Documents' },
+        ]);
+
+        function renderVisitors() {
+            const q = (document.getElementById('search-visitors').value || '').toLowerCase();
+            const sf = document.getElementById('filter-status').value;
+            const pf = document.getElementById('filter-purpose').value;
+            let rows = VISITORS;
+            if (q) rows = rows.filter(v => v.name.toLowerCase().includes(q) || v.hosteler.toLowerCase().includes(q));
+            if (sf !== 'all') rows = rows.filter(v => v.status === sf);
+            if (pf !== 'all') rows = rows.filter(v => v.purpose === pf);
+
+            document.getElementById('visitor-tbody').innerHTML = rows.map((v, i) => {
+                const purposeColors = { 'Parent Visit': 'violet', 'Friend Visit': 'blue', 'Delivery': 'amber', 'Maintenance': 'orange', 'Official': 'teal' };
+                const pc = purposeColors[v.purpose] || 'gray';
+                return `<tr class="border-t border-border hover:bg-white/[0.02] fade-row" style="animation-delay:${i * 40}ms">
+                    <td class="py-3 px-4"><div class="flex items-center gap-2.5"><div class="h-8 w-8 rounded-full bg-pink-500/15 flex items-center justify-center text-pink-400 font-bold text-xs">${(v.name || 'U').split(' ').map(w => w[0]).join('').slice(0, 2)}</div><div><span class="font-bold text-white text-sm">${v.name}</span><p class="text-[10px] text-gray-500">${v.phone}</p></div></div></td>
+                    <td class="py-3 px-4"><span class="bg-${pc}-500/20 text-${pc}-400 px-2 py-0.5 rounded text-[10px] font-bold">${v.purpose}</span></td>
+                    <td class="py-3 px-4 text-gray-300 text-xs">${v.hosteler}</td>
+                    <td class="py-3 px-4 text-green-400 font-bold text-xs">${v.inTime}</td>
+                    <td class="py-3 px-4 text-xs ${v.outTime ? 'text-teal font-bold' : 'text-gray-500'}">${v.outTime || '—'}</td>
+                    <td class="py-3 px-4 text-gray-400 font-mono text-[10px]">${v.idProof}</td>
+                    <td class="py-3 px-4">${v.status === 'inside' ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 w-fit"><span class="material-symbols-outlined text-xs">radio_button_checked</span>Inside</span>' : '<span class="bg-white/10 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">Exited</span>'}</td>
+                    <td class="py-3 px-4">${v.status === 'inside' ? `<button onclick="markExit(${v.id})" class="text-xs text-teal bg-teal/10 px-3 py-1.5 rounded-lg font-bold hover:bg-teal/20 transition-colors">Mark Exit</button>` : '<span class="text-xs text-gray-500">—</span>'}</td>
+                </tr>`;
+            }).join('');
+            updateStats();
+        }
+
+        function updateStats() {
+            // Count total visitors for today (any status)
+            document.getElementById('stat-today').innerText = VISITORS.length;
+            // People currently inside
+            const insideCount = VISITORS.filter(v => v.status === 'inside').length;
+            document.getElementById('stat-inside').innerText = insideCount;
+            // People who have exited
+            document.getElementById('stat-exited').innerText = VISITORS.filter(v => v.status === 'exited').length;
+
+            // Overstay calculation: checked in more than 3 hours ago
+            const now = new Date();
+            let overstayCount = 0;
+            VISITORS.forEach(v => {
+                if (v.status === 'inside' && v.inTime) {
+                    const [hours, minutes] = v.inTime.split(':').map(Number);
+                    const inDate = new Date();
+                    inDate.setHours(hours, minutes, 0, 0);
+                    const diffMs = now - inDate;
+                    if (diffMs > 3 * 60 * 60 * 1000) { // > 3 hours
+                        overstayCount++;
+                    }
+                }
+            });
+            document.getElementById('stat-overstay').innerText = overstayCount;
+        }
+
+        function markExit(id) {
+            const v = VISITORS.find(x => x.id === id);
+            if (v) {
+                v.status = 'exited';
+                v.outTime = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false });
+                ZoiDB.set('visitors', VISITORS);
+                renderVisitors();
+                showToast(`Visitor ${v.name} marked as exited.`, 'success');
+            }
+        }
+
+        function openVisitorModal() { document.getElementById('visitor-modal').classList.remove('hidden'); document.getElementById('visitor-modal').classList.add('flex'); }
+        function closeVisitorModal() { document.getElementById('visitor-modal').classList.add('hidden'); document.getElementById('visitor-modal').classList.remove('flex'); }
+
+        function logVisitor() {
+            const name = document.getElementById('v-name').value.trim();
+            if (!name) { showToast('Visitor name is required.', 'error'); return; }
+            VISITORS.unshift({ id: Date.now(), name, phone: document.getElementById('v-phone').value || '—', purpose: document.getElementById('v-purpose').value || 'Other', hosteler: document.getElementById('v-hosteler').value || '—', inTime: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false }), outTime: null, idProof: document.getElementById('v-id').value || '—', status: 'inside', relation: document.getElementById('v-relation').value || '—', items: document.getElementById('v-items').value || '—' });
+            ZoiDB.set('visitors', VISITORS);
+            closeVisitorModal();
+            renderVisitors();
+            showToast('Visitor logged successfully.', 'success');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('hdr-date').innerText = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+            renderVisitors();
+        });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

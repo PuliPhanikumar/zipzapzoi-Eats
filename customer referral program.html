@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ZipZapZoi Eats - Refer & Earn</title>
+<meta name="description" content="Invite friends to ZipZapZoi Eats and earn ₹200 credits on every successful referral."/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;900&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#00f0ff",
+                    "primary-hover": "#00d7e6",
+                    "background-light": "#f8f7f5",
+                    "background-dark": "#0a0314",
+                    "surface-dark": "#1a0b36",
+                    "border-dark": "#3c1e6e",
+                    "text-secondary": "#b4a5d8"
+                },
+                fontFamily: {
+                    "display": ["Be Vietnam Pro", "sans-serif"],
+                    "body": ["Noto Sans", "sans-serif"],
+                },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-white min-h-screen flex flex-col overflow-x-hidden">
+<!-- Navigation -->
+<header class="border-b border-[#e5e7eb] dark:border-border-dark bg-white dark:bg-background-dark sticky top-0 z-50">
+    <div class="px-4 md:px-10 py-3 max-w-[1280px] mx-auto w-full">
+        <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-8">
+                <a class="flex items-center gap-3 hover:opacity-80 transition-opacity" href="index.html">
+                    <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-black">
+                        <span class="material-symbols-outlined">bolt</span>
+                    </div>
+                    <h2 class="text-lg font-bold leading-tight tracking-tight hidden sm:block">ZipZapZoi Eats</h2>
+                </a>
+                <nav class="hidden md:flex items-center gap-6">
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="index.html">Home</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="customer_restaurant_listing.html">Restaurants</a>
+                    <a class="text-sm font-medium hover:text-primary transition-colors" href="promotions & offers.html">Offers</a>
+                    <a class="text-sm font-medium text-primary" href="#">Refer & Earn</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4 flex-1 justify-end">
+                <a href="customer profile.html" class="hidden sm:flex items-center gap-2 hover:opacity-80 transition-opacity">
+                    <div id="header-avatar" class="size-9 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center text-primary font-black text-base cursor-pointer">U</div>
+                    <span id="header-name" class="text-sm font-bold dark:text-white hidden md:block">Loading...</span>
+                </a>
+                <button onclick="if(typeof ZoiCustomer !== 'undefined') ZoiCustomer.logout()" class="hidden sm:flex items-center justify-center px-4 py-2 rounded-lg bg-primary text-black text-sm font-bold hover:bg-primary-hover transition-colors">Logout</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="flex-grow flex flex-col">
+    <!-- Hero Section -->
+    <section class="relative py-12 px-4 md:px-10 lg:px-20 max-w-[1280px] mx-auto w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="flex flex-col gap-6 order-2 lg:order-1">
+                <div class="flex flex-col gap-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 w-fit">
+                        <span class="material-symbols-outlined text-primary text-sm">redeem</span>
+                        <span class="text-primary text-xs font-bold uppercase tracking-wider">Referral Program</span>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-gray-900 dark:text-white">
+                        Eat Together,<br/>
+                        <span class="text-primary">Save Together</span>
+                    </h1>
+                    <p class="text-lg text-gray-600 dark:text-gray-300 max-w-lg leading-relaxed">
+                        Invite a friend to ZipZapZoi Eats. They get <span class="text-primary font-bold">50% off</span> their first order, and you get <span class="text-primary font-bold">₹200</span> in credits when they dig in.
+                    </p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a class="flex items-center justify-center gap-2 h-12 px-8 rounded-lg bg-primary hover:bg-primary-hover text-black font-bold transition-colors" href="#refer-section">
+                        <span>Get My Code</span>
+                        <span class="material-symbols-outlined text-lg">arrow_downward</span>
+                    </a>
+                </div>
+            </div>
+            <div class="relative order-1 lg:order-2">
+                <div class="absolute -inset-4 bg-primary/20 blur-3xl rounded-full opacity-50 dark:opacity-30"></div>
+                <div class="relative rounded-2xl overflow-hidden aspect-[4/3] shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
+                    <div class="w-full h-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA8RR75_bCjMWuh1-Qt3h2MJvA12vSpR6hN9qJGlNzfK0Wh5LwdJxylcN600Y7Y_Bybxo-sHj30FUR9UKxK6fHMvYEFNN9Hg7IR6pt5oNJ_CPLBRABsexVCCFS0E67--JHlty_Pu9pocvhzWmEdikvdpAvb8_uIxEhthQ8H_zhxFC7YUfRHWs0922Unx26rPsXjMKqJk_NW-88WHG5y8kVGQMArqBMFLI3LO2sRk6yEVlzEploxv2Q2mJPvy0zM6WupmRp9mejZZww");'></div>
+                    <div class="absolute bottom-6 left-6 bg-white dark:bg-surface-dark p-4 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 flex items-center gap-4 max-w-xs animate-bounce" style="animation-duration: 3s;">
+                        <div class="bg-green-100 dark:bg-green-900 p-2 rounded-full text-green-600 dark:text-green-400">
+                            <span class="material-symbols-outlined">payments</span>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Just Earned</p>
+                            <p class="text-sm font-bold text-gray-900 dark:text-white">₹200 from a referral!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Dashboard -->
+    <section class="bg-white dark:bg-surface-dark border-y border-gray-200 dark:border-border-dark">
+        <div class="px-4 md:px-10 py-8 max-w-[1280px] mx-auto w-full">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="flex items-center gap-4 p-5 rounded-xl bg-gray-50 dark:bg-background-dark border border-gray-100 dark:border-border-dark shadow-sm">
+                    <div class="size-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                        <span class="material-symbols-outlined">group_add</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Friends Referred</p>
+                        <h3 class="text-2xl font-black text-gray-900 dark:text-white" id="stat-referred">0</h3>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 p-5 rounded-xl bg-gray-50 dark:bg-background-dark border border-gray-100 dark:border-border-dark shadow-sm relative overflow-hidden">
+                    <div class="absolute right-0 top-0 h-full w-1 bg-primary"></div>
+                    <div class="size-12 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined">currency_rupee</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Total Earned</p>
+                        <h3 class="text-2xl font-black text-gray-900 dark:text-white" id="stat-earned">₹0</h3>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 p-5 rounded-xl bg-gray-50 dark:bg-background-dark border border-gray-100 dark:border-border-dark shadow-sm">
+                    <div class="size-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
+                        <span class="material-symbols-outlined">pending</span>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Pending Rewards</p>
+                        <h3 class="text-2xl font-black text-gray-900 dark:text-white" id="stat-pending">₹0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Referral Action -->
+    <section class="py-16 px-4 md:px-10 max-w-[960px] mx-auto w-full" id="refer-section">
+        <div class="bg-white dark:bg-surface-dark rounded-2xl p-8 md:p-12 border border-gray-200 dark:border-border-dark shadow-xl text-center">
+            <div class="flex flex-col gap-3 mb-8">
+                <h2 class="text-3xl font-black text-gray-900 dark:text-white">Your Unique Referral Code</h2>
+                <p class="text-gray-500 dark:text-text-secondary">Share this code with your friends and family to start earning.</p>
+            </div>
+            <!-- Code Display -->
+            <div class="max-w-lg mx-auto mb-10">
+                <div class="flex flex-col sm:flex-row h-auto sm:h-14 w-full gap-2 sm:gap-0">
+                    <div class="flex w-full items-stretch rounded-lg sm:rounded-r-none border border-gray-300 dark:border-none dark:bg-border-dark overflow-hidden">
+                        <input id="referral-code-input" class="w-full bg-transparent border-none text-gray-900 dark:text-white placeholder-gray-400 px-6 py-3 font-mono text-lg font-bold tracking-wider focus:ring-0" readonly value="Loading..."/>
+                    </div>
+                    <button onclick="copyReferralCode()" class="flex-shrink-0 bg-primary hover:bg-primary-hover text-black font-bold px-8 py-3 rounded-lg sm:rounded-l-none transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[20px]" id="copy-icon">content_copy</span>
+                        <span id="copy-text">Copy Code</span>
+                    </button>
+                </div>
+                <p class="text-xs text-gray-400 mt-2">Or copy your referral link: <span id="referral-link-display" class="font-mono text-primary cursor-pointer hover:underline" onclick="copyReferralLink()">Loading...</span></p>
+            </div>
+            <!-- Social Share -->
+            <div class="relative flex py-5 items-center max-w-lg mx-auto mb-8">
+                <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+                <span class="flex-shrink-0 mx-4 text-gray-400 dark:text-gray-500 text-sm font-medium">OR SHARE VIA</span>
+                <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+            </div>
+            <div class="flex flex-wrap justify-center gap-4 sm:gap-8">
+                <button onclick="shareViaWhatsApp()" class="flex flex-col items-center gap-2 group">
+                    <div class="size-14 rounded-full bg-[#25D366]/10 group-hover:bg-[#25D366]/20 flex items-center justify-center transition-all">
+                        <span class="material-symbols-outlined text-[#25D366] text-2xl">chat</span>
+                    </div>
+                    <span class="text-xs font-medium text-gray-600 dark:text-gray-400">WhatsApp</span>
+                </button>
+                <button onclick="shareViaEmail()" class="flex flex-col items-center gap-2 group">
+                    <div class="size-14 rounded-full bg-gray-500/10 group-hover:bg-gray-500/20 flex items-center justify-center transition-all">
+                        <span class="material-symbols-outlined text-gray-700 dark:text-gray-300 text-2xl">mail</span>
+                    </div>
+                    <span class="text-xs font-medium text-gray-600 dark:text-gray-400">Email</span>
+                </button>
+                <button onclick="shareViaSMS()" class="flex flex-col items-center gap-2 group">
+                    <div class="size-14 rounded-full bg-blue-500/10 group-hover:bg-blue-500/20 flex items-center justify-center transition-all">
+                        <span class="material-symbols-outlined text-blue-500 text-2xl">sms</span>
+                    </div>
+                    <span class="text-xs font-medium text-gray-600 dark:text-gray-400">SMS</span>
+                </button>
+                <button onclick="shareViaTwitter()" class="flex flex-col items-center gap-2 group">
+                    <div class="size-14 rounded-full bg-black/10 dark:bg-white/10 group-hover:bg-black/20 dark:group-hover:bg-white/20 flex items-center justify-center transition-all">
+                        <span class="material-symbols-outlined text-black dark:text-white text-2xl">public</span>
+                    </div>
+                    <span class="text-xs font-medium text-gray-600 dark:text-gray-400">X / Twitter</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-12 px-4 md:px-10 max-w-[1280px] mx-auto w-full">
+        <div class="flex flex-col gap-10">
+            <div class="text-center">
+                <h2 class="text-3xl font-black text-gray-900 dark:text-white mb-2">How it works</h2>
+                <p class="text-gray-600 dark:text-text-secondary">Simple steps to earn your free meals.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="group p-6 rounded-xl bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark hover:border-primary/50 transition-colors">
+                    <div class="size-12 rounded-lg bg-primary/10 mb-4 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
+                        <span class="material-symbols-outlined text-2xl">send</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">1. Send the Link</h3>
+                    <p class="text-gray-500 dark:text-text-secondary text-sm leading-relaxed">Share your unique code via chat or social media with friends who haven't tried ZipZapZoi yet.</p>
+                </div>
+                <div class="group p-6 rounded-xl bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark hover:border-primary/50 transition-colors">
+                    <div class="size-12 rounded-lg bg-primary/10 mb-4 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
+                        <span class="material-symbols-outlined text-2xl">shopping_bag</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">2. They Order</h3>
+                    <p class="text-gray-500 dark:text-text-secondary text-sm leading-relaxed">Your friend signs up using your link and places their first order of ₹200 or more.</p>
+                </div>
+                <div class="group p-6 rounded-xl bg-white dark:bg-surface-dark border border-gray-200 dark:border-border-dark hover:border-primary/50 transition-colors">
+                    <div class="size-12 rounded-lg bg-primary/10 mb-4 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
+                        <span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">3. You Earn</h3>
+                    <p class="text-gray-500 dark:text-text-secondary text-sm leading-relaxed">₹200 credits are instantly added to your ZapWallet. Use them on your next feast!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Referral History -->
+    <section class="py-12 px-4 md:px-10 max-w-[1280px] mx-auto w-full mb-12">
+        <div class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-border-dark overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-border-dark flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Your Referrals</h3>
+            </div>
+            <div id="referral-table-body">
+                <div class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-sm italic">
+                    Share your referral code to start earning!
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Terms -->
+    <section class="border-t border-gray-200 dark:border-border-dark py-8">
+        <div class="px-4 md:px-10 max-w-[1280px] mx-auto w-full">
+            <details class="group cursor-pointer">
+                <summary class="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 list-none">
+                    <span class="material-symbols-outlined text-lg transition-transform group-open:rotate-90">chevron_right</span>
+                    Terms & Conditions
+                </summary>
+                <div class="mt-4 pl-6 text-xs text-gray-400 dark:text-gray-500 space-y-2 max-w-2xl">
+                    <p>1. The referral program is open to all registered users of ZipZapZoi Eats.</p>
+                    <p>2. Referree must be a new user who has never placed an order before.</p>
+                    <p>3. Reward of ₹200 credits is granted only after the Referee completes their first order with a minimum value of ₹300.</p>
+                    <p>4. Credits are valid for 60 days from the date of issuance.</p>
+                    <p>5. ZipZapZoi Eats reserves the right to terminate the program at any time without prior notice.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+</main>
+
+<footer class="bg-white dark:bg-surface-dark border-t border-gray-200 dark:border-border-dark py-8 text-center text-sm text-gray-500">
+    <p>© 2026 ZipZapZoi Eats. Made with <span class="text-primary">♥</span> for food lovers.</p>
+</footer>
+
+<!-- Toast -->
+<div id="ref-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-surface-dark border border-primary text-white px-6 py-3 rounded-full text-sm font-bold shadow-2xl z-[9999] flex items-center gap-2 opacity-0 transition-all duration-300" style="transform: translate(-50%, 20px);">
+    <span class="material-symbols-outlined text-sm text-primary">check_circle</span>
+    <span id="ref-toast-msg">Copied!</span>
+</div>
+
+<script src="js/zoi_config.js"></script>
+<script src="js/zoi_api.js"></script>
+<script src="js/db_simulation.js"></script>
+<script src="js/zoi_customer_engine.js"></script>
+<script>
+    let _referralCode = 'ZOI2026';
+    let _referralLink = 'https://zipzapzoi.in/join?ref=ZOI2026';
+    let _refData = { code: 'ZOI2026', referred: 0, earned: 0, pending: 0, history: [] };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Auth Guard
+        if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+            window.location.href = 'login & registration.html';
+            return;
+        }
+        const user = ZoiToken.getUser();
+
+        // Bind header
+        const headerAvatar = document.getElementById('header-avatar');
+        const headerName = document.getElementById('header-name');
+        if (headerAvatar) headerAvatar.textContent = user.name ? user.name.charAt(0).toUpperCase() : 'U';
+        if (headerName) headerName.textContent = user.name || 'Guest';
+
+        // Load referral data
+        if (typeof ZoiReferral !== 'undefined') {
+            _refData = ZoiReferral.getData() || _refData;
+        }
+
+        // Generate code from user name if not set
+        if (!_refData.code || _refData.code === 'ZOI2026') {
+            const firstName = user.name ? user.name.split(' ')[0].toUpperCase().replace(/[^A-Z0-9]/g,'') : 'ZIPZAP';
+            _refData.code = firstName + Math.floor(1000 + Math.random() * 9000);
+        }
+
+        _referralCode = _refData.code;
+        _referralLink = `https://zipzapzoi.in/join?ref=${_referralCode}`;
+
+        // Bind referral code UI
+        const codeInput = document.getElementById('referral-code-input');
+        const linkDisplay = document.getElementById('referral-link-display');
+        if (codeInput) codeInput.value = _referralCode;
+        if (linkDisplay) linkDisplay.textContent = _referralLink;
+
+        // Bind stats
+        const referred = _refData.referred || _refData.referrals?.length || 0;
+        const earned = (referred) * 200;
+        const pending = (_refData.pending || 0);
+
+        document.getElementById('stat-referred').textContent = referred;
+        document.getElementById('stat-earned').textContent = '₹' + earned.toLocaleString('en-IN');
+        document.getElementById('stat-pending').textContent = '₹' + pending.toLocaleString('en-IN');
+
+        // Build referral history table
+        renderReferralTable(_refData.referrals || _refData.history || []);
+    });
+
+    function renderReferralTable(referrals) {
+        const container = document.getElementById('referral-table-body');
+        if (!referrals || referrals.length === 0) {
+            container.innerHTML = '<div class="px-6 py-8 text-center text-gray-500 dark:text-gray-400 text-sm italic">Share your referral code to start earning rewards!</div>';
+            return;
+        }
+        let rows = referrals.map(r => {
+            const statusColor = r.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-400';
+            const statusDot = r.status === 'completed' ? 'bg-green-500' : 'bg-yellow-500';
+            const reward = r.status === 'completed' ? '+₹200' : '--';
+            const rewardColor = r.status === 'completed' ? 'text-gray-900 dark:text-white font-bold' : 'text-gray-400 dark:text-gray-500';
+            return `
+            <tr class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${r.name || 'Friend'}</td>
+                <td class="px-6 py-4 text-gray-500 dark:text-gray-400">${r.date ? new Date(r.date).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}) : '--'}</td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor}">
+                        <span class="size-1.5 rounded-full ${statusDot}"></span>
+                        ${r.status === 'completed' ? 'Completed' : 'Pending Order'}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-right ${rewardColor}">${reward}</td>
+            </tr>`;
+        }).join('');
+
+        container.innerHTML = `
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 dark:bg-border-dark/30 text-gray-500 dark:text-gray-400">
+                    <tr>
+                        <th class="px-6 py-3 font-medium">Friend</th>
+                        <th class="px-6 py-3 font-medium">Date</th>
+                        <th class="px-6 py-3 font-medium">Status</th>
+                        <th class="px-6 py-3 font-medium text-right">Reward</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-border-dark">${rows}</tbody>
+            </table>
+        </div>`;
+    }
+
+    // === SHARE FUNCTIONS ===
+    function getReferralMsg() {
+        return encodeURIComponent(`Hey! I've been loving ZipZapZoi Eats — amazing food delivery 🚀. Sign up with my code ${_referralCode} and get 50% OFF your first order! Join here: ${_referralLink}`);
+    }
+
+    function shareViaWhatsApp() {
+        window.open(`https://wa.me/?text=${getReferralMsg()}`, '_blank');
+    }
+
+    function shareViaEmail() {
+        const subject = encodeURIComponent('You were invited to ZipZapZoi Eats!');
+        window.open(`mailto:?subject=${subject}&body=${getReferralMsg()}`, '_self');
+    }
+
+    function shareViaSMS() {
+        window.open(`sms:?body=${getReferralMsg()}`, '_self');
+    }
+
+    function shareViaTwitter() {
+        window.open(`https://twitter.com/intent/tweet?text=${getReferralMsg()}`, '_blank');
+    }
+
+    function copyReferralCode() {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(_referralCode).then(() => showRefToast('✅ Code copied!'));
+        } else {
+            const input = document.getElementById('referral-code-input');
+            input.select(); document.execCommand('copy');
+            showRefToast('✅ Code copied!');
+        }
+        const icon = document.getElementById('copy-icon');
+        const txt = document.getElementById('copy-text');
+        if (icon) icon.textContent = 'check_circle';
+        if (txt) txt.textContent = 'Copied!';
+        setTimeout(() => { if (icon) icon.textContent = 'content_copy'; if (txt) txt.textContent = 'Copy Code'; }, 2000);
+    }
+
+    function copyReferralLink() {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(_referralLink).then(() => showRefToast('✅ Link copied!'));
+        }
+    }
+
+    function showRefToast(msg) {
+        const toast = document.getElementById('ref-toast');
+        document.getElementById('ref-toast-msg').textContent = msg;
+        toast.style.opacity = '1';
+        toast.style.transform = 'translate(-50%, 0)';
+        setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translate(-50%, 20px)'; }, 3000);
+    }
+</script>
+<script src="js/zoi_ai_assistant.js?v=4"></script>
+<script src="js/zoi_theme.js"></script>
+</body></html>

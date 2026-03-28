@@ -1,0 +1,898 @@
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Eats - Admin: Feedback Management</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .glass {
+            background: rgba(24, 26, 32, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+</head>
+
+<script>
+    // Enforce RBAC
+    if (typeof ZoiAuth !== 'undefined') ZoiAuth.enforceAccess("Feedback");
+</script>
+
+<body class="bg-bg text-white font-sans h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+    <main class="flex-1 flex flex-col min-w-0 bg-bg relative">
+        <header
+            class="h-16 bg-surface/80/80 backdrop-blur-md border-b border-border flex items-center justify-between px-6 sticky top-0 z-10">
+            <div class="flex items-center gap-4">
+                <button class="lg:hidden text-gray-400 hover:text-white">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <h2 class="text-lg font-bold text-white tracking-tight">Feedback Management</h2>
+            </div>
+            <div class="hidden md:flex flex-1 max-w-xl mx-8">
+                <div class="relative w-full group">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span
+                            class="material-symbols-outlined text-gray-500 group-focus-within:text-primary transition-colors">search</span>
+                    </div>
+                    <input id="search-input" oninput="debounceSearch(event)"
+                        class="block w-full pl-10 pr-3 py-2 border-none rounded-lg leading-5 bg-surface text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white/5 sm:text-sm transition-all"
+                        placeholder="Search feedback, topics, or users..." type="text" />
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <span class="text-gray-600 text-xs border border-gray-700 rounded px-1.5 py-0.5">/</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="showToast('No new notifications', 'info', 'notifications')"
+                    class="relative p-2 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-white/5">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="absolute top-2 right-2 size-2 bg-primary rounded-full border-2 border-bg"></span>
+                </button>
+                <button onclick="showToast('Help Center opening...', 'info', 'help')"
+                    class="p-2 text-gray-400 hover:text-white transition-colors rounded-full hover:bg-white/5">
+                    <span class="material-symbols-outlined">help</span>
+                </button>
+                <div class="h-6 w-px bg-white/10 mx-1"></div>
+                <button onclick="document.getElementById('manual-modal').classList.remove('hidden')"
+                    class="bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">add</span>
+                    <span>Manual Entry</span>
+                </button>
+            </div>
+        </header>
+        <div class="flex-1 overflow-y-auto p-6 lg:p-8">
+            <div class="max-w-[1600px] mx-auto flex flex-col gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div
+                        class="bg-surface border border-border rounded-xl p-5 relative overflow-hidden group hover:border-border transition-all">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-4xl text-white">mark_email_unread</span>
+                        </div>
+                        <p class="text-gray-400 text-sm font-medium mb-1">Pending Review</p>
+                        <div class="flex items-end gap-3">
+                            <h3 class="text-2xl font-bold text-white tracking-tight" id="metric-pending">48</h3>
+                            <span
+                                class="text-orange-500 text-xs font-bold bg-orange-500/10 px-1.5 py-0.5 rounded mb-1 flex items-center">
+                                <span class="material-symbols-outlined text-[14px] mr-0.5">arrow_upward</span>
+                                12 New
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Requires immediate attention</p>
+                    </div>
+                    <div
+                        class="bg-surface border border-border rounded-xl p-5 relative overflow-hidden group hover:border-border transition-all">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-4xl text-white">thumb_up</span>
+                        </div>
+                        <p class="text-gray-400 text-sm font-medium mb-1">Avg Satisfaction</p>
+                        <div class="flex items-end gap-3">
+                            <h3 class="text-2xl font-bold text-white tracking-tight">4.6/5</h3>
+                            <span
+                                class="text-green-500 text-xs font-bold bg-green-500/10 px-1.5 py-0.5 rounded mb-1">+0.2</span>
+                        </div>
+                        <div class="w-full bg-gray-700 h-1 mt-3 rounded-full overflow-hidden">
+                            <div class="bg-green-500 h-full rounded-full" style="width: 92%"></div>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-surface border border-border rounded-xl p-5 relative overflow-hidden group hover:border-border transition-all">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-4xl text-white">bug_report</span>
+                        </div>
+                        <p class="text-gray-400 text-sm font-medium mb-1">Reported Bugs</p>
+                        <div class="flex items-end gap-3">
+                            <h3 class="text-2xl font-bold text-white tracking-tight" id="metric-bugs">15</h3>
+                            <span
+                                class="text-gray-500 text-xs font-bold bg-white/5 px-1.5 py-0.5 rounded mb-1">Stable</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">3 Critical issues open</p>
+                    </div>
+                    <div
+                        class="bg-surface border border-border rounded-xl p-5 relative overflow-hidden group hover:border-border transition-all">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-4xl text-white">rate_review</span>
+                        </div>
+                        <p class="text-gray-400 text-sm font-medium mb-1">Total Feedback (30d)</p>
+                        <div class="flex items-end gap-3">
+                            <h3 class="text-2xl font-bold text-white tracking-tight">1,204</h3>
+                            <span
+                                class="text-primary text-xs font-bold bg-primary/10 px-1.5 py-0.5 rounded mb-1">+18%</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Highest in Mumbai region</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-8 flex flex-col gap-6">
+                        <div
+                            class="bg-surface border border-border rounded-xl overflow-hidden flex flex-col shadow-xl min-h-[600px]">
+                            <div
+                                class="px-6 py-4 border-b border-border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white/[0.02]">
+                                <div class="flex items-center gap-4">
+                                    <h3 class="text-white font-bold text-lg flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-primary">inbox</span>
+                                        Incoming Feedback
+                                    </h3>
+                                    <div
+                                        class="hidden md:flex items-center gap-1 bg-surface/80 rounded-lg p-1 border border-border">
+                                        <button
+                                            class="filter-btn px-3 py-1.5 text-xs font-bold bg-white/10 text-white rounded shadow-sm transition-all">All</button>
+                                        <button
+                                            class="filter-btn px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors">Bugs</button>
+                                        <button
+                                            class="filter-btn px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors">Feature
+                                            Requests</button>
+                                        <button
+                                            class="filter-btn px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors">UX
+                                            Issues</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 w-full md:w-auto">
+                                    <div class="relative flex-1 md:flex-none">
+                                        <select id="sort-select" onchange="handleSort(event)"
+                                            class="bg-surface/80 border border-border text-gray-300 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full pl-3 pr-8 py-2 appearance-none">
+                                            <option>Sort by: Newest</option>
+                                            <option>Sort by: Priority</option>
+                                            <option>Sort by: Oldest</option>
+                                        </select>
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+                                            <span class="material-symbols-outlined text-sm">expand_more</span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onclick="showToast('Advanced filters panel opening...', 'primary', 'filter_alt')"
+                                        class="flex items-center justify-center p-2 rounded-lg bg-surface/80 hover:bg-white/5 text-gray-400 hover:text-white border border-border transition-colors">
+                                        <span class="material-symbols-outlined text-[20px]">filter_list</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="feedback-list" class="divide-y divide-white/5">
+                                <div
+                                    class="p-6 hover:bg-white/[0.02] transition-colors cursor-pointer group border-l-4 border-l-red-500">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="flex items-center gap-3">
+                                            <span
+                                                class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/10 text-red-500 border border-red-500/20 uppercase tracking-wide">High
+                                                Priority</span>
+                                            <span class="text-xs text-gray-500 font-mono">#FB-2023-881</span>
+                                            <span class="text-xs text-gray-400 flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-[14px]">schedule</span> 25m
+                                                ago
+                                            </span>
+                                        </div>
+                                        <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-500/10 rounded transition-colors"
+                                                title="Mark Resolved"><span
+                                                    class="material-symbols-outlined text-[18px]">check</span></button>
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded transition-colors"
+                                                title="Assign to Dev"><span
+                                                    class="material-symbols-outlined text-[18px]">person_add</span></button>
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded transition-colors"
+                                                title="More Options"><span
+                                                    class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <div class="flex-shrink-0 mt-1">
+                                            <div
+                                                class="size-10 rounded-full bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-500/10 flex items-center justify-center text-red-400">
+                                                <span class="material-symbols-outlined">bug_report</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h4
+                                                class="text-white font-bold text-base mb-1 group-hover:text-primary transition-colors">
+                                                Cart crashes when applying "DIWALI50" coupon</h4>
+                                            <p class="text-gray-400 text-sm leading-relaxed mb-3">When I try to apply
+                                                the new Diwali promo code on a cart value above ₹2000, the app freezes
+                                                and then crashes completely. I'm using an iPhone 13.</p>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <div
+                                                    class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface/80 border border-border text-gray-300 text-xs">
+                                                    <span
+                                                        class="material-symbols-outlined text-[14px]">smartphone</span>
+                                                    iOS 16.2
+                                                </div>
+                                                <div
+                                                    class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface/80 border border-border text-gray-300 text-xs">
+                                                    <span class="material-symbols-outlined text-[14px]">wifi</span>
+                                                    4G/LTE
+                                                </div>
+                                                <div
+                                                    class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface/80 border border-border text-gray-300 text-xs">
+                                                    <span class="material-symbols-outlined text-[14px]">person</span>
+                                                    Rahul V. (Gold User)
+                                                </div>
+                                                <div class="ml-auto flex items-center gap-2">
+                                                    <span class="text-xs text-gray-500">Linked to:</span>
+                                                    <span
+                                                        class="text-xs text-blue-400 hover:underline cursor-pointer">ISSUE-4022
+                                                        (Coupon System)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="p-6 hover:bg-white/[0.02] transition-colors cursor-pointer group border-l-4 border-l-blue-500">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="flex items-center gap-3">
+                                            <span
+                                                class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase tracking-wide">Feature
+                                                Request</span>
+                                            <span class="text-xs text-gray-500 font-mono">#FB-2023-880</span>
+                                            <span class="text-xs text-gray-400 flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-[14px]">schedule</span> 1h
+                                                ago
+                                            </span>
+                                        </div>
+                                        <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-500/10 rounded transition-colors"><span
+                                                    class="material-symbols-outlined text-[18px]">check</span></button>
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded transition-colors"><span
+                                                    class="material-symbols-outlined text-[18px]">person_add</span></button>
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded transition-colors"><span
+                                                    class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <div class="flex-shrink-0 mt-1">
+                                            <div
+                                                class="size-10 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/10 flex items-center justify-center text-blue-400">
+                                                <span class="material-symbols-outlined">lightbulb</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h4
+                                                class="text-white font-bold text-base mb-1 group-hover:text-primary transition-colors">
+                                                Add ability to schedule group orders</h4>
+                                            <p class="text-gray-400 text-sm leading-relaxed mb-3">Our office orders
+                                                lunch daily. It would be great if we could create a group cart link and
+                                                schedule it to be delivered at 1 PM every day automatically.</p>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <div
+                                                    class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface/80 border border-border text-gray-300 text-xs">
+                                                    <span class="material-symbols-outlined text-[14px]">business</span>
+                                                    Corporate Acct
+                                                </div>
+                                                <div
+                                                    class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface/80 border border-border text-gray-300 text-xs">
+                                                    <span class="material-symbols-outlined text-[14px]">person</span>
+                                                    Sarah M.
+                                                </div>
+                                                <div class="ml-auto flex items-center gap-2">
+                                                    <span class="text-xs text-gray-500">Status:</span>
+                                                    <span
+                                                        class="text-xs font-medium text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded">Under
+                                                        Review</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="p-6 hover:bg-white/[0.02] transition-colors cursor-pointer group border-l-4 border-l-yellow-500">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="flex items-center gap-3">
+                                            <span
+                                                class="px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 uppercase tracking-wide">UX
+                                                Improvement</span>
+                                            <span class="text-xs text-gray-500 font-mono">#FB-2023-879</span>
+                                            <span class="text-xs text-gray-400 flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-[14px]">schedule</span> 3h
+                                                ago
+                                            </span>
+                                        </div>
+                                        <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-500/10 rounded transition-colors"><span
+                                                    class="material-symbols-outlined text-[18px]">check</span></button>
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-500/10 rounded transition-colors"><span
+                                                    class="material-symbols-outlined text-[18px]">person_add</span></button>
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded transition-colors"><span
+                                                    class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <div class="flex-shrink-0 mt-1">
+                                            <div
+                                                class="size-10 rounded-full bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/10 flex items-center justify-center text-yellow-400">
+                                                <span class="material-symbols-outlined">sentiment_dissatisfied</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h4
+                                                class="text-white font-bold text-base mb-1 group-hover:text-primary transition-colors">
+                                                Confusing tip selection screen</h4>
+                                            <p class="text-gray-400 text-sm leading-relaxed mb-3">I accidentally tipped
+                                                ₹100 instead of ₹10 because the buttons are too close together and the
+                                                custom amount field isn't clear.</p>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <div
+                                                    class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface/80 border border-border text-gray-300 text-xs">
+                                                    <span
+                                                        class="material-symbols-outlined text-[14px]">smartphone</span>
+                                                    Android
+                                                </div>
+                                                <div class="ml-auto flex items-center gap-2">
+                                                    <button
+                                                        class="text-xs text-primary border border-primary/20 hover:bg-primary/10 px-3 py-1 rounded transition-colors">Create
+                                                        Task</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="p-6 hover:bg-white/[0.02] transition-colors cursor-pointer group border-l-4 border-l-green-500">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="flex items-center gap-3">
+                                            <span
+                                                class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20 uppercase tracking-wide">Praise</span>
+                                            <span class="text-xs text-gray-500 font-mono">#FB-2023-875</span>
+                                            <span class="text-xs text-gray-400 flex items-center gap-1">
+                                                <span class="material-symbols-outlined text-[14px]">schedule</span> 5h
+                                                ago
+                                            </span>
+                                        </div>
+                                        <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-green-500 hover:bg-green-500/10 rounded transition-colors"><span
+                                                    class="material-symbols-outlined text-[18px]">check</span></button>
+                                            <button
+                                                class="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded transition-colors"><span
+                                                    class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <div class="flex-shrink-0 mt-1">
+                                            <div
+                                                class="size-10 rounded-full bg-gradient-to-br from-green-500/20 to-teal-500/20 border border-green-500/10 flex items-center justify-center text-green-400">
+                                                <span class="material-symbols-outlined">favorite</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h4
+                                                class="text-white font-bold text-base mb-1 group-hover:text-primary transition-colors">
+                                                Super fast delivery today!</h4>
+                                            <p class="text-gray-400 text-sm leading-relaxed mb-3">Just wanted to say the
+                                                AI route optimization seems to be working. My food arrived hot in 15
+                                                mins during peak traffic. Kudos to the team.</p>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <div
+                                                    class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface/80 border border-border text-gray-300 text-xs">
+                                                    <span class="material-symbols-outlined text-[14px]">star</span> 5
+                                                    Star Rating
+                                                </div>
+                                                <div class="ml-auto flex items-center gap-2">
+                                                    <button
+                                                        class="text-xs text-gray-400 hover:text-white transition-colors">View
+                                                        Order Details</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 border-t border-border bg-surface/80/30 flex justify-center">
+                                <button onclick="showToast('Loading older feedback from archive...', 'info', 'sync')"
+                                    class="text-sm text-gray-400 hover:text-white font-medium flex items-center gap-2 transition-colors">
+                                    Load More Feedback
+                                    <span class="material-symbols-outlined text-[16px]">expand_more</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-4 flex flex-col gap-6">
+                        <div class="bg-surface border border-border rounded-xl overflow-hidden flex flex-col shadow-lg">
+                            <div
+                                class="px-5 py-4 border-b border-border bg-surface/80/50 flex items-center justify-between">
+                                <h3 class="text-white font-bold text-sm">Feedback Trends</h3>
+                                <button onclick="showToast('Exporting Trends Report...', 'success', 'download')"
+                                    class="text-gray-400 hover:text-white p-1 rounded hover:bg-white/5">
+                                    <span class="material-symbols-outlined text-[18px]">more_vert</span>
+                                </button>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="text-xs text-gray-400">Top Categories (This Week)</span>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="size-2 rounded-full bg-red-500"></div>
+                                            <span class="text-sm text-gray-300">Payment Issues</span>
+                                        </div>
+                                        <span class="text-sm font-bold text-white">32%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                                        <div class="bg-red-500 h-full rounded-full" style="width: 32%"></div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="size-2 rounded-full bg-blue-500"></div>
+                                            <span class="text-sm text-gray-300">UI/UX Suggestions</span>
+                                        </div>
+                                        <span class="text-sm font-bold text-white">24%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                                        <div class="bg-blue-500 h-full rounded-full" style="width: 24%"></div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="size-2 rounded-full bg-green-500"></div>
+                                            <span class="text-sm text-gray-300">Delivery Praise</span>
+                                        </div>
+                                        <span class="text-sm font-bold text-white">18%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                                        <div class="bg-green-500 h-full rounded-full" style="width: 18%"></div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="size-2 rounded-full bg-gray-500"></div>
+                                            <span class="text-sm text-gray-300">Other</span>
+                                        </div>
+                                        <span class="text-sm font-bold text-white">26%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                                        <div class="bg-gray-500 h-full rounded-full" style="width: 26%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-surface border border-border rounded-xl p-6 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-purple-600">
+                            </div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-[20px]">psychology</span>
+                                    <h3 class="text-white font-bold text-sm">AI Sentiment Analysis</h3>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-center justify-center py-4">
+                                <div class="relative size-32">
+                                    <svg class="size-full rotate-[-90deg]" viewBox="0 0 36 36">
+                                        <path class="text-gray-800" d="M18 2.0845
+                                      a 15.9155 15.9155 0 0 1 0 31.831
+                                      a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor"
+                                            stroke-width="3"></path>
+                                        <path class="text-green-500" d="M18 2.0845
+                                      a 15.9155 15.9155 0 0 1 0 31.831
+                                      a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor"
+                                            stroke-dasharray="72, 100" stroke-width="3"></path>
+                                    </svg>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span class="text-2xl font-bold text-white">72%</span>
+                                        <span class="text-[10px] text-gray-400 uppercase">Positive</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-center text-gray-400 mt-4 leading-relaxed">
+                                    Sentiment has improved by 4% since the last UI update. Key driver: <span
+                                        class="text-green-400">Faster Search</span>.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bg-surface border border-border rounded-xl p-6">
+                            <h3 class="text-white font-bold text-sm mb-4">Trending Tags</h3>
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    onclick="document.getElementById('search-input').value = this.innerText; handleSearch({target: {value: this.innerText}})"
+                                    class="px-2.5 py-1 rounded-full bg-surface/80 border border-border text-xs text-gray-300 hover:text-white hover:border-primary/50 transition-colors cursor-pointer">#payment_gateway</span>
+                                <span
+                                    onclick="document.getElementById('search-input').value = this.innerText; handleSearch({target: {value: this.innerText}})"
+                                    class="px-2.5 py-1 rounded-full bg-surface/80 border border-border text-xs text-gray-300 hover:text-white hover:border-primary/50 transition-colors cursor-pointer">#dark_mode</span>
+                                <span
+                                    onclick="document.getElementById('search-input').value = this.innerText; handleSearch({target: {value: this.innerText}})"
+                                    class="px-2.5 py-1 rounded-full bg-surface/80 border border-border text-xs text-gray-300 hover:text-white hover:border-primary/50 transition-colors cursor-pointer">#ios_crash</span>
+                                <span
+                                    onclick="document.getElementById('search-input').value = this.innerText; handleSearch({target: {value: this.innerText}})"
+                                    class="px-2.5 py-1 rounded-full bg-surface/80 border border-border text-xs text-gray-300 hover:text-white hover:border-primary/50 transition-colors cursor-pointer">#delivery_time</span>
+                                <span
+                                    onclick="document.getElementById('search-input').value = this.innerText; handleSearch({target: {value: this.innerText}})"
+                                    class="px-2.5 py-1 rounded-full bg-surface/80 border border-border text-xs text-gray-300 hover:text-white hover:border-primary/50 transition-colors cursor-pointer">#promo_code</span>
+                                <span
+                                    onclick="document.getElementById('search-input').value = this.innerText; handleSearch({target: {value: this.innerText}})"
+                                    class="px-2.5 py-1 rounded-full bg-surface/80 border border-border text-xs text-gray-300 hover:text-white hover:border-primary/50 transition-colors cursor-pointer">#map_accuracy</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="manual-modal"
+            class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-surface border border-border rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+                <div class="px-6 py-4 border-b border-border flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">add_circle</span> Manual Feedback Log
+                    </h3>
+                    <button onclick="document.getElementById('manual-modal').classList.add('hidden')"
+                        class="text-gray-400 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Feedback
+                            Type</label>
+                        <select id="modal-type"
+                            class="w-full bg-bg border border-border rounded-lg px-3 py-2 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm">
+                            <option value="Bugs">Bug Report</option>
+                            <option value="Feature Requests">Feature Request</option>
+                            <option value="UX Issues">UX / UI Issue</option>
+                            <option value="Praise">Praise</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Title</label>
+                        <input type="text" id="modal-title" placeholder="Short summary"
+                            class="w-full bg-bg border border-border rounded-lg px-3 py-2 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Description</label>
+                        <textarea id="modal-desc" rows="3" placeholder="Detailed description..."
+                            class="w-full bg-bg border border-border rounded-lg px-3 py-2 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Customer /
+                            Reporter</label>
+                        <input type="text" id="modal-user" placeholder="e.g. Call Center Agent #4"
+                            class="w-full bg-bg border border-border rounded-lg px-3 py-2 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm">
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-t border-border bg-black/20 flex justify-end gap-3">
+                    <button onclick="document.getElementById('manual-modal').classList.add('hidden')"
+                        class="px-4 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all">Cancel</button>
+                    <button onclick="submitManualFeedback()"
+                        class="px-6 py-2 rounded-lg text-sm font-bold bg-primary text-white hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">Log
+                        Feedback</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            // Data Model
+            let FEEDBACK_TICKETS = [
+                { id: "FB-2023-881", type: "Bugs", tagText: "High Priority", severity: "red", title: "Cart crashes when applying 'DIWALI50' coupon", desc: "When I try to apply the new Diwali promo code on a cart value above ₹2000, the app freezes and then crashes completely. I'm using an iPhone 13.", time: "25m ago", icon: "bug_report", metas: [{ icon: "smartphone", text: "iOS 16.2" }, { icon: "wifi", text: "4G/LTE" }, { icon: "person", text: "Rahul V. (Gold User)" }], link: "ISSUE-4022 (Coupon System)" },
+                { id: "FB-2023-880", type: "Feature Requests", tagText: "Feature Request", severity: "blue", title: "Add ability to schedule group orders", desc: "Our office orders lunch daily. It would be great if we could create a group cart link and schedule it to be delivered at 1 PM every day automatically.", time: "1h ago", icon: "lightbulb", metas: [{ icon: "business", text: "Corporate Acct" }, { icon: "person", text: "Sarah M." }], statusText: "Under Review", statusColor: "yellow" },
+                { id: "FB-2023-879", type: "UX Issues", tagText: "UX Improvement", severity: "yellow", title: "Confusing tip selection screen", desc: "I accidentally tipped ₹100 instead of ₹10 because the buttons are too close together and the custom amount field isn't clear.", time: "3h ago", icon: "sentiment_dissatisfied", metas: [{ icon: "smartphone", text: "Android" }], showTaskBtn: true },
+                { id: "FB-2023-875", type: "Praise", tagText: "Praise", severity: "green", title: "Super fast delivery today!", desc: "Just wanted to say the AI route optimization seems to be working. My food arrived hot in 15 mins during peak traffic. Kudos to the team.", time: "5h ago", icon: "favorite", metas: [{ icon: "star", text: "5 Star Rating" }], showOrderBtn: true }
+            ];
+
+            let currentFilter = 'All';
+            let searchQuery = '';
+            let currentSort = 'Newest';
+            let isLoading = false;
+            let searchTimeout = null;
+
+            function debounceSearch(e) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    handleSearch(e);
+                }, 400); // 400ms debounce
+            }
+
+            async function renderFeedback() {
+                const list = document.getElementById('feedback-list');
+                if (!list) return;
+                
+                // Show Skeleton Loader
+                list.innerHTML = Array(3).fill(0).map(() => `
+                    <div class="p-6 border-l-4 border-l-gray-700 animate-pulse bg-white/[0.01]">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3 w-1/3">
+                                <div class="h-4 bg-gray-700 rounded w-20"></div>
+                                <div class="h-3 bg-gray-800 rounded w-24"></div>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="size-10 rounded-full bg-gray-800 shrink-0"></div>
+                            <div class="flex-1">
+                                <div class="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                                <div class="h-3 bg-gray-800 rounded w-full mb-1"></div>
+                                <div class="h-3 bg-gray-800 rounded w-5/6 mb-4"></div>
+                                <div class="flex gap-2">
+                                    <div class="h-6 bg-gray-700 rounded w-20"></div>
+                                    <div class="h-6 bg-gray-700 rounded w-24"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('<div class="h-px w-full bg-white/5"></div>');
+
+                isLoading = true;
+                // Simulate Network Delay
+                await new Promise(resolve => setTimeout(resolve, 600));
+                isLoading = false;
+                list.innerHTML = '';
+
+                // Filter by Tab
+                let filtered = currentFilter === 'All' ? FEEDBACK_TICKETS : FEEDBACK_TICKETS.filter(t => t.type === currentFilter);
+
+                // Filter by Search
+                if (searchQuery) {
+                    const q = searchQuery.toLowerCase();
+                    filtered = filtered.filter(t =>
+                        t.title.toLowerCase().includes(q) ||
+                        t.desc.toLowerCase().includes(q) ||
+                        t.id.toLowerCase().includes(q) ||
+                        t.metas.some(m => m.text.toLowerCase().includes(q))
+                    );
+                }
+
+                // Sorting
+                if (currentSort === 'Priority') {
+                    const sevScore = { red: 3, yellow: 2, blue: 1, green: 0 };
+                    filtered.sort((a, b) => sevScore[b.severity] - sevScore[a.severity]);
+                } else if (currentSort === 'Oldest') {
+                    // Simulated inverse sort of our array (since Newest is default)
+                    filtered = [...filtered].reverse();
+                }
+
+                filtered.forEach(t => {
+                    let metasHtml = t.metas.map(m => `<div class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface border border-border text-gray-300 text-xs"><span class="material-symbols-outlined text-[14px]">${m.icon}</span>${m.text}</div>`).join('');
+
+                    let rightMetaHtml = '';
+                    if (t.link) rightMetaHtml = `<div class="ml-auto flex items-center gap-2"><span class="text-xs text-gray-500">Linked to:</span><span class="text-xs text-info hover:underline cursor-pointer">${t.link}</span></div>`;
+                    if (t.statusText) rightMetaHtml = `<div class="ml-auto flex items-center gap-2"><span class="text-xs text-gray-500">Status:</span><span class="text-xs font-medium text-warning bg-warning/10 px-2 py-0.5 rounded">${t.statusText}</span></div>`;
+                    if (t.showTaskBtn) rightMetaHtml = `<div class="ml-auto flex items-center gap-2"><button onclick="createTask(event)" class="text-xs text-primary border border-primary/20 hover:bg-primary/10 px-3 py-1 rounded transition-colors">Create Task</button></div>`;
+                    if (t.showOrderBtn) rightMetaHtml = `<div class="ml-auto flex items-center gap-2"><button onclick="viewDetails(event)" class="text-xs text-gray-400 hover:text-white transition-colors">View Order Details</button></div>`;
+
+                    list.innerHTML += `
+                        <div class="p-6 hover:bg-white/[0.02] transition-colors cursor-pointer group border-l-4 border-l-${t.severity}-500">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-${t.severity}-500/10 text-${t.severity}-500 border border-${t.severity}-500/20 uppercase tracking-wide">${t.tagText}</span>
+                                    <span class="text-xs text-gray-500 font-mono">#${t.id}</span>
+                                    <span class="text-xs text-gray-400 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span> ${t.time}</span>
+                                </div>
+                                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="resolveTicket('${t.id}', event)" class="p-1.5 text-gray-400 hover:text-success hover:bg-success/10 rounded transition-colors" title="Mark Resolved"><span class="material-symbols-outlined text-[18px]">check</span></button>
+                                    <button onclick="assignTicket(event)" class="p-1.5 text-gray-400 hover:text-info hover:bg-info/10 rounded transition-colors" title="Assign to Dev"><span class="material-symbols-outlined text-[18px]">person_add</span></button>
+                                    <button class="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded transition-colors" title="More Options"><span class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+                                </div>
+                            </div>
+                            <div class="flex gap-4">
+                                <div class="flex-shrink-0 mt-1">
+                                    <div class="size-10 rounded-full bg-gradient-to-br from-${t.severity}-500/20 to-orange-500/20 border border-${t.severity}-500/10 flex items-center justify-center text-${t.severity}-400">
+                                        <span class="material-symbols-outlined">${t.icon}</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-white font-bold text-base mb-1 group-hover:text-primary transition-colors">${t.title}</h4>
+                                    <p class="text-gray-400 text-sm leading-relaxed mb-3">${t.desc}</p>
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        ${metasHtml}
+                                        ${rightMetaHtml}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if (filtered.length === 0) {
+                    list.innerHTML = `<div class="p-8 text-center text-gray-500 font-medium border-l-4 border-transparent">No feedback items found matching your criteria.</div>`;
+                }
+            }
+
+            function handleSearch(e) {
+                searchQuery = e.target.value;
+                renderFeedback();
+            }
+
+            function handleSort(e) {
+                currentSort = e.target.value.replace('Sort by: ', '');
+                renderFeedback();
+            }
+
+            function resolveTicket(id, e) {
+                e.stopPropagation();
+                FEEDBACK_TICKETS = FEEDBACK_TICKETS.filter(t => t.id !== id);
+                showToast('Ticket marked as resolved', 'success', 'check_circle');
+                renderFeedback();
+                updateMetrics();
+            }
+
+            function assignTicket(e) { e.stopPropagation(); showToast('Ticket assigned to lead developer', 'info', 'person_add'); }
+            function createTask(e) { e.stopPropagation(); showToast('Jira Task DEV-893 Created', 'success', 'task'); }
+            function viewDetails(e) { e.stopPropagation(); showToast('Loading related order details...', 'info', 'receipt_long'); }
+
+            const TOAST_COLORS = {
+                success: { bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)', text: '#22c55e' },
+                danger: { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', text: '#ef4444' },
+                info: { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.3)', text: '#3b82f6' },
+                warning: { bg: 'rgba(234,179,8,0.12)', border: 'rgba(234,179,8,0.3)', text: '#eab308' },
+                primary: { bg: 'rgba(0, 240, 255,0.12)', border: 'rgba(0, 240, 255,0.3)', text: '#00f0ff' }
+            };
+
+            function showToast(msg, type, icon) {
+                const c = TOAST_COLORS[type] || TOAST_COLORS.info;
+                const toast = document.createElement('div');
+                toast.style.cssText = `position:fixed;bottom:24px;right:24px;background:${c.bg};border:1px solid ${c.border};color:${c.text};padding:12px 18px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.4);display:flex;align-items:center;gap:10px;z-index:9999;font-family:Manrope,sans-serif;font-size:14px;font-weight:600;cursor:pointer;backdrop-filter:blur(12px);animation:slideIn 0.3s ease`;
+                toast.innerHTML = `<span class="material-symbols-outlined" style="font-size:20px">${icon}</span>${msg}`;
+                toast.onclick = () => toast.remove();
+                document.body.appendChild(toast);
+                setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3500);
+            }
+
+            function updateMetrics() {
+                const pendingEl = document.getElementById('metric-pending');
+                const bugsEl = document.getElementById('metric-bugs');
+                if (pendingEl) pendingEl.innerText = FEEDBACK_TICKETS.filter(t => t.type !== 'Praise').length + 44;
+                if (bugsEl) bugsEl.innerText = FEEDBACK_TICKETS.filter(t => t.type === 'Bugs').length + 14;
+            }
+
+            function setupFilters() {
+                const btns = document.querySelectorAll('.filter-btn');
+                btns.forEach(b => {
+                    b.addEventListener('click', (e) => {
+                        btns.forEach(btn => btn.className = "filter-btn px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors");
+                        e.target.className = "filter-btn px-3 py-1.5 text-xs font-bold bg-white/10 text-white rounded shadow-sm transition-all";
+                        currentFilter = e.target.innerText;
+                        renderFeedback();
+                    });
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    renderFeedback();
+                    updateMetrics();
+                    setupFilters();
+                }, 100);
+            });
+            function submitManualFeedback() {
+                const typeEl = document.getElementById('modal-type');
+                const titleEl = document.getElementById('modal-title');
+                const descEl = document.getElementById('modal-desc');
+                const userEl = document.getElementById('modal-user');
+
+                const type = typeEl.value;
+                const title = titleEl.value.trim();
+                const desc = descEl.value.trim();
+                const user = userEl.value.trim();
+                
+                let hasError = false;
+
+                // Reset borders
+                [titleEl, descEl].forEach(el => el.classList.remove('border-danger', 'ring-danger'));
+
+                if (!title) {
+                    titleEl.classList.add('border-danger', 'ring-danger');
+                    hasError = true;
+                }
+                if (!desc) {
+                    descEl.classList.add('border-danger', 'ring-danger');
+                    hasError = true;
+                }
+
+                if (hasError) {
+                    showToast('Please fill out all required fields marked in red.', 'danger', 'error');
+                    return;
+                }
+
+                let severity = 'blue', icon = 'info', tagText = 'Info';
+                if (type === 'Bugs') { severity = 'red'; icon = 'bug_report'; tagText = 'New Bug'; }
+                if (type === 'UX Issues') { severity = 'yellow'; icon = 'sentiment_neutral'; tagText = 'UX Feedback'; }
+                if (type === 'Praise') { severity = 'green'; icon = 'favorite'; tagText = 'Praise'; }
+
+                const newFeedback = {
+                    id: "FB-" + new Date().getFullYear() + "-" + Math.floor(Math.random() * 9000 + 1000),
+                    type: type,
+                    tagText: tagText,
+                    severity: severity,
+                    title: title,
+                    desc: desc,
+                    time: "Just now",
+                    icon: icon,
+                    metas: [{ icon: "person", text: user || "Manual Entry" }]
+                };
+
+                FEEDBACK_TICKETS.unshift(newFeedback);
+                document.getElementById('manual-modal').classList.add('hidden');
+
+                // Clear form
+                document.getElementById('modal-title').value = '';
+                document.getElementById('modal-desc').value = '';
+                document.getElementById('modal-user').value = '';
+
+                showToast('Feedback logged successfully', 'success', 'check_circle');
+
+                // Switch tab to the type we just submitted so we can see it
+                const btns = document.querySelectorAll('.filter-btn');
+                btns.forEach(b => {
+                    if (b.innerText === type || (b.innerText === 'All' && type === 'All')) {
+                        btns.forEach(btn => btn.className = "filter-btn px-3 py-1.5 text-xs font-medium text-gray-400 hover:text-white transition-colors");
+                        b.className = "filter-btn px-3 py-1.5 text-xs font-bold bg-white/10 text-white rounded shadow-sm transition-all";
+                        currentFilter = b.innerText;
+                    }
+                });
+
+                renderFeedback();
+                updateMetrics();
+            }
+        </script>
+    </main>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>

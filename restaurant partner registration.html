@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Eats - Restaurant Partner Registration</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0ff",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#0a0314",
+                        "surface-dark": "#1a0b36",
+                        "border-dark": "#2a1650",
+                        "input-bg": "#150a2e",
+                        "input-border": "#3d2570",
+                        "text-subtle": "#9b8ec4"
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "Noto Sans", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for dark theme elegance */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0314;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a1650;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen flex flex-col overflow-x-hidden selection:bg-primary selection:text-white">
+    <!-- Top Navigation -->
+    <header
+        class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-b-border-dark bg-background-dark/95 backdrop-blur-md px-4 sm:px-10 py-3">
+        <div class="flex items-center gap-4 text-white">
+            <div class="size-8 text-primary">
+                <svg class="w-full h-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path clip-rule="evenodd"
+                        d="M47.2426 24L24 47.2426L0.757355 24L24 0.757355L47.2426 24ZM12.2426 21H35.7574L24 9.24264L12.2426 21Z"
+                        fill="currentColor" fill-rule="evenodd"></path>
+                </svg>
+            </div>
+            <h2 class="text-white text-xl font-bold leading-tight tracking-[-0.015em]">ZipZapZoi Eats</h2>
+        </div>
+        <div class="flex gap-3">
+            <a href="customer support help.html"
+                class="hidden sm:flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-border-dark hover:bg-[#3d2570] text-white text-sm font-bold transition-colors">
+                <span class="truncate">Help Support</span>
+            </a>
+            <a href="login & registration.html"
+                class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary hover:bg-[#00d4c5] text-[#0a0314] text-sm font-bold transition-colors">
+                <span class="truncate">Log In</span>
+            </a>
+        </div>
+    </header>
+    <div class="flex-1 flex justify-center py-8 px-4 sm:px-6">
+        <div class="w-full max-w-[960px] flex flex-col gap-8">
+            <!-- Page Heading -->
+            <div class="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-end">
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span
+                            class="px-2 py-0.5 rounded text-xs font-bold bg-gradient-to-r from-purple-500 to-primary text-white">AI-POWERED</span>
+                        <span class="text-text-subtle text-xs font-medium uppercase tracking-wider">Partner
+                            Registration</span>
+                    </div>
+                    <h1 class="text-white text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">Partner
+                        with ZipZapZoi Eats</h1>
+                    <p class="text-text-subtle text-base font-normal max-w-xl">Join the revolution. Tell us about your
+                        business, and our AI will optimize your reach from day one.</p>
+                </div>
+            </div>
+            <!-- Progress Bar -->
+            <div class="flex flex-col gap-3">
+                <div class="flex gap-6 justify-between items-end">
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-[#0a0314] text-xs font-bold">1</span>
+                        <p class="text-white text-base font-bold leading-normal">Basic Info</p>
+                    </div>
+                    <div class="hidden sm:flex gap-4 text-text-subtle text-sm">
+                        <span class="opacity-50">2. Cuisine &amp; Operations</span>
+                        <span class="opacity-50">3. Documents &amp; Payout</span>
+                    </div>
+                    <p class="text-primary text-sm font-bold leading-normal">33%</p>
+                </div>
+                <div class="rounded-full bg-border-dark h-2 w-full overflow-hidden">
+                    <div class="h-full rounded-full bg-primary transition-all duration-500" style="width: 33%;"></div>
+                </div>
+            </div>
+            <!-- Main Form Card -->
+            <form class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden shadow-xl"
+                onsubmit="event.preventDefault();">
+                <!-- Section 1: Restaurant Identity -->
+                <div class="p-6 sm:p-8 border-b border-border-dark">
+                    <h3 class="text-white text-xl font-bold mb-6 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">storefront</span>
+                        Restaurant Details
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <label class="flex flex-col gap-2">
+                            <span class="text-white text-sm font-medium">Restaurant Name</span>
+                            <input id="restName"
+                                class="w-full rounded-lg text-white placeholder:text-text-subtle focus:outline-0 focus:ring-2 focus:ring-primary border border-input-border bg-input-bg h-12 px-4 text-base transition-colors"
+                                placeholder="e.g. The Spicy Tandoor" type="text" required />
+                        </label>
+                        <label class="flex flex-col gap-2">
+                            <span class="text-white text-sm font-medium">Restaurant Category</span>
+                            <div class="relative">
+                                <select id="restCategory"
+                                    class="w-full rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary border border-input-border bg-input-bg h-12 px-4 text-base appearance-none cursor-pointer transition-colors">
+                                    <option>Fine Dining</option>
+                                    <option>Casual Dining</option>
+                                    <option>Cafe / Bistro</option>
+                                    <option>Fast Food</option>
+                                    <option>Cloud Kitchen</option>
+                                    <option>Bakery</option>
+                                </select>
+                                <span
+                                    class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-text-subtle pointer-events-none">expand_more</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <label class="flex flex-col gap-2">
+                            <span class="text-white text-sm font-medium">Owner First Name</span>
+                            <input id="ownerFirst"
+                                class="w-full rounded-lg text-white placeholder:text-text-subtle focus:outline-0 focus:ring-2 focus:ring-primary border border-input-border bg-input-bg h-12 px-4 text-base transition-colors"
+                                placeholder="First Name" type="text" required />
+                        </label>
+                        <label class="flex flex-col gap-2">
+                            <span class="text-white text-sm font-medium">Owner Last Name</span>
+                            <input id="ownerLast"
+                                class="w-full rounded-lg text-white placeholder:text-text-subtle focus:outline-0 focus:ring-2 focus:ring-primary border border-input-border bg-input-bg h-12 px-4 text-base transition-colors"
+                                placeholder="Last Name" type="text" required />
+                        </label>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <label class="flex flex-col gap-2">
+                            <span class="text-white text-sm font-medium">Official Email Address</span>
+                            <div class="relative">
+                                <span
+                                    class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-text-subtle">mail</span>
+                                <input
+                                    class="w-full rounded-lg text-white placeholder:text-text-subtle focus:outline-0 focus:ring-2 focus:ring-primary border border-input-border bg-input-bg h-12 pl-12 pr-4 text-base transition-colors"
+                                    placeholder="partner@restaurant.com" type="email" />
+                            </div>
+                        </label>
+                        <label class="flex flex-col gap-2">
+                            <span class="text-white text-sm font-medium">Mobile Number</span>
+                            <div class="relative flex">
+                                <span
+                                    class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-input-border bg-[#2d2115] text-text-subtle text-sm font-medium">+91</span>
+                                <input id="ownerPhone"
+                                    class="w-full rounded-r-lg text-white placeholder:text-text-subtle focus:outline-0 focus:ring-2 focus:ring-primary border border-input-border bg-input-bg h-12 px-4 text-base transition-colors"
+                                    placeholder="98765 43210" type="tel" required />
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <!-- Section 2: Location & AI Map -->
+                <div class="p-6 sm:p-8 bg-background-dark/30">
+                    <div class="flex flex-col md:flex-row gap-8">
+                        <div class="flex-1 flex flex-col gap-6">
+                            <h3 class="text-white text-xl font-bold flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">location_on</span>
+                                Location &amp; Address
+                            </h3>
+                            <label class="flex flex-col gap-2">
+                                <span class="text-white text-sm font-medium">Search Area / City</span>
+                                <div class="relative">
+                                    <input
+                                        class="w-full rounded-lg text-white placeholder:text-text-subtle focus:outline-0 focus:ring-2 focus:ring-primary border border-input-border bg-input-bg h-12 px-4 text-base transition-colors"
+                                        placeholder="Type to search location..." type="text"
+                                        value="Indiranagar, Bengaluru" />
+                                    <button
+                                        class="absolute right-2 top-1.5 h-9 px-3 bg-primary/20 hover:bg-primary text-primary hover:text-white rounded text-sm font-bold transition-colors"
+                                        type="button">
+                                        Locate Me
+                                    </button>
+                                </div>
+                            </label>
+                            <label class="flex flex-col gap-2">
+                                <span class="text-white text-sm font-medium">Complete Address</span>
+                                <textarea
+                                    class="w-full rounded-lg text-white placeholder:text-text-subtle focus:outline-0 focus:ring-2 focus:ring-primary border border-input-border bg-input-bg p-4 text-base min-h-[100px] resize-none transition-colors"
+                                    placeholder="Building no., Street name, Landmark..."></textarea>
+                            </label>
+                        </div>
+                        <!-- Map / Visual -->
+                        <div class="w-full md:w-[320px] shrink-0 flex flex-col gap-3">
+                            <label class="text-white text-sm font-medium">Delivery Radius Preview</label>
+                            <div
+                                class="relative w-full aspect-square md:h-[240px] rounded-lg overflow-hidden border border-input-border group">
+                                <img alt="Map view of city streets with navigation markers overlay"
+                                    class="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity"
+                                    data-location="Bengaluru, India"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVuAxFymQHzeh3pmB0mV8iScDQIBJif3HNy-09Zgmgu_9ry2HboEEj5pha5MyaWr0E_pSXn1gDEai7FTRqDMkhgOs_49yhPc-1fl9MajODSfTjBkJo7RHdagG1ShNQYUYZaG2eSYbp87i8m5t8zzNe-NFMO1bdfMSZ79tpD3QSbz5RDv8JTZgkCNRwhJ1CU5kwgRM9Iolzge-erk1SmfzKAqpebDCK-8jUo-q474ywOKs4kA4pLMgqbimBYuDowxR_wWSgrAHhTMw" />
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div
+                                        class="w-16 h-16 rounded-full bg-primary/30 animate-pulse flex items-center justify-center">
+                                        <div class="w-4 h-4 rounded-full bg-primary border-2 border-white"></div>
+                                    </div>
+                                </div>
+                                <div
+                                    class="absolute bottom-2 left-2 right-2 bg-black/70 backdrop-blur-sm rounded p-2 text-xs text-text-subtle border border-white/10">
+                                    <div class="flex items-center gap-1.5 text-primary mb-1">
+                                        <span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+                                        <span class="font-bold">AI Optimized</span>
+                                    </div>
+                                    We've detected high demand in this cluster.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Section 3: Branding (Mini Upload) -->
+                <div class="p-6 sm:p-8 border-t border-border-dark">
+                    <h3 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">image</span>
+                        Restaurant Branding
+                    </h3>
+                    <p class="text-text-subtle text-sm mb-4">Upload a cover image that represents your cuisine. This
+                        will be the first thing customers see.</p>
+                    <div
+                        class="border-2 border-dashed border-input-border rounded-xl p-8 flex flex-col items-center justify-center bg-input-bg/30 hover:bg-input-bg/50 transition-colors cursor-pointer group">
+                        <div
+                            class="size-12 rounded-full bg-background-dark flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-primary text-2xl">cloud_upload</span>
+                        </div>
+                        <p class="text-white font-medium">Click to upload or drag and drop</p>
+                        <p class="text-text-subtle text-sm mt-1">SVG, PNG, JPG or GIF (max. 5MB)</p>
+                    </div>
+                </div>
+                <!-- Footer Actions -->
+                <div
+                    class="p-6 sm:p-8 border-t border-border-dark bg-[#0a0314]/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <button
+                        class="text-text-subtle hover:text-white font-bold text-sm flex items-center gap-2 transition-colors"
+                        type="button">
+                        <span class="material-symbols-outlined text-lg">arrow_back</span>
+                        Back
+                    </button>
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <button
+                            class="flex-1 sm:flex-none h-12 px-6 rounded-lg border border-input-border text-white font-bold text-sm hover:bg-input-border/50 transition-colors"
+                            type="button">
+                            Save Draft
+                        </button>
+                        <button
+                            class="flex-1 sm:flex-none h-12 px-8 rounded-lg bg-primary hover:bg-[#00d4c5] text-[#0a0314] font-bold text-base shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                            type="button" onclick="submitRegistration(event)">
+                            Submit Application
+                            <span class="material-symbols-outlined text-lg">check_circle</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!-- Bottom Links -->
+            <div class="flex justify-center gap-6 text-sm text-text-subtle py-4">
+                <a class="hover:text-primary transition-colors" href="terms&conditions.html">Terms of Service</a>
+                <a class="hover:text-primary transition-colors" href="privacy policy.html">Privacy Policy</a>
+                <a class="hover:text-primary transition-colors" href="customer support help.html">Partner Support</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        // ─── TOAST NOTIFICATION ────────────────────────
+        function showToast(msg, type = 'info') {
+            const toast = document.createElement('div');
+            const bgMap = { success: '#00f0ff', error: '#ef4444', info: '#8b5cf6', warning: '#f59e0b' };
+            toast.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${bgMap[type]||bgMap.info};color:#0a0314;padding:12px 24px;border-radius:12px;font-weight:700;font-size:14px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:all .3s;`;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        // ─── LOCATE ME ────────────────────────
+        document.querySelector('button[type="button"]')?.addEventListener('click', function() {
+            // Find the Locate Me button specifically
+        });
+
+        // Wire Locate Me button
+        document.addEventListener('DOMContentLoaded', () => {
+            const locateBtn = document.querySelector('button');
+            // Find the button with text "Locate Me"
+            document.querySelectorAll('button').forEach(btn => {
+                if (btn.textContent.trim() === 'Locate Me') {
+                    btn.addEventListener('click', function() {
+                        const input = this.closest('.relative').querySelector('input');
+                        this.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span>';
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                async (pos) => {
+                                    try {
+                                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&zoom=16`);
+                                        const data = await res.json();
+                                        input.value = data.display_name || `${pos.coords.latitude}, ${pos.coords.longitude}`;
+                                        showToast('Location detected!', 'success');
+                                    } catch(e) {
+                                        input.value = `${pos.coords.latitude}, ${pos.coords.longitude}`;
+                                    }
+                                    this.textContent = 'Locate Me';
+                                },
+                                () => { this.textContent = 'Locate Me'; showToast('Location access denied', 'error'); }
+                            );
+                        } else {
+                            this.textContent = 'Locate Me';
+                            showToast('Geolocation not supported', 'error');
+                        }
+                    });
+                }
+
+                // Wire Back button
+                if (btn.textContent.trim() === 'Back') {
+                    btn.addEventListener('click', () => { window.location.href = 'restaurant pricing plans.html'; });
+                }
+
+                // Wire Save Draft button
+                if (btn.textContent.trim() === 'Save Draft') {
+                    btn.addEventListener('click', () => {
+                        const draft = {
+                            restName: document.getElementById('restName')?.value || '',
+                            restCategory: document.getElementById('restCategory')?.value || '',
+                            serviceLevel: document.getElementById('serviceLevel')?.value || '',
+                            ownerFirst: document.getElementById('ownerFirst')?.value || '',
+                            ownerLast: document.getElementById('ownerLast')?.value || '',
+                            ownerPhone: document.getElementById('ownerPhone')?.value || '',
+                            savedAt: new Date().toISOString()
+                        };
+                        localStorage.setItem('zoiPartnerDraft', JSON.stringify(draft));
+                        showToast('Draft saved successfully!', 'success');
+                    });
+                }
+            });
+
+            // Load draft if exists
+            try {
+                const draft = JSON.parse(localStorage.getItem('zoiPartnerDraft') || 'null');
+                if (draft) {
+                    if (draft.restName) document.getElementById('restName').value = draft.restName;
+                    if (draft.restCategory) document.getElementById('restCategory').value = draft.restCategory;
+                    if (draft.ownerFirst) document.getElementById('ownerFirst').value = draft.ownerFirst;
+                    if (draft.ownerLast) document.getElementById('ownerLast').value = draft.ownerLast;
+                    if (draft.ownerPhone) document.getElementById('ownerPhone').value = draft.ownerPhone;
+                    showToast('Draft restored. Continue your application!', 'info');
+                }
+            } catch(e) {}
+
+            // Wire file upload area
+            const uploadArea = document.querySelector('.border-dashed');
+            if (uploadArea) {
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = 'image/*';
+                fileInput.style.display = 'none';
+                fileInput.id = 'brandingUpload';
+                uploadArea.appendChild(fileInput);
+
+                uploadArea.addEventListener('click', () => fileInput.click());
+                uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('border-primary'); });
+                uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('border-primary'));
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('border-primary');
+                    if (e.dataTransfer.files.length) handleFileUpload(e.dataTransfer.files[0]);
+                });
+                fileInput.addEventListener('change', () => { if (fileInput.files.length) handleFileUpload(fileInput.files[0]); });
+            }
+        });
+
+        function handleFileUpload(file) {
+            if (file.size > 5 * 1024 * 1024) return showToast('File exceeds 5MB limit', 'error');
+            const uploadArea = document.querySelector('.border-dashed');
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadArea.innerHTML = `
+                    <img src="${e.target.result}" class="w-full h-48 object-cover rounded-lg mb-2" alt="Restaurant cover" />
+                    <p class="text-primary text-sm font-bold">${file.name}</p>
+                    <p class="text-text-subtle text-xs">Click to change</p>`;
+                window._uploadedCover = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ─── SUBMIT REGISTRATION ────────────────────────
+        function submitRegistration(event) {
+            event.preventDefault();
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+
+            // Gather all field values
+            const restName = document.getElementById('restName')?.value?.trim();
+            const restCategory = document.getElementById('restCategory')?.value;
+            const ownerFirst = document.getElementById('ownerFirst')?.value?.trim();
+            const ownerLast = document.getElementById('ownerLast')?.value?.trim();
+            const ownerPhone = document.getElementById('ownerPhone')?.value?.trim();
+
+            // Get email from the form
+            const emailInput = document.querySelector('input[type="email"]');
+            const ownerEmail = emailInput ? emailInput.value.trim() : '';
+
+            // Get address from textarea
+            const addressTextarea = document.querySelector('textarea');
+            const address = addressTextarea ? addressTextarea.value.trim() : '';
+
+            // Get location search
+            const locationInput = document.querySelector('input[placeholder*="location"]') || document.querySelector('input[value*="Bengaluru"]');
+            const area = locationInput ? locationInput.value.trim() : '';
+
+            // Validation
+            if (!restName) return showToast('Please enter restaurant name', 'error');
+            if (!ownerFirst) return showToast('Please enter owner first name', 'error');
+            if (!ownerPhone) return showToast('Please enter mobile number', 'error');
+            if (!ownerEmail) return showToast('Please enter email address', 'error');
+
+            // Show loading
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-lg">sync</span> Submitting...';
+            btn.disabled = true;
+
+            const appData = {
+                id: 'PAPP-' + Date.now(),
+                name: restName,
+                category: restCategory,
+                owner: ownerFirst + ' ' + (ownerLast || ''),
+                email: ownerEmail,
+                phone: '+91 ' + ownerPhone,
+                address: address,
+                area: area,
+                zone: 'Unassigned',
+                coverImage: window._uploadedCover || null,
+                status: 'pending_review',
+                submittedAt: new Date().toISOString()
+            };
+
+            setTimeout(() => {
+                try {
+                    // 1. Save to partner applications registry
+                    const apps = JSON.parse(localStorage.getItem('zoiPartnerApplications') || '[]');
+                    apps.push(appData);
+                    localStorage.setItem('zoiPartnerApplications', JSON.stringify(apps));
+
+                    // 2. Register as user in ecosystem
+                    const users = JSON.parse(localStorage.getItem('zoiRegisteredUsers') || '[]');
+                    const exists = users.find(u => u.email === ownerEmail);
+                    if (!exists) {
+                        users.push({
+                            name: appData.owner,
+                            email: ownerEmail,
+                            phone: ownerPhone,
+                            password: ownerPhone.slice(-6) || '123456',
+                            role: 'partner',
+                            restaurant: restName,
+                            createdAt: new Date().toISOString()
+                        });
+                        localStorage.setItem('zoiRegisteredUsers', JSON.stringify(users));
+                    }
+
+                    // 3. Try db_simulation integration
+                    if (typeof ZoiRestaurants !== 'undefined' && ZoiRestaurants.addApplication) {
+                        ZoiRestaurants.addApplication(appData);
+                    }
+
+                    // 4. Create partner session
+                    localStorage.setItem('zoiUser', JSON.stringify({
+                        id: appData.id,
+                        name: appData.owner,
+                        email: ownerEmail,
+                        type: 'partner',
+                        restaurant: restName,
+                        loginTime: new Date().toISOString()
+                    }));
+
+                    // 5. Clear draft
+                    localStorage.removeItem('zoiPartnerDraft');
+
+                    showToast('Application submitted successfully! 🎉', 'success');
+
+                    // 6. Route to payout agreement
+                    setTimeout(() => {
+                        window.location.href = 'restaurant payout agreement.html';
+                    }, 1500);
+
+                } catch (e) {
+                    console.error(e);
+                    showToast('Error submitting. Please try again.', 'error');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            }, 1500);
+        }
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=5"></script>
+    <script src="js/zoi_partner_engine.js"></script>
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>

@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_customer_engine.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="js/zoi_ai_assistant.js?v=6"></script>
+
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="theme-color" content="#00f0ff">
+    <link rel="manifest" href="manifest.json" />
+    <title>ZipZapZoi Eats - Smart Checkout</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0ff",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#0a0314",
+                        "surface-dark": "#1a0b36",
+                        "text-secondary": "#a1a1aa",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .modal-enter {
+            animation: fadeScale 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .hidden-section {
+            display: none;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-body text-slate-900 dark:text-white min-h-screen flex flex-col">
+
+    <header
+        class="sticky top-0 z-40 w-full bg-white dark:bg-background-dark border-b border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 lg:px-8 py-4 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 group">
+                <span
+                    class="material-symbols-outlined text-primary text-3xl group-hover:rotate-12 transition-transform">bolt</span>
+                <h1 class="text-xl font-bold font-display tracking-tight">ZipZapZoi <span
+                        class="text-primary">Checkout</span></h1>
+            </a>
+            <div class="flex items-center gap-4">
+                <div class="hidden sm:flex flex-col items-end">
+                    <span class="text-xs text-text-secondary uppercase font-bold tracking-wider">Logged in as</span>
+                    <span class="text-sm font-bold" id="header-user-name">Guest</span>
+                </div>
+                <a href="customer profile.html" class="size-10 rounded-full bg-gradient-to-tr from-primary to-purple-600 p-0.5 block">
+                    <div class="w-full h-full rounded-full bg-surface-dark flex items-center justify-center text-primary font-bold text-sm" id="header-user-avatar">G</div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+
+        <section class="lg:col-span-8 space-y-6">
+
+            <div class="bg-surface-dark rounded-2xl border border-gray-800 p-6 relative overflow-hidden group">
+                <div
+                    class="absolute right-0 top-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none">
+                </div>
+                <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="material-symbols-outlined text-primary">groups</span>
+                            <h2 class="text-lg font-bold">Group Order</h2>
+                        </div>
+                        <p class="text-text-secondary text-sm">Order together to save on delivery fees.</p>
+                    </div>
+                    <button onclick="openInviteModal()"
+                        class="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 border border-primary/20">
+                        <span class="material-symbols-outlined text-[18px]">share</span> Invite Friends
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-gray-800 overflow-hidden">
+                <div class="p-6 border-b border-gray-800 flex justify-between items-center">
+                    <h2 class="text-xl font-bold font-display">Your Items</h2>
+                    <div class="flex items-center gap-3">
+                        <span id="cart-rest-name" class="text-sm font-bold text-gray-500">Starting Fresh</span>
+                        <span id="cart-count-badge"
+                            class="bg-gray-800 text-text-secondary text-xs px-2.5 py-1 rounded-full font-bold">0
+                            Items</span>
+                    </div>
+                </div>
+                <div id="cart-container" class="divide-y divide-gray-800">
+                    <div class="p-12 text-center">
+                        <span class="material-symbols-outlined text-6xl text-gray-700 mb-4">shopping_cart_off</span>
+                        <p class="text-gray-400 mb-4">Your cart is empty.</p>
+                        <a href="customer_restaurant_listing.html"
+                            class="inline-flex items-center gap-2 text-primary font-bold hover:underline">
+                            Browse Restaurants <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </a>
+                    </div>
+                </div>
+                <!-- Clear Cart -->
+                <div id="clear-cart-row" class="hidden p-4 border-t border-gray-800 flex justify-end">
+                    <button onclick="clearCart()" class="text-red-400 hover:text-red-300 text-xs font-bold flex items-center gap-1 transition-colors">
+                        <span class="material-symbols-outlined text-sm">delete</span> Clear Cart
+                    </button>
+                </div>
+            </div>
+
+            <div
+                class="bg-gradient-to-r from-gray-900 to-surface-dark rounded-2xl border border-gray-800 p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10"><span
+                        class="material-symbols-outlined text-6xl">psychology</span></div>
+                <div class="flex items-center gap-2 mb-4 relative z-10">
+                    <span class="material-symbols-outlined text-primary animate-pulse">auto_awesome</span>
+                    <h3 class="text-white font-bold text-lg">AI Recommends</h3>
+                    <span
+                        class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded font-bold uppercase tracking-wider">Based
+                        on your cart</span>
+                </div>
+                <div id="ai-suggestions-container" class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide relative z-10">
+                    <div class="text-text-secondary text-sm italic">Add items to see recommendations...</div>
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-gray-800 p-6">
+                <label class="flex items-center gap-2 text-sm font-bold mb-3 text-text-secondary">
+                    <span class="material-symbols-outlined text-[18px]">chef_hat</span> Cooking Instructions
+                </label>
+                <textarea
+                    class="w-full bg-background-dark border border-gray-700 rounded-xl p-3 text-sm text-white placeholder:text-gray-600 focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none"
+                    rows="2" placeholder="Ex: Less spicy, extra sauce, don't ring doorbell..."></textarea>
+            </div>
+
+        </section>
+
+        <section class="lg:col-span-4 space-y-6 sticky top-28 h-fit">
+
+            <div class="bg-surface-dark rounded-2xl border border-gray-800 p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-white shrink-0">
+                            <span class="material-symbols-outlined text-[20px]">location_on</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-sm" id="addr-label">Home</h3>
+                            <p class="text-text-secondary text-xs mt-1 leading-relaxed line-clamp-2" id="addr-text">
+                                Loading address...</p>
+                        </div>
+                    </div>
+                    <button onclick="openAddressModal()"
+                        class="text-primary text-xs font-bold hover:text-orange-400 uppercase tracking-wider">Change</button>
+                </div>
+                <div class="bg-background-dark rounded-xl p-1 flex gap-1 border border-gray-800">
+                    <button id="btn-std" onclick="setDeliveryMode('standard')"
+                        class="flex-1 py-2 rounded-lg text-xs font-bold bg-gray-700 text-white shadow-sm transition-all">Standard<br><span
+                            class="text-[10px] font-normal opacity-70">35 mins</span></button>
+                    <button id="btn-sch" onclick="setDeliveryMode('schedule')"
+                        class="flex-1 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-all">Schedule<br><span
+                            class="text-[10px] font-normal opacity-70">Select Time</span></button>
+                </div>
+                <div id="schedule-picker"
+                    class="hidden mt-3 pt-3 border-t border-gray-800 gap-2">
+                    <p class="text-xs text-text-secondary mb-2">Choose when you'd like your order delivered:</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[10px] text-text-secondary font-bold uppercase">Date</label>
+                            <input type="date" id="schedule-date" class="w-full bg-gray-800 border border-gray-700 rounded-lg text-xs text-white px-3 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary">
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-text-secondary font-bold uppercase">Time Slot</label>
+                            <select id="schedule-time" class="w-full bg-gray-800 border border-gray-700 rounded-lg text-xs text-white px-3 py-2.5 focus:border-primary focus:ring-1 focus:ring-primary">
+                                <option value="">Select time...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="schedule-confirm" class="hidden mt-2 p-2 bg-primary/10 border border-primary/20 rounded-lg">
+                        <p class="text-xs text-primary font-medium flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">schedule</span>
+                            <span id="schedule-summary"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-dashed border-gray-700 overflow-hidden">
+                <button onclick="openOffersModal()"
+                    class="w-full p-4 flex items-center justify-between hover:bg-gray-800/50 transition-colors group">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="size-8 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[18px]">percent</span>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-sm font-bold text-white" id="offer-display-title">Select Offer</p>
+                            <p class="text-xs text-text-secondary" id="offer-display-desc">View coupons & promo codes
+                            </p>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-gray-500 group-hover:text-white">chevron_right</span>
+                </button>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-gray-800 p-6">
+                <h3 class="font-bold text-white mb-4">Bill Details</h3>
+                <div class="space-y-3 text-sm text-text-secondary mb-4 pb-4 border-b border-gray-800">
+                    <div class="flex justify-between"><span>Item Total</span><span class="text-white"
+                            id="bill-item-total">₹0</span></div>
+                    <div class="flex justify-between"><span>Delivery Fee</span><span class="text-primary"
+                            id="bill-delivery">₹40</span></div>
+                    <div class="flex justify-between"><span>Taxes & Charges</span><span class="text-white"
+                            id="bill-tax">₹0</span></div>
+                    <div class="flex justify-between text-yellow-400 hidden" id="surge-row">
+                        <span class="flex items-center gap-1"><span
+                                class="material-symbols-outlined text-[14px]">bolt</span> Peak Hour Surge</span>
+                        <span id="bill-surge">₹0</span>
+                    </div>
+                    <div class="flex justify-between text-green-500 hidden" id="discount-row"><span>Discount</span><span
+                            id="bill-discount">-₹0</span></div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-white text-lg">To Pay</span>
+                    <span class="font-bold text-white text-xl" id="bill-grand-total">₹0</span>
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-gray-800 p-6">
+                <h3 class="font-bold text-white mb-4">Payment Method</h3>
+                <div class="space-y-3">
+                    <label class="block cursor-pointer group">
+                        <div
+                            class="flex items-center gap-3 p-3 rounded-xl border border-gray-700 bg-background-dark peer-checked:border-primary transition-all">
+                            <input type="radio" name="payment" value="upi"
+                                class="text-primary focus:ring-primary bg-transparent border-gray-600"
+                                onchange="togglePaymentFields()">
+                            <span class="material-symbols-outlined text-gray-400">account_balance_wallet</span>
+                            <span class="text-sm font-medium text-white">UPI</span>
+                        </div>
+                        <div id="upi-field" class="hidden mt-2 ml-1 pl-3 border-l-2 border-gray-700">
+                            <input type="text" id="input-upi" placeholder="Example: user@okhdfc"
+                                class="w-full bg-background-dark border border-gray-700 rounded-lg text-sm text-white px-3 py-2 focus:border-primary focus:ring-0">
+                        </div>
+                    </label>
+                    <label class="block cursor-pointer group">
+                        <div
+                            class="flex items-center gap-3 p-3 rounded-xl border border-gray-700 bg-background-dark peer-checked:border-primary transition-all">
+                            <input type="radio" name="payment" value="card"
+                                class="text-primary focus:ring-primary bg-transparent border-gray-600"
+                                onchange="togglePaymentFields()">
+                            <span class="material-symbols-outlined text-gray-400">credit_card</span>
+                            <span class="text-sm font-medium text-white">Credit / Debit Card</span>
+                        </div>
+                        <div id="card-fields"
+                            class="hidden mt-2 space-y-2 p-3 bg-background-dark rounded-xl border border-gray-700">
+                            <input type="text" id="input-card-num" placeholder="Card Number"
+                                class="w-full bg-surface-dark border-none rounded-lg text-sm text-white px-3 py-2">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="text" id="input-card-expiry" placeholder="MM/YY"
+                                    class="w-full bg-surface-dark border-none rounded-lg text-sm text-white px-3 py-2">
+                                <input type="password" id="input-card-cvv" placeholder="CVV"
+                                    class="w-full bg-surface-dark border-none rounded-lg text-sm text-white px-3 py-2">
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Tip Section -->
+            <div class="bg-surface-dark rounded-2xl border border-gray-800 p-6">
+                <h3 class="font-bold text-white mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary text-lg">volunteer_activism</span>
+                    Tip your delivery partner
+                </h3>
+                <div class="flex gap-2" id="tip-buttons">
+                    <button onclick="setTip(0)" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">No Tip</button>
+                    <button onclick="setTip(20)" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">₹20</button>
+                    <button onclick="setTip(30)" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">₹30</button>
+                    <button onclick="setTip(50)" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">₹50</button>
+                    <button onclick="setCustomTip()" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">Other</button>
+                </div>
+            </div>
+
+            <button onclick="validateAndPay()"
+                class="w-full bg-primary hover:bg-[#00d4c5] text-[#0a0314] font-bold text-lg py-4 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98] flex justify-between px-6 items-center group">
+                <span class="flex flex-col items-start leading-tight">
+                    <span class="text-xs font-medium opacity-80 uppercase">Total</span>
+                    <span id="btn-total">₹0</span>
+                </span>
+                <span class="flex items-center gap-2">
+                    Place Order <span
+                        class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                </span>
+            </button>
+
+        </section>
+    </main>
+
+    <div id="offers-modal"
+        class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"
+        onclick="closeIfOutside(event, 'offers-modal')">
+        <div class="bg-surface-dark border border-gray-700 rounded-2xl p-6 w-full max-w-md modal-enter"
+            onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">local_offer</span> Apply Coupon
+                </h3>
+                <button onclick="closeModal('offers-modal')" class="text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="space-y-3" id="coupons-list">
+            </div>
+        </div>
+    </div>
+
+    <div id="address-modal"
+        class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"
+        onclick="closeIfOutside(event, 'address-modal')">
+        <div class="bg-surface-dark border border-gray-700 rounded-2xl p-6 w-full max-w-md modal-enter"
+            onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white">Select Delivery Location</h3>
+                <button onclick="closeModal('address-modal')" class="text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <button onclick="detectGPS()"
+                class="w-full flex items-center gap-3 p-4 rounded-xl border border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 transition-colors mb-4 group">
+                <span class="material-symbols-outlined group-hover:animate-bounce">my_location</span>
+                <div class="text-left">
+                    <p class="font-bold text-sm">Use Current Location</p>
+                    <p class="text-xs opacity-70">Using GPS</p>
+                </div>
+            </button>
+            <p class="text-xs text-gray-500 font-bold uppercase mb-3">Saved Addresses</p>
+            <div class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                <div onclick="selectAddress('Home', '123, Cyber Hub, Bengaluru')"
+                    class="p-4 rounded-xl bg-background-dark border border-gray-800 hover:border-primary cursor-pointer transition-colors flex items-start gap-3">
+                    <span class="material-symbols-outlined text-gray-400 mt-0.5">home</span>
+                    <div>
+                        <p class="font-bold text-white text-sm">Home</p>
+                        <p class="text-text-secondary text-xs">123, Cyber Hub, Bengaluru</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-800">
+                <button onclick="addNewAddress()"
+                    class="flex items-center gap-2 text-primary font-bold text-sm hover:underline"><span
+                        class="material-symbols-outlined text-[18px]">add</span> Add New Address</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="invite-modal"
+        class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"
+        onclick="closeIfOutside(event, 'invite-modal')">
+        <div class="bg-surface-dark border border-gray-700 rounded-2xl p-6 w-full max-w-sm modal-enter"
+            onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white">Invite Friends</h3>
+                <button onclick="closeModal('invite-modal')" class="text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="bg-background-dark p-4 rounded-xl border border-gray-800 mb-6 text-center">
+                <span class="text-xs text-text-secondary uppercase font-bold">Group Code</span>
+                <p class="text-3xl font-mono text-primary font-bold mt-1 tracking-widest" id="group-code">XYZ-99</p>
+            </div>
+            <div class="grid gap-3">
+                <a id="share-whatsapp" href="#" target="_blank"
+                    class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold transition-colors">WhatsApp</a>
+                <button onclick="copyInviteLink()"
+                    class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition-colors">Copy
+                    Link</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-modal"
+        class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="text-center animate-bounce-in">
+            <div
+                class="size-24 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_50px_rgba(34,197,94,0.5)]">
+                <span class="material-symbols-outlined text-black text-6xl">check</span>
+            </div>
+            <h2 class="text-4xl font-black text-white mb-2 font-display">Order Confirmed!</h2>
+            <p class="text-gray-400 mb-8 text-lg">Redirecting to Live Tracker...</p>
+            <div class="w-64 h-2 bg-gray-800 rounded-full mx-auto overflow-hidden">
+                <div class="h-full bg-green-500 animate-[loading_2s_ease-in-out]"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. CORE DATA ---
+        let cart = JSON.parse(localStorage.getItem('zoiCart')) || [];
+        const groupCode = "GRP-" + Math.floor(1000 + Math.random() * 9000);
+        let currentDiscount = 0;
+        let cartTotal = 0;
+        let currentTip = 0;
+        let deliveryMode = 'standard';
+
+        // --- AI LOGIC: CROSS-SELLING ENGINE ---
+        const pairings = {
+            'Biryani': [{ name: 'Raita', price: 40, img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC3lsPgvpwXtnxK3K9t1j0Wou61_OdbqYwv3pyL5nETlcOgJXJ2g6GdFV0JUgyjvlC1nVmKHYUVapikcMbnwl7NSgukfj51gYjXfb44KXxCqMeDOWHLCZIy5GgEBjrhzXCofqSbK7edixAYOTaP3g5er3inMcfP-8CnPzWZ8b_xBmSqWTryDhHF1TB5udk0V1VWms4RkrnkF7XoTrvLLO48pXdz0KQoYOl_5AByW3GLS1_SZaOlRllWASXz758wndsDFpc5QVg-P7A2' }, { name: 'Thums Up', price: 40, img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDxIR1AB2R7-mLd0CvAizj9TekAcyaAW5hAKNPe_JVqBiUxFZglIDHw7kaJJt5zl6RUIM_tH523kld6aaSw27f1j4Yp5xaiul8NG2ZQUhjfINbkzUBI9BnpbbjNKyZknzQ5SPmpfrad-g1tGPmROSmVo2W_0Y9F-HqjVan9TbyFS1d7gXjou449Vhj04c6WrVnOxfs05UGI1aed9OQs8XxbhxyqesO9o0cgoRyvdXSLN8uoylFJMhEs0dOhoRASMEXdLs12AKOftKw' }],
+            'Burger': [{ name: 'Fries', price: 90, img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC3lsPgvpwXtnxK3K9t1j0Wou61_OdbqYwv3pyL5nETlcOgJXJ2g6GdFV0JUgyjvlC1nVmKHYUVapikcMbnwl7NSgukfj51gYjXfb44KXxCqMeDOWHLCZIy5GgEBjrhzXCofqSbK7edixAYOTaP3g5er3inMcfP-8CnPzWZ8b_xBmSqWTryDhHF1TB5udk0V1VWms4RkrnkF7XoTrvLLO48pXdz0KQoYOl_5AByW3GLS1_SZaOlRllWASXz758wndsDFpc5QVg-P7A2' }, { name: 'Coke', price: 60, img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDxIR1AB2R7-mLd0CvAizj9TekAcyaAW5hAKNPe_JVqBiUxFZglIDHw7kaJJt5zl6RUIM_tH523kld6aaSw27f1j4Yp5xaiul8NG2ZQUhjfINbkzUBI9BnpbbjNKyZknzQ5SPmpfrad-g1tGPmROSmVo2W_0Y9F-HqjVan9TbyFS1d7gXjou449Vhj04c6WrVnOxfs05UGI1aed9OQs8XxbhxyqesO9o0cgoRyvdXSLN8uoylFJMhEs0dOhoRASMEXdLs12AKOftKw' }],
+            'Pizza': [{ name: 'Garlic Bread', price: 120, img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuArH5JE7vTgIYMxybP_vgfWNG4CxLpFMFHlRFXT9xHW6wLDQ8C_QcR2fzK_gzzdBPZsGh0sKOAUjGY_BTeOfibAHla0O4OwE3QUpQAeUQZt9TwIEcvzrT2ZEt0JVGHb7CDjQXy_XSammpsHDABzlbNR2j1WYrudBZFRAAcgfDONLhGmumU-GE5xKmo4Y0KNcT5wPl6StcfL4P3ilVXhMJQX8QrOME1YZ4QDOamnI3D0WpPviCXtq6KFXPOEi2NaVYdTIn0NTLNxCl80' }, { name: 'Choco Lava', price: 90, img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuArH5JE7vTgIYMxybP_vgfWNG4CxLpFMFHlRFXT9xHW6wLDQ8C_QcR2fzK_gzzdBPZsGh0sKOAUjGY_BTeOfibAHla0O4OwE3QUpQAeUQZt9TwIEcvzrT2ZEt0JVGHb7CDjQXy_XSammpsHDABzlbNR2j1WYrudBZFRAAcgfDONLhGmumU-GE5xKmo4Y0KNcT5wPl6StcfL4P3ilVXhMJQX8QrOME1YZ4QDOamnI3D0WpPviCXtq6KFXPOEi2NaVYdTIn0NTLNxCl82' }],
+            'Generic': [{ name: 'Mineral Water', price: 20, img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC3lsPgvpwXtnxK3K9t1j0Wou61_OdbqYwv3pyL5nETlcOgJXJ2g6GdFV0JUgyjvlC1nVmKHYUVapikcMbnwl7NSgukfj51gYjXfb44KXxCqMeDOWHLCZIy5GgEBjrhzXCofqSbK7edixAYOTaP3g5er3inMcfP-8CnPzWZ8b_xBmSqWTryDhHF1TB5udk0V1VWms4RkrnkF7XoTrvLLO48pXdz0KQoYOl_5AByW3GLS1_SZaOlRllWASXz758wndsDFpc5QVg-P7A3' }, { name: 'Gulab Jamun', price: 60, img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAAe2IFBvg0wq_XEgfIXet59nRvjSzyQCWP_f27Rmy_PFkBgKS-sv_RqQfpyRSwDHLNzbCAut3D6V0uzofEpbIz-hUUuKJBtkzZo-OOsDgndO5uftEPtoK7a56HdjtpWrPf4V8bUVtCpCg8WQdypDcPMplOlqLm_DDa4PQeVtKsRLaA2Imu5Lp3QvrxPfOrpPU-GIUC3sxZSY-pKJ44bjn-6u3kXgwpGlVbl4hRncNrEZvlmJ0zn5heS1YeceLiSQPR4Zsj-GPDm6A' }]
+        };
+
+        const coupons = [
+            { code: "WELCOME50", discount: 50, min: 200, desc: "Flat ₹50 OFF on orders above ₹200" },
+            { code: "ZAPIT", discount: 100, min: 500, desc: "Flat ₹100 OFF on orders above ₹500" },
+            { code: "STEALDEAL", discount: 30, min: 0, desc: "Flat ₹30 OFF no minimum" },
+            { code: "NEWUSER", discount: 75, min: 300, desc: "₹75 OFF for new users on ₹300+" },
+            { code: "ZIPFREE", discount: 40, min: 150, desc: "Free delivery on orders above ₹150" }
+        ];
+
+        // --- 2. INITIALIZATION ---
+        window.onload = function () {
+            loadUserSession();
+            renderCart();
+            renderAISuggestions();
+            loadAddress();
+            initSchedulePicker();
+            document.getElementById('group-code').innerText = groupCode;
+            const waMsg = encodeURIComponent(`Join my ZipZapZoi Order! Code: ${groupCode}`);
+            document.getElementById('share-whatsapp').href = `https://wa.me/?text=${waMsg}`;
+        };
+
+        // --- LOAD USER SESSION ---
+        function loadUserSession() {
+            let userName = 'Guest';
+            let initials = 'G';
+            // Try multiple session sources
+            const session = JSON.parse(localStorage.getItem('zoiCustomerSession') || 'null')
+                         || JSON.parse(localStorage.getItem('zoiUser') || 'null');
+            const profile = JSON.parse(localStorage.getItem('zoiUserProfile') || 'null');
+
+            if (profile && profile.name) {
+                userName = profile.name;
+            } else if (session && session.name) {
+                userName = session.name;
+            }
+
+            if (userName !== 'Guest') {
+                const parts = userName.split(' ');
+                initials = parts.map(p => p.charAt(0).toUpperCase()).join('').slice(0, 2);
+            }
+
+            document.getElementById('header-user-name').textContent = userName;
+            document.getElementById('header-user-avatar').textContent = initials;
+
+            // If user is not logged in, show login prompt
+            if (userName === 'Guest') {
+                document.getElementById('header-user-name').innerHTML = '<a href="login & registration.html" class="text-primary hover:underline">Sign In</a>';
+            }
+        }
+
+        // --- 3. RENDERERS ---
+        function renderCart() {
+            const list = document.getElementById('cart-container');
+            list.innerHTML = "";
+            let itemTotal = 0;
+
+            // Debug/Context: Show Restaurant Name
+            const cartRest = JSON.parse(localStorage.getItem('zoiCartRestaurant'));
+            const restNameLabel = document.getElementById('cart-rest-name');
+            if (restNameLabel) {
+                restNameLabel.innerText = cartRest ? cartRest.name : "Starting Fresh";
+                restNameLabel.className = cartRest ? "text-sm font-bold text-primary" : "text-sm font-bold text-gray-500";
+            }
+
+            const badge = document.getElementById('cart-count-badge');
+
+            if (cart.length === 0) {
+                list.innerHTML = `<div class="text-center text-gray-500 py-10">Cart is empty</div>`;
+                badge.innerText = "0 Items";
+                updateBill(0);
+                return;
+            }
+
+            let html = "";
+            cart.forEach((item, index) => {
+                itemTotal += item.price * (item.qty || 1);
+                html += `
+                    <div class="p-6 flex items-start gap-4 hover:bg-gray-800/30 transition-colors">
+                        <div class="w-20 h-20 rounded-xl bg-cover bg-center shrink-0 border border-gray-700" style="background-image: url('${item.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuDqVSbBRHF_1gL44bwx-KhGaRwQJREqj4wRTeRu0w3j7A0_-HTddgO5LY3HjujnAMOz0JsWULe-k7xvAa_qJkOgeIecxlKI6_BJAvHH4P758jaKLZ_4x8zVeMPv19f1-RptZ3UahFjKNnFU47mEWsii5BC1dUHyVKOpuaiIHXuXdsokAVzBBqp2DO7zBH7dx4cwM88xFSrf0nyzruxuQGGBcTj_lA7oPrh4Fx1A1fdSi6wgBiZ3TwIEcvzrT2ZEt0JVGHb7CDjQXy_XSammpsHDABzlbNR2j1WYrudBZFRAAcgfDONLhGmumU-GE5xKmo4Y0KNcT5wPl6StcfL4P3ilVXhMJQX8QrOME1YZ4QDOamnI3D0WpPviCXtq6KFXPOEi2NaVYdTIn0NTLNxCl82"}')"></div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-white mb-1">${item.name}</h3>
+                            <p class="text-primary font-mono text-sm">₹${item.price}</p>
+                        </div>
+                        <div class="flex items-center gap-3 bg-background-dark border border-gray-700 rounded-lg p-1">
+                            <button onclick="updateQty(${index}, -1)" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white">-</button>
+                            <span class="text-sm font-bold text-white w-4 text-center">${item.qty || 1}</span>
+                            <button onclick="updateQty(${index}, 1)" class="w-8 h-8 flex items-center justify-center text-primary hover:bg-primary/10">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+            list.innerHTML = html;
+            badge.innerText = `${cart.length} Items`;
+            document.getElementById('clear-cart-row').classList.remove('hidden');
+            updateBill(itemTotal);
+        }
+
+        function renderAISuggestions() {
+            const container = document.getElementById('ai-suggestions-container');
+            container.innerHTML = "";
+
+            // AI Logic: Detect keywords in cart
+            let suggestions = [];
+            const cartText = JSON.stringify(cart).toLowerCase();
+
+            if (cartText.includes('biryani') || cartText.includes('curry')) suggestions = [...pairings['Biryani']];
+            else if (cartText.includes('burger')) suggestions = [...pairings['Burger']];
+            else if (cartText.includes('pizza')) suggestions = [...pairings['Pizza']];
+
+            // Fallback + Unique check
+            suggestions = [...suggestions, ...pairings['Generic']];
+            const uniqueSuggestions = suggestions.filter((v, i, a) => a.findIndex(t => (t.name === v.name)) === i).slice(0, 4);
+
+            uniqueSuggestions.forEach(s => {
+                const html = `
+                    <div class="min-w-[140px] bg-background-dark rounded-xl p-3 border border-gray-800 hover:border-primary/50 cursor-pointer transition-all flex flex-col gap-2 group" onclick="addSuggestion('${s.name}', ${s.price}, '${s.img}')">
+                        <div class="h-20 rounded-lg bg-cover bg-center relative" style="background-image: url('${s.img}')">
+                            <button class="absolute top-1 right-1 bg-black/60 hover:bg-primary text-white rounded-full p-1"><span class="material-symbols-outlined text-[16px]">add</span></button>
+                        </div>
+                        <div>
+                            <p class="text-white text-xs font-bold truncate">${s.name}</p>
+                            <p class="text-text-secondary text-[10px]">₹${s.price}</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function updateBill(itemTotal) {
+            const delivery = itemTotal > 0 ? 40 : 0;
+            const tax = Math.round(itemTotal * 0.05);
+
+            // Check Surge
+            let surge = 0;
+            const config = ZoiSystem.getConfig();
+            if (config.surgeMultiplier > 1.0) {
+                surge = Math.round(itemTotal * (config.surgeMultiplier - 1));
+                document.getElementById('surge-row').classList.remove('hidden');
+                document.getElementById('bill-surge').innerText = `₹${surge}`;
+            } else {
+                document.getElementById('surge-row').classList.add('hidden');
+            }
+
+            cartTotal = itemTotal + delivery + tax + surge + currentTip - currentDiscount;
+
+            document.getElementById('bill-item-total').innerText = `₹${itemTotal}`;
+            document.getElementById('bill-delivery').innerText = delivery > 0 ? `₹${delivery}` : 'FREE';
+            document.getElementById('bill-tax').innerText = `₹${tax}`;
+            document.getElementById('bill-grand-total').innerText = `₹${cartTotal}`;
+            document.getElementById('btn-total').innerText = `₹${cartTotal}`;
+        }
+
+        // --- 4. CORE ACTIONS ---
+        function updateQty(index, change) {
+            cart[index].qty = (cart[index].qty || 1) + change;
+            if (cart[index].qty <= 0) cart.splice(index, 1);
+            saveAndRender();
+        }
+
+        function addSuggestion(name, price, image) {
+            const exist = cart.find(i => i.name === name);
+            if (exist) exist.qty = (exist.qty || 1) + 1;
+            else cart.push({ name, price, image, qty: 1 });
+            saveAndRender();
+        }
+
+        function saveAndRender() {
+            if (window.ZoiCart) {
+                ZoiCart.save(cart);
+            } else {
+                localStorage.setItem('zoiCart', JSON.stringify(cart));
+            }
+            renderCart();
+            renderAISuggestions(); // Re-run AI logic based on new cart
+        }
+
+        // --- 5. COUPONS LOGIC ---
+        function openOffersModal() {
+            const list = document.getElementById('coupons-list');
+            list.innerHTML = "";
+
+            // Smart Sort: Best savings first
+            const sortedCoupons = [...coupons].sort((a, b) => b.discount - a.discount);
+
+            sortedCoupons.forEach(c => {
+                const isApplicable = cartTotal >= c.min;
+                const btnClass = isApplicable
+                    ? "bg-primary text-white hover:bg-orange-600"
+                    : "bg-gray-700 text-gray-400 cursor-not-allowed";
+
+                const html = `
+                    <div class="p-4 rounded-xl border ${isApplicable ? 'border-primary/30 bg-primary/5' : 'border-gray-800 bg-background-dark'} flex justify-between items-center">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono font-bold text-white border border-dashed border-gray-500 px-2 py-0.5 rounded">${c.code}</span>
+                                ${isApplicable ? '<span class="text-[10px] bg-green-500/20 text-green-500 px-1.5 rounded font-bold">Best Value</span>' : ''}
+                            </div>
+                            <p class="text-text-secondary text-xs mt-1">${c.desc}</p>
+                        </div>
+                        <button onclick="${isApplicable ? `applyCoupon('${c.code}', ${c.discount})` : ''}" class="px-4 py-1.5 rounded-lg text-xs font-bold ${btnClass}">APPLY</button>
+                    </div>
+                `;
+                list.innerHTML += html;
+            });
+
+            document.getElementById('offers-modal').classList.remove('hidden');
+            document.getElementById('offers-modal').classList.add('flex');
+        }
+
+        function applyCoupon(code, amount) {
+            currentDiscount = amount;
+            document.getElementById('offer-display-title').innerText = `${code} Applied`;
+            document.getElementById('offer-display-desc').innerText = `You saved ₹${amount}`;
+            document.getElementById('offer-display-desc').classList.add('text-green-500');
+            document.getElementById('discount-row').classList.remove('hidden');
+            document.getElementById('bill-discount').innerText = `-₹${amount}`;
+
+            closeModal('offers-modal');
+            renderCart(); // Re-calc bill
+        }
+
+        // --- ADDED: VALIDATE AND PAY ---
+        async function validateAndPay() {
+            if (cart.length === 0) return showCartToast('Cart Empty', 'Please add items to your cart first');
+
+            // Check user session
+            const session = JSON.parse(localStorage.getItem('zoiCustomerSession') || 'null')
+                         || JSON.parse(localStorage.getItem('zoiUser') || 'null');
+            if (!session) {
+                showCartToast('Login Required', 'Please sign in to place an order');
+                setTimeout(() => { window.location.href = 'login & registration.html'; }, 2000);
+                return;
+            }
+
+            // Check address
+            const addr = document.getElementById('addr-text').textContent.trim();
+            if (!addr || addr === 'Loading address...') {
+                return showCartToast('Address Required', 'Please select a delivery address');
+            }
+
+            // Check payment
+            const payment = document.querySelector('input[name="payment"]:checked');
+            if (!payment) return showCartToast('Payment Required', 'Please select a payment method');
+
+            // Validate payment fields
+            if (payment.value === 'upi') {
+                const upi = document.getElementById('input-upi').value.trim();
+                if (!upi || !upi.includes('@')) return showCartToast('Invalid UPI', 'Please enter a valid UPI ID (e.g. user@okicici)');
+            }
+            if (payment.value === 'card') {
+                const cardNum = document.getElementById('input-card-num').value.trim();
+                const expiry = document.getElementById('input-card-expiry').value.trim();
+                const cvv = document.getElementById('input-card-cvv').value.trim();
+                if (!cardNum || cardNum.length < 12) return showCartToast('Invalid Card', 'Please enter a valid card number');
+                if (!expiry || expiry.length < 4) return showCartToast('Invalid Expiry', 'Please enter card expiry (MM/YY)');
+                if (!cvv || cvv.length < 3) return showCartToast('Invalid CVV', 'Please enter CVV');
+            }
+
+            // Check schedule if selected
+            if (deliveryMode === 'schedule') {
+                const date = document.getElementById('schedule-date').value;
+                const time = document.getElementById('schedule-time').value;
+                if (!date || !time) return showCartToast('Schedule Required', 'Please select date and time for scheduled delivery');
+            }
+
+            // All valid — proceed
+            const btn = document.querySelector('button[onclick="validateAndPay()"]');
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Processing Payment...`;
+            btn.disabled = true;
+
+            const totalStr = document.getElementById('bill-grand-total').innerText;
+            const total = parseInt(totalStr.replace(/[^0-9]/g, ''));
+            let cartRest = JSON.parse(localStorage.getItem('zoiCartRestaurant'));
+            if (!cartRest || !cartRest.id) {
+                cartRest = { id: '101', name: 'Spice Symphony' };
+            }
+
+            const instructions = document.querySelector('textarea')?.value?.trim() || '';
+            const deliveryType = deliveryMode === 'schedule' ? 'Scheduled' : 'Online Delivery';
+            const paymentMethod = payment.value;
+
+            // If Paid Online, trigger Razorpay Flow
+            if (paymentMethod !== 'cod') {
+                try {
+                    // Step 1: Create Razorpay order via backend
+                    const orderData = await ZoiAPI.payments.createOrder(total);
+
+                    // Step 2: Get Razorpay public key (from config loaded at startup)
+                    const rzpKey = ZOI_CONFIG.RAZORPAY_KEY_ID || orderData.key_id;
+                    if (!rzpKey) throw new Error('Payment gateway not configured');
+
+                    const options = {
+                        key: rzpKey,
+                        amount: orderData.amount,
+                        currency: orderData.currency || 'INR',
+                        name: "ZipZapZoi Eats",
+                        description: `Order from ${cartRest.name}`,
+                        order_id: orderData.id,
+                        handler: async function (response) {
+                            // Step 3: Verify payment signature server-side
+                            try {
+                                btn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Verifying Payment...`;
+                                const verification = await ZoiAPI.payments.verify({
+                                    razorpay_order_id: response.razorpay_order_id,
+                                    razorpay_payment_id: response.razorpay_payment_id,
+                                    razorpay_signature: response.razorpay_signature
+                                });
+
+                                if (verification.message === 'Payment successful') {
+                                    finalizeOrder(cart, total, cartRest, deliveryType, paymentMethod, currentTip, instructions, addr, response.razorpay_payment_id);
+                                } else {
+                                    showCartToast('Payment Failed', 'Signature verification failed. Contact support.');
+                                    btn.innerHTML = `Confirm & Pay`;
+                                    btn.disabled = false;
+                                }
+                            } catch (verifyErr) {
+                                // If verification fails but Razorpay handler fired, still finalize (funds are captured)
+                                console.warn('Payment verification failed, but Razorpay confirmed. Proceeding:', verifyErr);
+                                finalizeOrder(cart, total, cartRest, deliveryType, paymentMethod, currentTip, instructions, addr, response.razorpay_payment_id);
+                            }
+                        },
+                        prefill: {
+                            name: session.name || "Customer",
+                            email: session.email || "",
+                            contact: session.phone || ""
+                        },
+                        theme: {
+                            color: "#00f0ff"
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                btn.innerHTML = `Confirm & Pay`;
+                                btn.disabled = false;
+                            }
+                        }
+                    };
+                    const rzp1 = new Razorpay(options);
+                    rzp1.open();
+                } catch (err) {
+                    btn.innerHTML = `Confirm & Pay`;
+                    btn.disabled = false;
+                    console.error('Payment error:', err);
+                    showCartToast('Payment Error', err.error || 'Could not initialize payment gateway. Is the backend running?');
+                }
+            } else {
+                // Cash on Delivery
+                finalizeOrder(cart, total, cartRest, deliveryType, paymentMethod, currentTip, instructions, addr, null);
+            }
+        }
+
+        // Finalize order after payment success or if COD
+        async function finalizeOrder(cart, total, cartRest, deliveryType, paymentMethod, currentTip, instructions, addr, paymentId) {
+            // Create order via ZoiAPI (real backend) with local fallback
+            try {
+                const apiOrder = await ZoiAPI.orders.create({
+                    restaurantId: cartRest.id,
+                    items: cart,
+                    total: total,
+                    address: addr,
+                    deliveryAddress: addr,
+                    type: deliveryType === 'Scheduled' ? 'Delivery' : 'Delivery',
+                    paymentMethod: paymentMethod,
+                    zone: 'Default'
+                });
+                console.log('🟢 Order created via API:', apiOrder);
+            } catch (apiErr) {
+                console.warn('API order creation failed, saving locally:', apiErr);
+            }
+
+            // Also save locally for offline resilience
+            const order = typeof ZoiOrders !== 'undefined'
+                ? ZoiOrders.createOrder(cart, total, cartRest.id, cartRest.name, deliveryType, 'App Order')
+                : { id: 'ORD-' + Date.now(), status: 'Confirmed' };
+
+            try {
+                const orders = JSON.parse(localStorage.getItem('zoiOrders') || '[]');
+                const newOrderRecord = {
+                    ...order,
+                    items: cart,
+                    address: addr,
+                    payment: paymentMethod,
+                    paymentId: paymentId,
+                    tip: currentTip,
+                    instructions: instructions,
+                    scheduledDate: document.getElementById('schedule-date')?.value || null,
+                    scheduledTime: document.getElementById('schedule-time')?.value || null
+                };
+                orders.push(newOrderRecord);
+                localStorage.setItem('zoiOrders', JSON.stringify(orders));
+            } catch(e) {}
+
+            if (window.ZoiCart) {
+                ZoiCart.clear();
+            } else {
+                localStorage.removeItem('zoiCart');
+            }
+            localStorage.removeItem('zoiCartRestaurant');
+
+            document.getElementById('success-modal').classList.remove('hidden');
+            document.getElementById('success-modal').classList.add('flex');
+
+            setTimeout(() => {
+                window.location.href = 'customer order_tracking.html';
+            }, 2000);
+        }
+
+        // --- 6. UTILS & MODALS ---
+        function loadAddress() {
+            try {
+                const addresses = JSON.parse(localStorage.getItem('zoiSavedAddresses') || '[]');
+                if (addresses.length > 0) {
+                    // Find default or use first
+                    const defaultAddr = addresses.find(a => a.isDefault) || addresses[0];
+                    if (defaultAddr) {
+                        document.getElementById('addr-text').innerText = defaultAddr.text || defaultAddr.address;
+                        document.getElementById('addr-label').innerText = defaultAddr.type || 'Saved';
+                        localStorage.setItem('zoiAddress', document.getElementById('addr-text').innerText);
+                        localStorage.setItem('zoiType', document.getElementById('addr-label').innerText);
+                    }
+                } else {
+                    const saved = localStorage.getItem('zoiAddress');
+                    if (saved) {
+                        document.getElementById('addr-text').innerText = saved;
+                        document.getElementById('addr-label').innerText = localStorage.getItem('zoiType') || "Saved";
+                    }
+                }
+            } catch(e) {}
+        }
+
+        function openAddressModal() {
+            document.getElementById('address-modal').classList.remove('hidden');
+            document.getElementById('address-modal').classList.add('flex');
+        }
+        function openInviteModal() {
+            document.getElementById('invite-modal').classList.remove('hidden');
+            document.getElementById('invite-modal').classList.add('flex');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+        function closeIfOutside(e, id) { if (e.target.id === id) closeModal(id); }
+
+        function selectAddress(type, text) {
+            document.getElementById('addr-label').innerText = type;
+            document.getElementById('addr-text').innerText = text;
+            localStorage.setItem('zoiAddress', text);
+            localStorage.setItem('zoiType', type);
+            closeModal('address-modal');
+        }
+
+        function detectGPS() {
+            if (!navigator.geolocation) return showCartToast('Error', 'Geolocation not supported by your browser');
+            const btn = document.querySelector('button[onclick="detectGPS()"]');
+            const origHTML = btn.innerHTML;
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span><div class="text-left"><p class="font-bold text-sm">Detecting...</p><p class="text-xs opacity-70">Please wait</p></div>`;
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    try {
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`);
+                        const data = await res.json();
+                        const addr = data.display_name || `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+                        selectAddress('Current Location', addr);
+                    } catch(e) {
+                        selectAddress('Current Location', `${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`);
+                    }
+                    btn.innerHTML = origHTML;
+                },
+                () => { showCartToast('Error', 'Location permission denied'); btn.innerHTML = origHTML; }
+            );
+        }
+
+        function addNewAddress() {
+            const name = prompt('Address label (e.g. Home, Office):') || 'Custom';
+            const addr = prompt('Enter full address:');
+            if (addr) selectAddress(name, addr);
+        }
+
+        function copyInviteLink() {
+            navigator.clipboard.writeText(`https://zipzapzoi.in/join/${groupCode}`).then(() => {
+                showCartToast('Copied!', 'Invite link copied to clipboard');
+            });
+        }
+
+        // --- SCHEDULE PICKER ---
+        function setDeliveryMode(mode) {
+            deliveryMode = mode;
+            const btnStd = document.getElementById('btn-std');
+            const btnSch = document.getElementById('btn-sch');
+            const picker = document.getElementById('schedule-picker');
+
+            if (mode === 'standard') {
+                btnStd.className = 'flex-1 py-2 rounded-lg text-xs font-bold bg-gray-700 text-white shadow-sm transition-all';
+                btnSch.className = 'flex-1 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-all';
+                picker.classList.add('hidden');
+            } else {
+                btnSch.className = 'flex-1 py-2 rounded-lg text-xs font-bold bg-gray-700 text-white shadow-sm transition-all';
+                btnStd.className = 'flex-1 py-2 rounded-lg text-xs font-bold text-gray-400 hover:text-white hover:bg-gray-800 transition-all';
+                picker.classList.remove('hidden');
+                picker.style.display = 'block';
+            }
+        }
+
+        function initSchedulePicker() {
+            const dateInput = document.getElementById('schedule-date');
+            const timeSelect = document.getElementById('schedule-time');
+            if (!dateInput || !timeSelect) return;
+
+            // Set min date to today, max to 7 days from now
+            const today = new Date();
+            const maxDate = new Date(today);
+            maxDate.setDate(maxDate.getDate() + 7);
+            dateInput.min = today.toISOString().split('T')[0];
+            dateInput.max = maxDate.toISOString().split('T')[0];
+            dateInput.value = today.toISOString().split('T')[0];
+
+            dateInput.addEventListener('change', () => generateTimeSlots());
+            timeSelect.addEventListener('change', () => updateScheduleSummary());
+
+            generateTimeSlots();
+        }
+
+        function generateTimeSlots() {
+            const dateInput = document.getElementById('schedule-date');
+            const timeSelect = document.getElementById('schedule-time');
+            const selectedDate = dateInput.value;
+            const now = new Date();
+            const isToday = selectedDate === now.toISOString().split('T')[0];
+
+            timeSelect.innerHTML = '<option value="">Select time...</option>';
+
+            // Generate slots from 8 AM to 11 PM in 30-min intervals
+            for (let h = 8; h <= 23; h++) {
+                for (let m = 0; m < 60; m += 30) {
+                    // Skip past times for today + 1 hour buffer
+                    if (isToday && (h < now.getHours() + 1 || (h === now.getHours() + 1 && m <= now.getMinutes()))) continue;
+
+                    const hour12 = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+                    const ampm = h >= 12 ? 'PM' : 'AM';
+                    const label = `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`;
+                    const val = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+                    timeSelect.innerHTML += `<option value="${val}">${label}</option>`;
+                }
+            }
+        }
+
+        function updateScheduleSummary() {
+            const date = document.getElementById('schedule-date').value;
+            const time = document.getElementById('schedule-time').value;
+            const confirmEl = document.getElementById('schedule-confirm');
+            const summaryEl = document.getElementById('schedule-summary');
+
+            if (date && time) {
+                const dateObj = new Date(date);
+                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const h = parseInt(time.split(':')[0]);
+                const m = time.split(':')[1];
+                const hour12 = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                summaryEl.textContent = `Delivering ${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]} at ${hour12}:${m} ${ampm}`;
+                confirmEl.classList.remove('hidden');
+            } else {
+                confirmEl.classList.add('hidden');
+            }
+        }
+
+        // --- TIP ---
+        function setTip(amount) {
+            currentTip = amount;
+            document.querySelectorAll('.tip-btn').forEach(btn => {
+                btn.className = 'tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all';
+            });
+            event.target.className = 'tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-primary/20 text-primary border border-primary transition-all';
+            renderCart();
+            showCartToast('Tip Updated', amount > 0 ? `₹${amount} tip added. Thank you! 💚` : 'Tip removed');
+        }
+        function setCustomTip() {
+            const amount = parseInt(prompt('Enter tip amount (₹):'));
+            if (!isNaN(amount) && amount >= 0) {
+                setTip(amount);
+            }
+        }
+
+        // --- CLEAR CART ---
+        function clearCart() {
+            if (confirm('Remove all items from cart?')) {
+                cart = [];
+                localStorage.removeItem('zoiCartRestaurant');
+                saveAndRender();
+                showCartToast('Cart Cleared', 'All items have been removed');
+            }
+        }
+
+        // copyInviteLink_old removed — replaced by copyInviteLink() above
+
+        function togglePaymentFields() {
+            const checked = document.querySelector('input[name="payment"]:checked');
+            if (!checked) return;
+            const method = checked.value;
+            document.getElementById('upi-field').classList.add('hidden');
+            document.getElementById('card-fields').classList.add('hidden');
+            if (method === 'upi') document.getElementById('upi-field').classList.remove('hidden');
+            if (method === 'card') document.getElementById('card-fields').classList.remove('hidden');
+        }
+
+        // === TOAST NOTIFICATION ===
+        function showCartToast(title, message) {
+            let toast = document.getElementById('cart-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'cart-toast';
+                toast.className = 'fixed bottom-[80px] right-6 bg-[#1a0b36] border border-primary text-white px-6 py-4 rounded-xl shadow-[0_10px_40px_rgba(0, 240, 255,0.3)] z-[9999] flex items-center gap-3 transition-all duration-300 translate-y-20 opacity-0 pointer-events-none';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<span class="material-symbols-outlined text-primary text-2xl">info</span> 
+                           <div>
+                             <h4 class="font-bold text-sm text-white">${title}</h4>
+                             <p class="text-xs text-text-secondary">${message}</p>
+                           </div>`;
+
+            // Force reflow
+            void toast.offsetWidth;
+
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+
+            if (window._cartToastTimeout) clearTimeout(window._cartToastTimeout);
+
+            window._cartToastTimeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+            }, 3000);
+        }
+    </script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>

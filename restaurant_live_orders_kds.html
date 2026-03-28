@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi - Kitchen Command Center</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,1&display=swap"
+        rel="stylesheet" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script> <!-- ENABLE ZoiDB -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        kitchen_green: "#22c55e",
+                        kitchen_red: "#ef4444",
+                        kitchen_yellow: "#eab308"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-in': 'bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
+                        'flash-critical': 'flashRed 0.8s infinite'
+                    },
+                    keyframes: {
+                        bounceIn: { '0%': { opacity: '0', transform: 'scale(0.95)' }, '100%': { opacity: '1', transform: 'scale(1)' } },
+                        flashRed: { '0%, 100%': { borderColor: 'rgba(239, 68, 68, 0.3)' }, '50%': { borderColor: 'rgba(239, 68, 68, 1)' } }
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 4px;
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .card-3d {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .item-checked {
+            text-decoration: line-through;
+            opacity: 0.4;
+            filter: grayscale(1);
+            transition: all 0.2s;
+        }
+
+        .bg-pattern {
+            background-image: radial-gradient(#2a2d35 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        :fullscreen {
+            background-color: #0f1115;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .btn-active-gender {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-color: white;
+        }
+
+        .ticket-paper {
+            background: #fff;
+            color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Auto-Accept Countdown */
+        .auto-accept-bar {
+            height: 3px;
+            background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+            border-radius: 999px;
+            animation: shrinkBar 60s linear forwards;
+            transform-origin: left;
+        }
+
+        @keyframes shrinkBar {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0%;
+            }
+        }
+
+        /* SLA Priority */
+        .sla-on-time {
+            color: #22c55e;
+        }
+
+        .sla-delayed {
+            color: #eab308;
+        }
+
+        .sla-critical {
+            color: #ef4444;
+            animation: flashRed 0.8s infinite;
+        }
+
+        /* Special Instructions */
+        .special-instructions {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-left: 3px solid #ef4444;
+            border-radius: 6px;
+            padding: 6px 8px;
+            margin-top: 6px;
+        }
+
+        /* Stats strip */
+        .stats-strip {
+            display: flex;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .stat-card {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .stat-card:hover {
+            border-bottom-color: #00f0ff;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans select-none bg-pattern" id="app-container"
+    onkeydown="handleKeys(event)">
+
+    <div id="offline-banner"
+        class="hidden absolute top-0 left-0 w-full bg-red-600 text-white text-center font-bold py-2 z-[60] animate-pulse">
+        ⚠️ KITCHEN OFFLINE - STOPPING ORDERS
+    </div>
+
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+        <header
+            class="h-16 border-b border-border bg-[#15171c]/95 backdrop-blur-md flex items-center justify-between px-4 z-20 shadow-lg">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='restaurant_partner_dashboard.html'"
+                    class="flex items-center gap-1 text-gray-400 hover:text-white transition-colors pr-3 border-r border-border">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span class="text-xs font-bold hidden md:block">Back</span>
+                </button>
+
+                <div class="text-2xl font-mono font-black text-gray-200" id="live-clock">--:--</div>
+
+                <div class="flex items-center gap-3 hidden md:flex bg-black/20 p-1 rounded-lg border border-white/5">
+                    <span class="text-xs text-gray-500 font-bold ml-2">VOICE:</span>
+                    <div class="flex rounded border border-border h-7 p-0.5">
+                        <button onclick="setVoiceGender('male')" id="voice-male"
+                            class="px-3 rounded text-[10px] font-bold text-gray-400 hover:text-white flex items-center transition-all">MALE</button>
+                        <div class="w-[1px] bg-border my-1"></div>
+                        <button onclick="setVoiceGender('female')" id="voice-female"
+                            class="px-3 rounded text-[10px] font-bold bg-white/10 text-white flex items-center transition-all">FEMALE</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <span class="text-[10px] text-gray-500 font-mono hidden lg:block">[1] Accept [Space] Ready [R] Reject
+                    [F] Fullscreen [S] Sound</span>
+                <button onclick="simulateNewOrder()" id="sim-btn"
+                    class="h-9 px-4 bg-primary/20 text-primary border border-primary/30 rounded-lg text-xs font-bold hover:bg-primary hover:text-black transition-all shadow-lg shadow-primary/10">
+                    + Sim Order
+                </button>
+                <button onclick="toggleFullScreen()"
+                    class="h-9 w-9 bg-black/40 border border-border rounded-lg text-white hover:text-primary hover:border-primary flex items-center justify-center transition-all">
+                    <span class="material-symbols-outlined text-lg">fullscreen</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Live Stats Strip -->
+        <div class="stats-strip border-b border-border bg-[#12141a]">
+            <div class="stat-card">
+                <p class="text-[10px] text-gray-500 font-bold uppercase">Today's Orders</p>
+                <p class="text-lg font-black text-white font-mono" id="stat-orders">0</p>
+            </div>
+            <div class="stat-card">
+                <p class="text-[10px] text-gray-500 font-bold uppercase">Revenue</p>
+                <p class="text-lg font-black text-green-400 font-mono" id="stat-revenue">₹0</p>
+            </div>
+            <div class="stat-card">
+                <p class="text-[10px] text-gray-500 font-bold uppercase">Avg Prep Time</p>
+                <p class="text-lg font-black text-blue-400 font-mono" id="stat-avg-prep">--</p>
+            </div>
+            <div class="stat-card">
+                <p class="text-[10px] text-gray-500 font-bold uppercase">Active Now</p>
+                <p class="text-lg font-black text-primary font-mono" id="stat-active">0</p>
+            </div>
+        </div>
+
+        <div id="view-live" class="flex-1 overflow-hidden p-4 grid grid-cols-3 gap-4">
+            <div
+                class="flex flex-col h-full bg-[#1a1d21]/90 backdrop-blur-sm rounded-xl border border-border overflow-hidden shadow-2xl">
+                <div
+                    class="p-3 bg-gradient-to-r from-primary/10 to-transparent border-b border-primary/20 flex justify-between items-center">
+                    <h2 class="text-sm font-black text-primary flex items-center gap-2 tracking-tight">
+                        <span class="material-symbols-outlined animate-bounce text-lg">notifications_active</span>
+                        INCOMING (<span id="count-incoming">0</span>)
+                    </h2>
+                </div>
+                <div class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar scroll-smooth" id="col-incoming">
+                </div>
+            </div>
+
+            <div
+                class="flex flex-col h-full bg-[#1a1d21]/90 backdrop-blur-sm rounded-xl border border-border overflow-hidden shadow-2xl">
+                <div
+                    class="p-3 bg-gradient-to-r from-blue-500/10 to-transparent border-b border-blue-500/20 flex justify-between items-center">
+                    <h2 class="text-sm font-black text-blue-400 flex items-center gap-2 tracking-tight">
+                        <span class="material-symbols-outlined text-lg">skillet</span> PREPARING (<span
+                            id="count-preparing">0</span>)
+                    </h2>
+                </div>
+                <div class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar" id="col-preparing"></div>
+            </div>
+
+            <div
+                class="flex flex-col h-full bg-[#1a1d21]/90 backdrop-blur-sm rounded-xl border border-border overflow-hidden shadow-2xl">
+                <div
+                    class="p-3 bg-gradient-to-r from-kitchen_green/10 to-transparent border-b border-kitchen_green/20 flex justify-between items-center">
+                    <h2 class="text-sm font-black text-kitchen_green flex items-center gap-2 tracking-tight">
+                        <span class="material-symbols-outlined text-lg">delivery_dining</span> READY (<span
+                            id="count-ready">0</span>)
+                    </h2>
+                </div>
+                <div class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar" id="col-ready"></div>
+            </div>
+        </div>
+
+        <div id="view-history" class="hidden flex-1 overflow-y-auto p-6 bg-bg">
+            <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                    Order History
+                    <input type="date" id="kds-history-date" onchange="renderHistory()"
+                        class="bg-black/30 border border-white/10 rounded px-2 py-1 text-sm text-gray-400 focus:border-primary">
+                </h2>
+
+                <div class="flex items-center gap-4 bg-surface p-1 rounded-xl border border-border">
+                    <button onclick="filterHistory('All')" id="hist-btn-All"
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold text-black bg-white transition-colors hist-filter-btn">All</button>
+                    <button onclick="filterHistory('Dine-In')" id="hist-btn-Dine-In"
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition-colors hist-filter-btn">Dine-In</button>
+                    <button onclick="filterHistory('Takeaway')" id="hist-btn-Takeaway"
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition-colors hist-filter-btn">Takeaway</button>
+                    <button onclick="filterHistory('Delivery')" id="hist-btn-Delivery"
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition-colors hist-filter-btn">In-House
+                        Delivery</button>
+                    <button onclick="filterHistory('Online')" id="hist-btn-Online"
+                        class="px-3 py-1.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition-colors hist-filter-btn">Online</button>
+                </div>
+
+                <div class="flex gap-4 shrink-0">
+                    <div
+                        class="bg-surface px-4 py-2 rounded-lg border border-border text-xs text-gray-400 flex flex-col items-end">
+                        <span class="text-[9px] uppercase tracking-widest font-bold">Total Orders</span>
+                        <span class="text-white font-black text-sm font-mono" id="history-count">0</span>
+                    </div>
+                    <div
+                        class="bg-surface px-4 py-2 rounded-lg border border-border text-xs text-gray-400 flex flex-col items-end">
+                        <span class="text-[9px] uppercase tracking-widest font-bold">Revenue</span>
+                        <span class="text-green-400 font-black text-sm font-mono" id="history-total">₹0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-lg">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-black/20 text-gray-500 uppercase font-bold text-xs">
+                        <tr>
+                            <th class="p-4">Time Out</th>
+                            <th class="p-4">Order #</th>
+                            <th class="p-4">Summary</th>
+                            <th class="p-4 text-center">Prep Time</th>
+                            <th class="p-4 text-center">Wait to Pickup</th>
+                            <th class="p-4 font-mono text-right">Total</th>
+                            <th class="p-4 text-right">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border text-gray-300" id="history-table"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="summary-panel"
+            class="absolute right-0 top-16 bottom-0 w-72 bg-surface border-l border-border transform translate-x-full transition-transform duration-300 z-40 p-0 shadow-2xl flex flex-col">
+            <div class="p-4 border-b border-border flex justify-between items-center bg-black/20">
+                <h3 class="text-sm font-bold text-white uppercase flex items-center gap-2"><span
+                        class="material-symbols-outlined">bar_chart</span> Live Stats</h3>
+                <button onclick="toggleSummary()" class="text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar">
+                <div class="p-4">
+                    <h4 class="text-xs font-bold text-blue-400 uppercase mb-3 border-b border-blue-500/20 pb-1">🔥
+                        Currently Cooking</h4>
+                    <div id="summary-list-active" class="space-y-2"></div>
+                </div>
+
+                <div class="p-4 border-t border-border bg-black/10">
+                    <h4 class="text-xs font-bold text-green-400 uppercase mb-3 border-b border-green-500/20 pb-1">📈
+                        Sold Today (Total)</h4>
+                    <div id="summary-list-total" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="settings-modal" class="fixed inset-0 z-[70] bg-black/90 hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Kitchen Alerts</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">Notification Sound</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setSound('bell')"
+                            class="p-3 bg-white/5 border border-border rounded-lg text-white text-xs font-bold hover:border-primary focus:border-primary sound-opt"
+                            id="snd-bell">🔔 Bell</button>
+                        <button onclick="setSound('chime')"
+                            class="p-3 bg-white/5 border border-border rounded-lg text-white text-xs font-bold hover:border-primary focus:border-primary sound-opt"
+                            id="snd-chime">✨ Chime</button>
+                        <button onclick="setSound('buzzer')"
+                            class="p-3 bg-white/5 border border-border rounded-lg text-white text-xs font-bold hover:border-primary focus:border-primary sound-opt"
+                            id="snd-buzzer">🚨 Buzzer</button>
+                    </div>
+                    <!-- CUSTOM UPLOAD -->
+                    <button onclick="document.getElementById('kds-custom-input').click()"
+                        class="w-full mt-2 p-3 bg-white/5 border border-dashed border-gray-600 rounded-lg text-white text-xs font-bold hover:border-primary transition-all sound-opt flex items-center justify-center gap-2"
+                        id="snd-custom">
+                        🎵 Upload Custom Ringtone
+                    </button>
+                    <input type="file" id="kds-custom-input" accept=".mp3,.wav,.ogg,audio/*" class="hidden"
+                        onchange="handleKdsCustomSound(this)">
+                    <div id="kds-custom-info" class="hidden flex items-center gap-2 mt-1">
+                        <span class="text-[10px] text-purple-400 font-bold truncate flex-1" id="kds-custom-name"></span>
+                        <button onclick="removeKdsCustomSound()"
+                            class="text-[10px] text-red-400 font-bold hover:text-red-300">✕ Remove</button>
+                    </div>
+                </div>
+                <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">Audio Volume</label>
+                <div class="flex items-center gap-3 bg-black/30 p-3 rounded-lg border border-white/5 mb-4">
+                    <span class="material-symbols-outlined text-gray-400">volume_down</span>
+                    <input type="range" id="kds-volume" min="0" max="1" step="0.1" value="0.5"
+                        onchange="setVolume(this.value)" class="flex-1 accent-primary">
+                    <span class="material-symbols-outlined text-gray-400">volume_up</span>
+                </div>
+
+                <label
+                    class="text-xs font-bold text-gray-500 uppercase mb-2 block mt-4 border-t border-border pt-4">Mode-Specific
+                    Tones</label>
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <div class="text-[10px] text-gray-400">Dine-In:</div>
+                    <div class="text-[10px] text-white font-bold text-right" id="tone-dinein">🔔 Bell</div>
+                    <div class="text-[10px] text-gray-400">Online:</div>
+                    <div class="text-[10px] text-white font-bold text-right" id="tone-online">🚨 Buzzer</div>
+                    <div class="text-[10px] text-gray-400">Takeaway:</div>
+                    <div class="text-[10px] text-white font-bold text-right" id="tone-takeaway">✨ Chime</div>
+                </div>
+
+                <label
+                    class="text-xs font-bold text-gray-500 uppercase mb-2 block mt-4 border-t border-border pt-4">Test
+                    Audio</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="playAlert('bell')"
+                        class="py-2 bg-white/5 border border-white/10 rounded text-xs font-bold hover:bg-white/10">🔔
+                        Test</button>
+                    <button onclick="playAlert('chime')"
+                        class="py-2 bg-white/5 border border-white/10 rounded text-xs font-bold hover:bg-white/10">✨
+                        Test</button>
+                    <button onclick="playAlert('buzzer')"
+                        class="py-2 bg-white/5 border border-white/10 rounded text-xs font-bold hover:bg-white/10">🚨
+                        Test</button>
+                </div>
+            </div>
+        </div>
+        <button onclick="document.getElementById('settings-modal').classList.add('hidden')"
+            class="w-full mt-6 py-3 bg-white/10 text-white font-bold rounded-lg text-sm hover:bg-white/20">Done</button>
+    </div>
+    </div>
+
+    <div id="ticket-modal" class="fixed inset-0 z-[80] bg-black/90 hidden flex items-center justify-center p-4">
+        <div class="ticket-paper w-80 p-6 rounded relative transform scale-100 transition-transform">
+            <div class="text-center border-b-2 border-black border-dashed pb-4 mb-4">
+                <h2 class="text-2xl font-bold">Zoi Eats</h2>
+                <p class="text-xs font-bold mt-1" id="tick-meta">Dine-In • Table 04</p>
+                <p class="text-[10px]" id="tick-time">--</p>
+            </div>
+            <div class="space-y-2 text-sm font-bold border-b-2 border-black border-dashed pb-4 mb-4" id="tick-items">
+            </div>
+            <div class="flex justify-between font-black text-lg">
+                <span>TOTAL</span>
+                <span id="tick-total">₹0.00</span>
+            </div>
+            <div class="text-center mt-6">
+                <button onclick="document.getElementById('ticket-modal').classList.add('hidden')"
+                    class="px-6 py-2 bg-black text-white rounded text-xs font-bold">Close Receipt</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="action-modal"
+        class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><span
+                    class="material-symbols-outlined text-red-500">cancel</span> Reject Order?</h3>
+            <div class="grid grid-cols-1 gap-3 mb-6">
+                <button onclick="confirmReject('Item Out of Stock')"
+                    class="p-3 bg-black/30 border border-border rounded-lg text-left hover:border-red-500 hover:text-red-500 transition-all font-bold text-sm">Item
+                    Out of Stock</button>
+                <button onclick="confirmReject('Kitchen Busy')"
+                    class="p-3 bg-black/30 border border-border rounded-lg text-left hover:border-red-500 hover:text-red-500 transition-all font-bold text-sm">Kitchen
+                    Too Busy</button>
+            </div>
+            <button onclick="closeModal()"
+                class="w-full py-3 rounded-lg bg-white/10 text-white font-bold text-sm hover:bg-white/20 transition-colors">Go
+                Back</button>
+        </div>
+    </div>
+
+    <audio id="bell-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+
+    <script>
+        // --- CONFIG ---
+        const phrases = {
+            en: {
+                new: "New order received.",
+                accept: "Order Accepted.",
+                reject: "Order Rejected.",
+                ready: "Order Ready.",
+                picked: "Order Picked Up.",
+                delay_accept: "Please accept the order. It is delayed.",
+                delay_prep: "Order delayed. Please click Ready if prepared."
+            }
+        };
+        const sounds = {
+            bell: "https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3",
+            chime: "https://assets.mixkit.co/active_storage/sfx/2865/2865-preview.mp3",
+            buzzer: "https://assets.mixkit.co/active_storage/sfx/2860/2860-preview.mp3"
+        };
+
+        const modeTones = {
+            'Dine-In': 'bell',
+            'Online': 'buzzer',
+            'Takeaway': 'chime',
+            'Delivery': 'chime'
+        };
+
+        // --- STATE ---
+        let orders = [];
+        let history = JSON.parse(localStorage.getItem('kds_history') || '[]');
+        let historyFilter = 'All';
+        let dailyStats = {};
+        let currentGender = 'female';
+        let currentSound = 'bell';
+        let rejectId = null;
+        let isOnline = true;
+        let isMuted = localStorage.getItem('kds_muted') === 'true';
+        let kdsVolume = parseFloat(localStorage.getItem('kds_volume') || '0.5');
+        let _autoAcceptTimer = null;
+        let _autoAcceptStarted = false;
+        let _alertRepeatInterval = null;
+        let unacknowledgedOrders = new Set();
+
+        // Performance tracking
+        let perfStats = {
+            totalOrders: 0,
+            totalRevenue: 0,
+            prepTimes: [],  // array of minutes
+            activeCount: 0
+        };
+
+        // --- INIT ---
+        window.onload = () => {
+            renderBoard();
+            setInterval(renderBoard, 4000);
+            setInterval(updateTimers, 60000);
+
+            const REST_ID = localStorage.getItem('zoiPartnerRestId') || "101";
+            ZoiRestaurantSync.listen((e) => {
+                if (e.restId === REST_ID && (e.type === 'KDS_UPDATED' || e.type === 'HISTORY_UPDATED')) {
+                    // Check if anything was marked "Picked Up" externally so we can clear our local buzzer
+                    const tickets = ZoiRestaurantSync.getKDSTickets(REST_ID) || [];
+                    const activeIds = tickets.map(t => t.id);
+                    // If an order is no longer active, remove it from the buzzer list
+                    unacknowledgedOrders.forEach(id => {
+                        if (!activeIds.includes(id)) {
+                            unacknowledgedOrders.delete(id);
+                        }
+                    });
+
+                    renderBoard();
+                }
+            });
+            setInterval(checkReminders, 5000);
+            setInterval(updateClock, 1000);
+
+            if (localStorage.getItem('kds_sound')) currentSound = localStorage.getItem('kds_sound');
+            if (localStorage.getItem('kds_gender')) currentGender = localStorage.getItem('kds_gender');
+
+            // Load persisted stats
+            const saved = localStorage.getItem('kds_perf_stats');
+            if (saved) {
+                try { Object.assign(perfStats, JSON.parse(saved)); } catch (e) { }
+            }
+            updateStatsUI();
+            updateSettingsUI();
+
+            // Initialization UI for audio
+            if (isMuted) {
+                document.getElementById('mute-icon').innerText = 'volume_off';
+                document.getElementById('mute-toggle').classList.add('text-red-400', 'border-red-400');
+            }
+            const volSlider = document.getElementById('kds-volume');
+            if (volSlider) volSlider.value = kdsVolume;
+
+            // Auto Repeat Alert Loop
+            startAutoRepeatLoop();
+        };
+
+        // --- REAL DATA INTEGRATION ---
+        let _lastSeenOrderId = null;
+
+        function renderBoard() {
+            let liveOrders = typeof ZoiPartnerOrders !== 'undefined' ? ZoiPartnerOrders.getLiveOrders() : [];
+
+            ['incoming', 'preparing', 'ready'].forEach(c => document.getElementById('col-' + c).innerHTML = "");
+
+            let incomingCount = 0, preparingCount = 0, readyCount = 0;
+            let displayOrders = [];
+
+            liveOrders.forEach(o => {
+                let displayType = 'incoming';
+                if (['Accepted', 'Preparing', 'Cooking'].includes(o.status)) displayType = 'preparing';
+                else if (['Ready', 'Out for Delivery'].includes(o.status)) displayType = 'ready';
+
+                // Monitor Unacknowledged Ready orders
+                if (displayType === 'ready') unacknowledgedOrders.add(o.id);
+                else unacknowledgedOrders.delete(o.id);
+
+                let elapsedMins = 0;
+                try {
+                    const ticketDate = new Date(o.timestamp || o.time || o.date || new Date());
+                    elapsedMins = Math.floor((new Date() - ticketDate) / 60000);
+                    if (elapsedMins < 0) elapsedMins += 1440; // overnight fixes
+                } catch (e) { }
+
+                const itemCount = o.items ? o.items.length : 1;
+                const estPrepMins = o.estPrepMins || (10 + (itemCount - 1) * 3);
+                let slaStatus = 'on-time';
+                if (elapsedMins > estPrepMins) slaStatus = 'critical';
+                else if (elapsedMins > estPrepMins * 0.7) slaStatus = 'delayed';
+
+                displayOrders.push({
+                    id: o.id,
+                    type: displayType.charAt(0).toUpperCase() + displayType.slice(1),
+                    time: elapsedMins,
+                    mode: o.mode || "Online",
+                    items: (o.items || []).map(i => ({ qty: i.qty || 1, n: i.name, mods: i.mods || [] })),
+                    price: o.total,
+                    driver: o.riderName || o.meta || "Searching...",
+                    placedAt: o.timestamp || o.time,
+                    estPrepMins: estPrepMins,
+                    sla: slaStatus,
+                    instructions: o.instructions || '',
+                    riderAssigned: !!o.riderAssigned,
+                    riderAtRestaurant: !!o.riderAtRestaurant,
+                    displayType: displayType,
+                    isSync: true // Engine handles all syncing
+                });
+            });
+
+            // Render all
+            perfStats.activeCount = 0;
+            displayOrders.forEach(kdsOrder => {
+                if (kdsOrder.displayType === 'incoming') {
+                    incomingCount++;
+                    if (_lastSeenOrderId !== kdsOrder.id) {
+                        _lastSeenOrderId = kdsOrder.id;
+                        playAlert();
+                        announce("new");
+                        startAutoAcceptTimer();
+                    }
+                }
+                if (kdsOrder.displayType === 'preparing') { preparingCount++; perfStats.activeCount++; }
+                if (kdsOrder.displayType === 'ready') readyCount++;
+                if (kdsOrder.displayType === 'incoming') perfStats.activeCount++;
+
+                document.getElementById('col-' + kdsOrder.displayType).innerHTML += createCard(kdsOrder);
+            });
+
+            document.getElementById('count-incoming').innerText = incomingCount;
+            document.getElementById('count-preparing').innerText = preparingCount;
+            document.getElementById('count-ready').innerText = readyCount;
+            updateStatsUI();
+            renderSummary();
+        }
+
+
+
+        // Override Simulate to do nothing or warn
+        function simulateNewOrder() {
+            if (!isOnline) return alert("Kitchen is Offline!");
+            const newId = Math.floor(Math.random() * 1000) + 9000;
+            const modes = ["Dine-In", "Online", "Takeaway"];
+            const randMode = modes[Math.floor(Math.random() * modes.length)];
+
+            // Global Sync override for sim using actual Customer structure
+            const currentRestId = localStorage.getItem('zoiPartnerRestId') || "101";
+            let allOrders = JSON.parse(localStorage.getItem('zoiOrderHistory') || '[]');
+            
+            allOrders.unshift({
+                id: "SIM-" + newId,
+                status: "Pending",
+                restaurantId: currentRestId,
+                total: 150,
+                mode: randMode,
+                timestamp: new Date().toISOString(),
+                items: [{ name: "Veg Burger", qty: 1 }],
+                instructions: "Simulation generated."
+            });
+            localStorage.setItem('zoiOrderHistory', JSON.stringify(allOrders));
+
+            renderBoard();
+            playAlert(null, randMode); 
+            announce("new");
+        }
+
+function acceptOrder(id) {
+            clearAutoAcceptTimer();
+            if (typeof ZoiPartnerOrders !== 'undefined') {
+                ZoiPartnerOrders.updateOrderStatus(id, 'Preparing');
+            }
+
+            localStorage.setItem('kds_accept_time_' + id, new Date().toISOString());
+            renderBoard();
+            announce("accept");
+        }
+
+function markReady(id) {
+            if (typeof ZoiPartnerOrders !== 'undefined') {
+                ZoiPartnerOrders.updateOrderStatus(id, 'Ready');
+            }
+
+            const acceptTime = localStorage.getItem('kds_accept_time_' + id);
+            let prepMins = 0;
+            if (acceptTime) {
+                prepMins = Math.max(1, Math.round((new Date() - new Date(acceptTime)) / 60000));
+                perfStats.prepTimes.push(prepMins);
+                perfStats.totalOrders++;
+                savePerfStats();
+            }
+            localStorage.setItem('kds_ready_time_' + id, new Date().toISOString());
+
+            renderBoard();
+            announce("ready");
+        }
+
+function markPickedUp(id) {
+            if (typeof ZoiPartnerOrders !== 'undefined') {
+                ZoiPartnerOrders.updateOrderStatus(id, 'Delivered');
+            }
+            unacknowledgedOrders.delete(id);
+            renderBoard();
+            announce("picked");
+        }
+
+        // --- AUTO-ACCEPT TIMER ---
+function startAutoAcceptTimer() {
+            clearAutoAcceptTimer();
+            _autoAcceptTimer = setTimeout(() => {
+                // Auto-accept the incoming order
+                acceptOrder(null);
+                announce("accept");
+            }, 60000); // 60 seconds
+        }
+
+        function clearAutoAcceptTimer() {
+            if (_autoAcceptTimer) {
+                clearTimeout(_autoAcceptTimer);
+                _autoAcceptTimer = null;
+            }
+        }
+
+        // --- STATS ---
+        function updateStatsUI() {
+            document.getElementById('stat-orders').innerText = perfStats.totalOrders;
+            document.getElementById('stat-revenue').innerText = '₹' + perfStats.totalRevenue.toLocaleString('en-IN');
+            document.getElementById('stat-active').innerText = perfStats.activeCount;
+
+            if (perfStats.prepTimes.length > 0) {
+                const avg = Math.round(perfStats.prepTimes.reduce((a, b) => a + b, 0) / perfStats.prepTimes.length);
+                document.getElementById('stat-avg-prep').innerText = avg + 'm';
+            }
+        }
+
+        function savePerfStats() {
+            localStorage.setItem('kds_perf_stats', JSON.stringify(perfStats));
+        }
+
+        // --- EXPO (SUMMARY) ---
+        function renderSummary() {
+            const listActive = document.getElementById('summary-list-active');
+            const listTotal = document.getElementById('summary-list-total');
+            listActive.innerHTML = "";
+            listTotal.innerHTML = "";
+
+            // Active Prep — use real DB
+            const activeOrder = ZoiOrders.getActiveOrder();
+            const currentRestId = localStorage.getItem('zoiPartnerRestId') || "101";
+            let activeCounts = {};
+            if (activeOrder && activeOrder.restaurantId == currentRestId && activeOrder.status === 'preparing') {
+                activeOrder.items.forEach(i => activeCounts[i.name] = (activeCounts[i.name] || 0) + i.qty);
+            }
+            for (const [n, c] of Object.entries(activeCounts)) listActive.innerHTML += `<div class="flex justify-between p-2 bg-black/20 rounded border border-white/5"><span class="text-xs text-gray-300">${n}</span><span class="text-sm font-black text-blue-400">${c}</span></div>`;
+            if (Object.keys(activeCounts).length === 0) listActive.innerHTML = `<p class="text-xs text-gray-500 text-center">No active orders</p>`;
+
+            // Sold Today
+            for (const [n, c] of Object.entries(dailyStats)) {
+                listTotal.innerHTML += `<div class="flex justify-between p-2 bg-black/20 rounded border border-white/5"><span class="text-xs text-gray-300">${n}</span><span class="text-sm font-black text-green-400">${c}</span></div>`;
+            }
+            if (Object.keys(dailyStats).length === 0) listTotal.innerHTML = `<p class="text-xs text-gray-500 text-center">No sales yet</p>`;
+        }
+
+        // --- HISTORY & TICKET ---
+        function filterHistory(mode) {
+            historyFilter = mode;
+            document.querySelectorAll('.hist-filter-btn').forEach(b => {
+                b.classList.remove('bg-white', 'text-black');
+                b.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById('hist-btn-' + mode.replace(/\s+/g, '-'));
+            if (activeBtn) {
+                activeBtn.classList.remove('text-gray-400');
+                activeBtn.classList.add('bg-white', 'text-black');
+            }
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('history-table');
+            tbody.innerHTML = "";
+            let filteredHistory = history;
+
+            const dateInput = document.getElementById('kds-history-date');
+            if (!dateInput.value) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+            }
+            const selectedDate = dateInput.value;
+
+            if (historyFilter !== 'All') {
+                filteredHistory = history.filter(h => h.mode === historyFilter);
+            }
+
+            filteredHistory = filteredHistory.filter(h => h.date === selectedDate || (!h.date && selectedDate === new Date().toISOString().split('T')[0]));
+
+            let totalSales = 0;
+            let prepTimesForFilter = [];
+
+            filteredHistory.forEach((h, idx) => {
+                totalSales += h.price;
+                if (h.prepTime) prepTimesForFilter.push(h.prepTime);
+                let summary = h.items.map(x => x.n).join(', ');
+                const prepTimeStr = h.prepTime ? h.prepTime + 'min' : '--';
+
+                let waitTimeStr = '--';
+                let waitTimeClass = 'text-gray-500';
+                if (h.waitToPickup !== undefined) {
+                    waitTimeStr = h.waitToPickup + 'min';
+                    if (h.waitToPickup > 5) waitTimeClass = 'text-red-400 font-bold';
+                    else if (h.waitToPickup > 2) waitTimeClass = 'text-yellow-400 font-bold';
+                    else waitTimeClass = 'text-green-400';
+                }
+
+                let modeBadgeClass = 'bg-white/10 text-white';
+                if (h.mode === 'Dine-In') modeBadgeClass = 'bg-blue-500/20 text-blue-400';
+                if (h.mode === 'Takeaway') modeBadgeClass = 'bg-yellow-500/20 text-yellow-500';
+                if (h.mode === 'Online') modeBadgeClass = 'bg-purple-500/20 text-purple-400';
+                if (h.mode === 'Delivery') modeBadgeClass = 'bg-teal-500/20 text-teal-400';
+
+                // Find original global index for viewing ticket
+                const globalIdx = history.findIndex(x => x.id === h.id);
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/5 border-b border-border text-xs transition-colors">
+                        <td class="p-4 text-gray-400 font-mono">${h.endTime}</td>
+                        <td class="p-4 font-bold text-white">#${h.id} <span class="text-[10px] ${modeBadgeClass} px-1.5 py-0.5 ml-1 rounded uppercase tracking-wide font-bold">${h.mode}</span></td>
+                        <td class="p-4">${summary}</td>
+                        <td class="p-4 font-mono text-blue-400 text-center">${prepTimeStr}</td>
+                        <td class="p-4 font-mono ${waitTimeClass} text-center">${waitTimeStr}</td>
+                        <td class="p-4 font-mono text-right text-primary font-bold">₹${h.price}</td>
+                        <td class="p-4 text-right"><button onclick="openTicket(${globalIdx})" class="text-xs bg-white/10 px-3 py-1.5 rounded hover:bg-white/20 border border-white/10 font-bold transition-colors">View Ticket</button></td>
+                    </tr>`;
+            });
+            document.getElementById('history-count').innerText = filteredHistory.length;
+            document.getElementById('history-total').innerText = "₹" + totalSales.toLocaleString();
+
+            // Performance summary logic filtered to mode
+            if (filteredHistory.length > 0) {
+                let statText = "📉 No performance data";
+                if (prepTimesForFilter.length > 0) {
+                    const avg = Math.round(prepTimesForFilter.reduce((a, b) => a + b, 0) / prepTimesForFilter.length);
+                    const onTimeCount = prepTimesForFilter.filter(t => t <= 15).length;
+                    const onTimePct = Math.round((onTimeCount / prepTimesForFilter.length) * 100);
+                    statText = `📊 Performance (${historyFilter}): Avg ${avg}min • On-Time: ${onTimePct}% • ${filteredHistory.length} orders`;
+                }
+
+                const summaryRow = `
+                    <tr class="bg-primary/5 border-t-2 border-primary/20">
+                        <td class="p-4 text-primary font-bold" colspan="3">${statText}</td>
+                        <td class="p-4 text-right text-green-400 font-bold font-mono" colspan="3">Total: ₹${totalSales.toLocaleString('en-IN')}</td>
+                    </tr>`;
+                tbody.innerHTML += summaryRow;
+            } else {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500 text-sm">No ${historyFilter} orders found today.</td></tr>`;
+            }
+        }
+
+        function openTicket(idx) {
+            const order = history[idx];
+            document.getElementById('tick-meta').innerText = `${order.mode} • #${order.id}`;
+            document.getElementById('tick-time').innerText = order.endTime;
+            document.getElementById('tick-total').innerText = "₹" + order.price;
+
+            const list = document.getElementById('tick-items');
+            list.innerHTML = "";
+            order.items.forEach(i => {
+                list.innerHTML += `
+                    <div class="flex justify-between mb-1">
+                        <span>${i.qty} x ${i.n}</span>
+                    </div>
+                    ${i.mods.length ? `<div class="text-[10px] pl-4 italic mb-1">+ ${i.mods.join(', ')}</div>` : ''}
+                `;
+            });
+            document.getElementById('ticket-modal').classList.remove('hidden');
+            document.getElementById('ticket-modal').classList.add('flex');
+        }
+
+        // --- SETTINGS & UTILS ---
+        function openSettings() { document.getElementById('settings-modal').classList.remove('hidden'); document.getElementById('settings-modal').classList.add('flex'); }
+        function setSound(s) {
+            currentSound = s;
+            localStorage.setItem('kds_sound', s);
+            document.querySelectorAll('.sound-opt').forEach(b => b.classList.remove('border-primary', 'text-primary'));
+            const btn = document.getElementById('snd-' + s);
+            if (btn) btn.classList.add('border-primary', 'text-primary');
+            playAlert();
+        }
+
+        // --- KDS CUSTOM SOUND ---
+        function handleKdsCustomSound(input) {
+            const file = input.files[0];
+            if (!file) return;
+            if (file.size > 1024 * 1024) {
+                alert('File too large! Max 1MB allowed.');
+                input.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                localStorage.setItem('kds_custom_sound', e.target.result);
+                localStorage.setItem('kds_custom_sound_name', file.name);
+                setSound('custom');
+                document.getElementById('kds-custom-name').innerText = file.name;
+                document.getElementById('kds-custom-info').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeKdsCustomSound() {
+            localStorage.removeItem('kds_custom_sound');
+            localStorage.removeItem('kds_custom_sound_name');
+            if (currentSound === 'custom') setSound('bell');
+            document.getElementById('kds-custom-name').innerText = '';
+            document.getElementById('kds-custom-info').classList.add('hidden');
+            document.getElementById('kds-custom-input').value = '';
+        }
+
+        // Init KDS custom sound label
+        (function () {
+            const n = localStorage.getItem('kds_custom_sound_name');
+            if (n) {
+                document.getElementById('kds-custom-name').innerText = n;
+                document.getElementById('kds-custom-info').classList.remove('hidden');
+            }
+        })();
+        function setVoiceGender(g) {
+            currentGender = g;
+            localStorage.setItem('kds_gender', g);
+            updateSettingsUI();
+            announce("ready");
+        }
+        function updateSettingsUI() {
+            const mBtn = document.getElementById('voice-male');
+            const fBtn = document.getElementById('voice-female');
+            mBtn.className = `px-3 rounded text-[10px] font-bold flex items-center transition-all ${currentGender === 'male' ? 'btn-active-gender' : 'text-gray-400 hover:text-white'}`;
+            fBtn.className = `px-3 rounded text-[10px] font-bold flex items-center transition-all ${currentGender === 'female' ? 'btn-active-gender' : 'text-gray-400 hover:text-white'}`;
+            // Highlight active sound on load
+            document.querySelectorAll('.sound-opt').forEach(b => b.classList.remove('border-primary', 'text-primary'));
+            const activeBtn = document.getElementById('snd-' + currentSound);
+            if (activeBtn) activeBtn.classList.add('border-primary', 'text-primary');
+        }
+        function toggleStoreStatus() {
+            isOnline = !isOnline;
+            const btn = document.getElementById('store-toggle');
+            if (isOnline) {
+                btn.className = "size-10 rounded-full bg-kitchen_green/20 text-kitchen_green border border-kitchen_green flex items-center justify-center animate-pulse-fast hover:scale-110 transition-transform";
+                btn.innerHTML = '<span class="material-symbols-outlined text-lg">power_settings_new</span>';
+                document.getElementById('offline-banner').classList.add('hidden');
+            } else {
+                btn.className = "size-10 rounded-full bg-red-500/20 text-red-500 border border-red-500 flex items-center justify-center shadow-none"; // No pulse
+                btn.innerHTML = '<span class="material-symbols-outlined text-lg">power_off</span>';
+                document.getElementById('offline-banner').classList.remove('hidden');
+            }
+        }
+
+        function updateTimers() { if (isOnline) { renderBoard(); } }
+        function updateClock() { document.getElementById('live-clock').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+        function switchView(v) {
+            document.getElementById('view-live').classList.add('hidden');
+            document.getElementById('view-history').classList.add('hidden');
+            document.getElementById('nav-live').className = "flex flex-col items-center justify-center p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all";
+            document.getElementById('nav-history').className = "flex flex-col items-center justify-center p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-all";
+            document.getElementById('view-' + v).classList.remove('hidden');
+            document.getElementById('nav-' + v).className = "flex flex-col items-center justify-center p-2 rounded-lg bg-primary text-black shadow-md transition-all";
+        }
+        function openRejectModal(id) { rejectId = id; document.getElementById('action-modal').classList.remove('hidden'); document.getElementById('action-modal').classList.add('flex'); }
+        function closeModal() { document.getElementById('action-modal').classList.add('hidden'); document.getElementById('action-modal').classList.remove('flex'); }
+        function confirmReject() {
+            // Reject the real order
+            const order = ZoiOrders.getActiveOrder();
+            if (order) {
+                ZoiOrders.updateStatus('cancelled');
+            }
+            orders = orders.filter(o => o.id != rejectId);
+            renderBoard();
+            closeModal();
+            announce("reject");
+        }
+        function toggleSummary() { document.getElementById('summary-panel').classList.toggle('translate-x-full'); }
+        function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+        function handleKeys(e) {
+            const currentRestId = localStorage.getItem('zoiPartnerRestId') || "101";
+            const kdsTickets = ZoiRestaurantSync.getKDSTickets(currentRestId) || [];
+
+            if (e.key === '1') {
+                const firstIncoming = kdsTickets.find(t => t.status === 'Received' || t.status === 'Sent to Kitchen');
+                if (firstIncoming) { acceptOrder(firstIncoming.id); }
+                else { acceptOrder(null); }
+            }
+            if (e.code === 'Space') {
+                e.preventDefault();
+                const firstCooking = kdsTickets.find(t => t.status === 'Cooking');
+                if (firstCooking) { markReady(firstCooking.id); }
+                else { markReady(null); }
+            }
+            if (e.key === 'r' || e.key === 'R') {
+                const firstIncoming = kdsTickets.find(t => t.status === 'Received' || t.status === 'Sent to Kitchen');
+                if (firstIncoming) { openRejectModal(firstIncoming.id); }
+                else {
+                    const order = ZoiOrders.getActiveOrder();
+                    if (order && order.status === 'placed') openRejectModal(order.id);
+                }
+            }
+            if (e.key === 'f' || e.key === 'F') { toggleFullScreen(); }
+            if (e.key === 's' || e.key === 'S') {
+                const nextSound = currentSound === 'bell' ? 'chime' : currentSound === 'chime' ? 'buzzer' : 'bell';
+                setSound(nextSound);
+            }
+        }
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+    <script src="js/zoi_partner_engine.js"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+
+

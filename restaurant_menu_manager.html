@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi - Menu CommandOS</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        ai: "#8b5cf6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] },
+                    animation: { 'spin-slow': 'spin 3s linear infinite' }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #00f0ff;
+            color: white;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-inactive {
+            border-bottom: 2px solid transparent;
+            color: #9ca3af;
+        }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #22c55e;
+        }
+
+        .toggle-checkbox:checked+.toggle-label {
+            background-color: #22c55e;
+        }
+
+        .margin-good {
+            color: #22c55e;
+        }
+
+        .margin-bad {
+            color: #ef4444;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans selection:bg-primary selection:text-black">
+
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+        <header
+            class="h-16 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-6 z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-bold text-white">Menu CommandOS</h1>
+                <div class="h-6 w-[1px] bg-border"></div>
+                <div class="relative group">
+                    <span
+                        class="material-symbols-outlined absolute left-2 top-1.5 text-gray-500 text-sm group-focus-within:text-primary">search</span>
+                    <input type="text" id="menu-search" onkeyup="renderMenu()"
+                        placeholder="Search dishes (e.g. Biryani)..."
+                        class="bg-black/30 border border-border rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:border-primary focus:ring-0 w-72 transition-all">
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="openBulkPriceModal()"
+                    class="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-bold rounded-lg transition-all border border-border">
+                    <span class="material-symbols-outlined text-lg">percent</span> Bulk Price
+                </button>
+                <button onclick="toggleAllStock(false)"
+                    class="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 text-xs font-bold rounded-lg border border-red-500/30 transition-all">
+                    <span class="material-symbols-outlined text-lg">block</span> 86 All (Panic)
+                </button>
+                <button onclick="openEditor()"
+                    class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-orange-600 text-black text-xs font-bold rounded-lg transition-all shadow-lg shadow-primary/20">
+                    <span class="material-symbols-outlined text-lg">add</span> New Item
+                </button>
+            </div>
+        </header>
+
+        <div class="px-6 pt-4 pb-0 flex flex-col bg-bg z-10">
+            <div class="flex border-b border-border">
+                <button onclick="switchTab('live')" id="tab-live"
+                    class="tab-active px-6 py-3 text-sm font-bold flex items-center gap-2 transition-all">
+                    <span class="material-symbols-outlined text-sm">toggle_on</span> Live Menu
+                </button>
+                <button onclick="switchTab('editor')" id="tab-editor"
+                    class="tab-inactive px-6 py-3 text-sm font-bold flex items-center gap-2 transition-all">
+                    <span class="material-symbols-outlined text-sm">construction</span> Builder & AI
+                </button>
+                <button onclick="switchTab('history')" id="tab-history"
+                    class="tab-inactive px-6 py-3 text-sm font-bold flex items-center gap-2 transition-all">
+                    <span class="material-symbols-outlined text-sm">history</span> History Log
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 scroll-smooth bg-bg">
+
+            <div id="view-live" class="space-y-6">
+                <div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar" id="category-chips">
+                </div>
+
+                <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                </div>
+            </div>
+
+            <div id="view-editor" class="hidden flex flex-col md:flex-row gap-6 h-full">
+                <div class="w-full md:w-1/4 bg-surface border border-border rounded-xl p-4 flex flex-col h-fit">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-bold text-white uppercase">Categories</h3>
+                        <button onclick="addCategory()" class="text-primary hover:text-white"><span
+                                class="material-symbols-outlined">add_circle</span></button>
+                    </div>
+                    <div class="flex-1 overflow-y-auto space-y-2 max-h-[300px] md:max-h-full" id="setup-cat-list">
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-surface border border-border rounded-xl p-6 overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6 border-b border-border pb-4">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">edit_square</span> Item Editor
+                        </h3>
+                        <span class="text-xs font-bold text-gray-500 animate-pulse hidden"
+                            id="auto-save-text">Auto-Saving...</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="col-span-2 md:col-span-1 space-y-4">
+                            <label class="text-xs font-bold text-gray-500 uppercase">Product Image</label>
+                            <div
+                                class="aspect-video rounded-xl bg-black border border-border relative group overflow-hidden">
+                                <img id="editor-img-preview" src="https://via.placeholder.com/400x300?text=Upload+Image"
+                                    class="w-full h-full object-cover">
+                                <div
+                                    class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                                    <input type="file" id="file-input" class="hidden" accept="image/*"
+                                        onchange="handleFileUpload(event)">
+                                    <button onclick="document.getElementById('file-input').click()"
+                                        class="mb-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-lg backdrop-blur-md">Upload
+                                        New</button>
+                                    <button onclick="enhanceImage()"
+                                        class="px-4 py-2 bg-ai/20 hover:bg-ai/40 text-ai border border-ai/50 text-xs font-bold rounded-lg backdrop-blur-md flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-sm">auto_fix</span> AI Enhance
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-span-2 md:col-span-1 space-y-4">
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase">Item Name</label>
+                                <input type="text" id="editor-name"
+                                    class="w-full bg-black/30 border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Selling Price (₹)</label>
+                                    <input type="number" id="editor-price" oninput="calculateMargin()"
+                                        class="w-full bg-black/30 border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Cost Price (₹)</label>
+                                    <input type="number" id="editor-cost" oninput="calculateMargin()"
+                                        class="w-full bg-black/30 border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary"
+                                        placeholder="Optional">
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center text-xs px-1">
+                                <span class="text-gray-500">Margin:</span>
+                                <span id="margin-display" class="font-bold text-gray-400">--%</span>
+                            </div>
+
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase">Category</label>
+                                <select id="editor-category"
+                                    class="w-full bg-black/30 border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary"></select>
+                            </div>
+                        </div>
+
+                        <div class="col-span-2">
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="text-xs font-bold text-gray-500 uppercase">Description</label>
+                                <button onclick="generateDescription()"
+                                    class="text-[10px] text-ai font-bold flex items-center gap-1 hover:underline">
+                                    <span class="material-symbols-outlined text-sm">auto_awesome</span> AI Write
+                                </button>
+                            </div>
+                            <textarea id="editor-desc" rows="3"
+                                class="w-full bg-black/30 border border-border rounded-lg p-3 text-white text-sm focus:border-primary"></textarea>
+                        </div>
+
+                        <div class="col-span-2 bg-black/20 p-4 rounded-xl border border-border space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-sm font-bold text-white">⚙️ Variants & Portions</h4>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Half Portion Price</label>
+                                    <input type="number" id="editor-price-half"
+                                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white text-sm"
+                                        placeholder="Leave empty if N/A">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Family Pack Price</label>
+                                    <input type="number" id="editor-price-family"
+                                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white text-sm"
+                                        placeholder="Leave empty if N/A">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-4 border-t border-white/5 pt-4">
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Daily Quantity</label>
+                                    <input type="number" id="editor-qty"
+                                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white text-sm"
+                                        placeholder="∞">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Prep Time (m)</label>
+                                    <input type="number" id="editor-time"
+                                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white text-sm"
+                                        value="15">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Availability</label>
+                                    <select id="editor-schedule"
+                                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white text-sm">
+                                        <option value="All Day">All Day</option>
+                                        <option value="Breakfast">Breakfast (8am-11am)</option>
+                                        <option value="Lunch">Lunch (11am-3pm)</option>
+                                        <option value="Dinner">Dinner (6pm-11pm)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase">Allergens</label>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <label
+                                        class="flex items-center gap-1 bg-black/40 px-2 py-1 rounded cursor-pointer"><input
+                                            type="checkbox" class="accent-red-500" value="Nuts"> <span
+                                            class="text-xs text-gray-300">Nuts</span></label>
+                                    <label
+                                        class="flex items-center gap-1 bg-black/40 px-2 py-1 rounded cursor-pointer"><input
+                                            type="checkbox" class="accent-red-500" value="Dairy"> <span
+                                            class="text-xs text-gray-300">Dairy</span></label>
+                                    <label
+                                        class="flex items-center gap-1 bg-black/40 px-2 py-1 rounded cursor-pointer"><input
+                                            type="checkbox" class="accent-red-500" value="Gluten"> <span
+                                            class="text-xs text-gray-300">Gluten</span></label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase">Dietary Type</label>
+                                <div class="flex gap-4 mt-1">
+                                    <label class="flex items-center gap-1 cursor-pointer"><input type="radio"
+                                            name="diet" id="tag-veg" value="veg" class="accent-green-500"> <span
+                                            class="text-xs text-green-400">Veg</span></label>
+                                    <label class="flex items-center gap-1 cursor-pointer"><input type="radio"
+                                            name="diet" id="tag-nonveg" value="nonveg" class="accent-red-500"> <span
+                                            class="text-xs text-red-400">Non-Veg</span></label>
+                                    <label class="flex items-center gap-1 cursor-pointer"><input type="radio"
+                                            name="diet" id="tag-egg" value="egg" class="accent-yellow-500"> <span
+                                            class="text-xs text-yellow-400">Contains Egg</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-6 border-t border-border pt-4">
+                        <button onclick="clearEditor()"
+                            class="px-6 py-2 border border-border text-gray-400 rounded-lg font-bold text-sm hover:text-white">Clear
+                            Form</button>
+                        <button onclick="saveItemFromEditor()"
+                            class="px-6 py-2 bg-primary text-black rounded-lg font-bold text-sm hover:bg-orange-600 shadow-lg">Save
+                            Item</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="view-history" class="hidden">
+                <div class="bg-surface border border-border rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-black/20 text-gray-500 uppercase font-bold text-xs">
+                            <tr>
+                                <th class="p-4">Time</th>
+                                <th class="p-4">User</th>
+                                <th class="p-4">Item</th>
+                                <th class="p-4">Action</th>
+                                <th class="p-4">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-border text-gray-300" id="history-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="bulk-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Bulk Price Update</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase">Apply To</label>
+                    <select id="bulk-category"
+                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white text-sm mt-1">
+                        <option value="All">Entire Menu</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase">Percentage Change</label>
+                    <div class="flex gap-2 mt-1">
+                        <button
+                            class="px-3 py-2 bg-green-500/20 text-green-500 border border-green-500/30 rounded font-bold text-lg"
+                            onclick="document.getElementById('bulk-percent').value = 5">+5%</button>
+                        <button
+                            class="px-3 py-2 bg-green-500/20 text-green-500 border border-green-500/30 rounded font-bold text-lg"
+                            onclick="document.getElementById('bulk-percent').value = 10">+10%</button>
+                        <input type="number" id="bulk-percent"
+                            class="w-20 bg-black/30 border border-border rounded-lg p-2 text-white text-sm text-center"
+                            placeholder="%">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                <button onclick="document.getElementById('bulk-modal').classList.add('hidden')"
+                    class="px-4 py-2 border border-border text-gray-400 rounded-lg font-bold text-xs">Cancel</button>
+                <button onclick="applyBulkPrice()"
+                    class="px-4 py-2 bg-primary text-black rounded-lg font-bold text-xs">Apply Updates</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // === DATA STORE ===
+        let menuItems = [];
+        let categories = ["Starters", "Mains", "Breads", "Rice", "Desserts", "Beverages"];
+        let historyLog = [{ time: "10:30 AM", user: "System", item: "Zoi Menu Sync", action: "Connected", value: "Live" }];
+
+        // === INIT ===
+        window.onload = () => {
+            if (typeof ZoiPartnerMenu !== 'undefined') {
+                const zcat = ZoiPartnerMenu.getAllCategories();
+                if (zcat && zcat.length > 0 && zcat[0] !== 'Recommended') {
+                    categories = zcat;
+                }
+                const zItems = ZoiPartnerMenu.getMenuItems();
+                if (zItems && zItems.length > 0) {
+                    menuItems = zItems;
+                } else {
+                    // Seed initial if empty
+                    ZoiPartnerMenu.addMenuItem({ id: 101, name: "Butter Chicken", price: 350, cost: 200, type: "nonveg", img: "https://via.placeholder.com/300x200?text=Butter+Chicken", time: 20, cals: 450, qty: 100, schedule: "All Day" }, "Mains");
+                    menuItems = ZoiPartnerMenu.getMenuItems();
+                }
+            } else {
+                menuItems = [
+                    { id: 101, name: "Butter Chicken", category: "Mains", price: 350, cost: 200, stock: true, type: "nonveg", img: "https://via.placeholder.com/300x200?text=Butter+Chicken", time: 20, cals: 450, qty: 100, schedule: "All Day" },
+                    { id: 102, name: "Paneer Tikka", category: "Starters", price: 280, cost: 120, stock: true, type: "veg", img: "https://via.placeholder.com/300x200?text=Paneer+Tikka", time: 15, cals: 320, qty: 50, schedule: "Dinner" }
+                ];
+            }
+
+            // Unify stock flag
+            menuItems.forEach(i => {
+                if(i.tags && i.tags.includes('Out of Stock')) i.stock = false;
+                else i.stock = true;
+                if(!i.category) i.category = "Mains";
+            });
+
+            renderCategories();
+            renderMenu();
+            renderHistory();
+            updateEditorCats();
+        };
+
+        // === RENDER LOGIC ===
+        function renderCategories() {
+            const chipContainer = document.getElementById('category-chips');
+            chipContainer.innerHTML = `<button onclick="renderMenu('All')" class="px-4 py-1.5 rounded-full bg-primary text-black text-xs font-bold whitespace-nowrap shadow-lg">All</button>`;
+            categories.forEach(cat => {
+                chipContainer.innerHTML += `<button onclick="renderMenu('${cat}')" class="px-4 py-1.5 rounded-full bg-surface border border-border hover:border-primary text-gray-300 hover:text-white text-xs font-bold whitespace-nowrap transition-all">${cat}</button>`;
+            });
+
+            // Editor List
+            const setupList = document.getElementById('setup-cat-list');
+            setupList.innerHTML = "";
+            categories.forEach(cat => {
+                setupList.innerHTML += `
+                    <div class="flex items-center justify-between bg-black/20 px-3 py-2 rounded-lg border border-border group hover:border-primary/50 cursor-pointer">
+                        <span class="text-sm font-bold text-gray-300 group-hover:text-white">${cat}</span>
+                        <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="removeCategory('${cat}')" class="text-xs text-red-500 hover:text-red-400"><span class="material-symbols-outlined text-sm">delete</span></button>
+                        </div>
+                    </div>`;
+            });
+
+            // Bulk Modal
+            const bulkSelect = document.getElementById('bulk-category');
+            bulkSelect.innerHTML = '<option value="All">Entire Menu</option>';
+            categories.forEach(cat => bulkSelect.innerHTML += `<option value="${cat}">${cat}</option>`);
+        }
+
+        function updateEditorCats() {
+            const select = document.getElementById('editor-category');
+            select.innerHTML = "";
+            categories.forEach(cat => select.innerHTML += `<option value="${cat}">${cat}</option>`);
+        }
+
+        function renderMenu(filterCat = 'All') {
+            const grid = document.getElementById('menu-grid');
+            const search = document.getElementById('menu-search').value.toLowerCase();
+            grid.innerHTML = "";
+
+            menuItems.forEach(item => {
+                if (filterCat !== 'All' && item.category !== filterCat) return;
+                if (search && !item.name.toLowerCase().includes(search)) return;
+
+                let typeBadge = item.type === 'veg' ? `<span class="border border-green-500 text-green-500 px-1 rounded-[2px] text-[9px] font-black">VEG</span>`
+                    : (item.type === 'nonveg' ? `<span class="border border-red-500 text-red-500 px-1 rounded-[2px] text-[9px] font-black">NON-VEG</span>` : `<span class="border border-yellow-500 text-yellow-500 px-1 rounded-[2px] text-[9px] font-black">EGG</span>`);
+
+                const scheduleBadge = item.schedule !== 'All Day' ? `<span class="text-[9px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded font-bold">${item.schedule}</span>` : '';
+
+                const html = `
+                    <div class="bg-surface border border-border rounded-xl overflow-hidden group hover:border-primary/50 transition-all flex flex-col h-full relative">
+                        <div class="relative h-36 bg-gray-800 overflow-hidden">
+                            <img src="${item.img}" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute top-2 right-2 flex gap-1">
+                                <button onclick="loadIntoEditor(${item.id})" class="p-1.5 bg-black/60 rounded-lg text-white hover:bg-primary hover:text-black backdrop-blur-md transition-colors shadow-lg"><span class="material-symbols-outlined text-sm">edit</span></button>
+                            </div>
+                            <div class="absolute bottom-2 left-2 bg-black/60 px-2 py-1 rounded text-[10px] font-bold text-white backdrop-blur-md flex gap-1 items-center">
+                                <span>${item.category}</span>
+                                ${scheduleBadge}
+                            </div>
+                        </div>
+                        <div class="p-4 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    ${typeBadge}
+                                    <h4 class="font-bold text-white text-base truncate">${item.name}</h4>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <p class="text-primary font-black text-lg">₹${item.price}</p>
+                                    <span class="text-xs text-gray-500 font-mono">${item.qty === '∞' ? 'Unlimited' : item.qty + ' Left'}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-border">
+                                <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
+                                    <input type="checkbox" id="toggle-${item.id}" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" ${item.stock ? 'checked' : ''} onclick="toggleStock(${item.id})"/>
+                                    <label for="toggle-${item.id}" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-700 cursor-pointer border border-gray-600"></label>
+                                </div>
+                                <span class="text-xs ${item.stock ? 'text-green-500' : 'text-red-500'} font-bold">
+                                    ${item.stock ? 'LIVE' : 'SOLD OUT'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>`;
+                grid.innerHTML += html;
+            });
+        }
+
+        // === PHOTO UPLOAD & PREVIEW ===
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('editor-img-preview').src = e.target.result;
+                    showToast("Uploaded", "Image added successfully.");
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function enhanceImage() {
+            const img = document.getElementById('editor-img-preview');
+            // Visual feedback for AI enhancement
+            img.style.filter = "blur(2px)";
+            setTimeout(() => {
+                img.style.filter = "contrast(1.2) saturation(1.3)";
+                showToast("Enhanced", "AI upscale complete.");
+            }, 1000);
+        }
+
+        // === PROFIT MARGIN CALC ===
+        function calculateMargin() {
+            const price = parseFloat(document.getElementById('editor-price').value) || 0;
+            const cost = parseFloat(document.getElementById('editor-cost').value) || 0;
+            const marginDisplay = document.getElementById('margin-display');
+
+            if (price > 0 && cost > 0) {
+                const margin = ((price - cost) / price) * 100;
+                marginDisplay.innerText = margin.toFixed(1) + "%";
+                marginDisplay.className = margin >= 30 ? "font-bold margin-good" : "font-bold margin-bad";
+            } else {
+                marginDisplay.innerText = "--%";
+            }
+        }
+
+        // === EDITOR LOGIC ===
+        function loadIntoEditor(id) {
+            switchTab('editor');
+            const item = menuItems.find(i => i.id === id);
+
+            document.getElementById('editor-name').value = item.name;
+            document.getElementById('editor-price').value = item.price;
+            document.getElementById('editor-cost').value = item.cost || "";
+            document.getElementById('editor-category').value = item.category;
+            document.getElementById('editor-time').value = item.time || 15;
+            document.getElementById('editor-qty').value = item.qty || 100;
+            document.getElementById('editor-schedule').value = item.schedule || 'All Day';
+            document.getElementById('editor-img-preview').src = item.img;
+
+            const dietRadios = document.getElementsByName('diet');
+            dietRadios.forEach(r => { if (r.value === item.type) r.checked = true; });
+
+            calculateMargin();
+            document.getElementById('editor-name').setAttribute('data-id', id);
+        }
+
+        function saveItemFromEditor() {
+            const id = document.getElementById('editor-name').getAttribute('data-id');
+            const name = document.getElementById('editor-name').value;
+            const price = parseFloat(document.getElementById('editor-price').value);
+            const cost = parseFloat(document.getElementById('editor-cost').value);
+            const cat = document.getElementById('editor-category').value;
+            const img = document.getElementById('editor-img-preview').src;
+
+            let type = 'veg';
+            document.getElementsByName('diet').forEach(r => { if (r.checked) type = r.value; });
+
+            if (!name || !price) return alert("Name & Price required");
+
+            const newItem = {
+                id: id ? id : Date.now(), 
+                name, price, cost, category: cat, stock: true, type, img,
+                qty: document.getElementById('editor-qty').value || 100, 
+                schedule: document.getElementById('editor-schedule').value || "All Day",
+                time: document.getElementById('editor-time').value || 15
+            };
+
+            if (id) {
+                // Delete old and add new to simulate update
+                if (typeof ZoiPartnerMenu !== 'undefined') {
+                    ZoiPartnerMenu.deleteMenuItem(id);
+                    ZoiPartnerMenu.addMenuItem(newItem, cat);
+                }
+                const localIndex = menuItems.findIndex(i => i.id == id);
+                if (localIndex > -1) menuItems[localIndex] = newItem;
+                addToHistory(name, "Update", `Price: ₹${price}`);
+            } else {
+                if (typeof ZoiPartnerMenu !== 'undefined') {
+                    ZoiPartnerMenu.addMenuItem(newItem, cat);
+                }
+                menuItems.push(newItem);
+                addToHistory(name, "Creation", "Added to Menu");
+            }
+
+            // Sync back just in case
+            if (typeof ZoiPartnerMenu !== 'undefined') {
+                menuItems = ZoiPartnerMenu.getMenuItems();
+                menuItems.forEach(i => {
+                    if(i.tags && i.tags.includes('Out of Stock')) i.stock = false;
+                    else i.stock = true;
+                    if(!i.category) i.category = cat;
+                });
+            }
+
+            showToast("Saved", "Menu updated successfully.");
+            switchTab('live');
+            renderMenu();
+            clearEditor();
+        }
+
+        function clearEditor() {
+            document.getElementById('editor-name').value = "";
+            document.getElementById('editor-price').value = "";
+            document.getElementById('editor-cost').value = "";
+            document.getElementById('editor-desc').value = "";
+            document.getElementById('editor-name').removeAttribute('data-id');
+            document.getElementById('editor-img-preview').src = "https://via.placeholder.com/400x300?text=Upload+Image";
+            document.getElementById('margin-display').innerText = "--%";
+        }
+
+        // === BULK & AI TOOLS ===
+        function generateDescription() {
+            const btn = event.currentTarget;
+            btn.innerText = "Thinking...";
+            setTimeout(() => {
+                document.getElementById('editor-desc').value = "A chef-crafted masterpiece featuring locally sourced ingredients and a secret blend of spices. Perfect for satisfying your cravings.";
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">auto_awesome</span> AI Write`;
+                showToast("AI Magic", "Description generated!");
+            }, 1000);
+        }
+
+        function openBulkPriceModal() {
+            document.getElementById('bulk-modal').classList.remove('hidden');
+            document.getElementById('bulk-modal').classList.add('flex');
+        }
+
+        function applyBulkPrice() {
+            const percent = parseFloat(document.getElementById('bulk-percent').value);
+            const cat = document.getElementById('bulk-category').value;
+
+            if (!percent) return alert("Enter percentage");
+
+            let count = 0;
+            menuItems.forEach(item => {
+                if (cat === 'All' || item.category === cat) {
+                    item.price = Math.round(item.price * (1 + percent / 100));
+                    count++;
+                }
+            });
+
+            document.getElementById('bulk-modal').classList.add('hidden');
+            document.getElementById('bulk-modal').classList.remove('flex');
+            renderMenu();
+            addToHistory("Bulk Update", "Price Change", `${count} items updated by ${percent}%`);
+            showToast("Success", `Updated ${count} items.`);
+        }
+
+        // === STOCK & HISTORY ===
+        function toggleStock(id) {
+            const item = menuItems.find(i => i.id == id);
+            if (!item) return;
+            item.stock = !item.stock;
+            if (typeof ZoiPartnerMenu !== 'undefined') {
+                ZoiPartnerMenu.toggleItemStock(id);
+            }
+            renderMenu();
+            addToHistory(item.name, "Stock Change", item.stock ? "Live" : "Sold Out");
+            showToast(item.stock ? "Restocked" : "Sold Out", `${item.name} status updated.`);
+        }
+
+        function toggleAllStock(status) {
+            if (confirm(`Mark ALL items as ${status ? 'Available' : 'Sold Out'}?`)) {
+                menuItems.forEach(i => i.stock = status);
+                renderMenu();
+                addToHistory("ALL ITEMS", "Bulk Action", status ? "Open" : "Emergency Close");
+            }
+        }
+
+        function addToHistory(item, action, value) {
+            const now = new Date();
+            historyLog.unshift({
+                time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                user: "Chef", item, action, value
+            });
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const table = document.getElementById('history-table');
+            table.innerHTML = "";
+            historyLog.forEach(log => {
+                table.innerHTML += `
+                    <tr class="hover:bg-white/5 border-b border-border">
+                        <td class="p-4 text-gray-400 font-mono text-xs">${log.time}</td>
+                        <td class="p-4 font-bold text-white">${log.user}</td>
+                        <td class="p-4 text-primary">${log.item}</td>
+                        <td class="p-4"><span class="px-2 py-1 rounded bg-white/10 text-xs font-bold">${log.action}</span></td>
+                        <td class="p-4 text-gray-400 text-xs">${log.value}</td>
+                    </tr>`;
+            });
+        }
+
+        // === UTILS ===
+        function addCategory() {
+            const newCat = prompt("New Category Name:");
+            if (newCat) {
+                categories.push(newCat);
+                renderCategories();
+                updateEditorCats();
+            }
+        }
+
+        function removeCategory(cat) {
+            if (confirm(`Delete category '${cat}'?`)) {
+                categories = categories.filter(c => c !== cat);
+                renderCategories();
+                updateEditorCats();
+            }
+        }
+
+        function switchTab(tab) {
+            ['live', 'editor', 'history'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).className = "tab-inactive px-6 py-3 text-sm font-bold flex items-center gap-2 transition-all";
+            });
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            document.getElementById(`view-${tab}`).classList.add(tab === 'editor' ? 'flex' : 'block');
+            document.getElementById(`tab-${tab}`).className = "tab-active px-6 py-3 text-sm font-bold flex items-center gap-2 transition-all";
+        }
+
+        function openEditor() { switchTab('editor'); clearEditor(); }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+    </script>
+    <script>
+        // POS-ONLY SESSION GUARD: Hide online-only sidebar links for POS users
+        (function () {
+            try {
+                const u = JSON.parse(localStorage.getItem('zoiUser') || '{}');
+                if (u.role === 'pos_staff' || u.isPosOnly) {
+                    const hubTitle = document.querySelector('aside h1');
+                    if (hubTitle) hubTitle.textContent = 'POS Hub';
+                    const logoDiv = document.querySelector('aside > div[onclick]');
+                    if (logoDiv) logoDiv.setAttribute('onclick', "window.location.href='restaurant_pos_terminal.html'");
+                    document.querySelectorAll('aside nav a').forEach(link => {
+                        const text = link.textContent.trim();
+                        if (['Promotions', 'Loyalty', 'Reviews'].includes(text)) {
+                            link.style.display = 'none';
+                        }
+                        if (text === 'Dashboard') {
+                            link.href = 'restaurant_pos_terminal.html';
+                            link.innerHTML = '<span class="material-symbols-outlined">point_of_sale</span> POS Terminal';
+                        }
+                    });
+                    // Hide "Growth" section header
+                    document.querySelectorAll('aside nav div').forEach(el => {
+                        if (el.textContent.trim() === 'Growth') el.style.display = 'none';
+                    });
+                }
+            } catch (e) { }
+        })();
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+    <script src="js/zoi_config.js"></script>
+    <script src="js/zoi_partner_engine.js"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+

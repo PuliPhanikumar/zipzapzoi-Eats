@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Admin - User Database</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>ZoiAuth.enforceAccess('User Accounts');</script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .tab-active {
+            border-bottom: 2px solid #00f0ff;
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-inactive {
+            border-bottom: 2px solid transparent;
+            color: #6b7280;
+        }
+
+        .tab-inactive:hover {
+            color: #d1d5db;
+            background: rgba(255, 255, 255, 0.02);
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans selection:bg-primary selection:text-black">
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+
+        <header
+            class="h-16 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-6 z-10">
+            <h1 class="text-lg font-bold flex items-center gap-2">
+                User Database <span class="text-xs bg-surface border border-border px-2 py-0.5 rounded text-gray-400"
+                    id="total-count">Loading...</span>
+            </h1>
+            <div class="flex items-center gap-3">
+                <select id="status-filter" onchange="renderTable()"
+                    class="bg-black/30 border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary cursor-pointer h-9">
+                    <option value="all">All Status</option>
+                    <option value="Active">Active Only</option>
+                    <option value="Suspended">Suspended</option>
+                    <option value="Pending">Pending</option>
+                </select>
+
+                <div class="relative">
+                    <input type="text" id="search-input" onkeyup="renderTable()"
+                        placeholder="Search Name, ID or Email..."
+                        class="bg-surface border border-border rounded-lg pl-9 pr-4 py-1.5 text-sm text-white focus:border-primary focus:ring-0 w-64 h-9">
+                    <span class="material-symbols-outlined absolute left-2.5 top-2 text-gray-500 text-lg">search</span>
+                </div>
+                <button id="btn-hire-staff" onclick="openHireModal()"
+                    class="hidden px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-black font-bold transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(0, 240, 255,0.3)] text-sm">
+                    <span class="material-symbols-outlined text-lg">person_add</span> Hire Staff
+                </button>
+            </div>
+        </header>
+
+        <div class="px-6 pt-2 border-b border-border flex gap-2 bg-bg overflow-x-auto">
+            <button onclick="filterTable('all')" id="tab-all"
+                class="tab-active py-3 px-4 text-sm font-bold transition-all flex items-center gap-2 rounded-t-lg whitespace-nowrap">
+                All Users <span class="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300"
+                    id="count-all">0</span>
+            </button>
+            <button onclick="filterTable('customer')" id="tab-customer"
+                class="tab-inactive py-3 px-4 text-sm font-bold transition-all flex items-center gap-2 rounded-t-lg whitespace-nowrap">
+                Customers <span
+                    class="text-[10px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20"
+                    id="count-cust">0</span>
+            </button>
+            <button onclick="filterTable('partner')" id="tab-partner"
+                class="tab-inactive py-3 px-4 text-sm font-bold transition-all flex items-center gap-2 rounded-t-lg whitespace-nowrap">
+                Restaurants <span
+                    class="text-[10px] bg-orange-500/10 text-orange-400 px-1.5 py-0.5 rounded border border-orange-500/20"
+                    id="count-rest">0</span>
+            </button>
+            <button onclick="filterTable('rider')" id="tab-rider"
+                class="tab-inactive py-3 px-4 text-sm font-bold transition-all flex items-center gap-2 rounded-t-lg whitespace-nowrap">
+                Riders <span
+                    class="text-[10px] bg-green-500/10 text-green-400 px-1.5 py-0.5 rounded border border-green-500/20"
+                    id="count-ride">0</span>
+            </button>
+            <button onclick="filterTable('staff')" id="tab-staff"
+                class="tab-inactive py-3 px-4 text-sm font-bold transition-all flex items-center gap-2 rounded-t-lg whitespace-nowrap ml-auto bg-primary/10 border-b-2 border-transparent">
+                <span class="material-symbols-outlined text-[16px] text-primary">shield_person</span>
+                Internal Staff <span
+                    class="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded border border-primary/30"
+                    id="count-staff">0</span>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-auto p-6 bg-bg">
+            <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-lg">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-black/20 text-xs uppercase text-gray-400 font-bold sticky top-0 backdrop-blur-md">
+                        <tr>
+                            <th class="p-4 border-b border-border">Identity</th>
+                            <th class="p-4 border-b border-border">Role</th>
+                            <th class="p-4 border-b border-border">Status</th>
+                            <th class="p-4 border-b border-border">Trust Score</th>
+                            <th class="p-4 border-b border-border">Activity</th>
+                            <th class="p-4 border-b border-border text-right">Manage</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm" id="user-table-body">
+                    </tbody>
+                </table>
+
+                <div id="empty-state" class="hidden flex flex-col items-center justify-center p-12 text-gray-500">
+                    <span class="material-symbols-outlined text-4xl mb-2 opacity-50">search_off</span>
+                    <p>No users found matching your filters.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="user-modal"
+        class="fixed inset-0 z-40 bg-black/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-2xl p-6 shadow-2xl relative">
+            <button onclick="closeModal('user-modal')"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white"><span
+                    class="material-symbols-outlined">close</span></button>
+
+            <div class="flex items-center gap-6 mb-8 border-b border-border pb-6">
+                <div class="size-20 rounded-full bg-gray-700 bg-cover border-4 border-surface shadow-xl" id="modal-img">
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white" id="modal-name">--</h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <p class="text-sm text-gray-400 font-mono" id="modal-id">ID: --</p>
+                        <span class="text-gray-600">•</span>
+                        <p class="text-sm text-gray-400" id="modal-email">--</p>
+                    </div>
+                    <div class="mt-2" id="modal-role-badge"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="bg-bg p-4 rounded-xl border border-border">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-1" id="stat-1-label">Total Spend</p>
+                    <h3 class="text-xl font-mono font-bold text-white" id="stat-1-val">₹0</h3>
+                </div>
+                <div class="bg-bg p-4 rounded-xl border border-border">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-1" id="stat-2-label">Total Orders</p>
+                    <h3 class="text-xl font-mono font-bold text-white" id="stat-2-val">0</h3>
+                </div>
+                <div class="bg-bg p-4 rounded-xl border border-border">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">System Risk</p>
+                    <h3 class="text-xl font-mono font-bold text-success" id="modal-score">100/100</h3>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="openActionModal('suspend')"
+                    class="px-4 py-2 rounded-lg border border-warning/30 text-warning bg-warning/5 hover:bg-warning/10 font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">block</span> Suspend
+                </button>
+                <button onclick="openActionModal('delete')"
+                    class="px-4 py-2 rounded-lg border border-danger/30 text-danger bg-danger/5 hover:bg-danger/10 font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">delete_forever</span> Terminate
+                </button>
+                <button id="btn-promote" onclick="openRoleModal('promote')"
+                    class="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-black font-bold transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(57,224,121,0.3)]">
+                    <span class="material-symbols-outlined text-lg">shield_person</span> Promote to Staff
+                </button>
+                <button id="btn-demote" onclick="openRoleModal('demote')"
+                    class="hidden px-4 py-2 rounded-lg border border-warning/30 text-warning bg-warning/5 hover:bg-warning/10 font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">person_remove</span> Revoke Access
+                </button>
+                <button class="px-6 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold transition-all">
+                    Reset Password
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="action-modal"
+        class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div
+            class="bg-[#1a1212] border border-red-500/30 rounded-xl w-full max-w-md p-6 shadow-[0_0_50px_rgba(239,68,68,0.1)]">
+            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                <span class="material-symbols-outlined text-danger">gavel</span> Account Action
+            </h3>
+            <p class="text-sm text-gray-400 mb-6">You are about to take restrictive action on <span
+                    id="action-target-name" class="text-white font-bold">User</span>.</p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Action Type</label>
+                    <input type="text" id="action-type-display" disabled
+                        class="w-full bg-bg border border-border rounded-lg p-3 text-white opacity-50 font-bold">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Reason (Required)</label>
+                    <select id="action-reason"
+                        class="w-full bg-bg border border-border rounded-lg p-3 text-white focus:border-danger focus:ring-0 text-sm">
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Admin Note</label>
+                    <textarea id="action-note" rows="3"
+                        class="w-full bg-bg border border-border rounded-lg p-3 text-white focus:border-danger focus:ring-0 text-sm"
+                        placeholder="Details of violation..."></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeModal('action-modal')"
+                    class="flex-1 py-3 rounded-lg border border-border text-gray-400 font-bold hover:text-white transition-colors">Cancel</button>
+                <button onclick="executeAction()"
+                    class="flex-1 py-3 rounded-lg bg-danger hover:bg-red-600 text-white font-bold shadow-[0_0_15px_rgba(239,68,68,0.3)] transition-all">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROLE ASSIGNMENT MODAL -->
+    <div id="role-modal"
+        class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div
+            class="bg-surface border border-primary/30 rounded-xl w-full max-w-md p-6 shadow-[0_0_50px_rgba(57,224,121,0.1)]">
+            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">admin_panel_settings</span> Manage Access
+            </h3>
+            <p class="text-sm text-gray-400 mb-6">Assigning a new internal role to <span id="role-target-name"
+                    class="text-white font-bold tracking-wide">User</span>.</p>
+
+            <div class="space-y-5" id="role-assignment-form">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Select Target
+                        Role</label>
+                    <div class="relative">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-[20px]">badge</span>
+                        <select id="role-select"
+                            class="w-full bg-bg border border-border rounded-lg pl-10 pr-4 py-3 text-white focus:border-primary focus:ring-0 text-sm font-medium appearance-none cursor-pointer">
+                            <option value="Dispute Manager">Dispute Manager</option>
+                            <option value="Zone Supervisor">Zone Supervisor</option>
+                            <option value="Support Agent">Support Agent</option>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">expand_content</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2 ml-1" id="role-desc">Handles escalated support tickets and
+                        refunds.</p>
+                </div>
+
+                <div class="bg-warning/5 border border-warning/20 rounded-lg p-3 flex gap-3 items-start">
+                    <span class="material-symbols-outlined text-warning text-lg mt-0.5">info</span>
+                    <p class="text-xs text-gray-400 leading-relaxed">Promoting this user will grant them access to
+                        internal administrative consoles. They will be required to set up 2FA on their next login.</p>
+                </div>
+            </div>
+
+            <div class="hidden text-center py-6" id="role-revoke-form">
+                <span class="material-symbols-outlined text-5xl text-warning mb-2">warning</span>
+                <p class="text-sm text-gray-300">Are you sure you want to revoke <span class="text-white font-bold"
+                        id="revoke-target-name"></span>'s internal access?</p>
+                <p class="text-xs text-gray-500 mt-2">They will immediately lose access to all admin dashboards.</p>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeModal('role-modal')"
+                    class="flex-1 py-3 rounded-lg border border-border text-gray-400 font-bold hover:text-white transition-colors">Cancel</button>
+                <button id="role-confirm-btn" onclick="executeRoleChange()"
+                    class="flex-1 py-3 rounded-lg bg-primary hover:bg-primary/90 text-black font-bold shadow-[0_0_15px_rgba(57,224,121,0.3)] transition-all">Assign
+                    Role</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIRE NEW EMPLOYEE MODAL -->
+    <div id="hire-modal"
+        class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div
+            class="bg-surface border border-primary/30 rounded-xl w-full max-w-md p-6 shadow-[0_0_50px_rgba(0, 240, 255,0.1)]">
+            <h3 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">person_add</span> Hire New Employee
+            </h3>
+            <p class="text-sm text-gray-400 mb-6">Add a new internal team member to the system.</p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Full Name
+                        *</label>
+                    <div class="relative">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-[20px]">person</span>
+                        <input type="text" id="hire-name" placeholder="e.g. Rajan Verma"
+                            class="w-full bg-bg border border-border rounded-lg pl-10 pr-4 py-3 text-white focus:border-primary focus:ring-0 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Email Address
+                        *</label>
+                    <div class="relative">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-[20px]">mail</span>
+                        <input type="email" id="hire-email" placeholder="rajan.v@zipzapzoi.in"
+                            class="w-full bg-bg border border-border rounded-lg pl-10 pr-4 py-3 text-white focus:border-primary focus:ring-0 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">Assign Role
+                        *</label>
+                    <div class="relative">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-[20px]">badge</span>
+                        <select id="hire-role"
+                            class="w-full bg-bg border border-border rounded-lg pl-10 pr-4 py-3 text-white focus:border-primary focus:ring-0 text-sm font-medium appearance-none cursor-pointer">
+                            <option value="Dispute Manager">Dispute Manager</option>
+                            <option value="Zone Supervisor">Zone Supervisor</option>
+                            <option value="Support Agent">Support Agent</option>
+                            <option value="Super Admin">Super Admin</option>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">expand_content</span>
+                    </div>
+                </div>
+
+                <div class="bg-primary/5 border border-primary/20 rounded-lg p-3 flex gap-3 items-start">
+                    <span class="material-symbols-outlined text-primary text-lg mt-0.5">info</span>
+                    <p class="text-xs text-gray-400 leading-relaxed">A welcome email with login credentials and 2FA
+                        setup instructions will be sent to the new employee.</p>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeModal('hire-modal')"
+                    class="flex-1 py-3 rounded-lg border border-border text-gray-400 font-bold hover:text-white transition-colors">Cancel</button>
+                <button onclick="executeHire()"
+                    class="flex-1 py-3 rounded-lg bg-primary hover:bg-primary/90 text-black font-bold shadow-[0_0_15px_rgba(0, 240, 255,0.3)] transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-lg">check</span> Hire & Onboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. ROBUST DATA ENGINE
+        let users = [];
+        let staff = [];
+        let currentUser = null;
+        let currentFilter = 'all';
+
+        async function initData() {
+            try {
+                // Fetch Real Users from Backend
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/users', {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
+                });
+                if (response.ok) {
+                    const dbUsers = await response.json();
+
+                    // Map DB layout to frontend structure
+                    users = dbUsers.map(u => ({
+                        id: u.zoiId,
+                        name: u.name,
+                        email: u.email,
+                        role: u.role,
+                        status: u.status || 'Active',
+                        score: u.role === 'customer' ? 98 : (u.role === 'rider' ? 88 : 95), // Simulation fallback for UI
+                        lastActive: 'Today',
+                        spend: u.role === 'customer' ? '₹' + Math.floor(Math.random() * 5000) : 'N/A',
+                        orders: Math.floor(Math.random() * 50)
+                    }));
+                } else {
+                    console.warn("Backend Users API failed. Falling back to simulation data.");
+                    users = typeof ZoiUsers !== 'undefined' ? ZoiUsers.getAll() : [];
+                }
+            } catch (e) {
+                console.warn("Backend unavailable. Falling back to simulation data.", e);
+                users = typeof ZoiUsers !== 'undefined' ? ZoiUsers.getAll() : [];
+            }
+
+            // Internal Staff (keep local testing array for now unless we add a Staff table to Postgres later)
+            staff = typeof ZoiStaff !== 'undefined' ? ZoiStaff.getAll() : [];
+            updateCounts();
+            renderTable();
+        }
+
+        // 2. COUNTER LOGIC
+        function updateCounts() {
+            document.getElementById('count-all').innerText = users.length;
+            document.getElementById('count-cust').innerText = users.filter(u => u.role === 'customer').length;
+            document.getElementById('count-rest').innerText = users.filter(u => u.role === 'partner').length;
+            document.getElementById('count-ride').innerText = users.filter(u => u.role === 'rider').length;
+            document.getElementById('count-staff').innerText = staff.length;
+
+            if (currentFilter === 'staff') {
+                document.getElementById('total-count').innerText = `${staff.length} Internal Staff`;
+            } else {
+                document.getElementById('total-count').innerText = `${users.length} Records`;
+            }
+        }
+
+        // 3. RENDERER
+        function renderTable() {
+            const tbody = document.getElementById('user-table-body');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const statusFilter = document.getElementById('status-filter').value;
+
+            tbody.innerHTML = "";
+            let matchCount = 0;
+
+            // Handle Staff Rendering
+            if (currentFilter === 'staff') {
+                staff.forEach(emp => {
+                    if (search && !emp.name.toLowerCase().includes(search) && !emp.email.toLowerCase().includes(search)) return;
+                    matchCount++;
+
+                    let statusColor = emp.status === 'Active' ? 'text-success' : 'text-danger';
+
+                    const html = `
+                        <tr class="hover:bg-white/5 transition-colors border-b border-border group bg-primary/5">
+                            <td class="p-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="size-9 rounded-full bg-primary/20 border border-primary/50 text-primary flex items-center justify-center font-bold text-sm">
+                                        <span class="material-symbols-outlined text-lg">shield_person</span>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-white text-sm">${emp.name}</p>
+                                        <p class="text-xs text-gray-500 font-mono">${emp.id} • ${emp.email}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-4"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase border border-primary text-primary bg-primary/10">${emp.role}</span></td>
+                            <td class="p-4"><div class="flex items-center gap-1.5"><span class="size-1.5 rounded-full ${statusColor.replace('text-', 'bg-')}"></span><span class="text-xs font-bold ${statusColor}">${emp.status}</span></div></td>
+                            <td class="p-4 font-mono font-bold text-gray-500">N/A</td>
+                            <td class="p-4 text-gray-400 text-xs">Internal Access</td>
+                            <td class="p-4 text-right">
+                                <button onclick="viewUser('${emp.id}', true)" class="p-2 text-primary hover:text-black hover:bg-primary rounded transition-colors">
+                                    <span class="material-symbols-outlined text-[20px]">manage_accounts</span>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += html;
+                });
+            } else {
+                // Main Users Rendering
+                users.forEach(user => {
+                    // Filters
+                    if (currentFilter !== 'all' && user.role !== currentFilter) return;
+                    if (statusFilter !== 'all' && user.status !== statusFilter) return;
+                    if (search && !user.name.toLowerCase().includes(search) && !user.email.toLowerCase().includes(search) && !user.id.toLowerCase().includes(search)) return;
+
+                    matchCount++;
+
+                    // Visuals
+                    let roleColor = user.role === 'customer' ? 'text-blue-400 bg-blue-500/10 border-blue-500/20'
+                        : (user.role === 'rider' ? 'text-green-400 bg-green-500/10 border-green-500/20' : 'text-orange-400 bg-orange-500/10 border-orange-500/20');
+
+                    let roleName = user.role === 'partner' ? 'Restaurant' : (user.role.charAt(0).toUpperCase() + user.role.slice(1));
+
+                    let statusColor = user.status === 'Active' ? 'text-success' : (user.status === 'Pending' ? 'text-warning' : 'text-danger');
+                    let scoreColor = user.score < 50 ? 'text-danger' : 'text-white';
+
+                    const html = `
+                        <tr class="hover:bg-white/5 transition-colors border-b border-border group">
+                            <td class="p-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="size-9 rounded-full bg-surface border border-border flex items-center justify-center font-bold text-gray-400 text-sm">
+                                        ${user.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-white text-sm">${user.name}</p>
+                                        <p class="text-xs text-gray-500 font-mono">${user.id}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-4"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase border ${roleColor}">${roleName}</span></td>
+                            <td class="p-4"><div class="flex items-center gap-1.5"><span class="size-1.5 rounded-full ${statusColor.replace('text-', 'bg-')}"></span><span class="text-xs font-bold ${statusColor}">${user.status}</span></div></td>
+                            <td class="p-4 font-mono font-bold ${scoreColor}">${user.score}</td>
+                            <td class="p-4 text-gray-400 text-xs">${user.lastActive}</td>
+                            <td class="p-4 text-right">
+                                <button onclick="viewUser('${user.id}')" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded transition-colors">
+                                    <span class="material-symbols-outlined text-[20px]">manage_accounts</span>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += html;
+                });
+            }
+
+            document.getElementById('empty-state').style.display = matchCount === 0 ? 'flex' : 'none';
+        }
+
+        function filterTable(role) {
+            currentFilter = role;
+            ['all', 'customer', 'partner', 'rider', 'staff'].forEach(r => {
+                const btn = document.getElementById(`tab-${r}`);
+                if (r === role) {
+                    if (r === 'staff') {
+                        btn.className = "tab-active py-3 px-4 text-sm font-bold transition-all flex items-center gap-2 rounded-t-lg whitespace-nowrap ml-auto bg-primary text-black border-b-2 border-primary";
+                    } else {
+                        btn.className = "tab-active py-3 px-4 text-sm font-bold transition-all flex items-center gap-2 rounded-t-lg whitespace-nowrap";
+                    }
+                }
+                else {
+                    if (r === 'staff') {
+                        btn.className = "tab-inactive py-3 px-4 text-sm font-bold transition-all flex items-center gap-2 rounded-t-lg whitespace-nowrap ml-auto bg-primary/10 border-b-2 border-transparent hover:bg-primary/20 hover:text-primary";
+                    } else {
+                        btn.className = "tab-inactive py-3 px-4 text-sm font-bold transition-all flex items-center gap-2 rounded-t-lg whitespace-nowrap";
+                    }
+                }
+            });
+
+            // Toggle Hire Staff button
+            const hireBtn = document.getElementById('btn-hire-staff');
+            if (role === 'staff') {
+                hireBtn.classList.remove('hidden');
+                hireBtn.classList.add('flex');
+            } else {
+                hireBtn.classList.add('hidden');
+                hireBtn.classList.remove('flex');
+            }
+
+            updateCounts();
+            renderTable();
+        }
+
+        // 4. DETAILS MODAL
+        function viewUser(id, isStaff = false) {
+            if (isStaff) {
+                currentUser = staff.find(s => s.id === id);
+                if (!currentUser) return;
+
+                document.getElementById('modal-name').innerText = currentUser.name;
+                document.getElementById('modal-id').innerText = currentUser.id;
+                document.getElementById('modal-email').innerText = currentUser.email;
+                document.getElementById('modal-score').innerText = 'N/A';
+
+                document.getElementById('modal-img').style.backgroundImage = '';
+
+                document.getElementById('stat-1-label').innerText = 'Role';
+                document.getElementById('stat-1-val').innerText = currentUser.role;
+                document.getElementById('stat-2-label').innerText = 'Access';
+                document.getElementById('stat-2-val').innerText = 'Internal';
+
+                // Show demote, hide promote
+                document.getElementById('btn-promote').classList.add('hidden');
+                document.getElementById('btn-demote').classList.remove('hidden');
+                document.getElementById('btn-demote').classList.add('flex');
+            } else {
+                currentUser = users.find(u => u.id === id);
+                if (!currentUser) return;
+
+                document.getElementById('modal-name').innerText = currentUser.name;
+                document.getElementById('modal-id').innerText = currentUser.id;
+                document.getElementById('modal-email').innerText = currentUser.email;
+                document.getElementById('modal-score').innerText = currentUser.score + "/100";
+
+                document.getElementById('modal-img').style.backgroundImage = `url('http://googleusercontent.com/profile/picture/${Math.floor(Math.random() * 20)}')`;
+
+                // Role Context
+                let labels = { l1: "Spend", l2: "Orders" };
+                if (currentUser.role === 'partner') labels = { l1: "Revenue", l2: "Sales" };
+                if (currentUser.role === 'rider') labels = { l1: "Earnings", l2: "Deliveries" };
+
+                document.getElementById('stat-1-label').innerText = labels.l1;
+                document.getElementById('stat-1-val').innerText = currentUser.spend;
+                document.getElementById('stat-2-label').innerText = labels.l2;
+                document.getElementById('stat-2-val').innerText = currentUser.orders;
+
+                // Show promote, hide demote
+                document.getElementById('btn-promote').classList.remove('hidden');
+                document.getElementById('btn-demote').classList.add('hidden');
+            }
+
+            document.getElementById('user-modal').classList.remove('hidden');
+            document.getElementById('user-modal').classList.add('flex');
+        }
+
+        // 5. ACTION LOGIC
+        function openActionModal(type) {
+            document.getElementById('user-modal').classList.remove('flex');
+            document.getElementById('user-modal').classList.add('hidden');
+            document.getElementById('action-modal').classList.remove('hidden');
+            document.getElementById('action-modal').classList.add('flex');
+
+            document.getElementById('action-target-name').innerText = currentUser.name;
+            document.getElementById('action-type-display').value = type === 'suspend' ? "Suspension (7 Days)" : "Permanent Termination";
+
+            const reasons = {
+                customer: ["Fraudulent Payment", "Abuse of Support", "Fake Reviews"],
+                partner: ["Hygiene Violation", "Commission Evasion", "Menu Inflation"],
+                rider: ["Order Theft", "Frequent Delays", "Behavioral Issue"]
+            };
+
+            const select = document.getElementById('action-reason');
+            select.innerHTML = "";
+            reasons[currentUser.role].forEach(r => select.innerHTML += `<option>${r}</option>`);
+        }
+
+        async function executeAction() {
+            const reason = document.getElementById('action-reason').value;
+
+            // Update Backend State
+            const actionType = document.getElementById('action-type-display').value;
+            const status = actionType.includes("Suspension") ? "Suspended" : "Terminated";
+
+            try {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/users/' + currentUser.id + '/status', {
+                    method: 'PATCH',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '')
+                    },
+                    body: JSON.stringify({ status, reason })
+                });
+
+                if (!response.ok) throw new Error('Failed to update status on server');
+
+                if (typeof ZoiUsers !== 'undefined') ZoiUsers.updateStatus(currentUser.id, status);
+                users = users.map(u => u.id === currentUser.id ? { ...u, status } : u);
+                
+                updateCounts();
+                renderTable();
+                closeModal('action-modal');
+                showToast("Action Executed", `${currentUser.name} has been ${status}.`);
+            } catch (err) {
+                showToast("Server Error", err.message);
+            }
+        }
+
+        function showToast(title, msg) {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.className = "fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none";
+                toast.innerHTML = `<span class="material-symbols-outlined text-primary">check_circle</span><div><h4 class="font-bold text-sm" id="toast-title"></h4><p class="text-xs text-gray-400" id="toast-msg"></p></div>`;
+                document.body.appendChild(toast);
+            }
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+            }, 100);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        // 6. ROLE MANAGEMENT LOGIC
+        let roleAction = 'promote'; // 'promote' or 'demote'
+
+        function openRoleModal(type) {
+            roleAction = type;
+            closeModal('user-modal');
+
+            const modal = document.getElementById('role-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            if (type === 'promote') {
+                document.getElementById('role-target-name').innerText = currentUser.name;
+                document.getElementById('role-assignment-form').classList.remove('hidden');
+                document.getElementById('role-revoke-form').classList.add('hidden');
+                document.getElementById('role-confirm-btn').innerText = 'Assign Role';
+                document.getElementById('role-confirm-btn').className = 'flex-1 py-3 rounded-lg bg-primary hover:bg-primary/90 text-black font-bold shadow-[0_0_15px_rgba(57,224,121,0.3)] transition-all';
+            } else {
+                document.getElementById('role-assignment-form').classList.add('hidden');
+                document.getElementById('role-revoke-form').classList.remove('hidden');
+                document.getElementById('revoke-target-name').innerText = currentUser.name;
+                document.getElementById('role-confirm-btn').innerText = 'Revoke Access';
+                document.getElementById('role-confirm-btn').className = 'flex-1 py-3 rounded-lg bg-danger hover:bg-red-600 text-white font-bold shadow-[0_0_15px_rgba(239,68,68,0.3)] transition-all';
+            }
+        }
+
+        async function executeRoleChange() {
+            if (roleAction === 'promote') {
+                const selectedRole = document.getElementById('role-select').value;
+                
+                try {
+                    const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/users/' + currentUser.id + '/role', {
+                        method: 'PATCH',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '')
+                        },
+                        body: JSON.stringify({ role: selectedRole })
+                    });
+
+                    if (!response.ok) throw new Error('Failed to update role on server');
+
+                    // Create a new staff record locally for UI list integration if needed
+                    const newStaff = {
+                        id: 'EMP-' + Math.floor(Math.random() * 900 + 100),
+                        name: currentUser.name,
+                        role: selectedRole,
+                        email: currentUser.email,
+                        status: 'Active'
+                    };
+                    const allStaff = ZoiStaff.getAll();
+                    allStaff.push(newStaff);
+                    localStorage.setItem('zoiStaff', JSON.stringify(allStaff));
+                    staff = ZoiStaff.getAll(); 
+
+                    // Update local users list too
+                    users = users.map(u => u.id === currentUser.id ? { ...u, role: selectedRole } : u);
+
+                    closeModal('role-modal');
+                    showToast('Role Assigned', `${currentUser.name} is now a ${selectedRole}.`);
+                } catch (err) {
+                    showToast("Server Error", err.message);
+                }
+            } else {
+                // Demote/Revoke: Usually would hit an API too, but for simplicity we'll just handle staff list
+                let allStaff = ZoiStaff.getAll();
+                allStaff = allStaff.filter(s => s.id !== currentUser.id);
+                localStorage.setItem('zoiStaff', JSON.stringify(allStaff));
+                staff = ZoiStaff.getAll();
+
+                closeModal('role-modal');
+                showToast('Access Revoked', `${currentUser.name} has been removed from internal staff.`);
+            }
+            updateCounts();
+            renderTable();
+        }
+
+        function openHireModal() {
+            // Clear previous inputs
+            document.getElementById('hire-name').value = '';
+            document.getElementById('hire-email').value = '';
+            document.getElementById('hire-role').selectedIndex = 0;
+
+            const modal = document.getElementById('hire-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function executeHire() {
+            const nameInput = document.getElementById('hire-name').value.trim();
+            const emailInput = document.getElementById('hire-email').value.trim();
+            const roleInput = document.getElementById('hire-role').value;
+
+            if (!nameInput || !emailInput) {
+                alert("Please fill in both name and email.");
+                return;
+            }
+
+            const newStaff = {
+                id: 'EMP-' + Math.floor(Math.random() * 900 + 100),
+                name: nameInput,
+                role: roleInput,
+                email: emailInput,
+                status: 'Active'
+            };
+
+            const allStaff = ZoiStaff.getAll();
+            allStaff.unshift(newStaff); // Add to the top of the list
+            localStorage.setItem('zoiStaff', JSON.stringify(allStaff));
+            staff = ZoiStaff.getAll(); // Refresh local state
+
+            closeModal('hire-modal');
+            showToast('Employee Hired', `${nameInput} has been added as a ${roleInput}.`);
+
+            updateCounts();
+            renderTable();
+        }
+
+        // Init
+        window.onload = () => {
+            initData();
+            renderTable();
+        };
+
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

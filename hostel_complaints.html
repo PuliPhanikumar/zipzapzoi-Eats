@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaint Tickets - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="hostel_shared.js"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1));
+            color: #ec4899;
+            border-color: rgba(236, 72, 153, 0.3);
+            font-weight: 700;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <!-- SIDEBAR -->
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Complaint Tickets <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">report</span></h2>
+                <p class="text-gray-400 text-sm">Manage hosteler complaints, track resolution, and improve service
+                    quality.</p>
+            </div>
+            <button onclick="openComplaintModal()"
+                class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-shadow"><span
+                    class="material-symbols-outlined text-sm">add</span> Log Complaint</button>
+        </header>
+
+        <!-- Stats -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-pink-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-pink-400">confirmation_number</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Tickets</p>
+                    <p class="text-xl font-extrabold text-white" id="stat-total">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-red-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-red-400">error</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Open</p>
+                    <p class="text-xl font-extrabold text-red-400" id="stat-open">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">hourglass_top</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">In Progress</p>
+                    <p class="text-xl font-extrabold text-amber-400" id="stat-progress">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-green-400">check_circle</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Resolved</p>
+                    <p class="text-xl font-extrabold text-green-400" id="stat-resolved">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="px-8 pt-4 flex items-center gap-3 flex-shrink-0">
+            <button class="tab-btn active px-4 py-2 text-xs rounded-xl border border-white/10" data-filter="all"
+                onclick="filterTickets('all')">All</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400" data-filter="open"
+                onclick="filterTickets('open')">Open</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-filter="in-progress" onclick="filterTickets('in-progress')">In Progress</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-filter="resolved" onclick="filterTickets('resolved')">Resolved</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-filter="closed" onclick="filterTickets('closed')">Closed</button>
+            <div class="ml-auto relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span
+                        class="material-symbols-outlined text-gray-500 text-sm">search</span></div><input type="text"
+                    id="search-tickets" oninput="renderTickets()"
+                    class="bg-surface/50 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-pink-500 w-48"
+                    placeholder="Search...">
+            </div>
+        </div>
+
+        <!-- Tickets -->
+        <div class="flex-1 overflow-y-auto p-8 pb-24 space-y-3" id="tickets-container"></div>
+    </main>
+
+    <!-- NEW COMPLAINT MODAL -->
+    <div id="complaint-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-500">report</span> Log Complaint (Warden Entry)</h3>
+                <button onclick="closeComplaintModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <input id="c-hosteler" type="text" placeholder="Hosteler Name *"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="c-room" type="text" placeholder="Room No. *"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <select id="c-source"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="">Report Source</option>
+                        <option>Verbal / In-Person</option>
+                        <option>WhatsApp / Call</option>
+                        <option>Written Note</option>
+                    </select>
+                </div>
+                <select id="c-category"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    <option value="">Category *</option>
+                    <option>Plumbing</option>
+                    <option>Electrical</option>
+                    <option>Housekeeping</option>
+                    <option>Food Quality</option>
+                    <option>Noise</option>
+                    <option>Wi-Fi / Internet</option>
+                    <option>Security</option>
+                    <option>Room Maintenance</option>
+                    <option>Other</option>
+                </select>
+                <select id="c-priority"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    <option value="">Priority *</option>
+                    <option>Critical</option>
+                    <option>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                </select>
+                <input id="c-subject" type="text" placeholder="Subject *"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                <textarea id="c-desc" rows="3" placeholder="Description..."
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none resize-none"></textarea>
+            </div>
+            <div class="p-5 border-t border-border flex gap-3">
+                <button onclick="closeComplaintModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">Cancel</button>
+                <button onclick="fileComplaint()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] transition-shadow flex items-center justify-center gap-2"><span
+                        class="material-symbols-outlined text-sm">send</span> Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TICKET DETAIL MODAL -->
+    <div id="detail-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white" id="detail-title">Ticket</h3><button
+                    onclick="closeDetailModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5" id="detail-body"></div>
+            <div class="p-4 border-t border-border flex gap-2" id="detail-actions"></div>
+        </div>
+    </div>
+
+    <script>
+        const TICKETS = ZoiDB.get('complaint_tickets', [
+            { id: 'TKT-001', hosteler: 'Ravi Kumar (101)', category: 'Plumbing', priority: 'High', subject: 'Bathroom tap leaking continuously', desc: 'The hot water tap in room 101 bathroom has been leaking since yesterday morning. Tried closing it tightly but it still drips.', status: 'Open', date: '2026-03-04', assignee: null },
+            { id: 'TKT-002', hosteler: 'Deepak S. (102)', category: 'Wi-Fi / Internet', priority: 'Medium', subject: 'Wi-Fi signal very weak in room 102', desc: 'Internet speed has dropped significantly in the last week. Can barely load web pages. Other rooms seem fine.', status: 'In Progress', date: '2026-03-03', assignee: 'IT Support' },
+            { id: 'TKT-003', hosteler: 'Priya S. (301)', category: 'Housekeeping', priority: 'Low', subject: 'Room cleaning not done for 2 days', desc: 'Housekeeping staff has skipped room 301 for the past two days. Dustbin overflowing.', status: 'Resolved', date: '2026-03-02', assignee: 'Housekeeping Head' },
+            { id: 'TKT-004', hosteler: 'Manoj P. (103)', category: 'Electrical', priority: 'Critical', subject: 'Power socket sparking in room 103', desc: 'The power socket near bed B in room 103 is sparking when plugging in devices. This is a fire hazard and needs immediate attention.', status: 'Open', date: '2026-03-04', assignee: null },
+            { id: 'TKT-005', hosteler: 'Kiran R. (103)', category: 'Food Quality', priority: 'Medium', subject: 'Dinner quality has declined', desc: 'The dinner quality for the past week has been very poor. Rice is undercooked and dal is too watery. Multiple hostelers have the same complaint.', status: 'In Progress', date: '2026-03-01', assignee: 'Mess Manager' },
+            { id: 'TKT-006', hosteler: 'Sneha Sharma (301)', category: 'Noise', priority: 'Medium', subject: 'Loud music from room 302 late at night', desc: 'Hosteler in room 302 plays loud music past 11 PM almost every night. Affecting my sleep and studies.', status: 'Open', date: '2026-03-03', assignee: null },
+            { id: 'TKT-007', hosteler: 'Warden', category: 'Security', priority: 'High', subject: 'CCTV camera on 2nd floor not working', desc: 'The CCTV camera at the 2nd floor corridor entrance has been offline since 2 days ago. Security vulnerability.', status: 'In Progress', date: '2026-02-28', assignee: 'Security Vendor' },
+            { id: 'TKT-008', hosteler: 'Rahul Kumar (102)', category: 'Room Maintenance', priority: 'Low', subject: 'Ceiling fan making noise', desc: 'The ceiling fan in room 102 has started making a grinding noise. Works fine but the sound is disturbing.', status: 'Closed', date: '2026-02-25', assignee: 'Electrician' },
+        ]);
+
+        const PRIORITY_BADGE = { Critical: '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 w-fit"><span class="material-symbols-outlined text-xs">error</span>Critical</span>', High: '<span class="bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded text-[10px] font-bold">High</span>', Medium: '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">Medium</span>', Low: '<span class="bg-white/10 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">Low</span>' };
+        const STATUS_BADGE = { 'Open': '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">Open</span>', 'In Progress': '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">In Progress</span>', 'Resolved': '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">Resolved</span>', 'Closed': '<span class="bg-white/10 text-gray-500 px-2 py-0.5 rounded text-[10px] font-bold">Closed</span>' };
+        const CAT_ICONS = { Plumbing: 'water_drop', Electrical: 'bolt', Housekeeping: 'cleaning_services', 'Food Quality': 'restaurant', Noise: 'volume_up', 'Wi-Fi / Internet': 'wifi', Security: 'security', 'Room Maintenance': 'build', Other: 'help' };
+
+        let activeFilter = 'all';
+
+        const CAT_COLORS = { Plumbing: 'blue', Electrical: 'yellow', Housekeeping: 'purple', 'Food Quality': 'orange', Noise: 'cyan', 'Wi-Fi / Internet': 'indigo', Security: 'red', 'Room Maintenance': 'teal', Other: 'gray' };
+        const PRIORITY_COLORS = { Critical: 'red', High: 'orange', Medium: 'amber', Low: 'gray' };
+
+        let currentFilter = 'all';
+
+        function renderTickets() {
+            const q = (document.getElementById('search-tickets').value || '').toLowerCase();
+            let items = [...TICKETS];
+            if (currentFilter !== 'all') {
+                const map = { 'open': 'Open', 'in-progress': 'In Progress', 'resolved': 'Resolved', 'closed': 'Closed' };
+                items = items.filter(t => t.status === map[currentFilter]);
+            }
+            if (q) items = items.filter(t => t.subject.toLowerCase().includes(q) || t.hosteler.toLowerCase().includes(q) || t.id.toLowerCase().includes(q));
+
+            document.getElementById('tickets-container').innerHTML = items.map((t, i) => {
+                const cc = CAT_COLORS[t.category] || 'gray'; const ci = CAT_ICONS[t.category] || 'report';
+                const pc = PRIORITY_COLORS[t.priority] || 'gray';
+                const statusBadge = t.status === 'Resolved' ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">✓ Resolved</span>' : t.status === 'Closed' ? '<span class="bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">Closed</span>' : t.status === 'In Progress' ? '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">🔄 In Prog</span>' : '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">! Open</span>';
+
+                // Determine actions based on status
+                let actions = '';
+                if (t.status === 'Open') actions = `<button onclick="updateTicketStatus('${t.id}', 'In Progress')" class="text-[10px] text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded font-bold hover:bg-amber-500/20">Start Work</button>`;
+                else if (t.status === 'In Progress') actions = `<button onclick="updateTicketStatus('${t.id}', 'Resolved')" class="text-[10px] text-green-400 bg-green-500/10 px-2.5 py-1 rounded font-bold hover:bg-green-500/20">Mark Resolved</button>`;
+                else if (t.status === 'Resolved') actions = `<button onclick="updateTicketStatus('${t.id}', 'Closed')" class="text-[10px] text-gray-400 bg-gray-500/10 px-2.5 py-1 rounded font-bold hover:bg-gray-500/20">Close Ticket</button>`;
+
+                return `<div class="glass-panel p-4 bouncy-card fade-row" style="animation-delay:${i * 40}ms">
+                    <div class="flex items-start gap-4">
+                        <div class="h-11 w-11 rounded-xl bg-${cc}-500/15 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-${cc}-400">${ci}</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <span class="font-mono text-[10px] text-pink-400 bg-pink-500/10 px-1.5 py-0.5 rounded">${t.id}</span>
+                                ${statusBadge}
+                                <span class="bg-${pc}-500/20 text-${pc}-400 px-2 py-0.5 rounded text-[10px] font-bold">${t.priority}</span>
+                                <span class="bg-white/10 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">${t.category}</span>
+                            </div>
+                            <h4 class="font-bold text-white text-sm mt-1">${t.subject}</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed mt-1">${t.desc}</p>
+                            <div class="flex items-center gap-4 mt-3 text-[10px] text-gray-500">
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">person</span>${t.hosteler}</span>
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">calendar_today</span>${t.date}</span>
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">chat</span>${t.source || 'App'}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1.5 flex-shrink-0">
+                            ${actions}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            if (!items.length) document.getElementById('tickets-container').innerHTML = '<div class="text-center text-gray-500 py-20"><span class="material-symbols-outlined text-6xl mb-3 block">check_circle</span><p class="text-lg font-bold">No tickets found</p></div>';
+            updateStats();
+        }
+
+        function filterTickets(f) {
+            currentFilter = f;
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active');
+                b.classList.add('text-gray-400');
+            });
+            document.querySelector(`.tab-btn[data-filter="${f}"]`).classList.add('active');
+            document.querySelector(`.tab-btn[data-filter="${f}"]`).classList.remove('text-gray-400');
+            renderTickets();
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total').innerText = TICKETS.length;
+            document.getElementById('stat-open').innerText = TICKETS.filter(t => t.status === 'Open').length;
+            document.getElementById('stat-progress').innerText = TICKETS.filter(t => t.status === 'In Progress').length;
+            document.getElementById('stat-resolved').innerText = TICKETS.filter(t => t.status === 'Resolved' || t.status === 'Closed').length;
+        }
+
+        function viewTicket(id) {
+            const t = TICKETS.find(x => x.id === id);
+            document.getElementById('detail-title').innerText = t.id + ' — ' + t.category;
+            document.getElementById('detail-body').innerHTML = `
+                <div class="flex items-center gap-2 mb-3">${PRIORITY_BADGE[t.priority]}${STATUS_BADGE[t.status]}</div>
+                <h4 class="font-bold text-white text-lg mb-2">${t.subject}</h4>
+                <p class="text-sm text-gray-300 leading-relaxed mb-4">${t.desc}</p>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Filed By</span><span class="text-white font-bold">${t.hosteler}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Date</span><span class="text-white font-bold">${t.date}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Category</span><span class="text-white font-bold">${t.category}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Assigned To</span><span class="text-white font-bold">${t.assignee || 'Unassigned'}</span></div>
+                </div>`;
+            let actions = `<button onclick="closeDetailModal()" class="flex-1 py-2.5 text-xs font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">Close</button>`;
+            if (t.status === 'Open') actions += `<button onclick="updateTicketStatus('${t.id}','In Progress')" class="flex-1 py-2.5 text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-xl hover:bg-amber-500/20 transition-colors">Start Progress</button>`;
+            if (t.status === 'In Progress') actions += `<button onclick="updateTicketStatus('${t.id}','Resolved')" class="flex-1 py-2.5 text-xs font-bold text-green-400 bg-green-500/10 border border-green-500/30 rounded-xl hover:bg-green-500/20 transition-colors">Mark Resolved</button>`;
+            if (t.status === 'Resolved') actions += `<button onclick="updateTicketStatus('${t.id}','Closed')" class="flex-1 py-2.5 text-xs font-bold text-teal bg-teal/10 border border-teal/30 rounded-xl hover:bg-teal/20 transition-colors">Close Ticket</button>`;
+            document.getElementById('detail-actions').innerHTML = actions;
+            document.getElementById('detail-modal').classList.remove('hidden'); document.getElementById('detail-modal').classList.add('flex');
+        }
+        function closeDetailModal() { document.getElementById('detail-modal').classList.add('hidden'); document.getElementById('detail-modal').classList.remove('flex'); }
+
+        function updateTicketStatus(id, status) {
+            const t = TICKETS.find(x => x.id === id);
+            if (t) {
+                t.status = status;
+                if (status === 'In Progress' && !t.assignee) t.assignee = 'Warden';
+                ZoiDB.set('complaint_tickets', TICKETS);
+            }
+            closeDetailModal();
+            renderTickets();
+            showToast(`Ticket status updated to ${status}`, 'success');
+        }
+
+        function openComplaintModal() { document.getElementById('complaint-modal').classList.remove('hidden'); document.getElementById('complaint-modal').classList.add('flex'); }
+        function closeComplaintModal() { document.getElementById('complaint-modal').classList.add('hidden'); document.getElementById('complaint-modal').classList.remove('flex'); }
+
+        function fileComplaint() {
+            const subject = document.getElementById('c-subject').value.trim();
+            const hosteler = document.getElementById('c-hosteler').value.trim();
+            const room = document.getElementById('c-room').value.trim();
+            if (!subject || !hosteler || !room) { showToast('Hosteler Name, Room and Subject are required.', 'error'); return; }
+            TICKETS.unshift({ id: 'TKT-' + String(TICKETS.length + 1).padStart(3, '0'), hosteler: hosteler + ' (' + room + ')', category: document.getElementById('c-category').value || 'Other', priority: document.getElementById('c-priority').value || 'Medium', subject, desc: document.getElementById('c-desc').value || '—', status: 'Open', date: new Date().toISOString().split('T')[0], source: document.getElementById('c-source').value || 'Ext App', assignee: null });
+            ZoiDB.set('complaint_tickets', TICKETS);
+            closeComplaintModal();
+            renderTickets();
+            showToast('Complaint logged successfully.', 'success');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { renderTickets(); });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

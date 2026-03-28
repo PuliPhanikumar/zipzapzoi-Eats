@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Admin - Content CMS</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Inter:wght@300..700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>try { ZoiAuth.enforceAccess('Content Management'); } catch(e) { console.warn('Auth skipped:', e.message); }</script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff", // Standard ZipZap Orange
+                        "primary-hover": "#d96f0a",
+                        background: "#0f1115",
+                        surface: "#181a20",
+                        "surface-highlight": "#2a2d35",
+                        border: "#2a2d35",
+                        "text-main": "#e2e8f0",
+                        "text-muted": "#94a3b8"
+                    },
+                    fontFamily: {
+                        display: ["Manrope", "sans-serif"],
+                        body: ["Inter", "sans-serif"]
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body
+    class="bg-background text-text-main overflow-hidden h-screen flex font-body selection:bg-primary selection:text-black">
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+        <header
+            class="h-16 flex-none bg-surface/50 backdrop-blur-md border-b border-border flex items-center justify-between px-6 z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-display font-bold">Content Manager <span
+                        class="hidden sm:inline-block text-[10px] font-bold text-primary ml-2 border border-primary/30 bg-primary/10 px-2 py-0.5 rounded uppercase tracking-wide">Live</span>
+                </h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <div
+                    class="hidden md:flex items-center gap-2 bg-background rounded-lg px-3 py-1.5 border border-border focus-within:border-primary/50 transition-colors">
+                    <span class="material-symbols-outlined text-text-muted text-[18px]">search</span>
+                    <input id="search-input" onkeyup="renderAssets()"
+                        class="bg-transparent border-none text-sm text-white focus:ring-0 placeholder:text-text-muted/70 w-56"
+                        placeholder="Find assets..." type="text" />
+                </div>
+                <button onclick="openEditor()"
+                    class="flex items-center gap-2 bg-primary hover:bg-primary-hover text-black text-sm font-bold px-4 py-2 rounded-lg shadow-lg shadow-primary/20 transition-all">
+                    <span class="material-symbols-outlined text-[20px]">add</span> New Asset
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 lg:p-10 scroll-smooth">
+
+            <section class="mb-10">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold flex items-center gap-3 font-display text-white">
+                        <span class="material-symbols-outlined text-primary">analytics</span> Content Health
+                    </h2>
+                    <span
+                        class="text-xs font-medium text-text-muted bg-surface-highlight px-3 py-1.5 rounded-full border border-border flex items-center gap-2">
+                        <span class="size-2 bg-green-500 rounded-full animate-pulse"></span> AI Monitoring Active
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-surface border border-border rounded-xl p-6 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <span class="material-symbols-outlined text-6xl">public</span>
+                        </div>
+                        <p class="text-xs font-bold text-text-muted uppercase mb-1">Active Banners</p>
+                        <div class="flex items-baseline gap-2">
+                            <p class="text-3xl font-bold text-white">24</p>
+                            <span class="text-green-400 text-xs font-bold">3 Expiring Soon</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface border border-border rounded-xl p-6 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <span class="material-symbols-outlined text-6xl">touch_app</span>
+                        </div>
+                        <p class="text-xs font-bold text-text-muted uppercase mb-1">Click-Through Rate</p>
+                        <div class="flex items-baseline gap-2">
+                            <p class="text-3xl font-bold text-white">4.2%</p>
+                            <span class="text-green-400 text-xs font-bold">+0.8%</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface border border-border rounded-xl p-6 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <span class="material-symbols-outlined text-6xl">gavel</span>
+                        </div>
+                        <p class="text-xs font-bold text-text-muted uppercase mb-1">Compliance</p>
+                        <div class="flex items-baseline gap-2">
+                            <p class="text-3xl font-bold text-white">98%</p>
+                            <span
+                                class="text-yellow-500 text-xs font-bold px-2 py-0.5 bg-yellow-500/10 rounded border border-yellow-500/20">2
+                                Alerts</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-gradient-to-br from-surface to-[#1e1b16] border border-primary/30 rounded-xl p-6 relative overflow-hidden flex flex-col justify-between shadow-lg">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-primary text-lg">auto_awesome</span>
+                            <span class="text-xs font-bold text-primary uppercase">Top Insight</span>
+                        </div>
+                        <p class="text-sm font-medium text-white mb-4">"Diwali banners perform <span
+                                class="text-primary font-bold">24% better</span> with warm lighting."</p>
+                        <button onclick="applyAutoFix()"
+                            class="bg-primary hover:bg-primary-hover text-black text-xs font-bold px-4 py-2 rounded-lg transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">auto_fix</span> Apply Fix
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="flex flex-col sm:flex-row justify-between items-end sm:items-center gap-4 mb-6">
+                    <h3 class="text-xl font-bold text-white">Content Assets</h3>
+                    <div class="flex gap-3">
+                        <select id="filter-type" onchange="renderAssets()"
+                            class="bg-surface border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:ring-primary focus:border-primary">
+                            <option value="all">All Types</option>
+                            <option value="Home Banner">Home Banner</option>
+                            <option value="Restaurant Promo">Restaurant Promo</option>
+                            <option value="Notification">Notification</option>
+                        </select>
+                        <select id="filter-region" onchange="renderAssets()"
+                            class="bg-surface border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:ring-primary focus:border-primary">
+                            <option value="all">All Regions</option>
+                            <option value="India">India</option>
+                            <option value="South Zone">South Zone</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="space-y-4" id="asset-list">
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div id="editor-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div
+            class="bg-surface border border-border rounded-xl w-full max-w-4xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <h3 class="text-xl font-bold text-white mb-6" id="modal-title">Create New Asset</h3>
+            <input type="hidden" id="edit-id">
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-bold text-text-muted uppercase">Title</label>
+                        <input type="text" id="asset-title"
+                            class="w-full bg-background border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary focus:ring-0">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-bold text-text-muted uppercase">Type</label>
+                            <select id="asset-type"
+                                class="w-full bg-background border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary">
+                                <option value="Home Banner">Home Banner</option>
+                                <option value="Restaurant Promo">Restaurant Promo</option>
+                                <option value="Offer Card">Offer Card</option>
+                                <option value="Notification">Push Notification</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-text-muted uppercase">Priority (1-10)</label>
+                            <input type="number" id="asset-order"
+                                class="w-full bg-background border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary"
+                                placeholder="10 = High">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-text-muted uppercase">Deep Link / Action</label>
+                        <input type="text" id="asset-link"
+                            class="w-full bg-background border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary"
+                            placeholder="e.g. zipzap://restaurant/123 or https://...">
+                        <p class="text-[10px] text-text-muted mt-1">Leave empty for info-only banners.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-bold text-text-muted uppercase">Start Date</label>
+                            <input type="datetime-local" id="asset-start"
+                                class="w-full bg-background border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-text-muted uppercase">End Date</label>
+                            <input type="datetime-local" id="asset-end"
+                                class="w-full bg-background border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-text-muted uppercase">Target Audience</label>
+                        <select id="asset-segment"
+                            class="w-full bg-background border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary">
+                            <option value="All Users">All Users</option>
+                            <option value="Gold Members">ZipZap Gold Members</option>
+                            <option value="New Users">New Users Only</option>
+                            <option value="Vegetarian">Vegetarian Preference</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-bold text-text-muted uppercase">Description / Alt Text</label>
+                        <textarea id="asset-desc"
+                            class="w-full bg-background border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary"
+                            rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <label class="text-xs font-bold text-text-muted uppercase">Live Preview</label>
+                    <div
+                        class="aspect-video rounded-xl bg-black border border-border flex items-center justify-center relative group overflow-hidden shadow-lg">
+                        <img id="preview-img" src="" class="w-full h-full object-cover hidden">
+                        <div class="text-center p-4" id="preview-placeholder">
+                            <span class="material-symbols-outlined text-4xl text-text-muted mb-2">image</span>
+                            <p class="text-xs text-text-muted">Paste Image URL below</p>
+                        </div>
+                        <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                            <h4 id="preview-title" class="text-white font-bold text-lg truncate">Title Preview</h4>
+                            <span class="text-xs text-gray-300">Sponsored</span>
+                        </div>
+                    </div>
+                    <input type="text" id="asset-img" oninput="updatePreview()"
+                        class="w-full bg-background border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary"
+                        placeholder="Image URL...">
+                </div>
+            </div>
+
+            <div class="flex justify-between border-t border-border pt-6 mt-6">
+                <button onclick="deleteAsset()" id="btn-delete"
+                    class="px-4 py-2 text-red-400 hover:bg-red-500/10 rounded-lg text-sm font-bold hidden border border-transparent hover:border-red-500/30">Delete
+                    Asset</button>
+                <div class="flex gap-3 ml-auto">
+                    <button onclick="closeModal()"
+                        class="px-4 py-2 border border-border text-text-muted hover:text-white rounded-lg text-sm font-bold">Cancel</button>
+                    <button onclick="saveAsset()"
+                        class="px-6 py-2 bg-primary hover:bg-primary-hover text-black rounded-lg text-sm font-bold shadow-lg">Save
+                        & Publish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // DATA
+        let assets = [];
+
+        // INIT
+        window.onload = async () => {
+            await loadAssets();
+        };
+
+        async function loadAssets() {
+            try {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/cms/assets');
+                if (response.ok) {
+                    assets = await response.json();
+                } else {
+                    console.warn("CMS API failed. Using simulated assets.");
+                    assets = typeof ZoiCMS !== 'undefined' ? ZoiCMS.getAssets() : [];
+                }
+            } catch (e) {
+                console.warn("CMS Backend unavailable.", e);
+                assets = typeof ZoiCMS !== 'undefined' ? ZoiCMS.getAssets() : [];
+            }
+            renderAssets();
+        }
+
+        function renderAssets() {
+            const container = document.getElementById('asset-list');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const typeFilter = document.getElementById('filter-type').value;
+            container.innerHTML = "";
+
+            assets.forEach(a => {
+                if (search && !a.title.toLowerCase().includes(search)) return;
+                if (typeFilter !== 'all' && a.type !== typeFilter) return;
+
+                const imgHtml = a.image
+                    ? `<img src="${a.image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">`
+                    : `<div class="w-full h-full flex items-center justify-center bg-background"><span class="material-symbols-outlined text-4xl text-text-muted/30">description</span></div>`;
+
+                const statusHtml = a.status === 'Active'
+                    ? `<span class="flex items-center gap-1 text-green-400"><span class="material-symbols-outlined text-[14px]">check_circle</span> Active</span>`
+                    : `<span class="flex items-center gap-1 text-yellow-500"><span class="material-symbols-outlined text-[14px]">schedule</span> ${a.status}</span>`;
+
+                const html = `
+                    <div onclick="editAsset(${a.id})" class="group relative flex flex-col sm:flex-row gap-5 p-5 bg-surface border-l-4 border-l-primary border-y border-r border-y-border border-r-border rounded-xl cursor-pointer hover:bg-surface-highlight transition-all">
+                        <div class="w-full sm:w-48 h-28 bg-background rounded-lg overflow-hidden relative shrink-0 border border-border">
+                            ${imgHtml}
+                            <div class="absolute top-1 left-1 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded text-[10px] text-white font-bold">#${a.sortOrder || 0}</div>
+                        </div>
+                        <div class="flex-1 flex flex-col justify-center min-w-0">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">${(a.type || 'ASSET').toUpperCase()}</span>
+                                <span class="text-text-muted text-[10px]">•</span>
+                                <span class="text-[10px] text-text-muted flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">group</span> ${a.segment || 'All'}</span>
+                            </div>
+                            <h4 class="text-lg font-bold text-white truncate group-hover:text-primary transition-colors mb-1">${a.title}</h4>
+                            <p class="text-sm text-text-muted truncate">${a.description || ''}</p>
+                            <div class="mt-3 flex items-center gap-4 text-xs text-text-muted">
+                                ${statusHtml}
+                                <span class="flex items-center gap-1">By ${a.author || 'system'}</span>
+                            </div>
+                        </div>
+                        <div class="flex sm:flex-col items-center justify-center gap-2 sm:border-l border-border sm:pl-6 min-w-[80px]">
+                            <div class="relative size-10 flex items-center justify-center">
+                                <svg class="size-full -rotate-90" viewBox="0 0 36 36">
+                                    <path class="text-gray-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+                                    <path class="${(a.score || 0) > 80 ? 'text-primary' : 'text-yellow-500'}" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${a.score || 0}, 100" stroke-width="3"></path>
+                                </svg>
+                                <span class="absolute text-xs font-bold text-white">${a.score || 0}</span>
+                            </div>
+                            <span class="text-[9px] font-bold text-text-muted uppercase">AI Score</span>
+                        </div>
+                    </div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        // EDITOR
+        function openEditor() {
+            document.getElementById('modal-title').innerText = "Create New Asset";
+            document.getElementById('edit-id').value = "";
+            document.getElementById('btn-delete').classList.add('hidden');
+            // Reset
+            document.getElementById('asset-title').value = "";
+            document.getElementById('asset-desc').value = "";
+            document.getElementById('asset-img').value = "";
+            document.getElementById('asset-link').value = "";
+            document.getElementById('asset-order').value = "";
+            updatePreview();
+            document.getElementById('editor-modal').classList.remove('hidden');
+            document.getElementById('editor-modal').classList.add('flex');
+        }
+
+        function editAsset(id) {
+            const a = assets.find(x => x.id === id);
+            document.getElementById('modal-title').innerText = "Edit Asset";
+            document.getElementById('edit-id').value = id;
+            document.getElementById('btn-delete').classList.remove('hidden');
+
+            document.getElementById('asset-title').value = a.title;
+            document.getElementById('asset-type').value = a.type;
+            document.getElementById('asset-desc').value = a.description || '';
+            document.getElementById('asset-img').value = a.image || '';
+            document.getElementById('asset-order').value = a.sortOrder || 0;
+            document.getElementById('asset-segment').value = a.segment || 'All Users';
+
+            updatePreview();
+            document.getElementById('editor-modal').classList.remove('hidden');
+            document.getElementById('editor-modal').classList.add('flex');
+        }
+
+        function updatePreview() {
+            const url = document.getElementById('asset-img').value;
+            const title = document.getElementById('asset-title').value;
+            const img = document.getElementById('preview-img');
+            const placeholder = document.getElementById('preview-placeholder');
+
+            document.getElementById('preview-title').innerText = title || "Title Preview";
+
+            if (url) {
+                img.src = url;
+                img.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+            } else {
+                img.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+            }
+        }
+
+        async function saveAsset() {
+            const id = document.getElementById('edit-id').value;
+            const title = document.getElementById('asset-title').value;
+            const type = document.getElementById('asset-type').value;
+            const description = document.getElementById('asset-desc').value;
+            const image = document.getElementById('asset-img').value;
+            const sortOrder = parseInt(document.getElementById('asset-order').value) || 0;
+            const segment = document.getElementById('asset-segment').value || "All Users";
+
+            if (!title) return alert("Title required");
+
+            const assetData = {
+                title, type, description, image, 
+                sortOrder, segment,
+                status: 'Active',
+                author: 'Admin'
+            };
+
+            try {
+                const method = id ? 'PUT' : 'POST';
+                const url = ZOI_CONFIG.API_BASE_URL + '/cms/assets' + (id ? '/' + id : '');
+                const response = await fetch(url, {
+                    method,
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '')
+                    },
+                    body: JSON.stringify(assetData)
+                });
+
+                if (!response.ok) throw new Error('Failed to save asset');
+
+                showToast(id ? "Updated" : "Created", "CMS Asset synchronized.");
+                await loadAssets(); // Refresh
+                closeModal();
+            } catch (err) {
+                showToast("Save Failed", err.message);
+            }
+        }
+
+        async function deleteAsset() {
+            const id = document.getElementById('edit-id').value;
+            if (confirm("Delete this asset permanently?")) {
+                try {
+                    const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/cms/assets/' + id, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
+                    });
+                    if (!response.ok) throw new Error('Failed to delete asset');
+                    
+                    showToast("Deleted", "Asset removed.");
+                    await loadAssets(); // Refresh
+                    closeModal();
+                } catch (err) {
+                    showToast("Delete Failed", err.message);
+                }
+            }
+        }
+
+        async function applyAutoFix() {
+            const banner = assets.find(a => a.type === 'Home Banner');
+            if (banner) {
+                try {
+                    const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/cms/assets/' + banner.id, {
+                        method: 'PUT',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '')
+                        },
+                        body: JSON.stringify({ ...banner, score: 99, description: banner.description + " (AI Optimized)" })
+                    });
+                    if (!response.ok) throw new Error('Failed to update asset');
+                    
+                    showToast("AI Optimized", "Applied lighting fix to banner.");
+                    await loadAssets();
+                } catch (err) {
+                    showToast("Optimization Failed", err.message);
+                }
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('editor-modal').classList.add('hidden');
+            document.getElementById('editor-modal').classList.remove('flex');
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

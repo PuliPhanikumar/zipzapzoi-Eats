@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notice Board - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="hostel_shared.js"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        @keyframes pulse-border {
+
+            0%,
+            100% {
+                border-color: rgba(239, 68, 68, 0.3);
+            }
+
+            50% {
+                border-color: rgba(239, 68, 68, 0.7);
+            }
+        }
+
+        .urgent-pulse {
+            animation: pulse-border 2s ease-in-out infinite;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Notice Board <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">campaign</span></h2>
+                <p class="text-gray-400 text-sm">Post announcements, rules, events, and important updates for all
+                    hostelers.</p>
+            </div>
+            <button onclick="openNoticeModal()"
+                class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-shadow"><span
+                    class="material-symbols-outlined text-sm">add</span> Post Notice</button>
+        </header>
+
+        <!-- Stats -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-pink-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-pink-400">campaign</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Notices</p>
+                    <p class="text-xl font-extrabold text-white" id="st-total">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-red-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-red-400">priority_high</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Urgent</p>
+                    <p class="text-xl font-extrabold text-red-400" id="st-urgent">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">push_pin</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Pinned</p>
+                    <p class="text-xl font-extrabold text-amber-400" id="st-pinned">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-green-400">event_available</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Active</p>
+                    <p class="text-xl font-extrabold text-green-400" id="st-active">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="px-8 pt-4 flex items-center gap-3 flex-shrink-0">
+            <select id="filter-cat" onchange="render()"
+                class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-2 text-gray-300">
+                <option value="all">All Categories</option>
+                <option value="Urgent">🔴 Urgent</option>
+                <option value="General">📋 General</option>
+                <option value="Event">🎉 Event</option>
+                <option value="Rule Change">📜 Rule Change</option>
+                <option value="Maintenance">🔧 Maintenance</option>
+            </select>
+            <select id="filter-audience" onchange="render()"
+                class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-2 text-gray-300">
+                <option value="all">All Audience</option>
+                <option value="All Hostelers">All Hostelers</option>
+                <option value="Floor 1">Floor 1</option>
+                <option value="Floor 2">Floor 2</option>
+                <option value="Floor 3">Floor 3</option>
+            </select>
+            <div class="ml-auto relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span
+                        class="material-symbols-outlined text-gray-500 text-sm">search</span></div><input type="text"
+                    id="search" oninput="render()"
+                    class="bg-surface/50 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-pink-500 w-48"
+                    placeholder="Search notices...">
+            </div>
+        </div>
+
+        <!-- Notices -->
+        <div class="flex-1 overflow-y-auto p-8 pb-24 space-y-4" id="notices-grid"></div>
+    </main>
+
+    <!-- POST NOTICE MODAL -->
+    <div id="notice-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-500">campaign</span> Post Notice</h3><button
+                    onclick="closeNoticeModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <input id="n-title" type="text" placeholder="Notice Title *"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="n-category"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option>General</option>
+                        <option>Urgent</option>
+                        <option>Event</option>
+                        <option>Rule Change</option>
+                        <option>Maintenance</option>
+                    </select>
+                    <select id="n-audience"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option>All Hostelers</option>
+                        <option>Floor 1</option>
+                        <option>Floor 2</option>
+                        <option>Floor 3</option>
+                    </select>
+                </div>
+                <textarea id="n-body" rows="4" placeholder="Notice content..."
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none resize-none"></textarea>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Expiry
+                            Date</label><input id="n-expiry" type="date"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    </div>
+                    <div class="flex items-end"><label class="flex items-center gap-2 cursor-pointer py-3"><input
+                                type="checkbox" id="n-pin" class="accent-pink-500 w-4 h-4"><span
+                                class="text-sm text-gray-300">📌 Pin to Top</span></label></div>
+                </div>
+            </div>
+            <div class="p-5 border-t border-border flex gap-3"><button onclick="closeNoticeModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10">Cancel</button><button
+                    onclick="postNotice()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] flex items-center justify-center gap-2"><span
+                        class="material-symbols-outlined text-sm">send</span> Publish</button></div>
+        </div>
+    </div>
+
+    <script>
+        const NOTICES = ZoiDB.get('notices', [
+            { id: 1, title: '🚰 Water Supply Interruption — March 5', category: 'Maintenance', body: 'Municipal water supply will be interrupted on March 5th from 10 AM to 4 PM due to pipeline repair work. All hostelers are advised to store water in advance. Tanker water will be arranged by 2 PM if supply isn\'t restored.', audience: 'All Hostelers', date: '2026-03-04', expiry: '2026-03-06', pinned: true, postedBy: 'Admin' },
+            { id: 2, title: '⚠️ Strict Curfew Timing Update', category: 'Urgent', body: 'Effective immediately, hostel gate will close at 10:00 PM sharp (previously 10:30 PM). Any hosteler arriving after 10 PM must have an approved gate pass. Repeated violations will result in penalty of ₹500.', audience: 'All Hostelers', date: '2026-03-04', expiry: null, pinned: true, postedBy: 'Warden Ramesh' },
+            { id: 3, title: '🎉 Holi Celebration — March 14', category: 'Event', body: 'We\'re organizing a Holi celebration in the hostel courtyard on March 14th from 10 AM to 1 PM! Colors, water balloons, music, and special lunch will be provided. All hostelers are invited. Use only organic colors.', audience: 'All Hostelers', date: '2026-03-03', expiry: '2026-03-15', pinned: false, postedBy: 'Admin' },
+            { id: 4, title: '📜 New Wi-Fi Usage Policy', category: 'Rule Change', body: 'Effective March 10: Each hosteler gets 50 GB/month at 100 Mbps. Torrenting and VPN usage on hostel Wi-Fi is strictly prohibited. Violations will result in temporary ban from hostel internet for 7 days.', audience: 'All Hostelers', date: '2026-03-02', expiry: null, pinned: false, postedBy: 'Admin' },
+            { id: 5, title: '🔧 Floor 2 Bathroom Renovation', category: 'Maintenance', body: 'Bathroom renovation work on Floor 2 will begin March 8 and is expected to complete by March 15. Floor 2 hostelers may use Floor 1 and Floor 3 bathrooms during this period. We apologize for the inconvenience.', audience: 'Floor 2', date: '2026-03-01', expiry: '2026-03-16', pinned: false, postedBy: 'Admin' },
+            { id: 6, title: '📋 Monthly Rent Reminder', category: 'General', body: 'Rent for March 2026 is due by March 5th. Please pay via UPI, NetBanking, or cash at the admin office. Late payment after March 10th will attract a fine of ₹200.', audience: 'All Hostelers', date: '2026-03-01', expiry: '2026-03-10', pinned: false, postedBy: 'Admin' },
+            { id: 7, title: '⚠️ Fire Safety Drill — March 7', category: 'Urgent', body: 'Mandatory fire safety drill scheduled for March 7th at 6:00 PM. ALL hostelers must participate. Assembly point: Main parking area. Fire extinguisher demo will also be conducted by the fire department.', audience: 'All Hostelers', date: '2026-02-28', expiry: '2026-03-08', pinned: false, postedBy: 'Warden Ramesh' },
+        ]);
+
+        const CAT_COLORS = { Urgent: 'red', General: 'blue', Event: 'violet', 'Rule Change': 'amber', Maintenance: 'orange' };
+        const CAT_ICONS = { Urgent: 'priority_high', General: 'info', Event: 'celebration', 'Rule Change': 'gavel', Maintenance: 'build' };
+
+        function render() {
+            const q = (document.getElementById('search').value || '').toLowerCase();
+            const cf = document.getElementById('filter-cat').value;
+            const af = document.getElementById('filter-audience').value;
+            let items = [...NOTICES].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0));
+            if (cf !== 'all') items = items.filter(n => n.category === cf);
+            if (af !== 'all') items = items.filter(n => n.audience === af);
+            if (q) items = items.filter(n => n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q));
+
+            document.getElementById('notices-grid').innerHTML = items.map((n, i) => {
+                const c = CAT_COLORS[n.category] || 'gray';
+                const ic = CAT_ICONS[n.category] || 'info';
+                const isUrgent = n.category === 'Urgent';
+                const isExpired = n.expiry && new Date(n.expiry) < new Date();
+                return `<div class="glass-panel p-0 overflow-hidden ${isUrgent ? 'urgent-pulse border-red-500/30' : ''} ${isExpired ? 'opacity-50' : ''} bouncy-card fade-row" style="animation-delay:${i * 50}ms">
+                    <div class="p-5 flex items-start gap-4">
+                        <div class="h-11 w-11 rounded-xl bg-${c}-500/20 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-${c}-400">${ic}</span></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                ${n.pinned ? '<span class="text-amber-400 text-xs">📌</span>' : ''}
+                                <span class="bg-${c}-500/20 text-${c}-400 px-2 py-0.5 rounded text-[10px] font-bold">${n.category}</span>
+                                <span class="bg-white/10 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">${n.audience}</span>
+                                ${isExpired ? '<span class="bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">Expired</span>' : ''}
+                            </div>
+                            <h4 class="font-bold text-white text-sm mb-1">${n.title}</h4>
+                            <p class="text-xs text-gray-400 leading-relaxed">${n.body}</p>
+                            <div class="flex items-center gap-4 mt-3 text-[10px] text-gray-500">
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">person</span>${n.postedBy}</span>
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">calendar_today</span>${n.date}</span>
+                                ${n.expiry ? `<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">event_busy</span>Expires: ${n.expiry}</span>` : '<span class="flex items-center gap-1"><span class="material-symbols-outlined text-xs">all_inclusive</span>No Expiry</span>'}
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1.5 flex-shrink-0">
+                            <button onclick="togglePin(${n.id})" class="p-1.5 rounded-lg ${n.pinned ? 'bg-amber-500/20 text-amber-400' : 'bg-white/5 text-gray-500'} hover:bg-white/10 transition-colors" title="${n.pinned ? 'Unpin' : 'Pin'}"><span class="material-symbols-outlined text-sm">push_pin</span></button>
+                            <button onclick="deleteNotice(${n.id})" class="p-1.5 rounded-lg bg-white/5 text-gray-500 hover:bg-red-500/10 hover:text-red-400 transition-colors" title="Delete"><span class="material-symbols-outlined text-sm">delete</span></button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            if (!items.length) document.getElementById('notices-grid').innerHTML = '<div class="text-center text-gray-500 py-20"><span class="material-symbols-outlined text-6xl mb-3 block">campaign</span><p class="text-lg font-bold">No notices found</p></div>';
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('st-total').innerText = NOTICES.length;
+            document.getElementById('st-urgent').innerText = NOTICES.filter(n => n.category === 'Urgent').length;
+            document.getElementById('st-pinned').innerText = NOTICES.filter(n => n.pinned).length;
+            document.getElementById('st-active').innerText = NOTICES.filter(n => !n.expiry || new Date(n.expiry) >= new Date(new Date().setHours(0, 0, 0, 0))).length;
+        }
+
+        function togglePin(id) {
+            const n = NOTICES.find(x => x.id === id);
+            n.pinned = !n.pinned;
+            ZoiDB.set('notices', NOTICES);
+            render();
+            showToast(n.pinned ? 'Notice pinned' : 'Notice unpinned', 'info');
+        }
+        function deleteNotice(id) {
+            const idx = NOTICES.findIndex(x => x.id === id);
+            if (idx > -1) {
+                NOTICES.splice(idx, 1);
+                ZoiDB.set('notices', NOTICES);
+                render();
+                showToast('Notice deleted', 'success');
+            }
+        }
+
+        function openNoticeModal() { document.getElementById('notice-modal').classList.remove('hidden'); document.getElementById('notice-modal').classList.add('flex'); }
+        function closeNoticeModal() { document.getElementById('notice-modal').classList.add('hidden'); document.getElementById('notice-modal').classList.remove('flex'); }
+
+        function postNotice() {
+            const title = document.getElementById('n-title').value.trim();
+            if (!title) { showToast('Title required.', 'error'); return; }
+            NOTICES.unshift({ id: Date.now(), title, category: document.getElementById('n-category').value, body: document.getElementById('n-body').value || '—', audience: document.getElementById('n-audience').value, date: new Date().toISOString().split('T')[0], expiry: document.getElementById('n-expiry').value || null, pinned: document.getElementById('n-pin').checked, postedBy: 'Admin' });
+            ZoiDB.set('notices', NOTICES);
+            closeNoticeModal(); render();
+            showToast('Notice posted successfully', 'success');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { render(); });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

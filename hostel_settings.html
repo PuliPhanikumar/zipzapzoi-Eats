@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle.on {
+            background: rgba(0, 212, 197, 0.5);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .toggle.on::after {
+            transform: translateX(20px);
+        }
+
+        .settings-nav a {
+            transition: all 0.2s;
+        }
+
+        .settings-nav a.active {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(168, 85, 247, 0.08));
+            color: #ec4899;
+            border-left: 2px solid #ec4899;
+            font-weight: 700;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex h-screen overflow-hidden">
+        <!-- Settings Sidebar -->
+        <div class="w-56 border-r border-border/30 py-6 px-3 flex-shrink-0 settings-nav overflow-y-auto">
+            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest px-3 mb-3">Settings</p>
+            <a href="#" class="active flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="hostel" onclick="showSection('hostel')"><span
+                    class="material-symbols-outlined text-lg">apartment</span> Hostel Profile</a>
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="wardens" onclick="showSection('wardens')"><span
+                    class="material-symbols-outlined text-lg">shield_person</span> Warden Accounts</a>
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="notifications" onclick="showSection('notifications')"><span
+                    class="material-symbols-outlined text-lg">notifications</span> Notifications</a>
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="subscription" onclick="showSection('subscription')"><span
+                    class="material-symbols-outlined text-lg">card_membership</span> Subscription</a>
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="security" onclick="showSection('security')"><span
+                    class="material-symbols-outlined text-lg">lock</span> Security</a>
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="system" onclick="showSection('system')"><span
+                    class="material-symbols-outlined text-lg">tune</span> System</a>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+            <!-- HOSTEL PROFILE -->
+            <div id="sec-hostel" class="settings-section">
+                <h2 class="text-xl font-extrabold text-white mb-1 flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-400">apartment</span> Hostel Profile</h2>
+                <p class="text-sm text-gray-400 mb-6">Manage your hostel's basic information, location, and branding.
+                </p>
+                <div class="glass-panel p-6 space-y-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Hostel
+                                Name</label><input type="text" value="Bengaluru Tech Park Hostel"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        </div>
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Owner
+                                Name</label><input type="text" value="Phani Kumar"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        </div>
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Phone</label><input
+                                type="tel" value="+91 9876543210"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        </div>
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Email</label><input
+                                type="email" value="admin@zoihostel.com"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        </div>
+                    </div>
+                    <div><label
+                            class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Address</label><textarea
+                            rows="2"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none resize-none">123, Tech Park Layout, Whitefield, Bengaluru - 560066, Karnataka</textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">GSTIN</label><input
+                                type="text" value="29AABCU9603R1ZM"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none font-mono">
+                        </div>
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">PAN</label><input
+                                type="text" value="AABCU9603R"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none font-mono">
+                        </div>
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Hostel
+                                Type</label><select
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex h-screen overflow-hidden">
+        <!-- Settings Sidebar -->
+        <div class="w-56 border-r border-border/30 py-6 px-3 flex-shrink-0 settings-nav overflow-y-auto">
+            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest px-3 mb-3">Settings</p>
+            <a href="#" class="active flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="hostel" onclick="showSection('hostel')"><span
+                    class="material-symbols-outlined text-lg">apartment</span> Hostel Profile</a>
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="wardens" onclick="showSection('wardens')"><span
+                    class="material-symbols-outlined text-lg">shield_person</span> Warden Accounts</a>
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="notifications" onclick="showSection('notifications')"><span
+                    class="material-symbols-outlined text-lg">notifications</span> Notifications</a>
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="subscription" onclick="showSection('subscription')"><span
+                    class="material-symbols-outlined text-lg">card_membership</span> Subscription</a>
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="security" onclick="showSection('security')"><span
+                    class="material-symbols-outlined text-lg">lock</span> Security</a>
+            <a href="#" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-400 mb-1"
+                data-section="system" onclick="showSection('system')"><span
+                    class="material-symbols-outlined text-lg">tune</span> System</a>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+            <!-- HOSTEL PROFILE -->
+            <div id="sec-hostel" class="settings-section">
+                <h2 class="text-xl font-extrabold text-white mb-1 flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-400">apartment</span> Hostel Profile</h2>
+                <p class="text-sm text-gray-400 mb-6">Manage your hostel's basic information, location, and branding.
+                </p>
+                <div class="glass-panel p-6 space-y-4 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Hostel
+                                Name</label><input type="text" value="Bengaluru Tech Park Hostel"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        </div>
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Owner
+                                Name</label><input type="text" value="Phani Kumar"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        </div>
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Phone</label><input
+                                type="tel" value="+91 9876543210"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        </div>
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Email</label><input
+                                type="email" value="admin@zoihostel.com"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        </div>
+                    </div>
+                    <div><label
+                            class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Address</label><textarea
+                            rows="2"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none resize-none">123, Tech Park Layout, Whitefield, Bengaluru - 560066, Karnataka</textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">GSTIN</label><input
+                                type="text" value="29AABCU9603R1ZM"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none font-mono">
+                        </div>
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">PAN</label><input
+                                type="text" value="AABCU9603R"
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none font-mono">
+                        </div>
+                        <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Hostel
+                                Type</label><select
+                                class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                                <option>Boys</option>
+                                <option>Girls</option>
+                                <option selected>Co-Ed</option>
+                            </select></div>
+                    </div>
+                </div>
+                <button onclick="showToast('✅ Profile saved!')"
+                    class="px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)]">Save
+                    Changes</button>
+            </div>
+
+            <!-- WARDEN ACCOUNTS -->
+            <div id="sec-wardens" class="settings-section hidden">
+                <h2 class="text-xl font-extrabold text-white mb-1 flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-400">shield_person</span> Warden Accounts</h2>
+                <p class="text-sm text-gray-400 mb-6">Create and manage warden login accounts with limited access.</p>
+                <div class="glass-panel p-0 overflow-hidden mb-6">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white/[0.03] text-[11px] text-gray-500 uppercase tracking-wider">
+                            <tr>
+                                <th class="py-3 px-4">Name</th>
+                                <th class="py-3 px-4">Username</th>
+                                <th class="py-3 px-4">Phone</th>
+                                <th class="py-3 px-4">Shift</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t border-border">
+                                <td class="py-3 px-4 font-bold text-white">Ramesh K.</td>
+                                <td class="py-3 px-4 text-gray-400 font-mono text-xs">warden.ramesh</td>
+                                <td class="py-3 px-4 text-gray-300">9876001001</td>
+                                <td class="py-3 px-4 text-gray-400 text-xs">Day</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">Active</span>
+                                </td>
+                                <td class="py-3 px-4"><button
+                                        class="text-xs text-red-400 bg-red-500/10 px-3 py-1.5 rounded-lg font-bold">Deactivate</button>
+                                </td>
+                            </tr>
+                            <tr class="border-t border-border">
+                                <td class="py-3 px-4 font-bold text-white">Sunita M.</td>
+                                <td class="py-3 px-4 text-gray-400 font-mono text-xs">warden.sunita</td>
+                                <td class="py-3 px-4 text-gray-300">9876001010</td>
+                                <td class="py-3 px-4 text-gray-400 text-xs">Night</td>
+                                <td class="py-3 px-4"><span
+                                        class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">Active</span>
+                                </td>
+                                <td class="py-3 px-4"><button
+                                        class="text-xs text-red-400 bg-red-500/10 px-3 py-1.5 rounded-lg font-bold">Deactivate</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="glass-panel p-6">
+                    <h3 class="font-bold text-white text-sm mb-4">Create New Warden Account</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <input type="text" placeholder="Full Name *"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        <input type="tel" placeholder="Phone *"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        <input type="text" placeholder="Username *"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        <input type="password" placeholder="Password *"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        <select
+                            class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                            <option>Day Shift</option>
+                            <option>Night Shift</option>
+                        </select>
+                        <input type="text" placeholder="Aadhaar / ID"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    </div>
+                    <button onclick="showToast('✅ Warden account created!')"
+                        class="px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)]">Create
+                        Account</button>
+                </div>
+            </div>
+
+            <!-- NOTIFICATIONS -->
+            <div id="sec-notifications" class="settings-section hidden">
+                <h2 class="text-xl font-extrabold text-white mb-1 flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-400">notifications</span> Notifications</h2>
+                <p class="text-sm text-gray-400 mb-6">Configure email, SMS, and push notification preferences.</p>
+                <div class="glass-panel p-6 space-y-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Rent Due Reminders</p>
+                            <p class="text-xs text-gray-400">Send reminder to hostelers 3 days before rent due</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Low Stock Alerts</p>
+                            <p class="text-xs text-gray-400">Notify when inventory items fall below min level</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">New Complaint Ticket</p>
+                            <p class="text-xs text-gray-400">Notify owner when a new complaint is filed</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Visitor Entry Alert</p>
+                            <p class="text-xs text-gray-400">Notify hosteler via SMS when their visitor arrives</p>
+                        </div>
+                        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Gate Pass Approval</p>
+                            <p class="text-xs text-gray-400">Notify warden for pending gate pass approvals</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">GST Filing Reminders</p>
+                            <p class="text-xs text-gray-400">Remind 5 days before GSTR due date</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Daily Summary Email</p>
+                            <p class="text-xs text-gray-400">Send daily occupancy and collection summary at 10 PM</p>
+                        </div>
+                        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBSCRIPTION -->
+            <div id="sec-subscription" class="settings-section hidden">
+                <h2 class="text-xl font-extrabold text-white mb-1 flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-400">card_membership</span> Subscription</h2>
+                <p class="text-sm text-gray-400 mb-6">Manage your Zoi Hostel POS subscription plan.</p>
+                <div class="glass-panel p-6 border-green-500/20 mb-6">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="h-12 w-12 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                                class="material-symbols-outlined text-green-400 text-2xl">verified</span></div>
+                        <div>
+                            <h3 class="font-bold text-white text-lg">Yearly Plan — Active</h3>
+                            <p class="text-xs text-gray-400">₹8,999/year • Renews on 15 Dec 2026</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                        <div class="p-3 bg-white/[0.03] rounded-lg text-center"><span
+                                class="text-gray-500 block">Plan</span><span class="text-white font-bold">Yearly</span>
+                        </div>
+                        <div class="p-3 bg-white/[0.03] rounded-lg text-center"><span
+                                class="text-gray-500 block">Started</span><span class="text-white font-bold">15 Dec
+                                2025</span></div>
+                        <div class="p-3 bg-white/[0.03] rounded-lg text-center"><span class="text-gray-500 block">Days
+                                Left</span><span class="text-green-400 font-bold">286</span></div>
+                        <div class="p-3 bg-white/[0.03] rounded-lg text-center"><span
+                                class="text-gray-500 block">Amount</span><span
+                                class="text-pink-400 font-bold">₹8,999</span></div>
+                    </div>
+                </div>
+                <h3 class="font-bold text-white text-sm mb-3">Available Plans</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="glass-panel p-5 bouncy-card">
+                        <h4 class="font-bold text-white text-sm mb-1">Quarterly</h4>
+                        <p class="text-2xl font-extrabold text-white">₹2,999<span
+                                class="text-xs text-gray-500 font-normal">/3 months</span></p>
+                        <p class="text-[10px] text-gray-400 mt-2">All features • Email support</p><button
+                            class="w-full mt-4 py-2.5 text-xs font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl">Switch
+                            Plan</button>
+                    </div>
+                    <div class="glass-panel p-5 bouncy-card">
+                        <h4 class="font-bold text-white text-sm mb-1">Half-Yearly</h4>
+                        <p class="text-2xl font-extrabold text-white">₹5,499<span
+                                class="text-xs text-gray-500 font-normal">/6 months</span></p>
+                        <p class="text-[10px] text-gray-400 mt-2">All features • Priority support</p><button
+                            class="w-full mt-4 py-2.5 text-xs font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl">Switch
+                            Plan</button>
+                    </div>
+                    <div class="glass-panel p-5 bouncy-card border-pink-500/20">
+                        <h4 class="font-bold text-pink-400 text-sm mb-1">Yearly ★ Current</h4>
+                        <p class="text-2xl font-extrabold text-pink-400">₹8,999<span
+                                class="text-xs text-gray-500 font-normal">/year</span></p>
+                        <p class="text-[10px] text-gray-400 mt-2">All features • 24/7 support • AI</p><button
+                            class="w-full mt-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl">Current
+                            Plan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECURITY -->
+            <div id="sec-security" class="settings-section hidden">
+                <h2 class="text-xl font-extrabold text-white mb-1 flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-400">lock</span> Security</h2>
+                <p class="text-sm text-gray-400 mb-6">Manage passwords, two-factor authentication, and session settings.
+                </p>
+                <div class="glass-panel p-6 space-y-4 mb-6">
+                    <h3 class="font-bold text-white text-sm">Change Owner Password</h3>
+                    <input type="password" placeholder="Current Password"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="password" placeholder="New Password"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                        <input type="password" placeholder="Confirm Password"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    </div>
+                    <button onclick="showToast('✅ Password updated!')"
+                        class="px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)]">Update
+                        Password</button>
+                </div>
+                <div class="glass-panel p-6 space-y-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Two-Factor Authentication</p>
+                            <p class="text-xs text-gray-400">Require OTP for login via SMS</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Session Timeout</p>
+                            <p class="text-xs text-gray-400">Auto logout after inactivity</p>
+                        </div><select class="bg-bg border border-white/10 rounded-lg px-3 py-1.5 text-xs text-gray-300">
+                            <option>15 minutes</option>
+                            <option selected>30 minutes</option>
+                            <option>1 hour</option>
+                            <option>Never</option>
+                        </select>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Login History</p>
+                            <p class="text-xs text-gray-400">Last login: Today, 01:30 AM from Chrome/Windows</p>
+                        </div><button class="text-xs text-pink-400 bg-pink-500/10 px-3 py-1.5 rounded-lg font-bold">View
+                            All</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SYSTEM -->
+            <div id="sec-system" class="settings-section hidden">
+                <h2 class="text-xl font-extrabold text-white mb-1 flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-400">tune</span> System Preferences</h2>
+                <p class="text-sm text-gray-400 mb-6">Configure system-wide settings, data management, and integrations.
+                </p>
+                <div class="glass-panel p-6 space-y-5 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Currency</p>
+                            <p class="text-xs text-gray-400">Display currency for all monetary values</p>
+                        </div><select class="bg-bg border border-white/10 rounded-lg px-3 py-1.5 text-xs text-gray-300">
+                            <option selected>₹ INR (Indian Rupee)</option>
+                            <option>$ USD (US Dollar)</option>
+                        </select>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Date Format</p>
+                            <p class="text-xs text-gray-400">Date display format across the system</p>
+                        </div><select class="bg-bg border border-white/10 rounded-lg px-3 py-1.5 text-xs text-gray-300">
+                            <option selected>DD/MM/YYYY</option>
+                            <option>MM/DD/YYYY</option>
+                            <option>YYYY-MM-DD</option>
+                        </select>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Timezone</p>
+                            <p class="text-xs text-gray-400">System timezone</p>
+                        </div><select class="bg-bg border border-white/10 rounded-lg px-3 py-1.5 text-xs text-gray-300">
+                            <option selected>IST (UTC +5:30)</option>
+                            <option>UTC</option>
+                        </select>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Zoi AI Engine</p>
+                            <p class="text-xs text-gray-400">Enable AI-powered insights and predictions</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                    <div class="border-t border-border pt-4 flex items-center justify-between">
+                        <div>
+                            <p class="font-bold text-white text-sm">Auto Backup</p>
+                            <p class="text-xs text-gray-400">Daily automated backup at 2 AM IST</p>
+                        </div>
+                        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                    </div>
+                </div>
+                <div class="glass-panel p-6">
+                    <h3 class="font-bold text-white text-sm mb-3">Data Management</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <button
+                            class="p-4 bg-white/[0.03] rounded-xl text-center hover:bg-white/[0.06] transition-colors border border-white/5"><span
+                                class="material-symbols-outlined text-teal text-2xl block mb-1">cloud_download</span>
+                            <p class="text-xs font-bold text-white">Export All Data</p>
+                            <p class="text-[10px] text-gray-500">Download CSV/Excel</p>
+                        </button>
+                        <button
+                            class="p-4 bg-white/[0.03] rounded-xl text-center hover:bg-white/[0.06] transition-colors border border-white/5"><span
+                                class="material-symbols-outlined text-amber-400 text-2xl block mb-1">backup</span>
+                            <p class="text-xs font-bold text-white">Manual Backup</p>
+                            <p class="text-[10px] text-gray-500">Create snapshot now</p>
+                        </button>
+                        <button
+                            class="p-4 bg-red-500/10 rounded-xl text-center hover:bg-red-500/15 transition-colors border border-red-500/20"><span
+                                class="material-symbols-outlined text-red-400 text-2xl block mb-1">delete_forever</span>
+                            <p class="text-xs font-bold text-red-400">Reset Data</p>
+                            <p class="text-[10px] text-gray-500">Irreversible action</p>
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-6 glass-panel p-4">
+                    <p class="text-[10px] text-gray-500 text-center">Zoi Hostel POS v2.1.0 • Build 2026.03.04 • © 2026
+                        ZipZapZoi Technologies Pvt. Ltd.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function showSection(s) {
+            document.querySelectorAll('.settings-section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById('sec-' + s).classList.remove('hidden');
+            document.querySelectorAll('.settings-nav a').forEach(a => a.classList.remove('active'));
+            document.querySelector(`.settings-nav a[data-section="${s}"]`).classList.add('active');
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'fixed bottom-10 right-10 bg-surface border border-pink-500/50 text-white px-6 py-4 rounded-2xl shadow-[0_10px_40px_rgba(236,72,153,0.3)] z-[9999] opacity-0 translate-y-10 transition-all duration-300 font-bold';
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => { t.classList.remove('opacity-0', 'translate-y-10'); }, 10);
+            setTimeout(() => {
+                t.classList.add('opacity-0', 'translate-y-10');
+                setTimeout(() => t.remove(), 300);
+            }, 3000);
+        }
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+
+</html>
+

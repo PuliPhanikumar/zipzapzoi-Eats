@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Admin - Content Defense</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6",
+                        ai: "#8b5cf6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] },
+                    animation: { 'pulse-slow': 'pulse 3s infinite' }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .nav-item.active {
+            background: rgba(0, 240, 255, 0.1);
+            color: #00f0ff;
+            border-color: rgba(0, 240, 255, 0.2);
+            border-width: 1px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        /* Safety Filters */
+        .blur-shield {
+            filter: blur(12px);
+            transition: filter 0.3s ease;
+        }
+
+        .blur-shield:hover {
+            filter: blur(0);
+        }
+
+        .toxic-word {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border-bottom: 1px dashed #ef4444;
+            padding: 0 2px;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+    .glass { background: rgba(24, 26, 32, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white font-sans h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>
+        // Enforce RBAC Access Before Rendering
+        try { ZoiAuth.enforceAccess("Moderation"); } catch(e) { console.warn('[ZOI] Auth check skipped:', e.message); }
+    </script>
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-bg">
+
+        <header class="h-16 flex items-center justify-between px-6 border-b border-border bg-surface z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold text-white flex items-center gap-2">
+                    Safety Shield <span
+                        class="text-[10px] bg-ai/10 text-ai px-2 py-0.5 rounded border border-ai/20 flex items-center gap-1"><span
+                            class="material-symbols-outlined text-[10px]">visibility</span> Z.O.I. Vision</span>
+                </h1>
+                <div class="h-6 w-[1px] bg-border"></div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-400">Queue Load:</span>
+                    <span class="text-xs font-bold text-danger font-mono" id="queue-load">2 Critical</span>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <select id="filter-type" onchange="renderQueue()"
+                    class="bg-black/30 border border-border rounded-lg text-xs text-white px-3 py-1.5 focus:border-primary">
+                    <option value="all">All Content</option>
+                    <option value="text">Reviews (Text)</option>
+                    <option value="image">Media (Images)</option>
+                </select>
+                <button onclick="approveAllSafe()"
+                    class="bg-surface border border-border hover:border-white text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">done_all</span> Approve Safe (AI)
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-auto p-6 space-y-6 custom-scrollbar">
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-surface border border-border p-4 rounded-xl flex items-center gap-4">
+                    <div class="size-12 rounded-lg bg-danger/10 flex items-center justify-center text-danger"><span
+                            class="material-symbols-outlined">report</span></div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-bold">Pending Review</p>
+                        <h3 class="text-2xl font-bold text-white" id="stat-pending">0</h3>
+                    </div>
+                </div>
+                <div class="bg-surface border border-border p-4 rounded-xl flex items-center gap-4">
+                    <div class="size-12 rounded-lg bg-ai/10 flex items-center justify-center text-ai"><span
+                            class="material-symbols-outlined">smart_toy</span></div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-bold">Auto-Blocked (24h)</p>
+                        <h3 class="text-2xl font-bold text-white" id="stat-blocked">124</h3>
+                    </div>
+                </div>
+                <div class="bg-surface border border-border p-4 rounded-xl flex items-center gap-4">
+                    <div class="size-12 rounded-lg bg-warning/10 flex items-center justify-center text-warning"><span
+                            class="material-symbols-outlined">gavel</span></div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-bold">User Bans</p>
+                        <h3 class="text-2xl font-bold text-white" id="stat-bans">3</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-lg">
+                <div class="p-4 border-b border-border bg-black/20 flex justify-between items-center">
+                    <h3 class="font-bold text-white text-sm">Review Queue</h3>
+                    <div class="flex gap-2">
+                        <span
+                            class="text-[10px] bg-red-500/10 text-red-400 px-2 py-1 rounded border border-red-500/20">High
+                            Priority</span>
+                    </div>
+                </div>
+
+                <div class="divide-y divide-border" id="mod-queue">
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-ai text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-ai">security</span>
+        <div>
+            <h4 class="font-bold text-sm text-ai" id="toast-title">Action Taken</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. DATA ENGINE (Simulated DB)
+        let queueData = [
+            {
+                id: 101,
+                type: 'text',
+                user: 'Rahul K.',
+                userId: '8821',
+                avatar: '3',
+                flag: 'Reported by Restaurant',
+                content: '"The food was cold and the rider was <span class="toxic-word">stupid</span>. This restaurant is <span class="toxic-word">garbage</span>. Never ordering again!"',
+                confidence: 98,
+                risk: 'High',
+                time: '15 mins ago',
+                order: '#ORD-992'
+            },
+            {
+                id: 102,
+                type: 'image',
+                user: 'Unknown User',
+                userId: '9912',
+                avatar: '8',
+                flag: 'Flagged by Z.O.I. Vision',
+                imageSrc: 'https://via.placeholder.com/150/000000/FFFFFF/?text=Sensitive+Content',
+                confidence: 99,
+                risk: 'Critical',
+                time: '2 mins ago',
+                context: 'Profile Picture'
+            }
+        ];
+
+        // 2. RENDER LOGIC
+        function renderQueue() {
+            const container = document.getElementById('mod-queue');
+            const filter = document.getElementById('filter-type').value;
+            container.innerHTML = "";
+            let count = 0;
+
+            queueData.forEach(item => {
+                if (filter !== 'all' && item.type !== filter) return;
+                count++;
+
+                const initials = item.user.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+                let contentHTML = '';
+                if (item.type === 'text') {
+                    contentHTML = `
+                        <div class="bg-black/30 p-4 rounded-lg border border-border mb-4">
+                            <p class="text-sm text-gray-300 italic">${item.content}</p>
+                        </div>`;
+                } else {
+                    contentHTML = `
+                        <div class="flex gap-4 mb-4">
+                            <div class="relative size-32 bg-gray-800 rounded-lg overflow-hidden border border-red-500/50 cursor-pointer group/img">
+                                <img src="${item.imageSrc}" class="w-full h-full object-cover blur-shield">
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <span class="material-symbols-outlined text-white text-3xl drop-shadow-lg">visibility_off</span>
+                                </div>
+                            </div>
+                            <div class="flex-1 bg-black/30 p-3 rounded-lg border border-border flex flex-col justify-center">
+                                <p class="text-xs text-gray-400 mb-2">AI Analysis Report:</p>
+                                <div class="space-y-1">
+                                    <div class="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden"><div class="bg-danger h-full" style="width: 95%"></div></div>
+                                    <div class="flex justify-between text-[10px] text-gray-500"><span>Inappropriate</span><span>95%</span></div>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+
+                const html = `
+                    <div class="p-6 hover:bg-white/5 transition-colors group" id="item-${item.id}">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-full bg-gradient-to-br from-primary/40 to-ai/40 border border-gray-500 flex items-center justify-center text-xs font-bold text-white">${initials}</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white">${item.user} <span class="text-[10px] text-gray-500 font-normal">(ID: ${item.userId})</span></h4>
+                                    <div class="flex items-center gap-1 text-[10px] text-danger">
+                                        <span class="material-symbols-outlined text-[12px]">${item.type === 'text' ? 'flag' : 'image'}</span> ${item.flag}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] bg-ai/10 text-ai px-2 py-1 rounded border border-ai/20 font-bold">AI Confidence: ${item.confidence}%</span>
+                            </div>
+                        </div>
+                        
+                        ${contentHTML}
+
+                        <div class="flex justify-between items-center">
+                            <div class="text-[10px] text-gray-500">Time: ${item.time} • ${item.type === 'text' ? item.order : item.context}</div>
+                            <div class="flex gap-3">
+                                <button onclick="handleAction('ignore', ${item.id})" class="px-4 py-2 border border-border text-gray-400 hover:text-white rounded-lg text-xs font-bold transition-all">Ignore</button>
+                                <button onclick="handleAction('delete', ${item.id})" class="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500 hover:text-white rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">delete</span> Delete
+                                </button>
+                                <button onclick="handleAction('ban', ${item.id})" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">block</span> Ban User
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+
+                container.innerHTML += html;
+            });
+
+            if (count === 0) {
+                container.innerHTML = `
+                    <div class="p-12 flex flex-col items-center justify-center text-gray-500">
+                        <span class="material-symbols-outlined text-4xl mb-2 opacity-50">check_circle</span>
+                        <p>All clean! No flagged content.</p>
+                    </div>`;
+            }
+
+            // Update Stats
+            document.getElementById('stat-pending').innerText = count;
+            document.getElementById('queue-load').innerText = count > 0 ? `${count} Critical` : "Clean";
+        }
+
+        // 3. ACTION LOGIC
+        function handleAction(type, id) {
+            const el = document.getElementById(`item-${id}`);
+            if (!el) return;
+
+            // Animate removal
+            el.style.transform = "translateX(20px)";
+            el.style.opacity = "0";
+
+            setTimeout(() => {
+                // Remove from data array
+                queueData = queueData.filter(x => x.id !== id);
+                renderQueue();
+                updateCounters(type);
+            }, 300);
+
+            // Toast feedback
+            let msg = "", title = "";
+            if (type === 'delete') { title = "Content Removed"; msg = "User warned via email."; }
+            else if (type === 'ban') { title = "User Banned"; msg = "Account suspended immediately."; }
+            else if (type === 'ignore') { title = "Marked Safe"; msg = "Content approved."; }
+
+            showToast(title, msg);
+        }
+
+        function updateCounters(type) {
+            if (type === 'ban') {
+                const bans = document.getElementById('stat-bans');
+                bans.innerText = parseInt(bans.innerText) + 1;
+            }
+            if (type === 'delete' || type === 'ban') {
+                const blocked = document.getElementById('stat-blocked');
+                blocked.innerText = parseInt(blocked.innerText) + 1;
+            }
+        }
+
+        // 4. AI BULK ACTION
+        function approveAllSafe() {
+            const btn = document.querySelector('button[onclick="approveAllSafe()"]');
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Scanning...`;
+
+            setTimeout(() => {
+                btn.innerHTML = `<span class="material-symbols-outlined text-sm">done_all</span> Approve Safe (AI)`;
+                // Logic: Only approve if confidence < 70 (Simulation)
+                // In this mock, both are high confidence (>90), so nothing happens safely.
+                showToast("Z.O.I. Scan Complete", "No low-risk items found. Manual review required for high-risk content.");
+            }, 2000);
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        // Skeleton loader for the moderation queue
+        function renderQueueSkeleton() {
+            const container = document.getElementById('mod-queue');
+            container.innerHTML = Array(2).fill(0).map(() => `
+                <div class="p-6 animate-pulse">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="size-10 rounded-full bg-gray-700"></div>
+                        <div class="space-y-1.5 flex-1"><div class="h-3 w-32 bg-gray-700 rounded"></div><div class="h-2 w-48 bg-gray-700/60 rounded"></div></div>
+                        <div class="h-5 w-28 bg-gray-700 rounded"></div>
+                    </div>
+                    <div class="h-20 bg-gray-800/50 rounded-lg mb-4"></div>
+                    <div class="flex justify-end gap-3"><div class="h-8 w-20 bg-gray-700 rounded-lg"></div><div class="h-8 w-20 bg-gray-700 rounded-lg"></div><div class="h-8 w-24 bg-red-900/30 rounded-lg"></div></div>
+                </div>
+            `).join('<div class="border-t border-border"></div>');
+        }
+
+        // INIT
+        window.onload = function () {
+            // Show skeleton then load real data after simulated latency
+            renderQueueSkeleton();
+            setTimeout(() => renderQueue(), 700);
+        };
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+
+

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Scheduler - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="hostel_shared.js"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        @keyframes pulse-border {
+
+            0%,
+            100% {
+                border-color: rgba(239, 68, 68, 0.2);
+            }
+
+            50% {
+                border-color: rgba(239, 68, 68, 0.6);
+            }
+        }
+
+        .overdue-pulse {
+            animation: pulse-border 2s ease-in-out infinite;
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1));
+            color: #ec4899;
+            border-color: rgba(236, 72, 153, 0.3);
+            font-weight: 700;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Maintenance Scheduler <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">engineering</span></h2>
+                <p class="text-gray-400 text-sm">Preventive maintenance, work orders, vendor tracking, and cost
+                    analysis.</p>
+            </div>
+            <button onclick="openWOModal()"
+                class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)]"><span
+                    class="material-symbols-outlined text-sm">add</span> New Work Order</button>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-blue-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-blue-400">assignment</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Orders</p>
+                    <p class="text-xl font-extrabold text-white" id="st-total">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">pending</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">In Progress</p>
+                    <p class="text-xl font-extrabold text-amber-400" id="st-prog">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-red-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-red-400">warning</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Overdue</p>
+                    <p class="text-xl font-extrabold text-red-400" id="st-over">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-pink-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-pink-400">currency_rupee</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Cost</p>
+                    <p class="text-xl font-extrabold text-pink-400" id="st-cost">₹0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="px-8 pt-4 flex gap-2 flex-shrink-0">
+            <button class="tab-btn active px-4 py-2 text-xs rounded-xl border border-white/10" data-tab="orders"
+                onclick="switchTab('orders')">Work Orders</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-tab="calendar" onclick="switchTab('calendar')">Calendar</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-tab="analytics" onclick="switchTab('analytics')">Cost Analytics</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+            <!-- WORK ORDERS -->
+            <div id="tab-orders" class="tab-content">
+                <div class="flex items-center gap-3 mb-4">
+                    <select id="wo-status" onchange="renderOrders()"
+                        class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-2 text-gray-300">
+                        <option value="all">All Status</option>
+                        <option>Scheduled</option>
+                        <option>In Progress</option>
+                        <option>Completed</option>
+                        <option>Overdue</option>
+                    </select>
+                    <select id="wo-cat" onchange="renderOrders()"
+                        class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-2 text-gray-300">
+                        <option value="all">All Categories</option>
+                        <option>Plumbing</option>
+                        <option>Electrical</option>
+                        <option>AC/HVAC</option>
+                        <option>Painting</option>
+                        <option>Pest Control</option>
+                        <option>Deep Cleaning</option>
+                        <option>Furniture</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="space-y-3" id="wo-list"></div>
+            </div>
+
+            <!-- CALENDAR -->
+            <div id="tab-calendar" class="tab-content hidden">
+                <div class="glass-panel p-6">
+                    <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                            class="material-symbols-outlined text-pink-400 text-lg">calendar_month</span> March 2026
+                        Maintenance Calendar</h3>
+                    <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-gray-500 font-bold mb-2">
+                        <span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1" id="cal-grid"></div>
+                </div>
+            </div>
+
+            <!-- COST ANALYTICS -->
+            <div id="tab-analytics" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 bouncy-card">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-amber-400 text-lg">pie_chart</span> Cost by
+                            Category</h3><canvas id="cost-cat-chart" height="220"></canvas>
+                    </div>
+                    <div class="glass-panel p-6 bouncy-card">
+                        <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
+                                class="material-symbols-outlined text-teal text-lg">show_chart</span> Monthly
+                            Maintenance Spend</h3><canvas id="cost-trend-chart" height="220"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- NEW WORK ORDER MODAL -->
+    <div id="wo-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-500">add_task</span> New Work Order</h3><button
+                    onclick="closeWOModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <input id="nw-title" type="text" placeholder="Task Title *"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="nw-cat"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option>Plumbing</option>
+                        <option>Electrical</option>
+                        <option>AC/HVAC</option>
+                        <option>Painting</option>
+                        <option>Pest Control</option>
+                        <option>Deep Cleaning</option>
+                        <option>Furniture</option>
+                        <option>Other</option>
+                    </select>
+                    <select id="nw-priority"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option>Low</option>
+                        <option>Medium</option>
+                        <option selected>High</option>
+                        <option>Urgent</option>
+                    </select>
+                </div>
+                <input id="nw-loc" type="text" placeholder="Location (e.g., Room 204, Floor 1 Bathroom)"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                <div class="grid grid-cols-2 gap-3">
+                    <input id="nw-vendor" type="text" placeholder="Vendor / Technician"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <input id="nw-cost" type="number" placeholder="Est. Cost ₹"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Scheduled
+                            Date</label><input id="nw-date" type="date"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    </div>
+                    <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Due Date</label><input
+                            id="nw-due" type="date"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+            <div class="p-5 border-t border-border flex gap-3"><button onclick="closeWOModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10">Cancel</button><button
+                    onclick="createWO()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)]">Create
+                    Order</button></div>
+        </div>
+    </div>
+
+    <script>
+        const CAT_ICONS = { Plumbing: 'plumbing', Electrical: 'bolt', 'AC/HVAC': 'ac_unit', Painting: 'format_paint', 'Pest Control': 'bug_report', 'Deep Cleaning': 'cleaning_services', Furniture: 'chair', Other: 'more_horiz' };
+        const CAT_COLORS = { Plumbing: 'blue', Electrical: 'amber', 'AC/HVAC': 'teal', Painting: 'violet', 'Pest Control': 'green', 'Deep Cleaning': 'pink', Furniture: 'orange', Other: 'gray' };
+        const PRIORITY_COLORS = { Low: 'green', Medium: 'blue', High: 'amber', Urgent: 'red' };
+
+        const ORDERS = ZoiDB.get('maintenance_orders', [
+            { id: 1, title: 'AC Servicing — Room 204 & 205', category: 'AC/HVAC', priority: 'High', location: 'Room 204, 205', vendor: 'Blue Star Service', cost: 5600, scheduledDate: '2026-03-05', dueDate: '2026-03-06', status: 'Scheduled' },
+            { id: 2, title: 'Bathroom Pipe Leak Fix', category: 'Plumbing', priority: 'Urgent', location: 'Floor 1 Bathroom', vendor: 'Sri Ganesh Plumbing', cost: 3500, scheduledDate: '2026-03-03', dueDate: '2026-03-03', status: 'Overdue' },
+            { id: 3, title: 'Floor 2 Bathroom Renovation', category: 'Plumbing', priority: 'High', location: 'Floor 2 Bathrooms', vendor: 'Krishna Constructions', cost: 45000, scheduledDate: '2026-03-08', dueDate: '2026-03-15', status: 'Scheduled' },
+            { id: 4, title: 'Electrical Wiring Check — Floor 3', category: 'Electrical', priority: 'Medium', location: 'Floor 3 Common Area', vendor: 'Local Electrician', cost: 2000, scheduledDate: '2026-03-04', dueDate: '2026-03-05', status: 'In Progress' },
+            { id: 5, title: 'Monthly Pest Control', category: 'Pest Control', priority: 'Medium', location: 'All Floors', vendor: 'Godrej Pest Control', cost: 3000, scheduledDate: '2026-03-01', dueDate: '2026-03-01', status: 'Completed' },
+            { id: 6, title: 'Deep Cleaning — Common Hall', category: 'Deep Cleaning', priority: 'Low', location: 'Common Hall', vendor: 'Housekeeping Team', cost: 1500, scheduledDate: '2026-03-02', dueDate: '2026-03-02', status: 'Completed' },
+            { id: 7, title: 'Broken Bed Frame Replacement', category: 'Furniture', priority: 'Medium', location: 'Room 105 Bed B', vendor: 'Local Furniture Shop', cost: 4500, scheduledDate: '2026-03-06', dueDate: '2026-03-08', status: 'Scheduled' },
+            { id: 8, title: 'Wall Repainting — Room 303', category: 'Painting', priority: 'Low', location: 'Room 303', vendor: 'SRK Painters', cost: 6000, scheduledDate: '2026-03-10', dueDate: '2026-03-12', status: 'Scheduled' },
+            { id: 9, title: 'Geyser Replacement — Floor 2', category: 'Electrical', priority: 'High', location: 'Floor 2 Bathroom', vendor: 'Racold Service Center', cost: 8500, scheduledDate: '2026-03-07', dueDate: '2026-03-07', status: 'Scheduled' },
+            { id: 10, title: 'Garden Maintenance & Landscaping', category: 'Other', priority: 'Low', location: 'Hostel Garden', vendor: 'Green Thumb Services', cost: 2500, scheduledDate: '2026-03-09', dueDate: '2026-03-09', status: 'Scheduled' },
+        ]);
+
+        function renderOrders() {
+            const sf = document.getElementById('wo-status').value;
+            const cf = document.getElementById('wo-cat').value;
+            let items = [...ORDERS];
+            if (sf !== 'all') items = items.filter(o => o.status === sf);
+            if (cf !== 'all') items = items.filter(o => o.category === cf);
+            document.getElementById('wo-list').innerHTML = items.map((o, i) => {
+                const cc = CAT_COLORS[o.category] || 'gray'; const ci = CAT_ICONS[o.category] || 'build';
+                const pc = PRIORITY_COLORS[o.priority] || 'gray';
+                const isOverdue = o.status === 'Overdue';
+                const statusBadge = o.status === 'Completed' ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">✓ Completed</span>' : o.status === 'In Progress' ? '<span class="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[10px] font-bold">🔄 In Progress</span>' : o.status === 'Overdue' ? '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">⚠ Overdue</span>' : '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">⏳ Scheduled</span>';
+                return `<div class="glass-panel p-4 bouncy-card fade-row ${isOverdue ? 'overdue-pulse border-red-500/30' : ''}" style="animation-delay:${i * 40}ms">
+                    <div class="flex items-start gap-3">
+                        <div class="h-10 w-10 rounded-xl bg-${cc}-500/15 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-${cc}-400">${ci}</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <span class="bg-${cc}-500/20 text-${cc}-400 px-2 py-0.5 rounded text-[10px] font-bold">${o.category}</span>
+                                <span class="bg-${pc}-500/20 text-${pc}-400 px-2 py-0.5 rounded text-[10px] font-bold">${o.priority}</span>
+                                ${statusBadge}
+                            </div>
+                            <h4 class="font-bold text-white text-sm">${o.title}</h4>
+                            <div class="flex flex-wrap gap-3 mt-1.5 text-[10px] text-gray-500">
+                                <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">location_on</span>${o.location}</span>
+                                <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">person</span>${o.vendor}</span>
+                                <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">currency_rupee</span>₹${o.cost.toLocaleString()}</span>
+                                <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">calendar_today</span>${o.scheduledDate} → ${o.dueDate}</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1 flex-shrink-0">
+                            ${o.status === 'Scheduled' ? `<button onclick="updateStatus(${o.id},'In Progress')" class="text-[10px] text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded font-bold hover:bg-blue-500/20 transition-colors">Start</button>` : ''}
+                            ${o.status === 'In Progress' ? `<button onclick="updateStatus(${o.id},'Completed')" class="text-[10px] text-green-400 bg-green-500/10 px-2.5 py-1 rounded font-bold hover:bg-green-500/20 transition-colors">Complete</button>` : ''}
+                            ${o.status === 'Overdue' ? `<button onclick="updateStatus(${o.id},'In Progress')" class="text-[10px] text-blue-400 bg-blue-500/10 px-2.5 py-1 rounded font-bold hover:bg-blue-500/20 transition-colors">Resume</button>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            updateStats();
+        }
+
+        function updateStatus(id, newStatus) {
+            const o = ORDERS.find(x => x.id === id);
+            if (o) {
+                o.status = newStatus;
+                ZoiDB.set('maintenance_orders', ORDERS);
+                renderOrders();
+                initCharts();
+                showToast(`Work order marked as ${newStatus}`, 'success');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('st-total').innerText = ORDERS.length;
+            document.getElementById('st-prog').innerText = ORDERS.filter(o => o.status === 'In Progress').length;
+            document.getElementById('st-over').innerText = ORDERS.filter(o => o.status === 'Overdue').length;
+            document.getElementById('st-cost').innerText = '₹' + ORDERS.reduce((s, o) => s + o.cost, 0).toLocaleString();
+        }
+
+        function renderCalendar() {
+            const days = []; for (let i = 0; i < 6; i++)days.push(null);// March 2026 starts on Sunday
+            for (let d = 1; d <= 31; d++)days.push(d);
+            const orderDates = {};
+            ORDERS.forEach(o => { const d = parseInt(o.scheduledDate.split('-')[2]); if (!orderDates[d]) orderDates[d] = []; orderDates[d].push(o); });
+            document.getElementById('cal-grid').innerHTML = days.map(d => {
+                if (d === null) return '<div></div>';
+                const events = orderDates[d] || [];
+                const today = d === 4;
+                return `<div class="p-1.5 rounded-lg ${today ? 'bg-pink-500/20 border border-pink-500/30' : 'bg-white/[0.02] border border-white/5'} min-h-[60px]">
+                    <p class="text-[10px] font-bold ${today ? 'text-pink-400' : 'text-gray-400'} mb-0.5">${d}</p>
+                    ${events.map(e => {
+                    const tc = CAT_COLORS[e.category] || 'gray';
+                    return `<div class="bg-${tc}-500/20 rounded px-1 py-0.5 text-[7px] text-${tc}-400 font-bold truncate mb-0.5">${e.title.substring(0, 15)}…</div>`;
+                }).join('')}
+                </div>`;
+            }).join('');
+        }
+
+        let catChartInstance = null;
+        let trendChartInstance = null;
+
+        function initCharts() {
+            const catCost = {};
+            ORDERS.forEach(o => {
+                catCost[o.category] = (catCost[o.category] || 0) + o.cost;
+            });
+
+            if (catChartInstance) catChartInstance.destroy();
+            catChartInstance = new Chart(document.getElementById('cost-cat-chart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(catCost),
+                    datasets: [{
+                        data: Object.values(catCost),
+                        backgroundColor: ['rgba(59,130,246,0.5)', 'rgba(251,191,36,0.5)', 'rgba(0,212,197,0.5)', 'rgba(139,92,246,0.5)', 'rgba(34,197,94,0.5)', 'rgba(236,72,153,0.5)', 'rgba(249,115,22,0.5)', 'rgba(107,114,128,0.4)'],
+                        borderWidth: 0,
+                        hoverOffset: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: '#9ca3af', font: { size: 10 }, padding: 8 } }
+                    }
+                }
+            });
+
+            // Trend chart (Simulated trailing months + current month sum)
+            const currentTotal = ORDERS.reduce((sum, o) => sum + o.cost, 0);
+
+            if (trendChartInstance) trendChartInstance.destroy();
+            trendChartInstance = new Chart(document.getElementById('cost-trend-chart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
+                    datasets: [{
+                        label: 'Maintenance Cost',
+                        data: [12000, 18000, 15000, 22000, 8500, currentTotal],
+                        backgroundColor: 'rgba(236,72,153,0.4)',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 9 } } },
+                        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 9 }, callback: v => '₹' + (v / 1000) + 'K' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function openWOModal() { document.getElementById('wo-modal').classList.remove('hidden'); document.getElementById('wo-modal').classList.add('flex'); document.getElementById('nw-date').value = new Date().toISOString().split('T')[0]; }
+        function closeWOModal() { document.getElementById('wo-modal').classList.add('hidden'); document.getElementById('wo-modal').classList.remove('flex'); }
+        function createWO() {
+            const t = document.getElementById('nw-title').value.trim();
+            if (!t) { showToast('Task Title is required.', 'error'); return; }
+
+            ORDERS.unshift({
+                id: Date.now(),
+                title: t,
+                category: document.getElementById('nw-cat').value,
+                priority: document.getElementById('nw-priority').value,
+                location: document.getElementById('nw-loc').value || '—',
+                vendor: document.getElementById('nw-vendor').value || '—',
+                cost: parseInt(document.getElementById('nw-cost').value) || 0,
+                scheduledDate: document.getElementById('nw-date').value,
+                dueDate: document.getElementById('nw-due').value || document.getElementById('nw-date').value,
+                status: 'Scheduled'
+            });
+
+            ZoiDB.set('maintenance_orders', ORDERS);
+            closeWOModal();
+            renderOrders();
+            initCharts();
+            showToast('Work order created successfully', 'success');
+        }
+
+        function switchTab(t) { document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.getElementById('tab-' + t).classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); }); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.add('active'); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.remove('text-gray-400'); if (t === 'calendar') renderCalendar(); if (t === 'analytics') initCharts(); }
+        document.addEventListener('DOMContentLoaded', () => { renderOrders(); initCharts(); });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

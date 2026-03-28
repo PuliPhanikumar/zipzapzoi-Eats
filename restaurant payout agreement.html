@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ZipZapZoi Eats - Partner Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00f0ff",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#0a0314",
+                        "surface-dark": "#1a0b36",
+                        "surface-dark-lighter": "#2a1650",
+                        "text-secondary": "#9b8ec4",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+    <script src="global_sidebar.js"></script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-surface-dark-lighter dark:border-b-[#493622] px-6 lg:px-10 py-3 bg-background-dark sticky top-0 z-50">
+<div class="flex items-center gap-4 text-white">
+<div class="size-8 text-primary">
+<svg class="w-full h-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M42.1739 20.1739L27.8261 5.82609C29.1366 7.13663 28.3989 10.1876 26.2002 13.7654C24.8538 15.9564 22.9595 18.3449 20.6522 20.6522C18.3449 22.9595 15.9564 24.8538 13.7654 26.2002C10.1876 28.3989 7.13663 29.1366 5.82609 27.8261L20.1739 42.1739C21.4845 43.4845 24.5355 42.7467 28.1133 40.548C30.3042 39.2016 32.6927 37.3073 35 35C37.3073 32.6927 39.2016 30.3042 40.548 28.1133C42.7467 24.5355 43.4845 21.4845 42.1739 20.1739Z" fill="currentColor"></path>
+<path clip-rule="evenodd" d="M7.24189 26.4066C7.31369 26.4411 7.64204 26.5637 8.52504 26.3738C9.59462 26.1438 11.0343 25.5311 12.7183 24.4963C14.7583 23.2426 17.0256 21.4503 19.238 19.238C21.4503 17.0256 23.2426 14.7583 24.4963 12.7183C25.5311 11.0343 26.1438 9.59463 26.3738 8.52504C26.5637 7.64204 26.4411 7.31369 26.4066 7.24189C26.345 7.21246 26.143 7.14535 25.6664 7.1918C24.9745 7.25925 23.9954 7.5498 22.7699 8.14278C20.3369 9.32007 17.3369 11.4915 14.4142 14.4142C11.4915 17.3369 9.32007 20.3369 8.14278 22.7699C7.5498 23.9954 7.25925 24.9745 7.1918 25.6664C7.14534 26.143 7.21246 26.345 7.24189 26.4066ZM29.9001 10.7285C29.4519 12.0322 28.7617 13.4172 27.9042 14.8126C26.465 17.1544 24.4686 19.6641 22.0664 22.0664C19.6641 24.4686 17.1544 26.465 14.8126 27.9042C13.4172 28.7617 12.0322 29.4519 10.7285 29.9001L21.5754 40.747C21.6001 40.7606 21.8995 40.931 22.8729 40.7217C23.9424 40.4916 25.3821 39.879 27.0661 38.8441C29.1062 37.5904 31.3734 35.7982 33.5858 33.5858C35.7982 31.3734 37.5904 29.1062 38.8441 27.0661C39.879 25.3821 40.4916 23.9425 40.7216 22.8729C40.931 21.8995 40.7606 21.6001 40.747 21.5754L29.9001 10.7285ZM29.2403 4.41187L43.5881 18.7597C44.9757 20.1473 44.9743 22.1235 44.6322 23.7139C44.2714 25.3919 43.4158 27.2666 42.252 29.1604C40.8128 31.5022 38.8165 34.012 36.4142 36.4142C34.012 38.8165 31.5022 40.8128 29.1604 42.252C27.2666 43.4158 25.3919 44.2714 23.7139 44.6322C22.1235 44.9743 20.1473 44.9757 18.7597 43.5881L4.41187 29.2403C3.29027 28.1187 3.08209 26.5973 3.21067 25.2783C3.34099 23.9415 3.8369 22.4852 4.54214 21.0277C5.96129 18.0948 8.43335 14.7382 11.5858 11.5858C14.7382 8.43335 18.0948 5.9613 21.0277 4.54214C22.4852 3.8369 23.9415 3.34099 25.2783 3.21067C26.5973 3.08209 28.1187 3.29028 29.2403 4.41187Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">ZipZapZoi Eats Partner</h2>
+<p class="text-text-secondary text-xs">Onboarding</p>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-6">
+<div class="flex gap-3">
+<button onclick="saveDraft()" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-background-dark text-sm font-bold leading-normal tracking-[0.015em] transition hover:bg-opacity-90">
+<span class="truncate">Save Draft</span>
+</button>
+<a href="customer support help.html" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-surface-dark-lighter hover:bg-[#2a1650] border border-[#3d2570] text-white text-sm font-bold leading-normal tracking-[0.015em] transition">
+<span class="truncate">Help</span>
+</a>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-primary/30" data-alt="Restaurant profile logo placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDFWCPjHihlN4R5O2WVNEif7VQHXVywodsZ6Xk_iYIu7IH47Fsxuv9mmiRbeZ6eeC3gf_HqduxRpfTlzF203Bt6ljBZIfTMMUlXS7UBk8yUWr3idhXThfbudXWuzrMSAJlLDgePRkcaVeVpWlN85LdGxY8z2zJRDKrqrhX5BBo4AlIZy7XKBizVsRW8Z4Xki_e1-BboUldZhHo6Of-KjpASymPropaar48rz-eRpqy_Rm6XVi8szlKr23sfknalwAICtBISvItt-wo");'></div>
+</div>
+</header>
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-20 xl:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[1200px] flex-1">
+<!-- Progress Bar -->
+<div class="flex flex-col gap-3 p-4 mb-4">
+<div class="flex gap-6 justify-between items-center">
+<p class="text-white text-sm font-medium leading-normal tracking-wide uppercase text-primary">Step 4 of 5</p>
+<p class="text-text-secondary text-sm">Next: Menu Setup</p>
+</div>
+<div class="rounded-full bg-surface-dark-lighter h-2">
+<div class="h-2 rounded-full bg-primary" style="width: 80%;"></div>
+</div>
+<p class="text-white text-lg font-bold leading-normal mt-1">Payout &amp; Legal</p>
+</div>
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-between gap-3 p-4 mb-4">
+<div class="flex min-w-72 flex-col gap-3">
+<h1 class="text-white text-4xl font-black leading-tight tracking-[-0.033em]">Let's make it official, Spice Garden</h1>
+<p class="text-text-secondary text-lg font-normal leading-relaxed max-w-2xl">Review our partnership terms and set up your payouts securely to start receiving orders. We are RBI compliant and ensure timely weekly settlements.</p>
+</div>
+</div>
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 pb-20">
+<!-- LEFT COLUMN: Terms & Agreement -->
+<div class="lg:col-span-5 flex flex-col gap-6">
+<!-- Summary Card -->
+<div class="bg-surface-dark rounded-xl border border-surface-dark-lighter overflow-hidden">
+<div class="px-6 pt-6 pb-2">
+<h2 class="text-white text-xl font-bold">Commercial Terms</h2>
+</div>
+<div class="p-6 grid grid-cols-1 gap-0">
+<div class="flex justify-between items-center border-b border-surface-dark-lighter py-4">
+<p class="text-text-secondary text-sm">Commission Rate</p>
+<p class="text-white text-base font-medium">22% <span class="text-text-secondary text-sm font-normal">per order</span></p>
+</div>
+<div class="flex justify-between items-center border-b border-surface-dark-lighter py-4">
+<p class="text-text-secondary text-sm">Payout Frequency</p>
+<p class="text-white text-base font-medium">Weekly <span class="text-text-secondary text-sm font-normal">on Wednesdays</span></p>
+</div>
+<div class="flex justify-between items-center border-b border-surface-dark-lighter py-4">
+<p class="text-text-secondary text-sm">Onboarding Fee</p>
+<p class="text-primary text-base font-bold">₹0 <span class="text-text-secondary text-sm font-normal">(Waived for launch)</span></p>
+</div>
+<div class="flex justify-between items-center py-4">
+<p class="text-text-secondary text-sm">Cancellation Policy</p>
+<p class="text-white text-base font-medium">Standard policies apply</p>
+</div>
+</div>
+</div>
+<!-- Detailed Agreement Scroll -->
+<div class="bg-surface-dark rounded-xl border border-surface-dark-lighter flex flex-col flex-1">
+<div class="px-6 py-4 border-b border-surface-dark-lighter flex justify-between items-center">
+<h3 class="text-white font-bold text-lg">Partner Agreement</h3>
+<button class="text-primary text-sm font-medium flex items-center gap-1 hover:text-white transition">
+<span class="material-symbols-outlined text-lg">download</span> Download PDF
+                                    </button>
+</div>
+<div class="p-6 h-64 overflow-y-auto custom-scrollbar text-sm text-text-secondary leading-relaxed space-y-4 bg-surface-dark-lighter/30">
+<p><strong class="text-white">1. Definitions.</strong> "Platform" refers to ZipZapZoi Eats. "Partner" refers to the restaurant entity.</p>
+<p><strong class="text-white">2. Commission &amp; Fees.</strong> The Partner agrees to pay a commission of 22% on the gross order value excluding taxes. ZipZapZoi reserves the right to adjust these rates with a 30-day notice period.</p>
+<p><strong class="text-white">3. Payout Schedule.</strong> Net earnings will be transferred via NEFT/RTGS to the registered bank account every Wednesday for the sales cycle ending the previous Sunday.</p>
+<p><strong class="text-white">4. Food Safety.</strong> The Partner warrants that all food prepared complies with FSSAI regulations and hygiene standards.</p>
+<p><strong class="text-white">5. Intellectual Property.</strong> Partner grants ZipZapZoi a non-exclusive license to use its name, logo, and menu content for marketing purposes on the Platform.</p>
+<p><strong class="text-white">6. Termination.</strong> Either party may terminate this agreement with 14 days written notice.</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Banking & Signature -->
+<div class="lg:col-span-7 flex flex-col gap-6">
+<!-- Banking Form -->
+<div class="bg-surface-dark rounded-xl border border-surface-dark-lighter p-6">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h2 class="text-white text-xl font-bold">Payout Details</h2>
+<p class="text-text-secondary text-sm mt-1">Enter your bank account details for settlements.</p>
+</div>
+<div class="flex items-center gap-1 bg-green-900/30 border border-green-800 rounded px-2 py-1 text-green-400 text-xs font-medium">
+<span class="material-symbols-outlined text-sm">verified_user</span>
+                                        SSL Encrypted
+                                    </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<div class="md:col-span-2">
+<label class="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Account Holder Name</label>
+<input class="w-full bg-background-dark border border-surface-dark-lighter text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 placeholder-gray-600" placeholder="e.g. Spice Garden Pvt Ltd" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Account Number</label>
+<input class="w-full bg-background-dark border border-surface-dark-lighter text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 placeholder-gray-600" placeholder="•••• •••• •••• 1234" type="password"/>
+</div>
+<div>
+<label class="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Confirm Account Number</label>
+<input class="w-full bg-background-dark border border-surface-dark-lighter text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 placeholder-gray-600" placeholder="e.g. 98765432101234" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">IFSC Code</label>
+<div class="relative">
+<input class="w-full bg-background-dark border border-surface-dark-lighter text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 placeholder-gray-600 uppercase" placeholder="e.g. HDFC0001234" type="text"/>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+<span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Bank Name</label>
+<input class="w-full bg-surface-dark-lighter border border-transparent text-text-secondary text-sm rounded-lg block p-3 cursor-not-allowed" disabled="" type="text" value="HDFC Bank, Koramangala Branch"/>
+</div>
+</div>
+<div class="mt-6 flex justify-end">
+<button class="text-primary text-sm font-bold bg-primary/10 hover:bg-primary/20 px-4 py-2 rounded-lg transition border border-primary/20 flex items-center gap-2">
+                                        Verify Account
+                                        <span class="material-symbols-outlined text-sm">currency_rupee</span>
+</button>
+</div>
+</div>
+<!-- Acceptance & Signature -->
+<div class="bg-surface-dark rounded-xl border border-surface-dark-lighter p-6 flex flex-col gap-6">
+<div>
+<h2 class="text-white text-xl font-bold">Acceptance</h2>
+<p class="text-text-secondary text-sm mt-1">Digital signature to finalize the agreement.</p>
+</div>
+<div class="flex items-start gap-3 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+<div class="flex h-6 items-center">
+<input class="h-5 w-5 rounded border-gray-600 bg-background-dark text-primary focus:ring-primary focus:ring-offset-background-dark" id="comments" name="comments" type="checkbox"/>
+</div>
+<div class="text-sm leading-6">
+<label class="font-medium text-white" for="comments">I confirm I am an authorized signatory</label>
+<p class="text-text-secondary">By checking this box, I agree to the ZipZapZoi Merchant Agreement and confirm that the bank details provided are correct.</p>
+</div>
+</div>
+<div>
+<label class="block text-xs font-medium text-text-secondary mb-2 uppercase tracking-wide">Draw your signature</label>
+<div class="border-2 border-dashed border-surface-dark-lighter rounded-xl bg-background-dark h-32 flex items-center justify-center relative group cursor-crosshair">
+<p class="text-text-secondary text-sm group-hover:opacity-50 transition">Sign here</p>
+<button class="absolute top-2 right-2 text-text-secondary hover:text-white text-xs bg-surface-dark-lighter px-2 py-1 rounded">Clear</button>
+</div>
+</div>
+<div class="pt-2">
+<button onclick="finalizeAgreement()" class="w-full flex cursor-pointer items-center justify-center overflow-hidden rounded-xl h-14 px-6 bg-primary text-background-dark text-base font-bold leading-normal tracking-[0.015em] hover:bg-opacity-90 transition shadow-lg shadow-primary/20">
+<span class="truncate">Finalize Agreement &amp; Set Up Menu</span>
+<span class="material-symbols-outlined ml-2">arrow_forward</span>
+</button>
+<p class="text-center text-xs text-text-secondary mt-4">
+                                        Your data is securely processed in compliance with RBI regulations.
+                                    </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<style>
+        /* Custom Scrollbar for terms */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+    <script>
+    // ── TOAST ──
+    function showToast(msg, type='info') {
+        const t = document.createElement('div');
+        const bg = {success:'#00f0ff',error:'#ef4444',info:'#8b5cf6',warning:'#f59e0b'};
+        t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${bg[type]||bg.info};color:#0a0314;padding:12px 24px;border-radius:12px;font-weight:700;font-size:14px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:all .3s;`;
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(),300); },3000);
+    }
+
+    // ── SAVE DRAFT ──
+    function saveDraft() {
+        const inputs = document.querySelectorAll('input:not([disabled])');
+        const draft = {};
+        inputs.forEach((inp, i) => { draft['field_'+i] = inp.value; });
+        draft.agreementChecked = document.getElementById('comments')?.checked || false;
+        localStorage.setItem('zoiPayoutDraft', JSON.stringify(draft));
+        showToast('Draft saved!', 'success');
+    }
+
+    // ── DOWNLOAD PDF ──
+    document.addEventListener('DOMContentLoaded', () => {
+        // Wire Download PDF button
+        document.querySelectorAll('button').forEach(btn => {
+            if (btn.textContent.includes('Download PDF')) {
+                btn.addEventListener('click', () => {
+                    showToast('Agreement PDF will be sent to your registered email', 'info');
+                });
+            }
+            if (btn.textContent.includes('Verify Account')) {
+                btn.addEventListener('click', () => {
+                    btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> Verifying...';
+                    setTimeout(() => {
+                        btn.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Verified!';
+                        btn.classList.add('text-green-400', 'border-green-400/30');
+                        showToast('Bank account verified successfully!', 'success');
+                    }, 2000);
+                });
+            }
+            if (btn.textContent.includes('Clear')) {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showToast('Signature cleared', 'info');
+                });
+            }
+        });
+
+        // Load draft if exists
+        try {
+            const draft = JSON.parse(localStorage.getItem('zoiPayoutDraft') || 'null');
+            if (draft) {
+                const inputs = document.querySelectorAll('input:not([disabled])');
+                inputs.forEach((inp, i) => { if (draft['field_'+i]) inp.value = draft['field_'+i]; });
+                if (draft.agreementChecked && document.getElementById('comments')) {
+                    document.getElementById('comments').checked = true;
+                }
+                showToast('Draft restored', 'info');
+            }
+        } catch(e) {}
+
+        // Load restaurant name from partner application
+        try {
+            const apps = JSON.parse(localStorage.getItem('zoiPartnerApplications') || '[]');
+            if (apps.length) {
+                const latest = apps[apps.length - 1];
+                const heading = document.querySelector('h1');
+                if (heading) heading.textContent = `Let's make it official, ${latest.name}`;
+            }
+        } catch(e) {}
+    });
+
+    // ── FINALIZE AGREEMENT ──
+    function finalizeAgreement() {
+        const checkbox = document.getElementById('comments');
+        if (!checkbox || !checkbox.checked) {
+            return showToast('Please check the confirmation box first', 'error');
+        }
+
+        const btn = event.target.closest('button');
+        btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Finalizing...';
+        btn.disabled = true;
+
+        setTimeout(() => {
+            // Save agreement status
+            localStorage.setItem('zoiPartnerAgreement', JSON.stringify({
+                status: 'signed',
+                signedAt: new Date().toISOString(),
+                terms: { commission: '22%', payout: 'weekly', fee: 0 }
+            }));
+
+            // Update partner application status
+            try {
+                const apps = JSON.parse(localStorage.getItem('zoiPartnerApplications') || '[]');
+                if (apps.length) {
+                    apps[apps.length - 1].status = 'agreement_signed';
+                    localStorage.setItem('zoiPartnerApplications', JSON.stringify(apps));
+                }
+            } catch(e) {}
+
+            localStorage.removeItem('zoiPayoutDraft');
+            showToast('Agreement signed! Redirecting to menu setup...', 'success');
+
+            setTimeout(() => {
+                window.location.href = 'restaurant partner golive dashboard.html';
+            }, 1500);
+        }, 1500);
+    }
+</script>
+
+    <script src="js/zoi_ai_assistant.js?v=5"></script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/zoi_partner_engine.js"></script>
+<script src="js/zoi_theme.js?v=5"></script>
+</body></html>
+
+

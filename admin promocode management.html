@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Admin - Marketing Engine</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&family=Noto+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>
+        // Enforce RBAC Access Before Rendering
+        ZoiAuth.enforceAccess("Promo Codes");
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6"
+                    },
+                    fontFamily: { sans: ["Plus Jakarta Sans", "sans-serif"], body: ["Noto Sans", "sans-serif"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .code-copy:active {
+            transform: scale(0.95);
+        }
+    .glass { background: rgba(24, 26, 32, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white font-sans h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-bg">
+
+        <header class="h-16 flex items-center justify-between px-6 border-b border-border bg-surface z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-lg font-bold text-white flex items-center gap-2">
+                    Marketing Engine <span
+                        class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded border border-primary/30"
+                        id="active-count">Loading...</span>
+                </h1>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="exportCSV()"
+                    class="bg-surface border border-border hover:border-white text-white px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">download</span> Export
+                </button>
+                <button onclick="openAIModal()"
+                    class="bg-[#2a1e12] border border-primary/30 text-primary px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 hover:bg-primary/10">
+                    <span class="material-symbols-outlined text-sm">auto_awesome</span> AI Generate
+                </button>
+                <button onclick="openCreateModal()"
+                    class="bg-primary hover:bg-orange-600 text-black px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-primary/20 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">add</span> New Campaign
+                </button>
+            </div>
+        </header>
+
+        <div class="px-6 pt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div
+                class="bg-surface border border-border p-4 rounded-xl flex items-center justify-between group hover:border-primary/50 transition-colors">
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Redemptions (24h)</p>
+                    <div class="flex items-end gap-2 mt-1">
+                        <h3 class="text-2xl font-bold text-white">1,402</h3>
+                        <span class="text-[10px] text-green-400 flex items-center bg-green-900/20 px-1 rounded"><span
+                                class="material-symbols-outlined text-xs">trending_up</span> +15%</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-primary/10 rounded-lg text-primary"><span
+                        class="material-symbols-outlined text-2xl">redeem</span></div>
+            </div>
+            <div
+                class="bg-surface border border-border p-4 rounded-xl flex items-center justify-between group hover:border-blue-500/50 transition-colors">
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Total Discounts Given</p>
+                    <div class="flex items-end gap-2 mt-1">
+                        <h3 class="text-2xl font-bold text-white">₹45.2k</h3>
+                        <span class="text-[10px] text-green-400 flex items-center bg-green-900/20 px-1 rounded"><span
+                                class="material-symbols-outlined text-xs">trending_up</span> +8%</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-blue-500/10 rounded-lg text-blue-400"><span
+                        class="material-symbols-outlined text-2xl">savings</span></div>
+            </div>
+            <div
+                class="bg-surface border border-border p-4 rounded-xl flex items-center justify-between group hover:border-purple-500/50 transition-colors">
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">ROI (Revenue/Cost)</p>
+                    <div class="flex items-end gap-2 mt-1">
+                        <h3 class="text-2xl font-bold text-white">4.2x</h3>
+                        <span
+                            class="text-[10px] text-purple-400 flex items-center bg-purple-900/20 px-1 rounded">Healthy</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-purple-500/10 rounded-lg text-purple-400"><span
+                        class="material-symbols-outlined text-2xl">monetization_on</span></div>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-hidden p-6 flex flex-col">
+            <div class="bg-surface border border-border rounded-t-xl p-3 flex justify-between items-center">
+                <div class="flex gap-2">
+                    <div class="relative">
+                        <input type="text" id="search-input" onkeyup="renderTable()" placeholder="Search Code..."
+                            class="bg-bg border border-border rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:border-primary w-56">
+                        <span
+                            class="material-symbols-outlined absolute left-2 top-1.5 text-gray-500 text-sm">search</span>
+                    </div>
+                    <select id="filter-status" onchange="renderTable()"
+                        class="bg-bg border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary">
+                        <option value="all">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Scheduled">Scheduled</option>
+                        <option value="Expired">Expired</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500" id="page-indicator">Page 1 of 1</span>
+                    <button onclick="changePage(-1)"
+                        class="p-1.5 rounded-lg border border-border text-gray-400 hover:text-white hover:bg-white/5"><span
+                            class="material-symbols-outlined text-sm">chevron_left</span></button>
+                    <button onclick="changePage(1)"
+                        class="p-1.5 rounded-lg border border-border text-gray-400 hover:text-white hover:bg-white/5"><span
+                            class="material-symbols-outlined text-sm">chevron_right</span></button>
+                </div>
+            </div>
+
+            <div class="bg-surface border-x border-b border-border rounded-b-xl flex-1 overflow-auto relative">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-black/20 text-gray-500 uppercase font-semibold sticky top-0 z-10 backdrop-blur-sm">
+                        <tr>
+                            <th class="px-6 py-3">Code Name</th>
+                            <th class="px-6 py-3">Discount Details</th>
+                            <th class="px-6 py-3">Usage</th>
+                            <th class="px-6 py-3">Status</th>
+                            <th class="px-6 py-3">Validity</th>
+                            <th class="px-6 py-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border text-gray-300" id="promo-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <div id="create-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div
+            class="bg-surface border border-border rounded-xl w-full max-w-lg p-6 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <h3 class="text-xl font-bold text-white mb-6" id="modal-title">Create New Campaign</h3>
+            <input type="hidden" id="edit-promo-id">
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Code Name</label>
+                        <input type="text" id="new-code"
+                            class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm mt-1 uppercase focus:border-primary focus:ring-0"
+                            placeholder="e.g. SUMMER50">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Target Audience</label>
+                        <select class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm mt-1">
+                            <option>All Users</option>
+                            <option>New Users Only</option>
+                            <option>VIP Customers</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Discount Type</label>
+                        <select id="new-type"
+                            class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm mt-1">
+                            <option value="%">Percentage (%)</option>
+                            <option value="flat">Flat Amount (₹)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Value</label>
+                        <input type="number" id="new-val"
+                            class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm mt-1 focus:border-primary focus:ring-0"
+                            placeholder="50">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Max Cap (₹)</label>
+                        <input type="number" id="new-cap"
+                            class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm mt-1 focus:border-primary focus:ring-0"
+                            placeholder="150">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase">Usage Limit</label>
+                        <input type="number" id="new-limit"
+                            class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm mt-1 focus:border-primary focus:ring-0"
+                            placeholder="1000">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase">End Date</label>
+                    <input type="date" id="new-date"
+                        class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm mt-1 focus:border-primary focus:ring-0">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase">Description</label>
+                    <textarea id="new-desc"
+                        class="w-full bg-black/20 border border-border rounded-lg p-2 text-white text-sm mt-1 focus:border-primary focus:ring-0"
+                        rows="2" placeholder="Internal note..."></textarea>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeModal('create-modal')"
+                    class="flex-1 py-3 rounded-lg border border-border text-gray-400 font-bold hover:bg-white/5">Cancel</button>
+                <button onclick="savePromo()"
+                    class="flex-1 py-3 rounded-lg bg-primary text-black font-bold hover:bg-orange-600 shadow-lg"
+                    id="modal-save-btn">Launch Campaign</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ai-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div
+            class="bg-[#1a1212] border border-primary/30 rounded-xl w-full max-w-md p-6 shadow-[0_0_50px_rgba(0, 240, 255,0.1)]">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                <h3 class="text-xl font-bold text-white">AI Campaign Generator</h3>
+            </div>
+            <p class="text-sm text-gray-400 mb-4">Describe your goal, and Zap AI will create the perfect promo code
+                structure.</p>
+            <textarea id="ai-prompt"
+                class="w-full bg-black/40 border border-border rounded-lg p-3 text-white text-sm mb-4 focus:border-primary focus:ring-0"
+                rows="3" placeholder="e.g. 'I want to boost lunch orders on rainy days for new users'"></textarea>
+            <div class="flex gap-3">
+                <button onclick="closeModal('ai-modal')"
+                    class="flex-1 py-2 rounded-lg border border-border text-gray-400 font-bold">Cancel</button>
+                <button onclick="generateAICode()"
+                    class="flex-1 py-2 rounded-lg bg-gradient-to-r from-primary to-orange-600 text-white font-bold flex justify-center items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">magic_button</span> Generate
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // DATA
+        // DATA
+        let promos = ZoiPromos.getAll();
+        let currentPromoId = null;
+        let chartInstance = null;
+        let currentPage = 1;
+        const itemsPerPage = 6;
+
+        // INIT
+        window.onload = () => {
+            fetch('sidebar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sidebar-container').innerHTML = data;
+                    setTimeout(() => {
+                        const links = document.querySelectorAll('#sidebar-container nav a');
+                        links.forEach(l => {
+                            if (l.innerText.includes('Promo Codes')) {
+                                l.className = "flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg font-bold transition-all";
+                                l.querySelector('span').classList.add('text-primary');
+                            } else {
+                                l.className = "flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition-all group";
+                            }
+                        });
+                        ZoiAuth.renderSimLogin();
+                    }, 100);
+                });
+            renderTable();
+        };
+
+        function renderTable() {
+            const tbody = document.getElementById('promo-table-body');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const filter = document.getElementById('filter-status').value;
+            tbody.innerHTML = "";
+
+            // Check expiry
+            const today = new Date().toISOString().split('T')[0];
+            promos.forEach(p => { if (p.date < today && p.status !== 'Expired') p.status = 'Expired'; });
+
+            let filtered = promos.filter(p => {
+                if (filter !== 'all' && p.status !== filter) return false;
+                if (search && !p.code.toLowerCase().includes(search)) return false;
+                return true;
+            });
+
+            // Pagination
+            const totalPages = Math.ceil(filtered.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+            document.getElementById('page-indicator').innerText = `Page ${currentPage} of ${totalPages || 1}`;
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const slice = filtered.slice(start, start + itemsPerPage);
+
+            // Counters
+            document.getElementById('active-count').innerText = `${promos.filter(p => p.status === 'Active').length} Active`;
+
+            slice.forEach(p => {
+                const statusColor = p.status === 'Active' ? 'text-green-500 bg-green-500/10 border-green-500/20' : (p.status === 'Expired' ? 'text-red-500 bg-red-500/10 border-red-500/20' : 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20');
+                const percent = (p.used / p.limit) * 100;
+                const barColor = percent > 90 ? 'bg-red-500' : (percent > 50 ? 'bg-primary' : 'bg-blue-500');
+                const displayType = p.type === '%' ? `${p.val}% Off` : `Flat ₹${p.val}`;
+                const displayCap = p.type === '%' ? `Cap: ₹${p.cap}` : '-';
+
+                const row = `
+                    <tr class="hover:bg-white/5 transition-colors border-b border-border/50 cursor-pointer group" onclick="openDrawer(${p.id})">
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col">
+                                <span class="text-white font-bold text-base font-mono code-copy hover:text-primary transition-colors" onclick="copyCode(event, '${p.code}')">${p.code} <span class="material-symbols-outlined text-[12px] opacity-0 group-hover:opacity-100">content_copy</span></span>
+                                <span class="text-text-secondary text-xs">${p.desc}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary"><span class="material-symbols-outlined text-lg">percent</span></div>
+                                <div class="flex flex-col"><span class="text-white font-medium">${displayType}</span><span class="text-text-secondary text-xs">${displayCap}</span></div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="w-32 flex flex-col gap-1.5">
+                                <div class="flex justify-between text-xs font-medium"><span class="text-white">${p.used}</span><span class="text-text-secondary">/ ${p.limit}</span></div>
+                                <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden"><div class="h-full ${barColor} rounded-full" style="width: ${percent}%;"></div></div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4"><span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${statusColor}">${p.status}</span></td>
+                        <td class="px-6 py-4 text-xs text-text-secondary">${p.date}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="openEditModal(${p.id}); event.stopPropagation()" class="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg"><span class="material-symbols-outlined text-lg">edit</span></button>
+                        </td>
+                    </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function changePage(dir) {
+            currentPage += dir;
+            renderTable();
+        }
+
+        // DRAWER
+        function openDrawer(id) {
+            const p = promos.find(x => x.id === id);
+            currentPromoId = id;
+            document.getElementById('drawer-code').innerText = p.code;
+            document.getElementById('drawer-desc').innerText = p.desc;
+            document.getElementById('drawer-type').innerText = p.type === '%' ? `${p.val}% Off (Cap ₹${p.cap})` : `Flat ₹${p.val}`;
+            document.getElementById('detail-drawer').classList.remove('translate-x-full');
+
+            if (chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('usageChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+                    datasets: [{
+                        label: 'Redemptions',
+                        data: [12, 19, 3, 5, 2, 3, 10].map(x => x * Math.random() * 10),
+                        borderColor: '#00f0ff',
+                        tension: 0.4
+                    }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+            });
+        }
+        function closeDrawer() { document.getElementById('detail-drawer').classList.add('translate-x-full'); }
+
+        // CRUD
+        function openCreateModal() {
+            document.getElementById('modal-title').innerText = "Create New Campaign";
+            document.getElementById('modal-save-btn').innerText = "Launch Campaign";
+            document.getElementById('edit-promo-id').value = "";
+            document.getElementById('new-code').value = "";
+            document.getElementById('new-val').value = "";
+            document.getElementById('new-cap').value = "";
+            document.getElementById('new-limit').value = "";
+            document.getElementById('new-date').value = "";
+            document.getElementById('new-desc').value = "";
+            document.getElementById('create-modal').classList.remove('hidden');
+            document.getElementById('create-modal').classList.add('flex');
+        }
+
+        function openEditModal(id) {
+            const p = promos.find(x => x.id === id);
+            document.getElementById('modal-title').innerText = "Edit Campaign";
+            document.getElementById('modal-save-btn').innerText = "Update Campaign";
+            document.getElementById('edit-promo-id').value = p.id;
+            document.getElementById('new-code').value = p.code;
+            document.getElementById('new-type').value = p.type;
+            document.getElementById('new-val').value = p.val;
+            document.getElementById('new-cap').value = p.cap === '-' ? '' : p.cap;
+            document.getElementById('new-limit').value = p.limit;
+            document.getElementById('new-date').value = p.date;
+            document.getElementById('new-desc').value = p.desc;
+
+            document.getElementById('create-modal').classList.remove('hidden');
+            document.getElementById('create-modal').classList.add('flex');
+        }
+
+        function openEditModalFromDrawer() {
+            if (currentPromoId) {
+                closeDrawer();
+                openEditModal(currentPromoId);
+            }
+        }
+
+        function savePromo() {
+            const id = document.getElementById('edit-promo-id').value;
+            const code = document.getElementById('new-code').value.toUpperCase();
+            const type = document.getElementById('new-type').value;
+            const val = document.getElementById('new-val').value;
+            const cap = document.getElementById('new-cap').value || "-";
+            const limit = document.getElementById('new-limit').value;
+            const date = document.getElementById('new-date').value;
+            const desc = document.getElementById('new-desc').value;
+
+            if (!code || !val || !date) return showToast("Error", "Please fill required fields.");
+
+            if (id) {
+                // Update
+                ZoiPromos.updatePromo(id, { code, type, val, cap, limit, date, desc });
+                showToast("Updated", "Campaign modified successfully.");
+            } else {
+                // Create
+                const newPromo = { id: Date.now(), code, type, val, cap, limit, used: 0, status: "Active", date, desc };
+                ZoiPromos.addPromo(newPromo);
+                showToast("Created", `${code} is live!`);
+            }
+            promos = ZoiPromos.getAll(); // Refresh
+            renderTable();
+            closeModal('create-modal');
+        }
+
+        function deletePromo() {
+            if (confirm("Delete this campaign?")) {
+                ZoiPromos.deletePromo(currentPromoId);
+                promos = ZoiPromos.getAll(); // Refresh
+                renderTable();
+                closeDrawer();
+                showToast("Deleted", "Campaign removed.");
+            }
+        }
+
+        function togglePromoStatus() {
+            const p = promos.find(x => x.id === currentPromoId);
+            const newStatus = p.status === 'Active' ? 'Paused' : 'Active';
+            ZoiPromos.updatePromo(currentPromoId, { status: newStatus });
+            promos = ZoiPromos.getAll(); // Refresh
+            renderTable();
+            closeDrawer();
+            showToast("Updated", `Campaign is now ${p.status}`);
+        }
+
+        // UTILS
+        function copyCode(e, code) { e.stopPropagation(); navigator.clipboard.writeText(code); showToast("Copied", `${code} to clipboard`); }
+        function openAIModal() { document.getElementById('ai-modal').classList.remove('hidden'); document.getElementById('ai-modal').classList.add('flex'); }
+        function generateAICode() {
+            if (!document.getElementById('ai-prompt').value) return;
+            document.getElementById('new-code').value = "RAINYDAY30";
+            document.getElementById('new-val').value = "30";
+            document.getElementById('new-desc').value = "AI Generated: Targeted at rainy weather.";
+            closeModal('ai-modal');
+            openCreateModal();
+            showToast("AI Success", "Campaign structure generated.");
+        }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+        function exportCSV() {
+            let csv = "Code,Type,Value,Used,Limit,Status\n";
+            promos.forEach(p => csv += `${p.code},${p.type},${p.val},${p.used},${p.limit},${p.status}\n`);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'promocodes.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast("Exported", "CSV downloaded.");
+        }
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+
+

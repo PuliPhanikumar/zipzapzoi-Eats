@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Eats - Feedback &amp; Suggestions</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Noto+Sans:wght@300..800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#00f0ff", "primary-hover": "#00d7e6", "background-light": "#f7f5f8", "background-dark": "#0a0314", "card-dark": "#1a0b36", "surface-dark": "#1a0b36", "surface-border": "#3c1e6e", "border-dark": "#3c1e6e", "text-secondary": "#b4a5d8" }, fontFamily: { display: "Manrope", body: ["Noto Sans", "sans-serif"] }, borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" } } } };</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col overflow-x-hidden text-slate-900 dark:text-white">
+    <!-- Top Navigation -->
+    <header class="sticky top-0 z-50 bg-[#0a0314]/80 backdrop-blur-md border-b border-[#3c1e6e]/50">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity shrink-0">
+                    <div
+                        class="w-8 h-8 rounded-lg bg-[#00f0ff] flex items-center justify-center text-[#0a0314] shadow-lg shadow-[#00f0ff]/50">
+                        <span class="material-symbols-outlined text-xl">bolt</span>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight hidden sm:block text-white"
+                        style="font-family: 'Quicksand', sans-serif;">Zoi<span class="text-[#00f0ff]">Eats</span></span>
+                </a>
+
+                <div class="hidden xl:flex items-center gap-6">
+                    <a class="text-sm font-bold text-[#ffff00] hover:text-white transition-colors flex items-center gap-1"
+                        href="promotions & offers.html">
+                        <span class="material-symbols-outlined text-sm">local_offer</span> Offers & Deals
+                    </a>
+
+                    <div class="hidden xl:flex items-center gap-6">
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="customer_restaurant_listing.html">Restaurants</a>
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="feedback.html">Feedback</a>
+                        <a class="text-sm font-medium text-[#b4a5d8] hover:text-[#00f0ff] transition-colors"
+                            href="customer support help.html">Support</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 sm:gap-4">
+
+                    <a href="restaurant pricing plans.html"
+                        class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#ff00ff]/50 hover:bg-[#ff00ff]/10 transition-all group">
+                        <span
+                            class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#ff00ff] transition-colors">store</span>
+                        <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Add
+                            Restaurant</span>
+                    </a>
+
+                    <a href="delivery partner application.html"
+                        class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#3c1e6e] hover:border-[#00ff00]/50 hover:bg-[#00ff00]/10 transition-all group">
+                        <span
+                            class="material-symbols-outlined text-[#b4a5d8] text-sm group-hover:text-[#00ff00] transition-colors">two_wheeler</span>
+                        <span class="text-xs font-bold text-[#b4a5d8] group-hover:text-white transition-colors">Ride
+                            with Us</span>
+                    </a>
+
+                    <button
+                        class="hidden sm:flex items-center gap-2 bg-[#1a0b36] px-3 py-1.5 rounded-full border border-[#3c1e6e]/50 shadow-inner shadow-[#00f0ff]/5 cursor-pointer hover:border-[#00ff00]/50 transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-[#00ff00] text-sm group-hover:animate-bounce">location_on</span>
+                        <span class="text-xs font-medium text-[#b4a5d8]">Bengaluru</span>
+                    </button>
+
+                    <a href="shopping_cart.html"
+                        class="relative p-2 rounded-full hover:bg-[#1a0b36] transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-[#00f0ff] group-hover:text-white transition-colors">shopping_cart</span>
+                        <span class="zoi-cart-badge absolute top-1 right-1 min-w-[16px] h-4 bg-[#ff00ff] text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse hidden">0</span>
+                    </a>
+
+                    <a href="login & registration.html"
+                        class="w-9 h-9 rounded-full bg-cover bg-center border-2 border-[#00f0ff]/50 ring-2 ring-[#00f0ff]/30 cursor-pointer shadow-lg hover:ring-[#ff00ff] transition-all group overflow-hidden relative"
+                        data-alt="User profile"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBT6tCKI45lIHrDLxsyuh-TDPmobyPeVU6AyG7iM4HJzbXt4FAgaDQwWFcZnvtqXNR2v3lDATirSitKZgMb_FnrCII5JPdAZBxC-dcoHwPte4HShdkJMCfiA4IDkriDys7wgNvhhqh9d7SijAKyWm5ODFazB5xCczQkThdsZabwrvSBdIdzaX2H6j4kbcbHlX86Enzq9IK-Y2zpqCliaGC8ekgZyi2dYF6J2WftA0Fh9_LuEmN84hmLZsHM7I4nSAuwQ4ZPT3UIBcU');">
+                        <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors">
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="flex-grow w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Hero Section -->
+        <section
+            class="mb-10 text-center lg:text-left lg:flex lg:justify-between lg:items-end border-b border-gray-200 dark:border-surface-border pb-8">
+            <div class="max-w-2xl">
+                <h1
+                    class="text-4xl md:text-5xl font-black leading-tight tracking-tight mb-3 text-slate-900 dark:text-white">
+                    We Value Your Voice
+                </h1>
+                <p class="text-lg text-slate-600 dark:text-text-secondary">
+                    Help ZipZapZoi Eats get smarter every day. Tell us what you love or what needs fixing, and our AI
+                    will prioritize your request.
+                </p>
+            </div>
+            <div
+                class="mt-6 lg:mt-0 flex items-center gap-2 text-sm font-medium text-primary bg-primary/10 px-4 py-2 rounded-full self-start lg:self-end">
+                <span class="material-symbols-outlined text-lg">auto_awesome</span>
+                <span>AI-Powered Prioritization Active</span>
+            </div>
+        </section>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <!-- Left Column: Feedback Form -->
+            <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-8">
+                <!-- Category Selector -->
+                <div class="space-y-3">
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">What's on your mind?</h3>
+                    <div class="flex gap-3 flex-wrap">
+                        <label class="cursor-pointer">
+                            <input checked="" class="peer sr-only" name="feedback_type" type="radio" />
+                            <div
+                                class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 dark:border-surface-border bg-white dark:bg-surface-dark peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary hover:bg-gray-50 dark:hover:bg-surface-border transition-all">
+                                <span class="material-symbols-outlined text-[18px]">bug_report</span>
+                                <span class="text-sm font-medium">Bug Report</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input class="peer sr-only" name="feedback_type" type="radio" />
+                            <div
+                                class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 dark:border-surface-border bg-white dark:bg-surface-dark peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary hover:bg-gray-50 dark:hover:bg-surface-border transition-all">
+                                <span class="material-symbols-outlined text-[18px]">lightbulb</span>
+                                <span class="text-sm font-medium">Feature Request</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input class="peer sr-only" name="feedback_type" type="radio" />
+                            <div
+                                class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 dark:border-surface-border bg-white dark:bg-surface-dark peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary hover:bg-gray-50 dark:hover:bg-surface-border transition-all">
+                                <span class="material-symbols-outlined text-[18px]">restaurant</span>
+                                <span class="text-sm font-medium">Restaurant Issue</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input class="peer sr-only" name="feedback_type" type="radio" />
+                            <div
+                                class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 dark:border-surface-border bg-white dark:bg-surface-dark peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary hover:bg-gray-50 dark:hover:bg-surface-border transition-all">
+                                <span class="material-symbols-outlined text-[18px]">rate_review</span>
+                                <span class="text-sm font-medium">General Feedback</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <!-- Main Form Inputs -->
+                <div
+                    class="bg-white dark:bg-surface-dark rounded-xl p-6 md:p-8 border border-gray-200 dark:border-surface-border shadow-sm">
+                    <div class="space-y-6">
+                        <!-- Subject Line -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-bold text-slate-700 dark:text-gray-200">Subject</label>
+                            <input
+                                class="w-full rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-200 dark:border-surface-border focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-text-secondary h-12 px-4 transition-colors"
+                                placeholder="Briefly summarize your feedback" type="text" />
+                        </div>
+                        <!-- Details Text Area -->
+                        <div class="flex flex-col gap-2 relative">
+                            <label class="text-sm font-bold text-slate-700 dark:text-gray-200 flex justify-between">
+                                Details
+                                <span class="text-xs font-normal text-primary flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[14px]">psychology</span> AI Suggestions
+                                    Enabled
+                                </span>
+                            </label>
+                            <textarea
+                                class="w-full rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-200 dark:border-surface-border focus:border-primary focus:ring-1 focus:ring-primary text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-text-secondary p-4 min-h-[160px] resize-y transition-colors"
+                                placeholder="Describe your experience in detail. What happened? How can we improve?"></textarea>
+                            <div class="absolute bottom-3 right-3">
+                                <button
+                                    class="text-xs bg-gray-200 dark:bg-[#2a1555] hover:bg-gray-300 dark:hover:bg-[#3c1e6e] text-slate-600 dark:text-text-secondary px-2 py-1 rounded flex items-center gap-1 transition-colors">
+                                    <span class="material-symbols-outlined text-[14px]">mic</span> Dictate
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Attachments -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm font-bold text-slate-700 dark:text-gray-200">Attachments
+                                (Optional)</label>
+                            <input type="file" id="zoi-file-input" multiple accept="image/*,.svg,.gif,.pdf"
+                                class="hidden" />
+                            <div id="zoi-upload-zone"
+                                class="border-2 border-dashed border-gray-300 dark:border-surface-border rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+                                <div
+                                    class="size-12 rounded-full bg-gray-100 dark:bg-[#2a1555] flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+                                    <span
+                                        class="material-symbols-outlined text-slate-500 dark:text-text-secondary group-hover:text-primary">cloud_upload</span>
+                                </div>
+                                <p class="text-sm font-medium text-slate-700 dark:text-white">Click to upload or drag
+                                    and drop</p>
+                                <p class="text-xs text-slate-500 dark:text-text-secondary mt-1">SVG, PNG, JPG or GIF
+                                    (max. 5MB)</p>
+                            </div>
+                            <div id="zoi-file-list" class="space-y-2 mt-2"></div>
+                        </div>
+                        <!-- Actions -->
+                        <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <p class="text-xs text-slate-500 dark:text-text-secondary order-2 sm:order-1">
+                                By submitting, you agree to our <a class="underline hover:text-primary"
+                                    href="terms&conditions.html">Community Guidelines</a>.
+                            </p>
+                            <button
+                                class="w-full sm:w-auto px-8 h-12 bg-primary hover:bg-primary-hover text-white font-bold rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 order-1 sm:order-2">
+                                <span>Submit Feedback</span>
+                                <span class="material-symbols-outlined">send</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Right Column: Community & Status -->
+            <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
+                <!-- Status Tracker Card -->
+                <div
+                    class="bg-white dark:bg-surface-dark rounded-xl border border-gray-200 dark:border-surface-border overflow-hidden">
+                    <div
+                        class="p-5 border-b border-gray-200 dark:border-surface-border flex justify-between items-center bg-gray-50 dark:bg-[#1a0b36]">
+                        <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">trending_up</span>
+                            Top Requested Features
+                        </h3>
+                        <a class="text-xs font-bold text-primary hover:underline" href="#">View Roadmap</a>
+                    </div>
+                    <div class="divide-y divide-gray-200 dark:divide-surface-border">
+                        <!-- Item 1 -->
+                        <div class="p-4 hover:bg-gray-50 dark:hover:bg-[#1a0b36] transition-colors group">
+                            <div class="flex justify-between items-start mb-2">
+                                <span
+                                    class="inline-flex items-center rounded-full bg-yellow-400/10 px-2 py-1 text-xs font-medium text-yellow-500 ring-1 ring-inset ring-yellow-400/20">In
+                                    Progress</span>
+                                <div class="flex items-center gap-1 text-slate-400 dark:text-text-secondary">
+                                    <span class="material-symbols-outlined text-[16px]">thumb_up</span>
+                                    <span class="text-xs font-medium">428</span>
+                                </div>
+                            </div>
+                            <h4
+                                class="text-sm font-bold text-slate-900 dark:text-white mb-1 group-hover:text-primary transition-colors">
+                                Dark Mode for Restaurant Dashboard</h4>
+                            <p class="text-xs text-slate-500 dark:text-text-secondary">Highly requested by night-shift
+                                managers.</p>
+                        </div>
+                        <!-- Item 2 -->
+                        <div class="p-4 hover:bg-gray-50 dark:hover:bg-[#1a0b36] transition-colors group">
+                            <div class="flex justify-between items-start mb-2">
+                                <span
+                                    class="inline-flex items-center rounded-full bg-blue-400/10 px-2 py-1 text-xs font-medium text-blue-400 ring-1 ring-inset ring-blue-400/20">Under
+                                    Review</span>
+                                <div class="flex items-center gap-1 text-slate-400 dark:text-text-secondary">
+                                    <span class="material-symbols-outlined text-[16px]">thumb_up</span>
+                                    <span class="text-xs font-medium">315</span>
+                                </div>
+                            </div>
+                            <h4
+                                class="text-sm font-bold text-slate-900 dark:text-white mb-1 group-hover:text-primary transition-colors">
+                                Group Ordering Split Bill</h4>
+                            <p class="text-xs text-slate-500 dark:text-text-secondary">Allow users to pay individually
+                                for shared cart.</p>
+                        </div>
+                        <!-- Item 3 -->
+                        <div class="p-4 hover:bg-gray-50 dark:hover:bg-[#1a0b36] transition-colors group">
+                            <div class="flex justify-between items-start mb-2">
+                                <span
+                                    class="inline-flex items-center rounded-full bg-green-400/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-400/20">Released</span>
+                                <div class="flex items-center gap-1 text-slate-400 dark:text-text-secondary">
+                                    <span
+                                        class="material-symbols-outlined text-[16px] text-primary">thumb_up_off_alt</span>
+                                    <span class="text-xs font-medium text-primary">892</span>
+                                </div>
+                            </div>
+                            <h4
+                                class="text-sm font-bold text-slate-900 dark:text-white mb-1 group-hover:text-primary transition-colors">
+                                AI Calorie Counter</h4>
+                            <p class="text-xs text-slate-500 dark:text-text-secondary">Now available in the latest app
+                                update!</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Recent Activity / Resolved -->
+                <div class="bg-primary/5 rounded-xl border border-primary/20 p-5">
+                    <h3 class="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-green-500">check_circle</span>
+                        Recently Resolved
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="flex gap-3">
+                            <div class="mt-1 min-w-[24px]">
+                                <span class="material-symbols-outlined text-green-500 text-[20px]">task_alt</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-slate-800 dark:text-gray-200">Fixed: Login glitch on
+                                    iOS 17</p>
+                                <p class="text-xs text-slate-500 dark:text-text-secondary mt-0.5">Reported by 12 users •
+                                    2 days ago</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <div class="mt-1 min-w-[24px]">
+                                <span class="material-symbols-outlined text-green-500 text-[20px]">task_alt</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-slate-800 dark:text-gray-200">Added: PayPal
+                                    integration for EU markets</p>
+                                <p class="text-xs text-slate-500 dark:text-text-secondary mt-0.5">Feature Request • 5
+                                    days ago</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Gamification Banner -->
+                <div
+                    class="relative overflow-hidden rounded-xl bg-gradient-to-br from-[#00f0ff] to-[#7c3aed] p-6 text-white shadow-lg shadow-[#7c3aed]/30">
+                    <div class="relative z-10">
+                        <div
+                            class="mb-3 size-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                            <span class="material-symbols-outlined text-white">loyalty</span>
+                        </div>
+                        <h3 class="text-lg font-bold mb-1">Earn ZipPoints</h3>
+                        <p class="text-sm text-white/90 mb-4">Get rewarded for verified bug reports and accepted feature
+                            suggestions!</p>
+                        <button
+                            class="text-xs font-bold bg-white text-primary px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                            Learn More
+                        </button>
+                    </div>
+                    <!-- Decorative background element -->
+                    <div class="absolute -bottom-6 -right-6 size-32 rounded-full bg-white/10 blur-2xl"></div>
+                    <div class="absolute top-0 right-0 p-4 opacity-20">
+                        <span class="material-symbols-outlined text-6xl">military_tech</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Simple Footer -->
+    <footer class="bg-[#0a0314] text-[#b4a5d8] border-t border-[#3c1e6e] mt-auto">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mb-8">
+                <!-- Column 1: Brand -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span
+                            class="material-symbols-outlined text-primary text-2xl drop-shadow-[0_0_8px_currentColor]">bolt</span>
+                        <span class="font-bold text-xl text-white"
+                            style="font-family: 'Quicksand', sans-serif;">ZoiEats</span>
+                    </div>
+                    <p class="text-sm mb-4 text-[#b4a5d8]">
+                        Your AI-powered portal to the comforting flavors of India.
+                    </p>
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00ff00]/20 border border-[#00ff00]/30 shadow-md shadow-[#00ff00]/10">
+                        <span class="relative flex h-2 w-2">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff00] opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#00ff00]"></span>
+                        </span>
+                        <span class="text-xs font-mono font-medium text-[#00ff00]">AI System: OPTIMAL</span>
+                    </div>
+                </div>
+
+                <!-- Column 2: Explore ZoiEats -->
+                <div>
+                    <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Explore ZoiEats
+                    </h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a class="hover:text-primary transition-colors" href="promotions & offers.html">Offers &
+                                Promos</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="feedback.html">Feedback Portal</a>
+                        </li>
+                        <li><a class="hover:text-primary transition-colors" href="customer support help.html">Customer
+                                Support</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Partner with Us -->
+                <div>
+                    <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Partner with Us
+                    </h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a class="hover:text-primary transition-colors"
+                                href="restaurant pricing plans.html">Add Restaurant</a></li>
+                        <li><a class="hover:text-primary transition-colors"
+                                href="delivery partner application.html">Ride with Us</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="dev_hub.html">Developer APIs</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Company -->
+                <div>
+                    <h4 class="text-white font-bold mb-4" style="font-family: 'Quicksand', sans-serif;">Company</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a class="hover:text-primary transition-colors" href="careerspage.html">Careers</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="press & media kit.html">Press &
+                                Media</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="about us.html">About Us</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-[#3c1e6e] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm">
+                    <span>© 2025 ZoiEats. All rights reserved.</span>
+                    <span class="hidden sm:inline-block text-[#3c1e6e]">|</span>
+                    <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms & Conditions</a>
+                    <a class="hover:text-white transition-colors" href="privacy policy.html">Privacy Policy</a>
+                    <a class="hover:text-white transition-colors" href="gst disclaimer.html">GST & Taxation</a>
+                </div>
+                <div class="flex gap-6">
+                    <a class="hover:text-white transition-colors text-lg" href="#"><i class="fa fa-twitter"></i></a>
+                    <span class="material-symbols-outlined cursor-pointer hover:text-primary text-lg">public</span>
+                    <span
+                        class="material-symbols-outlined cursor-pointer hover:text-primary text-lg">alternate_email</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_customer_engine.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+    <script>
+        (function () {
+            document.addEventListener('DOMContentLoaded', function () {
+                // === FILE UPLOAD WIRING ===
+                const uploadZone = document.getElementById('zoi-upload-zone');
+                const fileInput = document.getElementById('zoi-file-input');
+                const fileList = document.getElementById('zoi-file-list');
+                const uploadedFiles = [];
+
+                if (uploadZone && fileInput) {
+                    // Click to upload
+                    uploadZone.addEventListener('click', () => fileInput.click());
+
+                    // File input change
+                    fileInput.addEventListener('change', function () {
+                        handleFiles(this.files);
+                        this.value = ''; // reset so same file can be re-selected
+                    });
+
+                    // Drag and drop
+                    uploadZone.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        uploadZone.classList.add('border-primary', 'bg-primary/10');
+                    });
+                    uploadZone.addEventListener('dragleave', () => {
+                        uploadZone.classList.remove('border-primary', 'bg-primary/10');
+                    });
+                    uploadZone.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        uploadZone.classList.remove('border-primary', 'bg-primary/10');
+                        handleFiles(e.dataTransfer.files);
+                    });
+                }
+
+                function handleFiles(files) {
+                    for (const file of files) {
+                        if (file.size > 5 * 1024 * 1024) {
+                            if (window.zoiToast) window.zoiToast(`"${file.name}" exceeds 5MB limit`, 'error');
+                            continue;
+                        }
+                        if (uploadedFiles.length >= 5) {
+                            if (window.zoiToast) window.zoiToast('Maximum 5 files allowed', 'warning');
+                            break;
+                        }
+                        uploadedFiles.push(file);
+                        renderFileList();
+                        if (window.zoiToast) window.zoiToast(`📎 "${file.name}" attached`, 'success', 2000);
+                    }
+                }
+
+                function renderFileList() {
+                    if (!fileList) return;
+                    fileList.innerHTML = '';
+                    uploadedFiles.forEach((file, idx) => {
+                        const isImage = file.type.startsWith('image/');
+                        const sizeKB = (file.size / 1024).toFixed(1);
+                        const item = document.createElement('div');
+                        item.className = 'flex items-center gap-3 bg-white/5 border border-surface-border rounded-lg px-3 py-2';
+                        item.innerHTML = `
+                            <div class="size-8 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-primary text-[16px]">${isImage ? 'image' : 'description'}</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-medium text-white truncate">${file.name}</p>
+                                <p class="text-[10px] text-text-secondary">${sizeKB} KB</p>
+                            </div>
+                            <button class="text-text-secondary hover:text-red-400 transition-colors" data-idx="${idx}">
+                                <span class="material-symbols-outlined text-[18px]">close</span>
+                            </button>
+                        `;
+                        item.querySelector('button').addEventListener('click', () => {
+                            uploadedFiles.splice(idx, 1);
+                            renderFileList();
+                            if (window.zoiToast) window.zoiToast('File removed', 'info', 1500);
+                        });
+                        fileList.appendChild(item);
+                    });
+                }
+
+                // === FEEDBACK PAGE WIRING ===
+                let selectedCategory = 'Bug Report';
+                const categoryLabels = document.querySelectorAll('input[name="feedback_type"]');
+                categoryLabels.forEach(radio => {
+                    radio.addEventListener('change', function () {
+                        const label = this.closest('label');
+                        const text = label ? label.querySelector('span:last-child')?.textContent?.trim() : '';
+                        if (text) selectedCategory = text;
+                    });
+                });
+
+                // Find the submit button
+                const submitBtn = document.querySelector('button');
+                const allButtons = document.querySelectorAll('button');
+                let feedbackSubmitBtn = null;
+                allButtons.forEach(btn => {
+                    if (btn.textContent.toLowerCase().includes('submit feedback')) feedbackSubmitBtn = btn;
+                });
+
+                if (feedbackSubmitBtn) {
+                    feedbackSubmitBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const subjectInput = document.querySelector('input[placeholder*="summarize"]');
+                        const detailsTextarea = document.querySelector('textarea');
+                        const subject = subjectInput ? subjectInput.value.trim() : '';
+                        const details = detailsTextarea ? detailsTextarea.value.trim() : '';
+
+                        if (!subject && !details) {
+                            if (window.zoiToast) window.zoiToast('Please fill in the subject or details', 'warning');
+                            return;
+                        }
+
+                        // Submit to customer engine
+                        const entry = {
+                            id: 'FB-' + Math.floor(1000 + Math.random() * 9000),
+                            category: selectedCategory,
+                            subject: subject,
+                            message: details,
+                            rating: 5,
+                            name: window.ZoiProfile ? window.ZoiProfile.get().name : 'Customer',
+                            email: window.ZoiProfile ? window.ZoiProfile.get().email : '',
+                            date: new Date().toISOString(),
+                            status: 'Open',
+                            priority: selectedCategory === 'Bug Report' ? 'High' : 'Medium'
+                        };
+
+                        // Save to customer feedback store
+                        const entries = JSON.parse(localStorage.getItem('zoiFeedbackEntries') || '[]');
+                        entries.unshift(entry);
+                        localStorage.setItem('zoiFeedbackEntries', JSON.stringify(entries));
+
+                        // SYNC to admin: also write to zoiFeedback (shared with admin console)
+                        const adminFeedback = JSON.parse(localStorage.getItem('zoiFeedback') || '[]');
+                        adminFeedback.unshift({
+                            id: entry.id,
+                            user: entry.name,
+                            email: entry.email,
+                            type: selectedCategory,
+                            subject: subject,
+                            message: details,
+                            status: 'Open',
+                            priority: entry.priority,
+                            date: entry.date,
+                            assignedTo: 'Unassigned',
+                            responses: []
+                        });
+                        localStorage.setItem('zoiFeedback', JSON.stringify(adminFeedback));
+
+                        // Show success toast
+                        if (window.zoiToast) {
+                            window.zoiToast('Feedback submitted! Our team will review it soon. 🙏', 'success');
+                        }
+
+                        // Clear form
+                        if (subjectInput) subjectInput.value = '';
+                        if (detailsTextarea) detailsTextarea.value = '';
+
+                        // Award gamification points
+                        try {
+                            const profile = window.ZoiProfile ? window.ZoiProfile.get() : null;
+                            if (profile) {
+                                profile.points = (profile.points || 0) + 25;
+                                localStorage.setItem('zoiUserProfile', JSON.stringify(profile));
+                            }
+                        } catch (e) { }
+                    });
+                }
+
+                // Wire "Learn More" button in ZipPoints banner
+                allButtons.forEach(btn => {
+                    if (btn.textContent.trim().toLowerCase() === 'learn more') {
+                        btn.addEventListener('click', () => {
+                            window.location.href = 'customer gamification hub.html';
+                        });
+                    }
+                    // Wire View Roadmap link
+                    if (btn.textContent.trim().toLowerCase().includes('dictate')) {
+                        btn.addEventListener('click', () => {
+                            if (window.zoiToast) window.zoiToast('Voice dictation coming soon!', 'info');
+                        });
+                    }
+                });
+
+                // Wire upvote buttons on feature items
+                document.querySelectorAll('.material-symbols-outlined').forEach(icon => {
+                    if (icon.textContent === 'thumb_up' || icon.textContent === 'thumb_up_off_alt') {
+                        icon.style.cursor = 'pointer';
+                        icon.addEventListener('click', function () {
+                            const countEl = this.nextElementSibling || this.parentElement.querySelector('span:last-child');
+                            if (countEl) {
+                                const num = parseInt(countEl.textContent) || 0;
+                                countEl.textContent = num + 1;
+                            }
+                            this.textContent = 'thumb_up';
+                            this.style.color = '#00f0ff';
+                            if (window.zoiToast) window.zoiToast('Upvoted! +1', 'success', 1500);
+                        });
+                    }
+                });
+            });
+        })();
+    </script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>

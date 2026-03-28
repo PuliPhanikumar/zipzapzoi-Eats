@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms & Beds - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        teal: "#00D4C5",
+                        bg: "#0B0C10",
+                        surface: "#1A1B23",
+                        border: "rgba(255,255,255,0.05)"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"] },
+                    animation: {
+                        'bounce-subtle': 'bounceSubtle 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                    },
+                    keyframes: {
+                        bounceSubtle: {
+                            '0%': { transform: 'scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="hostel_shared.js"></script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ec4899;
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        .bed-cell {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .bed-cell:hover {
+            transform: scale(1.08);
+            z-index: 10;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+
+    <!-- SIDEBAR -->
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- Header -->
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">
+                    Rooms & Beds <span class="material-symbols-outlined text-pink-500 text-3xl">bed</span>
+                </h2>
+                <p class="text-gray-400 text-sm">Manage rooms, beds, assignments, and maintenance across all floors.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="material-symbols-outlined text-gray-500">search</span>
+                    </div>
+                    <input type="text" id="search-rooms" oninput="filterRooms()"
+                        class="bg-surface/50 border border-white/10 rounded-full py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-pink-500 w-56 transition-all"
+                        placeholder="Search rooms or hostelers...">
+                </div>
+                <button id="btn-add-room" onclick="openAddRoomModal()"
+                    class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-shadow owner-only">
+                    <span class="material-symbols-outlined text-sm">add</span> Add Room
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-6 flex-wrap">
+            <div class="flex items-center gap-2 px-4 py-2 bg-surface rounded-xl border border-white/5">
+                <span class="h-3 w-3 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></span>
+                <span class="text-sm text-gray-300"><strong class="text-white" id="stat-vacant">30</strong>
+                    Vacant</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 bg-surface rounded-xl border border-white/5">
+                <span class="h-3 w-3 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444]"></span>
+                <span class="text-sm text-gray-300"><strong class="text-white" id="stat-occupied">170</strong>
+                    Occupied</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 bg-surface rounded-xl border border-white/5">
+                <span class="h-3 w-3 rounded-full bg-amber-500 shadow-[0_0_8px_#eab308]"></span>
+                <span class="text-sm text-gray-300"><strong class="text-white" id="stat-reserved">8</strong>
+                    Reserved</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2 bg-surface rounded-xl border border-white/5">
+                <span class="h-3 w-3 rounded-full bg-gray-500"></span>
+                <span class="text-sm text-gray-300"><strong class="text-white" id="stat-maint">4</strong>
+                    Maintenance</span>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+                <span class="text-xs text-gray-500">Filter:</span>
+                <select id="filter-type" onchange="filterRooms()"
+                    class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-1.5 text-gray-300 focus:outline-none focus:border-pink-500">
+                    <option value="all">All Types</option>
+                    <option value="executive">Executive</option>
+                    <option value="ac">AC Room</option>
+                    <option value="non-ac">Non-AC</option>
+                    <option value="dormitory">Dormitory</option>
+                </select>
+                <select id="filter-floor" onchange="filterRooms()"
+                    class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-1.5 text-gray-300 focus:outline-none focus:border-pink-500">
+                    <option value="all">All Floors</option>
+                    <option value="1">Floor 1</option>
+                    <option value="2">Floor 2</option>
+                    <option value="3">Floor 3</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Room Grid -->
+        <div class="flex-1 overflow-y-auto p-8 pb-24" id="room-grid-container">
+            <!-- Floor sections will be rendered by JS -->
+        </div>
+    </main>
+
+    <!-- ADD ROOM MODAL -->
+    <div id="add-room-modal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0 animate-bounce-subtle">
+            <div class="p-6 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-xl text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-500">add_home</span> Add New Room</h3>
+                <button onclick="closeAddRoomModal()"
+                    class="p-2 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <input type="text" id="new-room-number" placeholder="Room Number (e.g. 301)"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none focus:ring-1 focus:ring-pink-500">
+                <div class="grid grid-cols-2 gap-4">
+                    <select id="new-room-floor"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="1">Floor 1</option>
+                        <option value="2">Floor 2</option>
+                        <option value="3">Floor 3</option>
+                    </select>
+                    <select id="new-room-type"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option value="executive">Executive</option>
+                        <option value="ac">AC Room</option>
+                        <option value="non-ac">Non-AC</option>
+                        <option value="dormitory">Dormitory</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="new-room-beds" placeholder="No. of Beds" value="2" min="1" max="12"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                    <input type="number" id="new-room-rent" placeholder="Rent ₹/month" value="8000"
+                        class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                </div>
+                <div class="flex items-center gap-3">
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="new-room-ac"
+                            class="accent-pink-500"> <span class="text-sm text-gray-300">AC</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="new-room-attached"
+                            class="accent-pink-500"> <span class="text-sm text-gray-300">Attached Bath</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="new-room-wifi"
+                            checked class="accent-pink-500"> <span class="text-sm text-gray-300">WiFi</span></label>
+                </div>
+            </div>
+            <div class="p-6 border-t border-border flex gap-3">
+                <button onclick="closeAddRoomModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors">Cancel</button>
+                <button onclick="addRoom()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-shadow">Create
+                    Room</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BED DETAIL MODAL -->
+    <div id="bed-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm p-0 animate-bounce-subtle">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white" id="bed-modal-title">Bed Detail</h3>
+                <button onclick="closeBedModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5" id="bed-modal-body">
+                <!-- Populated by JS -->
+            </div>
+            <div class="p-4 border-t border-border flex gap-2" id="bed-modal-actions"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- ROOM DATA (simulated) ---
+        let ROOMS = ZoiDB.get('rooms', [
+            {
+                id: 'R101', number: '101', floor: 1, type: 'executive', rent: 12000, ac: true, attached: true, beds: [
+                    { label: 'A', status: 'occupied', tenant: 'Ravi Kumar', since: '2025-08-15', mobile: '9876543210' },
+                    { label: 'B', status: 'vacant', tenant: null }
+                ]
+            },
+            {
+                id: 'R102', number: '102', floor: 1, type: 'ac', rent: 9000, ac: true, attached: false, beds: [
+                    { label: 'A', status: 'occupied', tenant: 'Deepak S.', since: '2025-11-01', mobile: '9988776655' },
+                    { label: 'B', status: 'occupied', tenant: 'Rahul Kumar', since: '2026-01-10', mobile: '9123456780' },
+                    { label: 'C', status: 'reserved', tenant: 'Arjun M.', since: null }
+                ]
+            },
+            {
+                id: 'R103', number: '103', floor: 1, type: 'non-ac', rent: 6500, ac: false, attached: false, beds: [
+                    { label: 'A', status: 'occupied', tenant: 'Manoj P.', since: '2025-06-01', mobile: '9001122334' },
+                    { label: 'B', status: 'occupied', tenant: 'Kiran R.', since: '2025-09-20', mobile: '9112233445' },
+                    { label: 'C', status: 'vacant', tenant: null },
+                    { label: 'D', status: 'maintenance', tenant: null }
+                ]
+            },
+            {
+                id: 'R201', number: '201', floor: 2, type: 'executive', rent: 12000, ac: true, attached: true, beds: [
+                    { label: 'A', status: 'vacant', tenant: null },
+                    { label: 'B', status: 'occupied', tenant: 'Sanjay V.', since: '2025-12-01', mobile: '9223344556' }
+                ]
+            },
+            {
+                id: 'R202', number: '202', floor: 2, type: 'dormitory', rent: 5000, ac: false, attached: false, beds: [
+                    { label: 'A', status: 'occupied', tenant: 'Anil K.', since: '2026-01-15', mobile: '9334455667' },
+                    { label: 'B', status: 'occupied', tenant: 'Vijay D.', since: '2026-01-15', mobile: '9445566778' },
+                    { label: 'C', status: 'reserved', tenant: 'Pending', since: null },
+                    { label: 'D', status: 'vacant', tenant: null },
+                    { label: 'E', status: 'occupied', tenant: 'Suresh M.', since: '2025-10-01', mobile: '9556677889' },
+                    { label: 'F', status: 'vacant', tenant: null }
+                ]
+            },
+            {
+                id: 'R203', number: '203', floor: 2, type: 'ac', rent: 9000, ac: true, attached: true, beds: [
+                    { label: 'A', status: 'vacant', tenant: null },
+                    { label: 'B', status: 'vacant', tenant: null }
+                ]
+            },
+            {
+                id: 'R301', number: '301', floor: 3, type: 'ac', rent: 9500, ac: true, attached: false, beds: [
+                    { label: 'A', status: 'occupied', tenant: 'Priya S.', since: '2025-07-01', mobile: '9667788990' },
+                    { label: 'B', status: 'maintenance', tenant: null },
+                    { label: 'C', status: 'occupied', tenant: 'Sneha Sharma', since: '2026-02-01', mobile: '9778899001' }
+                ]
+            },
+            {
+                id: 'R302', number: '302', floor: 3, type: 'non-ac', rent: 6000, ac: false, attached: false, beds: [
+                    { label: 'A', status: 'vacant', tenant: null },
+                    { label: 'B', status: 'occupied', tenant: 'Lakshmi N.', since: '2025-05-01', mobile: '9889900112' },
+                    { label: 'C', status: 'vacant', tenant: null },
+                    { label: 'D', status: 'reserved', tenant: 'Kavitha R.', since: null }
+                ]
+            }
+        ]);
+
+        const TYPE_COLORS = { executive: 'pink', ac: 'violet', 'non-ac': 'amber', dormitory: 'blue' };
+        const TYPE_LABELS = { executive: 'Executive', ac: 'AC Room', 'non-ac': 'Non-AC', dormitory: 'Dormitory' };
+        const STATUS_COLORS = { vacant: 'green', occupied: 'red', reserved: 'amber', maintenance: 'gray', damaged: 'orange' };
+
+        // RBAC: Detect user role from localStorage
+        let USER_ROLE = 'owner'; // default
+        function isOwner() { return USER_ROLE === 'owner'; }
+
+        function getBedUID(room, bed) { return room.number + '-' + bed.label; }
+
+        function renderRooms() {
+            const container = document.getElementById('room-grid-container');
+            const filterType = document.getElementById('filter-type').value;
+            const filterFloor = document.getElementById('filter-floor').value;
+            const searchVal = document.getElementById('search-rooms').value.toLowerCase();
+
+            let filtered = ROOMS.filter(r => {
+                if (filterType !== 'all' && r.type !== filterType) return false;
+                if (filterFloor !== 'all' && r.floor !== parseInt(filterFloor)) return false;
+                if (searchVal) {
+                    const match = r.number.includes(searchVal) || r.beds.some(b => b.tenant && b.tenant.toLowerCase().includes(searchVal));
+                    if (!match) return false;
+                }
+                return true;
+            });
+
+            // Group by floor
+            const floors = {};
+            filtered.forEach(r => {
+                if (!floors[r.floor]) floors[r.floor] = [];
+                floors[r.floor].push(r);
+            });
+
+            let html = '';
+            Object.keys(floors).sort().forEach(floor => {
+                html += `<div class="mb-8">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30 flex items-center justify-center text-pink-400 font-bold text-sm">F${floor}</div>
+                        <h3 class="font-bold text-lg text-white">Floor ${floor}</h3>
+                        <span class="text-xs text-gray-500">${floors[floor].length} rooms</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5">`;
+
+                floors[floor].forEach(room => {
+                    const tc = TYPE_COLORS[room.type] || 'gray';
+                    const vacantCount = room.beds.filter(b => b.status === 'vacant').length;
+                    const occupiedCount = room.beds.filter(b => b.status === 'occupied').length;
+
+                    html += `<div class="glass-panel p-0 overflow-hidden bouncy-card border-${tc}-500/20 hover:border-${tc}-500/40">
+                        <div class="p-4 border-b border-border flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-white flex items-center gap-2">Room ${room.number}
+                                    <span class="bg-${tc}-500/20 text-${tc}-400 px-2 py-0.5 rounded text-[9px] font-bold uppercase">${TYPE_LABELS[room.type]}</span>
+                                </h4>
+                                <div class="flex items-center gap-3 mt-1 text-[10px] text-gray-500">
+                                    ${room.ac ? '<span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs text-blue-400">ac_unit</span>AC</span>' : ''}
+                                    ${room.attached ? '<span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs text-teal">bathtub</span>Attached</span>' : ''}
+                                    <span>₹${room.rent.toLocaleString()}/mo</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-gray-400">${occupiedCount}/${room.beds.length} filled</p>
+                                ${vacantCount > 0 ? `<p class="text-[10px] text-green-400 font-bold">${vacantCount} available</p>` : '<p class="text-[10px] text-red-400 font-bold">Full</p>'}
+                            </div>
+                        </div>
+                        <div class="p-4 grid grid-cols-${room.beds.length <= 4 ? room.beds.length : 4} gap-2">`;
+
+                    room.beds.forEach(bed => {
+                        const sc = STATUS_COLORS[bed.status];
+                        const uid = getBedUID(room, bed);
+                        html += `<div onclick="showBedDetail('${room.id}','${bed.label}')" class="bed-cell relative p-3 rounded-xl border text-center
+                            bg-${sc}-500/10 border-${sc}-500/30 hover:bg-${sc}-500/20 hover:shadow-[0_0_12px_rgba(0,0,0,0.3)]">
+                            <p class="text-sm font-bold text-${sc}-400">${bed.label}</p>
+                            <p class="text-[9px] text-gray-400 mt-0.5 truncate">${bed.tenant || bed.status}</p>
+                            <p class="text-[7px] text-gray-600 font-mono mt-0.5">${uid}</p>
+                        </div>`;
+                    });
+
+                    html += `</div>
+                        ${isOwner() ? `<div class="p-3 border-t border-border flex items-center justify-between">
+                            <div class="flex gap-1">
+                                <button onclick="renameRoom('${room.id}')" class="text-[10px] text-gray-500 hover:text-pink-400 px-2 py-1 rounded hover:bg-white/5 transition-colors" title="Rename"><span class="material-symbols-outlined text-xs">edit</span></button>
+                                <button onclick="editRoomType('${room.id}')" class="text-[10px] text-gray-500 hover:text-violet-400 px-2 py-1 rounded hover:bg-white/5 transition-colors" title="Change Type"><span class="material-symbols-outlined text-xs">tune</span></button>
+                                <button onclick="addBedToRoom('${room.id}')" class="text-[10px] text-gray-500 hover:text-teal px-2 py-1 rounded hover:bg-white/5 transition-colors" title="Add Bed"><span class="material-symbols-outlined text-xs">add_circle</span></button>
+                                <button onclick="deleteRoom('${room.id}')" class="text-[10px] text-gray-500 hover:text-red-400 px-2 py-1 rounded hover:bg-white/5 transition-colors" title="Delete Room"><span class="material-symbols-outlined text-xs">delete</span></button>
+                            </div>
+                            <span class="text-[9px] text-gray-600 font-mono">ID: ${room.id}</span>
+                        </div>` : ''}
+                    </div>`;
+                });
+
+                html += `</div></div>`;
+            });
+
+            if (!html) html = '<div class="text-center text-gray-500 py-20"><span class="material-symbols-outlined text-6xl mb-4 block">search_off</span><p class="text-lg font-bold">No rooms match your filter</p></div>';
+            container.innerHTML = html;
+            updateStats(filtered);
+        }
+
+        function updateStats(rooms) {
+            let v = 0, o = 0, r = 0, m = 0;
+            rooms.forEach(room => room.beds.forEach(b => {
+                if (b.status === 'vacant') v++;
+                else if (b.status === 'occupied') o++;
+                else if (b.status === 'reserved') r++;
+                else if (b.status === 'maintenance') m++;
+            }));
+            document.getElementById('stat-vacant').innerText = v;
+            document.getElementById('stat-occupied').innerText = o;
+            document.getElementById('stat-reserved').innerText = r;
+            document.getElementById('stat-maint').innerText = m;
+        }
+
+        function filterRooms() { renderRooms(); }
+
+        function showBedDetail(roomId, bedLabel) {
+            const room = ROOMS.find(r => r.id === roomId);
+            const bed = room.beds.find(b => b.label === bedLabel);
+            document.getElementById('bed-modal-title').innerText = `Room ${room.number} — Bed ${bed.label}`;
+            document.getElementById('bed-modal-title').innerHTML = `Room ${room.number} — Bed ${bed.label} <span class="text-xs font-mono text-gray-500 ml-2 bg-white/5 px-2 py-0.5 rounded">${getBedUID(room, bed)}</span>`;
+            const body = document.getElementById('bed-modal-body');
+            const actions = document.getElementById('bed-modal-actions');
+            const sc = STATUS_COLORS[bed.status];
+
+            if (bed.status === 'occupied') {
+                body.innerHTML = `
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="h-12 w-12 rounded-full bg-${sc}-500/20 border border-${sc}-500/30 flex items-center justify-center text-${sc}-400 font-bold">${bed.tenant.split(' ').map(w => w[0]).join('')}</div>
+                        <div><p class="font-bold text-white">${bed.tenant}</p><p class="text-xs text-gray-400">Since ${bed.since} • ${bed.mobile}</p></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Room Type</span><p class="font-bold text-white mt-0.5">${TYPE_LABELS[room.type]}</p></div>
+                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Monthly Rent</span><p class="font-bold text-white mt-0.5">₹${room.rent.toLocaleString()}</p></div>
+                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Status</span><p class="font-bold text-${sc}-400 mt-0.5 uppercase">${bed.status}</p></div>
+                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Amenities</span><p class="font-bold text-white mt-0.5">${room.ac ? 'AC, ' : ''}${room.attached ? 'Bath' : 'Shared'}</p></div>
+                    </div>`;
+                actions.innerHTML = `
+                    ${isOwner() ? `<button class="flex-1 py-2.5 text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-xl hover:bg-amber-500/20 transition-colors">Transfer Bed</button>
+                    <button onclick="vacateBed('${roomId}','${bedLabel}')" class="flex-1 py-2.5 text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl hover:bg-red-500/20 transition-colors">Vacate</button>
+                    <button onclick="removeBedFromRoom('${roomId}','${bedLabel}')" class="py-2.5 px-3 text-xs font-bold text-gray-400 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors" title="Remove Bed"><span class="material-symbols-outlined text-sm">delete</span></button>` :
+                        `<button onclick="wardenUpdateStatus('${roomId}','${bedLabel}')" class="flex-1 py-2.5 text-xs font-bold text-teal bg-teal/10 border border-teal/30 rounded-xl hover:bg-teal/20 transition-colors">Update Status</button>
+                    <button class="flex-1 py-2.5 text-xs font-bold text-violet-400 bg-violet-500/10 border border-violet-500/30 rounded-xl hover:bg-violet-500/20 transition-colors">Upload ID Proof</button>`}`;
+            } else if (bed.status === 'vacant') {
+                body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-green-400 text-5xl mb-2">check_circle</span><p class="font-bold text-white text-lg">Bed Available</p><p class="text-sm text-gray-400 mt-1">Room ${room.number} (${TYPE_LABELS[room.type]}) — ₹${room.rent.toLocaleString()}/mo</p></div>`;
+                actions.innerHTML = `<button onclick="window.location.href='hostel_allocation.html'" class="flex-1 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_10px_rgba(236,72,153,0.3)]">Assign Hosteler</button>`;
+            } else if (bed.status === 'maintenance') {
+                body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-gray-400 text-5xl mb-2">build</span><p class="font-bold text-white text-lg">Under Maintenance</p><p class="text-sm text-gray-400 mt-1">This bed is currently not available.</p></div>`;
+                actions.innerHTML = `<button onclick="markReady('${roomId}','${bedLabel}')" class="flex-1 py-2.5 text-sm font-bold text-teal bg-teal/10 border border-teal/30 rounded-xl hover:bg-teal/20 transition-colors">Mark as Ready</button>`;
+            } else {
+                body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-amber-400 text-5xl mb-2">bookmark</span><p class="font-bold text-white text-lg">Reserved</p><p class="text-sm text-gray-400 mt-1">For: ${bed.tenant || 'TBD'}</p></div>`;
+                actions.innerHTML = `<button class="flex-1 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl">Confirm Check-in</button>
+                    <button onclick="cancelReservation('${roomId}','${bedLabel}')" class="flex-1 py-2.5 text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl">Cancel</button>`;
+            }
+
+            const modal = document.getElementById('bed-modal');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+        }
+
+        function closeBedModal() { const m = document.getElementById('bed-modal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+
+        // --- OWNER-ONLY: Room Customization ---
+        function renameRoom(roomId) {
+            if (!isOwner()) return;
+            const room = ROOMS.find(r => r.id === roomId);
+            const newName = prompt('Enter new room name/number:', room.number);
+            if (newName && newName.trim()) {
+                room.number = newName.trim();
+                room.id = 'R' + newName.trim();
+                ZoiDB.set('rooms', ROOMS);
+                renderRooms();
+                showToast(`Room renamed to ${room.number}`, 'success');
+            }
+        }
+
+        function editRoomType(roomId) {
+            if (!isOwner()) return;
+            const room = ROOMS.find(r => r.id === roomId);
+            const types = ['executive', 'ac', 'non-ac', 'dormitory'];
+            const choice = prompt(`Current type: ${TYPE_LABELS[room.type]}\nEnter new type (executive, ac, non-ac, dormitory):`, room.type);
+            if (choice && types.includes(choice.toLowerCase())) {
+                room.type = choice.toLowerCase();
+                if (choice === 'ac' || choice === 'executive') room.ac = true;
+                ZoiDB.set('rooms', ROOMS);
+                renderRooms();
+                showToast(`Room type changed to ${choice}`, 'success');
+            }
+        }
+
+        function addBedToRoom(roomId) {
+            if (!isOwner()) return;
+            const room = ROOMS.find(r => r.id === roomId);
+            if (room.beds.length >= 12) return showToast('Maximum 12 beds per room.', 'error');
+            const nextLabel = String.fromCharCode(65 + room.beds.length);
+            room.beds.push({ label: nextLabel, status: 'vacant', tenant: null });
+            ZoiDB.set('rooms', ROOMS);
+            renderRooms();
+            showToast(`Added Bed ${nextLabel} to Room ${room.number}`, 'success');
+        }
+
+        function removeBedFromRoom(roomId, label) {
+            if (!isOwner()) return;
+            const room = ROOMS.find(r => r.id === roomId);
+            const bed = room.beds.find(b => b.label === label);
+            if (bed.status === 'occupied') return showToast('Cannot remove an occupied bed. Vacate first.', 'error');
+            if (!confirm(`Remove Bed ${label} (${getBedUID(room, bed)}) from Room ${room.number}?`)) return;
+            room.beds = room.beds.filter(b => b.label !== label);
+            ZoiDB.set('rooms', ROOMS);
+            closeBedModal(); renderRooms();
+            showToast(`Removed Bed ${label}`, 'success');
+        }
+
+        function deleteRoom(roomId) {
+            if (!isOwner()) return;
+            const room = ROOMS.find(r => r.id === roomId);
+            if (room.beds.some(b => b.status === 'occupied')) return showToast('Cannot delete room with occupied beds.', 'error');
+            if (!confirm(`Delete Room ${room.number}? This cannot be undone.`)) return;
+            const idx = ROOMS.indexOf(room);
+            if (idx > -1) ROOMS.splice(idx, 1);
+            ZoiDB.set('rooms', ROOMS);
+            renderRooms();
+            showToast(`Deleted Room ${room.number}`, 'success');
+        }
+
+        // --- WARDEN: Status Update ---
+        function wardenUpdateStatus(roomId, label) {
+            const room = ROOMS.find(r => r.id === roomId);
+            const bed = room.beds.find(b => b.label === label);
+            const statuses = ['occupied', 'vacant', 'damaged', 'maintenance'];
+            const choice = prompt(`Current status: ${bed.status}\nEnter new status (${statuses.join(', ')}):`, bed.status);
+            if (choice && statuses.includes(choice.toLowerCase())) {
+                if (choice === 'vacant') { bed.tenant = null; bed.since = null; bed.mobile = null; }
+                bed.status = choice.toLowerCase();
+                ZoiDB.set('rooms', ROOMS);
+                closeBedModal(); renderRooms();
+                showToast(`Bed status updated to ${choice}`, 'success');
+            }
+        }
+
+        function vacateBed(roomId, label) {
+            const room = ROOMS.find(r => r.id === roomId);
+            const bed = room.beds.find(b => b.label === label);
+            bed.status = 'vacant'; bed.tenant = null; bed.since = null; bed.mobile = null;
+            ZoiDB.set('rooms', ROOMS);
+            closeBedModal(); renderRooms();
+            showToast(`Bed ${label} has been vacated.`, 'success');
+        }
+
+        function markReady(roomId, label) {
+            const room = ROOMS.find(r => r.id === roomId);
+            room.beds.find(b => b.label === label).status = 'vacant';
+            ZoiDB.set('rooms', ROOMS);
+            closeBedModal(); renderRooms();
+            showToast(`Bed ${label} marked as ready.`, 'success');
+        }
+
+        function cancelReservation(roomId, label) {
+            const room = ROOMS.find(r => r.id === roomId);
+            const bed = room.beds.find(b => b.label === label);
+            bed.status = 'vacant'; bed.tenant = null;
+            ZoiDB.set('rooms', ROOMS);
+            closeBedModal(); renderRooms();
+            showToast(`Reservation cancelled for Bed ${label}.`, 'info');
+        }
+
+        function openAddRoomModal() { const m = document.getElementById('add-room-modal'); m.classList.remove('hidden'); m.classList.add('flex'); }
+        function closeAddRoomModal() { const m = document.getElementById('add-room-modal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+
+        function addRoom() {
+            const num = document.getElementById('new-room-number').value;
+            const floor = parseInt(document.getElementById('new-room-floor').value);
+            const type = document.getElementById('new-room-type').value;
+            const bedCount = parseInt(document.getElementById('new-room-beds').value) || 2;
+            const rent = parseInt(document.getElementById('new-room-rent').value) || 8000;
+            const ac = document.getElementById('new-room-ac').checked;
+            const attached = document.getElementById('new-room-attached').checked;
+            if (!num) return showToast('Please enter a room number', 'error');
+```javascript
+                                <button onclick="renameRoom('${room.id}')" class="text-[10px] text-gray-500 hover:text-pink-400 px-2 py-1 rounded hover:bg-white/5 transition-colors" title="Rename"><span class="material-symbols-outlined text-xs">edit</span></button>
+                                <button onclick="editRoomType('${room.id}')" class="text-[10px] text-gray-500 hover:text-violet-400 px-2 py-1 rounded hover:bg-white/5 transition-colors" title="Change Type"><span class="material-symbols-outlined text-xs">tune</span></button>
+                                <button onclick="addBedToRoom('${room.id}')" class="text-[10px] text-gray-500 hover:text-teal px-2 py-1 rounded hover:bg-white/5 transition-colors" title="Add Bed"><span class="material-symbols-outlined text-xs">add_circle</span></button>
+                                <button onclick="deleteRoom('${room.id}')" class="text-[10px] text-gray-500 hover:text-red-400 px-2 py-1 rounded hover:bg-white/5 transition-colors" title="Delete Room"><span class="material-symbols-outlined text-xs">delete</span></button>
+                            </div>
+                            <span class="text-[9px] text-gray-600 font-mono">ID: ${room.id}</span>
+                        </div>` : ''}
+                    </div>`;
+                });
+
+                html += `</div></div>`;
+            });
+
+            if (!html) html = '<div class="text-center text-gray-500 py-20"><span class="material-symbols-outlined text-6xl mb-4 block">search_off</span><p class="text-lg font-bold">No rooms match your filter</p></div>';
+            container.innerHTML = html;
+            updateStats(filtered);
+        }
+
+        function updateStats(rooms) {
+            let v = 0, o = 0, r = 0, m = 0;
+            rooms.forEach(room => room.beds.forEach(b => {
+                if (b.status === 'vacant') v++;
+                else if (b.status === 'occupied') o++;
+                else if (b.status === 'reserved') r++;
+                else if (b.status === 'maintenance') m++;
+            }));
+            document.getElementById('stat-vacant').innerText = v;
+            document.getElementById('stat-occupied').innerText = o;
+            document.getElementById('stat-reserved').innerText = r;
+            document.getElementById('stat-maint').innerText = m;
+        }
+
+        function filterRooms() { renderRooms(); }
+
+        function showBedDetail(roomId, bedLabel) {
+            const room = ROOMS.find(r => r.id === roomId);
+            const bed = room.beds.find(b => b.label === bedLabel);
+            document.getElementById('bed-modal-title').innerText = `Room ${room.number} — Bed ${bed.label}`;
+            document.getElementById('bed-modal-title').innerHTML = `Room ${room.number} — Bed ${bed.label} <span class="text-xs font-mono text-gray-500 ml-2 bg-white/5 px-2 py-0.5 rounded">${getBedUID(room, bed)}</span>`;
+            const body = document.getElementById('bed-modal-body');
+            const actions = document.getElementById('bed-modal-actions');
+            const sc = STATUS_COLORS[bed.status];
+
+            if (bed.status === 'occupied') {
+                body.innerHTML = `
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="h-12 w-12 rounded-full bg-${sc}-500/20 border border-${sc}-500/30 flex items-center justify-center text-${sc}-400 font-bold">${bed.tenant.split(' ').map(w => w[0]).join('')}</div>
+                        <div><p class="font-bold text-white">${bed.tenant}</p><p class="text-xs text-gray-400">Since ${bed.since} • ${bed.mobile}</p></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Room Type</span><p class="font-bold text-white mt-0.5">${TYPE_LABELS[room.type]}</p></div>
+                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Monthly Rent</span><p class="font-bold text-white mt-0.5">₹${room.rent.toLocaleString()}</p></div>
+                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Status</span><p class="font-bold text-${sc}-400 mt-0.5 uppercase">${bed.status}</p></div>
+                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Amenities</span><p class="font-bold text-white mt-0.5">${room.ac ? 'AC, ' : ''}${room.attached ? 'Bath' : 'Shared'}</p></div>
+                    </div>`;
+                actions.innerHTML = `
+                    ${isOwner() ? `<button class="flex-1 py-2.5 text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-xl hover:bg-amber-500/20 transition-colors">Transfer Bed</button>
+                    <button onclick="vacateBed('${roomId}','${bedLabel}')" class="flex-1 py-2.5 text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl hover:bg-red-500/20 transition-colors">Vacate</button>
+                    <button onclick="removeBedFromRoom('${roomId}','${bedLabel}')" class="py-2.5 px-3 text-xs font-bold text-gray-400 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors" title="Remove Bed"><span class="material-symbols-outlined text-sm">delete</span></button>` :
+                        `<button onclick="wardenUpdateStatus('${roomId}','${bedLabel}')" class="flex-1 py-2.5 text-xs font-bold text-teal bg-teal/10 border border-teal/30 rounded-xl hover:bg-teal/20 transition-colors">Update Status</button>
+                    <button class="flex-1 py-2.5 text-xs font-bold text-violet-400 bg-violet-500/10 border border-violet-500/30 rounded-xl hover:bg-violet-500/20 transition-colors">Upload ID Proof</button>`}`;
+            } else if (bed.status === 'vacant') {
+                body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-green-400 text-5xl mb-2">check_circle</span><p class="font-bold text-white text-lg">Bed Available</p><p class="text-sm text-gray-400 mt-1">Room ${room.number} (${TYPE_LABELS[room.type]}) — ₹${room.rent.toLocaleString()}/mo</p></div>`;
+                actions.innerHTML = `<button onclick="window.location.href='hostel_allocation.html'" class="flex-1 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_10px_rgba(236,72,153,0.3)]">Assign Hosteler</button>`;
+            } else if (bed.status === 'maintenance') {
+                body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-gray-400 text-5xl mb-2">build</span><p class="font-bold text-white text-lg">Under Maintenance</p><p class="text-sm text-gray-400 mt-1">This bed is currently not available.</p></div>`;
+                actions.innerHTML = `<button onclick="markReady('${roomId}','${bedLabel}')" class="flex-1 py-2.5 text-sm font-bold text-teal bg-teal/10 border border-teal/30 rounded-xl hover:bg-teal/20 transition-colors">Mark as Ready</button>`;
+            } else {
+                body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-amber-400 text-5xl mb-2">bookmark</span><p class="font-bold text-white text-lg">Reserved</p><p class="text-sm text-gray-400 mt-1">For: ${bed.tenant || 'TBD'}</p></div>`;
+                actions.innerHTML = `<button class="flex-1 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl">Confirm Check-in</button>
+                    <button onclick="cancelReservation('${roomId}','${bedLabel}')" class="flex-1 py-2.5 text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/30 rounded-xl">Cancel</button>`;
+            }
+
+            const modal = document.getElementById('bed-modal');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+        }
+
+        function closeBedModal() { const m = document.getElementById('bed-modal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+
+        // --- OWNER-ONLY: Room Customization ---
+        function renameRoom(roomId) {
+            if (!isOwner()) return;
+            const room = ROOMS.find(r => r.id === roomId);
+            const newName = prompt('Enter new room name/number:', room.number);
+            if (newName && newName.trim()) {
+                room.number = newName.trim();
+                room.id = 'R' + newName.trim();
+                ZoiDB.set('rooms', ROOMS);
+                renderRooms();
+                showToast(`Room renamed to ${room.number}`, 'success');
+            }
+        }
+
+        function editRoomType(roomId) {
+            if (!isOwner()) return;
+            const room = ROOMS.find(r => r.id === roomId);
+            const types = ['executive', 'ac', 'non-ac', 'dormitory'];
+            const choice = prompt(`Current type: ${TYPE_LABELS[room.type]}\nEnter new type (executive, ac, non-ac, dormitory):`, room.type);
+            if (choice && types.includes(choice.toLowerCase())) {
+                room.type = choice.toLowerCase();
+                if (choice === 'ac' || choice === 'executive') room.ac = true;
+                ZoiDB.set('rooms', ROOMS);
+                renderRooms();
+                showToast(`Room type changed to ${choice}`, 'success');
+            }
+        }
+
+        function addBedToRoom(roomId) {
+            if (!isOwner()) return;
+            const room = ROOMS.find(r => r.id === roomId);
+            if (room.beds.length >= 12) return showToast('Maximum 12 beds per room.', 'error');
+            const nextLabel = String.fromCharCode(65 + room.beds.length);
+            room.beds.push({ label: nextLabel, status: 'vacant', tenant: null });
+            ZoiDB.set('rooms', ROOMS);
+            renderRooms();
+            showToast(`Added Bed ${nextLabel} to Room ${room.number}`, 'success');
+        }
+
+        function removeBedFromRoom(roomId, label) {
+            if (!isOwner()) return;
+            const room = ROOMS.find(r => r.id === roomId);
+            const bed = room.beds.find(b => b.label === label);
+            if (bed.status === 'occupied') return showToast('Cannot remove an occupied bed. Vacate first.', 'error');
+            if (!confirm(`Remove Bed ${label} (${getBedUID(room, bed)}) from Room ${room.number}?`)) return;
+            room.beds = room.beds.filter(b => b.label !== label);
+            ZoiDB.set('rooms', ROOMS);
+            closeBedModal(); renderRooms();
+            showToast(`Removed Bed ${label}`, 'success');
+        }
+
+        function deleteRoom(roomId) {
+            if (!isOwner()) return;
+            const room = ROOMS.find(r => r.id === roomId);
+            if (room.beds.some(b => b.status === 'occupied')) return showToast('Cannot delete room with occupied beds.', 'error');
+            if (!confirm(`Delete Room ${room.number}? This cannot be undone.`)) return;
+            const idx = ROOMS.indexOf(room);
+            if (idx > -1) ROOMS.splice(idx, 1);
+            ZoiDB.set('rooms', ROOMS);
+            renderRooms();
+            showToast(`Deleted Room ${room.number}`, 'success');
+        }
+
+        // --- WARDEN: Status Update ---
+        function wardenUpdateStatus(roomId, label) {
+            const room = ROOMS.find(r => r.id === roomId);
+            const bed = room.beds.find(b => b.label === label);
+            const statuses = ['occupied', 'vacant', 'damaged', 'maintenance'];
+            const choice = prompt(`Current status: ${bed.status}\nEnter new status (${statuses.join(', ')}):`, bed.status);
+            if (choice && statuses.includes(choice.toLowerCase())) {
+                if (choice === 'vacant') { bed.tenant = null; bed.since = null; bed.mobile = null; }
+                bed.status = choice.toLowerCase();
+                ZoiDB.set('rooms', ROOMS);
+                closeBedModal(); renderRooms();
+                showToast(`Bed status updated to ${choice}`, 'success');
+            }
+        }
+
+        function vacateBed(roomId, label) {
+            const room = ROOMS.find(r => r.id === roomId);
+            const bed = room.beds.find(b => b.label === label);
+            bed.status = 'vacant'; bed.tenant = null; bed.since = null; bed.mobile = null;
+            ZoiDB.set('rooms', ROOMS);
+            closeBedModal(); renderRooms();
+            showToast(`Bed ${label} has been vacated.`, 'success');
+        }
+
+        function markReady(roomId, label) {
+            const room = ROOMS.find(r => r.id === roomId);
+            room.beds.find(b => b.label === label).status = 'vacant';
+            ZoiDB.set('rooms', ROOMS);
+            closeBedModal(); renderRooms();
+            showToast(`Bed ${label} marked as ready.`, 'success');
+        }
+
+        function cancelReservation(roomId, label) {
+            const room = ROOMS.find(r => r.id === roomId);
+            const bed = room.beds.find(b => b.label === label);
+            bed.status = 'vacant'; bed.tenant = null;
+            ZoiDB.set('rooms', ROOMS);
+            closeBedModal(); renderRooms();
+            showToast(`Reservation cancelled for Bed ${label}.`, 'info');
+        }
+
+        function openAddRoomModal() { const m = document.getElementById('add-room-modal'); m.classList.remove('hidden'); m.classList.add('flex'); }
+        function closeAddRoomModal() { const m = document.getElementById('add-room-modal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+
+        function addRoom() {
+            const num = document.getElementById('new-room-number').value;
+            const floor = parseInt(document.getElementById('new-room-floor').value);
+            const type = document.getElementById('new-room-type').value;
+            const bedCount = parseInt(document.getElementById('new-room-beds').value) || 2;
+            const rent = parseInt(document.getElementById('new-room-rent').value) || 8000;
+            const ac = document.getElementById('new-room-ac').checked;
+            const attached = document.getElementById('new-room-attached').checked;
+            if (!num) return showToast('Please enter a room number', 'error');
+            const beds = [];
+            for (let i = 0; i < bedCount; i++) beds.push({ label: String.fromCharCode(65 + i), status: 'vacant', tenant: null });
+            ROOMS.unshift({ id: 'R' + num, number: num, floor, type, rent, ac, attached, beds });
+            ZoiDB.set('rooms', ROOMS);
+            closeAddRoomModal(); renderRooms();
+            showToast(`Room ${num} created successfully!`, 'success');
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                if (window.ZoiAuth) ZoiAuth.enforceAccess();
+                const u = localStorage.getItem('zoiUser');
+                if (u) {
+                    const user = JSON.parse(u);
+                    USER_ROLE = (user.role === 'warden') ? 'warden' : 'owner';
+                }
+            } catch (e) { console.warn('Auth/Role init:', e); }
+
+            // Hide owner-only elements for wardens
+            if (!isOwner()) {
+                document.querySelectorAll('.owner-only').forEach(el => el.style.display = 'none');
+            }
+            renderRooms();
+        });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi - My Orders</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        "background-dark": "#0a0314",
+                        "card-dark": "#1a0b36",
+                        "border-dark": "#3c1e6e",
+                        "text-secondary": "#b4a5d8",
+                        "neon-green": "#00ff00",
+                        "neon-pink": "#ff00ff",
+                        "neon-yellow": "#ffff00"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            cursor: pointer;
+            color: #3c1e6e;
+            font-size: 1.5rem;
+            transition: color 0.2s;
+        }
+
+        .star-rating input:checked~label,
+        .star-rating label:hover,
+        .star-rating label:hover~label {
+            color: #ffeb3b;
+        }
+
+        .star-rating {
+            direction: rtl;
+            display: inline-flex;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0314;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3c1e6e;
+            border-radius: 4px;
+        }
+
+        /* Timeline styling */
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            padding-bottom: 1.5rem;
+            border-left: 2px solid #3c1e6e;
+        }
+
+        .timeline-item:last-child {
+            border-left: 2px solid transparent;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -9px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #1a0b36;
+            border: 2px solid #3c1e6e;
+        }
+
+        .timeline-item.active .timeline-dot {
+            background: #00ff00;
+            border-color: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .timeline-item.active {
+            border-left-color: #00ff00;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-dark text-white min-h-screen flex flex-col font-sans selection:bg-primary selection:text-black">
+
+    <header class="sticky top-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-border-dark/50">
+        <div class="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 group">
+                <div
+                    class="size-8 rounded-lg bg-primary flex items-center justify-center text-black font-black text-xl shadow-lg shadow-primary/50 group-hover:scale-105 transition-transform">
+                    Z</div>
+                <span class="font-bold text-xl tracking-tight hidden sm:block">Zoi<span
+                        class="text-primary">Eats</span></span>
+            </a>
+            <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-text-secondary">
+                <a href="index.html" class="hover:text-white transition-colors">Home</a>
+                <a href="promotions &amp; offers.html" class="hover:text-white transition-colors">Offers</a>
+                <a href="customer profile.html" class="hover:text-white transition-colors">Profile</a>
+                <a href="customer_orders history.html" class="text-white font-bold text-primary">Orders</a>
+            </nav>
+            <div id="header-avatar" class="size-9 rounded-full border-2 border-primary/50 bg-primary/20 flex items-center justify-center text-primary font-bold text-sm">
+                U
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 max-w-[1600px] w-full mx-auto">
+    <!-- Universal Sidebar -->
+    <aside class="hidden lg:flex flex-col w-72 border-r border-border-dark shrink-0 h-[calc(100vh-65px)] sticky top-[65px] overflow-y-auto p-4 gap-6 bg-card-dark">
+        <div class="flex gap-3 p-3 rounded-xl bg-white/5 border border-border-dark">
+            <div class="size-12 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center text-primary font-black text-xl shrink-0" id="sidebar-avatar">U</div>
+            <div class="flex flex-col justify-center">
+                <h1 id="sidebar-name" class="text-white text-base font-bold leading-normal">Loading...</h1>
+                <p class="text-text-secondary text-xs">ZipZap Gold Member</p>
+            </div>
+        </div>
+        <div class="flex flex-col gap-2">
+            <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-text-secondary hover:text-white" href="customer profile.html">
+                <span class="material-symbols-outlined">person</span>
+                <p class="text-sm font-bold leading-normal">Overview</p>
+            </a>
+            <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg bg-primary/10 text-primary" href="customer_orders history.html">
+                <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">receipt_long</span>
+                <p class="text-sm font-bold leading-normal">My Orders</p>
+            </a>
+            <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-text-secondary hover:text-white" href="customer profile.html#favorites-section">
+                <span class="material-symbols-outlined">favorite</span>
+                <p class="text-sm font-medium leading-normal">Favorites</p>
+            </a>
+            <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-text-secondary hover:text-white" href="customer profile.html#zapwallet-section">
+                <span class="material-symbols-outlined">account_balance_wallet</span>
+                <p class="text-sm font-medium leading-normal">ZapWallet</p>
+            </a>
+            <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-text-secondary hover:text-white" href="customer gamification hub.html">
+                <span class="material-symbols-outlined">stars</span>
+                <p class="text-sm font-medium leading-normal">ZapPoints</p>
+            </a>
+            <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-text-secondary hover:text-white" href="customer profile.html#addresses-section">
+                <span class="material-symbols-outlined">location_on</span>
+                <p class="text-sm font-medium leading-normal">Addresses</p>
+            </a>
+            <div class="h-px w-full bg-border-dark my-2"></div>
+            <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-text-secondary hover:text-white" href="customer profile.html#settings-section">
+                <span class="material-symbols-outlined">settings</span>
+                <p class="text-sm font-medium leading-normal">Settings</p>
+            </a>
+            <a class="sidebar-nav-link flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white/5 transition-colors text-text-secondary hover:text-white" href="customer support help.html">
+                <span class="material-symbols-outlined">support_agent</span>
+                <p class="text-sm font-medium leading-normal">Support Help</p>
+            </a>
+            <a onclick="if(typeof ZoiCustomer !== 'undefined') ZoiCustomer.logout()" class="sidebar-nav-link flex items-center gap-3 px-3 py-3 mt-2 rounded-lg hover:bg-red-500/20 transition-colors text-red-400 hover:text-red-300 cursor-pointer">
+                <span class="material-symbols-outlined">logout</span>
+                <p class="text-sm font-bold leading-normal">Log Out</p>
+            </a>
+        </div>
+        <div class="mt-auto p-4 rounded-xl bg-gradient-to-b from-white/5 to-transparent border border-border-dark relative overflow-hidden group cursor-pointer">
+            <span class="material-symbols-outlined text-6xl absolute top-0 right-0 p-2 opacity-10">lunch_dining</span>
+            <p class="text-text-secondary text-xs uppercase tracking-wider font-bold mb-1">Weekly Offer</p>
+            <p class="text-white font-bold text-sm mb-3">Get 20% off on all Biryanis this weekend!</p>
+            <button onclick="window.location.href='promotions & offers.html'" class="w-full bg-primary text-[#231a10] font-bold text-xs py-2 rounded-lg hover:shadow-[0_0_15px_rgba(0,240,255,0.4)] transition-all uppercase tracking-wider">Claim Offer</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 max-w-[1000px] w-full mx-auto px-4 py-8">
+
+
+
+        <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+            <div>
+                <a href="customer profile.html" class="text-primary hover:text-white text-sm font-bold flex items-center gap-1 mb-4 w-fit transition-colors">
+                    <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Profile
+                </a>
+                <h1 class="text-3xl font-black mb-1">Your Orders</h1>
+                <p class="text-text-secondary text-sm">Track deliveries and view your dining history.</p>
+            </div>
+
+            <div class="relative group">
+                <span
+                    class="absolute left-3 top-2.5 text-primary material-symbols-outlined text-sm">calendar_month</span>
+                <select id="date-filter" onchange="renderOrders()"
+                    class="bg-card-dark border border-border-dark rounded-xl pl-9 pr-8 py-2 text-sm text-white focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer w-48 transition-all hover:border-primary/50">
+                    <option value="all">All Time</option>
+                    <option value="this_month">This Month</option>
+                    <option value="last_3_months">Last 3 Months</option>
+                    <option value="2025">2025</option>
+                </select>
+
+                <span class="absolute right-3 top-3 text-gray-500 material-symbols-outlined text-xs pointer-events-none">expand_more</span>
+            </div>
+        </div>
+
+        <div class="mb-10" id="live-order-section">
+            <!-- Active order logic handled by JS -->
+        </div>
+
+        <h2 class="text-xl font-bold mb-6 mt-8">Past Orders</h2>
+        <div class="flex flex-col gap-4" id="orders-list">
+            <p class="text-text-secondary text-sm py-4 italic">Loading orders...</p>
+        </div>
+    </main>
+</div><!-- end layout wrapper -->
+
+    <!-- Modals -->
+    <div id="invoice-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 transition-all opacity-0">
+        <div class="bg-card-dark border border-border-dark rounded-2xl p-6 w-full max-w-md shadow-2xl transform scale-95 transition-all">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Invoice</h3>
+                <button onclick="closeModal('invoice-modal')" class="text-gray-400 hover:text-white"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="flex justify-between text-sm text-text-secondary mb-6 pb-4 border-b border-border-dark">
+                <span id="inv-id">#10245</span>
+                <span id="inv-date">Oct 15, 2025</span>
+            </div>
+            <div id="inv-items" class="flex flex-col gap-3 mb-6"></div>
+            <div class="flex flex-col gap-2 pt-4 border-t border-border-dark text-sm">
+                <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="inv-sub">₹0</span></div>
+                <div class="flex justify-between text-gray-400"><span>Tax</span><span id="inv-tax">₹0</span></div>
+                <div class="flex justify-between text-gray-400"><span>Delivery</span><span id="inv-del">₹0</span></div>
+                <div class="flex justify-between font-bold text-white text-lg mt-2 pt-2 border-t border-border-dark"><span>Total Paid</span><span id="inv-total" class="text-primary">₹0</span></div>
+            </div>
+            <button onclick="window.print()" class="w-full mt-8 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-all">Download PDF</button>
+        </div>
+    </div>
+
+    <div id="rate-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 transition-all opacity-0">
+        <div class="bg-card-dark border border-border-dark rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl transform scale-95 transition-all">
+            <div class="size-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4 text-primary text-3xl"><span class="material-symbols-outlined star">star</span></div>
+            <h3 class="text-xl font-bold mb-1">Rate your order</h3>
+            <p class="text-text-secondary text-sm mb-6 pb-4 border-b border-border-dark" id="rate-name">Restaurant Name</p>
+            
+            <div class="star-rating mb-8">
+                <input type="radio" id="star5" name="rate" value="5"><label for="star5" class="material-symbols-outlined">star</label>
+                <input type="radio" id="star4" name="rate" value="4"><label for="star4" class="material-symbols-outlined">star</label>
+                <input type="radio" id="star3" name="rate" value="3"><label for="star3" class="material-symbols-outlined">star</label>
+                <input type="radio" id="star2" name="rate" value="2"><label for="star2" class="material-symbols-outlined">star</label>
+                <input type="radio" id="star1" name="rate" value="1"><label for="star1" class="material-symbols-outlined">star</label>
+            </div>
+            
+            <button onclick="submitRating()" class="w-full py-3 bg-primary text-black font-bold rounded-xl hover:bg-white transition-all">Submit Rating</button>
+            <button onclick="closeModal('rate-modal')" class="w-full py-2 mt-2 text-text-secondary hover:text-white text-sm">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/zoi_config.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_customer_engine.js"></script>
+    <script>
+        let completedOrders = [];
+        let currentRateIdx = -1;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+                window.location.href = 'login & registration.html';
+                return;
+            }
+            const activeUser = ZoiToken.getUser();
+
+            // Update avatar in header
+            const avatarEl = document.querySelector('.size-9.rounded-full');
+            if (avatarEl) {
+                avatarEl.style.backgroundImage = 'none';
+                avatarEl.style.display = 'flex';
+                avatarEl.style.alignItems = 'center';
+                avatarEl.style.justifyContent = 'center';
+                avatarEl.style.fontWeight = 'bold';
+                avatarEl.textContent = activeUser.name ? activeUser.name.charAt(0).toUpperCase() : 'U';
+            }
+            // Populate sidebar user info
+            const sidebarName = document.getElementById('sidebar-name');
+            if (sidebarName) sidebarName.textContent = activeUser.name || 'Guest';
+            const sidebarAvatar = document.getElementById('sidebar-avatar');
+            if (sidebarAvatar) sidebarAvatar.textContent = activeUser.name ? activeUser.name.charAt(0).toUpperCase() : 'U';
+
+            // === LOAD ORDERS ===
+            try {
+                const apiRes = await zoiApi('GET', '/api/orders');
+                if (apiRes && apiRes.orders) {
+                    completedOrders = apiRes.orders.filter(o => o.userId === activeUser.id || o.user?.zoiId === activeUser.zoiId);
+                }
+            } catch(e) { console.log('Using local fallback orders'); }
+
+            if (completedOrders.length === 0) {
+                const legacyOrders = JSON.parse(localStorage.getItem('zoiCompletedOrders') || '[]');
+                const historyOrders = JSON.parse(localStorage.getItem('zoiOrderHistory') || '[]');
+                completedOrders = [...legacyOrders, ...historyOrders].filter(o =>
+                    o.customer === activeUser.name || o.userId === activeUser.id || o.userName === activeUser.name
+                );
+                completedOrders = Array.from(new Map(completedOrders.map(item => [item.id, item])).values());
+            }
+
+            if (completedOrders.length === 0) {
+                completedOrders = [{
+                    id: "10245", restaurantName: "Pizza Hut", total: 450, status: "delivered", rating: 5,
+                    date: new Date().toISOString(), items: [{name: "Cheese Burst Pizza", price: 450, qty: 1}]
+                }];
+            }
+
+            completedOrders.sort((a, b) =>
+                new Date(b.date || b.timestamp || b.createdAt) - new Date(a.date || a.timestamp || a.createdAt)
+            );
+
+            renderOrders();
+
+            const active = completedOrders.find(o =>
+                o.status && !['delivered', 'Delivered', 'Cancelled', 'Completed'].includes(o.status)
+            );
+            if (active) renderLiveOrder(active);
+            else document.getElementById('live-order-section').innerHTML = '';
+        });
+
+        function renderLiveOrder(o) {
+            let statusText = "PREPARING";
+            if (o.status === "confirmed") statusText = "CONFIRMED";
+            if (o.status === "ready_for_pickup") statusText = "READY";
+            if (o.status === "out_for_delivery") statusText = "ON THE WAY";
+            const itemCount = o.items ? o.items.length : 0;
+            document.getElementById('live-order-section').innerHTML = `
+            <h2 class="text-xs font-bold text-neon-green uppercase tracking-widest mb-4 flex items-center gap-2">
+                <span class="size-2 rounded-full bg-neon-green animate-pulse"></span> Live Order
+            </h2>
+            <div class="bg-gradient-to-r from-card-dark to-border-dark/30 border border-primary/30 rounded-2xl p-6 relative overflow-hidden hover:border-neon-green/50 transition-all">
+                <div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+                <div class="flex flex-col md:flex-row justify-between gap-4 relative z-10">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <h3 class="text-xl font-bold text-white">${o.restaurantName || "Restaurant"}</h3>
+                            <span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded animate-pulse">${statusText}</span>
+                        </div>
+                        <p class="text-text-secondary text-sm mb-1">${itemCount} Items • ₹${o.total || 0}</p>
+                        <p class="text-xs text-primary font-bold">Est. Delivery: ${o.estimatedTime || "30 Mins"}</p>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="window.location.href='customer order_tracking.html'" class="px-4 py-2 bg-primary text-black text-xs font-bold rounded-lg hover:bg-white transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">location_on</span> Track Live
+                            </button>
+                        </div>
+                    </div>
+                    <span class="material-symbols-outlined text-6xl text-primary/20 md:text-primary self-center">motorcycle</span>
+                </div>
+            </div>`;
+        }
+
+        function renderOrders() {
+            const list = document.getElementById('orders-list');
+            const filter = document.getElementById('date-filter').value;
+            list.innerHTML = "";
+
+            const filtered = completedOrders.filter(o => {
+                if (filter === 'all') return true;
+                const d = new Date(o.date || o.timestamp || o.createdAt || Date.now());
+                const now = new Date();
+                if (filter === 'this_month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                if (filter === 'last_3_months') return (now - d) / (1000 * 60 * 60 * 24 * 30) <= 3;
+                if (filter === '2025') return d.getFullYear() === 2025;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = '<p class="text-text-secondary text-sm py-8 italic text-center">No orders found for this filter.</p>';
+                return;
+            }
+
+            const spendMap = {};
+            completedOrders.forEach(o => spendMap[o.restaurantName] = (spendMap[o.restaurantName] || 0) + (o.total || 0));
+
+            filtered.forEach((o) => {
+                const realIdx = completedOrders.indexOf(o);
+                const dateStr = new Date(o.date || o.timestamp || o.createdAt || Date.now()).toDateString();
+                const itemSummary = (o.items || []).map(i => i.name || i.n).filter(Boolean).join(", ") || "View items";
+                const lifetimeSpend = spendMap[o.restaurantName] || 0;
+                const spendBadge = lifetimeSpend > 1000
+                    ? `<span class="text-[10px] bg-neon-yellow/20 text-neon-yellow px-2 py-0.5 rounded font-bold border border-neon-yellow/30">₹${lifetimeSpend} spent</span>`
+                    : '';
+                const statusColor = o.status === 'Cancelled' ? 'text-red-400 bg-red-400/10' : 'text-green-400 bg-green-400/10';
+                const statusLabel = o.status || 'Delivered';
+                const safeName = (o.restaurantName || 'Restaurant').replace(/'/g, "\\'");
+
+                list.innerHTML += `
+                <div class="bg-card-dark border border-border-dark rounded-xl p-5 hover:border-primary/30 transition-all group relative overflow-hidden">
+                    <div class="flex flex-col sm:flex-row justify-between gap-4">
+                        <div class="flex gap-4">
+                            <div class="size-12 rounded-lg bg-white/5 flex items-center justify-center text-xl shadow-inner shrink-0">🍽️</div>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-bold text-white group-hover:text-primary transition-colors text-lg">${o.restaurantName || 'Restaurant'}</h3>
+                                    ${spendBadge}
+                                </div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${statusColor}">${statusLabel}</span>
+                                <p class="text-xs text-text-secondary mt-1">${dateStr}</p>
+                                <p class="text-xs text-gray-500 mt-1 truncate max-w-xs">${itemSummary}</p>
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col items-end gap-2">
+                            <p class="font-black text-white text-lg">₹${o.total || 0}</p>
+                            <div class="flex gap-2 flex-wrap justify-end">
+                                <button onclick="openRateModal('${safeName}', ${realIdx})" class="text-xs text-neon-pink border border-neon-pink/30 px-3 py-1.5 rounded-lg hover:bg-neon-pink hover:text-black font-bold flex items-center gap-1 transition-all">
+                                    <span class="material-symbols-outlined text-sm">${o.rating > 0 ? 'star' : 'star_border'}</span> ${o.rating > 0 ? 'Rated' : 'Rate'}
+                                </button>
+                                <button onclick="reorder(${realIdx})" class="text-xs text-primary font-bold hover:bg-primary/10 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all">
+                                    <span class="material-symbols-outlined text-sm">refresh</span> Reorder
+                                </button>
+                                <button onclick="openInvoice(${realIdx})" class="text-xs text-text-secondary hover:text-white px-3 py-1.5 rounded-lg flex items-center gap-1 border border-border-dark hover:border-white/50 transition-all">
+                                    <span class="material-symbols-outlined text-sm">receipt_long</span> Invoice
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function openInvoice(idx) {
+            const o = completedOrders[idx];
+            if (!o) return;
+            document.getElementById('inv-id').innerText = "#" + (o.id || 'N/A');
+            document.getElementById('inv-date').innerText = new Date(o.date || o.timestamp || Date.now()).toDateString();
+            const itemList = document.getElementById('inv-items');
+            itemList.innerHTML = "";
+            let itemTotal = 0;
+            (o.items || []).forEach(i => {
+                const name = i.name || i.n || 'Item';
+                const price = i.price || i.p || 0;
+                const qty = i.qty || i.quantity || 1;
+                const lineTotal = price * qty;
+                itemTotal += lineTotal;
+                itemList.innerHTML += `<div class="flex justify-between text-sm text-gray-300"><span>${qty}x ${name}</span><span>₹${lineTotal.toFixed(2)}</span></div>`;
+            });
+            const tax = o.tax || Math.round(itemTotal * 0.05);
+            const del = o.deliveryFee || 40;
+            document.getElementById('inv-sub').innerText = "₹" + itemTotal.toFixed(2);
+            document.getElementById('inv-tax').innerText = "₹" + tax;
+            document.getElementById('inv-del').innerText = "₹" + del;
+            document.getElementById('inv-total').innerText = "₹" + (o.total || 0).toFixed(2);
+            openModal('invoice-modal');
+        }
+
+        function reorder(idx) {
+            const o = completedOrders[idx];
+            if (!o) return;
+            const cart = JSON.parse(localStorage.getItem('zoiCart') || '[]');
+            (o.items || []).forEach(i => {
+                cart.push({ name: i.name || i.n, price: i.price || i.p || 0, qty: i.qty || 1, restaurant: o.restaurantName });
+            });
+            localStorage.setItem('zoiCart', JSON.stringify(cart));
+            showToast('✅ Items from ' + o.restaurantName + ' added to cart!');
+        }
+
+        function openRateModal(name, idx) {
+            currentRateIdx = idx;
+            document.getElementById('rate-name').innerText = name;
+            openModal('rate-modal');
+        }
+
+        function submitRating() {
+            const checked = document.querySelector('.star-rating input[name="rate"]:checked');
+            if (checked && currentRateIdx >= 0) {
+                const r = parseInt(checked.value);
+                completedOrders[currentRateIdx].rating = r;
+                const stored = JSON.parse(localStorage.getItem('zoiCompletedOrders') || '[]');
+                const found = stored.find(o => o.id === completedOrders[currentRateIdx].id);
+                if (found) { found.rating = r; localStorage.setItem('zoiCompletedOrders', JSON.stringify(stored)); }
+                renderOrders();
+            }
+            showToast('⭐ Thanks for your review!');
+            closeModal('rate-modal');
+        }
+
+        function openModal(id) {
+            const m = document.getElementById(id);
+            if (!m) return;
+            m.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                m.classList.remove('opacity-0');
+                if (m.children[0]) { m.children[0].classList.remove('scale-95'); m.children[0].classList.add('scale-100'); }
+            });
+        }
+
+        function closeModal(id) {
+            const m = document.getElementById(id);
+            if (!m) return;
+            m.classList.add('opacity-0');
+            if (m.children[0]) { m.children[0].classList.add('scale-95'); m.children[0].classList.remove('scale-100'); }
+            setTimeout(() => m.classList.add('hidden'), 300);
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById('hist-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'hist-toast';
+                toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-card-dark border border-primary text-white px-6 py-3 rounded-full text-sm font-bold shadow-[0_4px_20px_rgba(0,240,255,0.3)] z-[9999] flex items-center gap-2';
+                toast.style.transition = 'all 0.3s ease';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<span class="material-symbols-outlined text-sm text-primary">info</span> ${message}`;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, 0)';
+            if (window._histToastTimeout) clearTimeout(window._histToastTimeout);
+            window._histToastTimeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, 20px)';
+            }, 3000);
+        }
+    </script>
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+</body>
+</html>

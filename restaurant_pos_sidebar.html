@@ -1,0 +1,69 @@
+<aside id="pos-nav-drawer"
+    class="fixed inset-y-0 left-0 w-64 bg-surface border-r border-border z-50 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 flex flex-col shadow-2xl shrink-0">
+    <div class="p-5 flex items-center justify-between border-b border-border">
+        <div class="flex items-center gap-3">
+            <div
+                class="size-9 bg-primary rounded-xl flex items-center justify-center text-black font-black text-lg shadow-lg shadow-primary/20">
+                Z</div>
+            <span class="text-lg font-bold">POS <span class="text-primary">Hub</span></span>
+        </div>
+        <button onclick="togglePosNav()"
+            class="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white md:hidden"><span
+                class="material-symbols-outlined text-xl">close</span></button>
+    </div>
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <a href="restaurant_pos_terminal.html"
+            class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg text-sm transition-all group"><span
+                class="material-symbols-outlined group-hover:text-primary transition-colors">point_of_sale</span> POS
+            Terminal</a>
+        <a href="restaurant_table_management.html"
+            class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg text-sm transition-all group"><span
+                class="material-symbols-outlined group-hover:text-primary transition-colors">table_restaurant</span>
+            Floor Plan</a>
+        <a href="restaurant_live_orders_kds.html"
+            class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg text-sm transition-all group"><span
+                class="material-symbols-outlined group-hover:text-primary transition-colors">cooking</span> KDS
+            (Kitchen)</a>
+        <div class="pt-3 pb-1 px-3 text-[10px] font-bold text-gray-600 uppercase tracking-wider">Quick Actions</div>
+        <button
+            onclick="if(typeof togglePosNav == 'function') togglePosNav(); if(typeof openShiftModal == 'function') openShiftModal()"
+            class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg text-sm transition-all w-full text-left"><span
+                class="material-symbols-outlined">assignment_turned_in</span> Shift Management</button>
+        <button
+            onclick="if(typeof togglePosNav == 'function') togglePosNav(); if(typeof openRecallModal == 'function') openRecallModal(); else window.location.href='restaurant_pos_terminal.html'"
+            class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg text-sm transition-all w-full text-left"><span
+                class="material-symbols-outlined">history</span> Recall Orders <span id="recall-count-drawer"
+                class="bg-yellow-500 text-black text-[10px] px-1.5 rounded-full hidden ml-auto">0</span></button>
+        <div class="pt-3 pb-1 px-3 text-[10px] font-bold text-gray-600 uppercase tracking-wider">Back Office</div>
+        <a href="restaurant management dashboard.html"
+            class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg text-sm transition-all group"><span
+                class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
+            Dashboard</a>
+        <a href="restaurant_menu_manager.html"
+            class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg text-sm transition-all group"><span
+                class="material-symbols-outlined group-hover:text-primary transition-colors">restaurant_menu</span> Menu
+            Manager</a>
+        <a href="restaurant inventory management.html"
+            class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg text-sm transition-all group"><span
+                class="material-symbols-outlined group-hover:text-primary transition-colors">inventory_2</span>
+            Inventory</a>
+        <a href="restaurant staff management.html"
+            class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg text-sm transition-all group"><span
+                class="material-symbols-outlined group-hover:text-primary transition-colors">groups</span> Staff</a>
+        <a href="restaurant_financials.html"
+            class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg text-sm transition-all group"><span
+                class="material-symbols-outlined group-hover:text-primary transition-colors">payments</span>
+            Financials</a>
+        <a href="restaurant_settings.html"
+            class="flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg text-sm transition-all group"><span
+                class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+            Settings</a>
+    </nav>
+    <div class="p-4 border-t border-border">
+        <button
+            onclick="if(typeof confirmCloseShift == 'function') confirmCloseShift(); else window.location.href='restaurant management dashboard.html'"
+            class="flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-500 transition-colors text-sm font-bold"><span
+                class="material-symbols-outlined">logout</span> Log Out</button>
+    </div>
+</aside>
+

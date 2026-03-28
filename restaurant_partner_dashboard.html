@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Eats - Restaurant Brain</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"] },
+                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .glass-panel {
+            background: rgba(24, 26, 32, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid #2a2d35;
+        }
+
+        .status-btn-active {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans selection:bg-primary selection:text-black">
+
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+        <header
+            class="h-16 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-6 z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-bold text-white hidden sm:block">Dashboard</h1>
+                <!-- RESTAURANT SWITCHER -->
+                <select id="rest-switcher" onchange="switchRestaurant(this.value)"
+                    class="bg-black/30 border border-border rounded-lg text-xs py-1 px-2 text-white font-bold cursor-pointer hover:border-primary focus:ring-0">
+                    <option value="101">Spice Symphony</option>
+                    <option value="104">La Pino'z Pizza</option>
+                    <option value="102">Burger King</option>
+                </select>
+                <div class="flex items-center bg-black/30 rounded-lg p-1 border border-border" id="status-container">
+                    <button onclick="setStatus('open')" id="btn-open"
+                        class="px-3 py-1 rounded bg-success/20 text-success text-xs font-bold border border-success/30 shadow-lg transition-all">Open</button>
+                    <button onclick="setStatus('busy')" id="btn-busy"
+                        class="px-3 py-1 rounded text-gray-500 hover:text-white text-xs font-bold transition-all border border-transparent">Busy</button>
+                    <button onclick="setStatus('closed')" id="btn-closed"
+                        class="px-3 py-1 rounded text-gray-500 hover:text-red-500 text-xs font-bold transition-all border border-transparent">Closed</button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <button onclick="toggleNotifications()"
+                        class="flex items-center justify-center size-10 rounded-full bg-surface border border-border hover:border-primary text-gray-400 hover:text-white transition-all relative">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full animate-pulse"></span>
+                    </button>
+                    <div id="notif-dropdown"
+                        class="hidden absolute right-0 top-12 w-80 bg-surface border border-border rounded-xl shadow-2xl z-50 p-4">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase mb-3">Recent Alerts</h4>
+                        <div class="space-y-3">
+                            <div class="flex gap-3 items-start p-2 hover:bg-white/5 rounded-lg cursor-pointer"
+                                onclick="window.location.href='restaurant inventory management.html'">
+                                <span
+                                    class="material-symbols-outlined text-red-500 bg-red-500/10 p-1 rounded">inventory_2</span>
+                                <div>
+                                    <p class="text-sm font-bold text-white">Low Stock: Chicken</p>
+                                    <p class="text-xs text-gray-500">Only 2kg remaining.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-3 items-start p-2 hover:bg-white/5 rounded-lg cursor-pointer"
+                                onclick="window.location.href='restaurant reviews&ratings.html'">
+                                <span
+                                    class="material-symbols-outlined text-yellow-500 bg-yellow-500/10 p-1 rounded">star</span>
+                                <div>
+                                    <p class="text-sm font-bold text-white">New 5-Star Review</p>
+                                    <p class="text-xs text-gray-500">"Best Biryani ever!" - Amit</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="openSettingsModal()"
+                    class="flex items-center justify-center size-10 rounded-full bg-surface border border-border hover:border-primary text-gray-400 hover:text-white transition-all">
+                    <span class="material-symbols-outlined">settings</span>
+                </button>
+
+                <div class="size-10 rounded-full bg-gradient-to-br from-primary to-orange-600 p-[2px] cursor-pointer">
+                    <div class="size-full rounded-full bg-surface bg-cover bg-center"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCQOb2gF7iyZapalXjY2E1a_JfjQtMXm8RLvbMaZMzlCY9LV54xsHttXWZ88Gnn9G8ctaVr5o_iWsz0JPJQ3iO8C7rKL9sHSeTcf6Sn_2-6TxYKPrA3M4seFyFp1NqZ06upAFSGWEJKXUuA7f9bFWJhir5HMtyLXs97hzfWJbjxegmKQcUuzwhZssYlTAyqUjdiiq_SlWBFlwp5X8JdjfcsHkyr5HlUwid9xS1zewIHumeJ_5BZkk5l71OCLl3sW23bzmEZLRmvauo');">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 lg:p-10 scroll-smooth">
+            <div class="max-w-7xl mx-auto space-y-8">
+
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                    <div>
+                        <h2 class="text-3xl font-black text-white tracking-tight">Good Evening, Chef! 👨‍🍳</h2>
+                        <div class="flex items-center gap-2 mt-2 text-sm text-gray-400">
+                            <span class="size-2 rounded-full bg-success animate-pulse" id="status-indicator"></span>
+                            <span>Kitchen is <span id="status-text" class="text-white font-bold">Live</span> • <span
+                                    class="text-white font-bold">12m Prep Time</span></span>
+                        </div>
+                    </div>
+                    <button onclick="window.location.href='restaurant_live_orders_kds.html'"
+                        class="flex items-center gap-2 bg-primary hover:bg-orange-600 text-black px-6 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 transition-all transform hover:scale-105">
+                        <span class="material-symbols-outlined">cooking</span> Open KDS Screen
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-6xl text-primary">payments</span>
+                        </div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Today's Sales</p>
+                        <div class="flex items-end gap-2 mt-1">
+                            <h3 class="text-3xl font-black text-white" id="stat-sales">₹24,500</h3>
+                            <span class="text-xs font-bold text-success bg-success/10 px-1.5 py-0.5 rounded">+12%</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-6xl text-blue-500">receipt_long</span>
+                        </div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Active Orders</p>
+                        <div class="flex items-end gap-2 mt-1">
+                            <h3 class="text-3xl font-black text-white" id="stat-orders">0</h3>
+                            <span class="text-xs font-bold text-blue-400" id="stat-active-orders-text">0
+                                Preparing</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-6xl text-warning">star</span>
+                        </div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Rating (Today)</p>
+                        <div class="flex items-end gap-2 mt-1">
+                            <h3 class="text-3xl font-black text-white">4.8</h3>
+                            <span class="text-xs font-bold text-warning">15 Reviews</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-5 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <span class="material-symbols-outlined text-6xl text-purple-500">inventory</span>
+                        </div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Low Stock</p>
+                        <div class="flex items-end gap-2 mt-1">
+                            <h3 class="text-3xl font-black text-white">2</h3>
+                            <span class="text-xs font-bold text-red-500">Action Req.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                    <div class="lg:col-span-2 glass-panel rounded-2xl p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">notifications_active</span> Live
+                                Orders
+                            </h3>
+                            <a href="restaurant_live_orders_kds.html"
+                                class="text-xs font-bold text-primary hover:underline">View All in KDS</a>
+                        </div>
+                        <div class="space-y-3" id="live-orders-container">
+                            <!-- Dynamic Live Orders -->
+                        </div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-6 bg-gradient-to-br from-surface to-purple-900/10">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="material-symbols-outlined text-purple-400">auto_awesome</span>
+                            <h3 class="text-lg font-bold text-white">Zap AI Insight</h3>
+                        </div>
+                        <div class="p-4 bg-purple-500/10 border border-purple-500/20 rounded-xl mb-4">
+                            <p class="text-sm text-gray-300 italic">"It's raining in your area 🌧️. Demand for <span
+                                    class="text-white font-bold">Hot Soups</span> has spiked 40%."</p>
+                        </div>
+                        <button onclick="window.location.href='restaurant promotion tool.html'"
+                            class="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-purple-900/20 flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-lg">campaign</span> Launch 'Soup Promo'
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button onclick="window.location.href='restaurant dine-in&pickup menu.html'"
+                        class="p-4 bg-surface border border-border rounded-xl hover:border-primary hover:bg-surface/80 transition-all text-left group">
+                        <span
+                            class="material-symbols-outlined text-gray-400 group-hover:text-primary text-2xl mb-2">restaurant_menu</span>
+                        <p class="text-sm font-bold text-white">Edit Menu</p>
+                    </button>
+                    <button onclick="window.location.href='restaurant inventory management.html'"
+                        class="p-4 bg-surface border border-border rounded-xl hover:border-primary hover:bg-surface/80 transition-all text-left group">
+                        <span
+                            class="material-symbols-outlined text-gray-400 group-hover:text-primary text-2xl mb-2">inventory_2</span>
+                        <p class="text-sm font-bold text-white">Stock Check</p>
+                    </button>
+                    <button onclick="window.location.href='restaurant staff management.html'"
+                        class="p-4 bg-surface border border-border rounded-xl hover:border-primary hover:bg-surface/80 transition-all text-left group">
+                        <span
+                            class="material-symbols-outlined text-gray-400 group-hover:text-primary text-2xl mb-2">badge</span>
+                        <p class="text-sm font-bold text-white">Staff Roster</p>
+                    </button>
+                    <button onclick="window.location.href='restaurant supplier management.html'"
+                        class="p-4 bg-surface border border-border rounded-xl hover:border-primary hover:bg-surface/80 transition-all text-left group">
+                        <span
+                            class="material-symbols-outlined text-gray-400 group-hover:text-primary text-2xl mb-2">local_shipping</span>
+                        <p class="text-sm font-bold text-white">Suppliers</p>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="settings-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-6">Quick Settings</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-3 bg-black/30 rounded-lg">
+                    <span class="text-sm text-gray-300">Auto-Accept Orders</span>
+                    <input type="checkbox" class="accent-primary w-5 h-5">
+                </div>
+                <div class="flex justify-between items-center p-3 bg-black/30 rounded-lg">
+                    <span class="text-sm text-gray-300">Auto-Print Invoices</span>
+                    <input type="checkbox" checked class="accent-primary w-5 h-5">
+                </div>
+                <div class="flex justify-between items-center p-3 bg-black/30 rounded-lg">
+                    <span class="text-sm text-gray-300">KDS Sound Volume</span>
+                    <input type="range" class="accent-primary h-2 w-24">
+                </div>
+            </div>
+            <button onclick="closeSettingsModal()"
+                class="w-full mt-6 py-3 bg-primary text-black font-bold rounded-xl">Save & Close</button>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // === 1. STATUS LOGIC ===
+        function setStatus(status) {
+            // Reset styles
+            ['open', 'busy', 'closed'].forEach(s => {
+                const btn = document.getElementById(`btn-${s}`);
+                btn.className = "px-3 py-1 rounded text-gray-500 hover:text-white text-xs font-bold transition-all border border-transparent";
+            });
+
+            const activeBtn = document.getElementById(`btn-${status}`);
+            const indicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+
+            if (status === 'open') {
+                activeBtn.className = "px-3 py-1 rounded bg-success/20 text-success text-xs font-bold border border-success/30 shadow-lg transition-all";
+                indicator.className = "size-2 rounded-full bg-success animate-pulse";
+                statusText.innerText = "Live";
+                showToast("Store Open", "You are now receiving orders.");
+            } else if (status === 'busy') {
+                activeBtn.className = "px-3 py-1 rounded bg-warning/20 text-warning text-xs font-bold border border-warning/30 shadow-lg transition-all";
+                indicator.className = "size-2 rounded-full bg-warning";
+                statusText.innerText = "Busy";
+                showToast("Busy Mode", "Preparation time increased to 45m.");
+            } else {
+                activeBtn.className = "px-3 py-1 rounded bg-danger/20 text-danger text-xs font-bold border border-danger/30 shadow-lg transition-all";
+                indicator.className = "size-2 rounded-full bg-danger";
+                statusText.innerText = "Offline";
+                showToast("Store Closed", "You are currently offline.");
+            }
+        }
+
+        // === 2. REALTIME DASHBOARD METRICS ===
+        function updateDashboardMetrics() {
+            if (typeof ZoiOrders === 'undefined') return;
+
+            const completed = (ZoiOrders.getCompletedOrders() || []).filter(o => o.restaurantId == CURRENT_RESTAURANT_ID);
+            const active = ZoiOrders.getActiveOrder();
+            let hasActive = active && active.restaurantId == CURRENT_RESTAURANT_ID;
+
+            let totalSales = 0;
+            completed.forEach(o => totalSales += (o.total || 0));
+
+            let totalOrders = completed.length;
+            if (hasActive) {
+                totalOrders += 1;
+            }
+
+            const salesEl = document.getElementById('stat-sales');
+            const prevSales = salesEl.innerText;
+            const newSales = "₹" + totalSales.toLocaleString();
+
+            if (prevSales !== newSales) {
+                salesEl.innerText = newSales;
+                salesEl.classList.add('text-success');
+                setTimeout(() => salesEl.classList.remove('text-success'), 1000);
+            }
+
+            document.getElementById('stat-orders').innerText = totalOrders;
+            document.getElementById('stat-active-orders-text').innerText = hasActive ? "1 Preparing" : "0 Preparing";
+
+            const liveContainer = document.getElementById('live-orders-container');
+            if (liveContainer) {
+                if (hasActive) {
+                    let statusText = "Preparing";
+                    let statusColor = "blue-400";
+                    let iconColor = "primary";
+                    let bgIconColor = "primary/20";
+                    if (active.status === 'ready_for_pickup') {
+                        statusText = "Ready for Pickup";
+                        statusColor = "green-500";
+                        iconColor = "green-500";
+                        bgIconColor = "green-500/20";
+                    } else if (active.status === 'placed') {
+                        statusText = "New Order";
+                        statusColor = "orange-500";
+                    }
+
+                    const itemsStr = active.items.map(i => `${i.qty}x ${i.name}`).join(', ');
+
+                    liveContainer.innerHTML = `
+                        <div class="flex items-center justify-between p-4 bg-surface border border-border rounded-xl hover:border-primary/50 transition-colors cursor-pointer group"
+                            onclick="window.location.href='restaurant_live_orders_kds.html'">
+                            <div class="flex items-center gap-4">
+                                <div class="size-10 rounded-lg bg-${bgIconColor} text-${iconColor} flex items-center justify-center font-bold">
+                                    #${active.id.split('-')[1] || active.id}</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-white truncate max-w-[200px] sm:max-w-[400px]">${itemsStr}</h4>
+                                    <p class="text-xs text-gray-500">Customer • <span class="text-${statusColor}">${statusText}</span></p>
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined text-gray-600 group-hover:text-white">chevron_right</span>
+                        </div>
+                    `;
+                } else {
+                    liveContainer.innerHTML = `<div class="text-gray-500 text-sm italic py-4 text-center border border-dashed border-gray-700 rounded-xl">No live orders at the moment.</div>`;
+                }
+            }
+        }
+
+        // === 3. NOTIFICATIONS ===
+        function toggleNotifications() {
+            document.getElementById('notif-dropdown').classList.toggle('hidden');
+        }
+
+        // === 4. SETTINGS MODAL ===
+        function openSettingsModal() {
+            document.getElementById('settings-modal').classList.remove('hidden');
+            document.getElementById('settings-modal').classList.add('flex');
+        }
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+            document.getElementById('settings-modal').classList.remove('flex');
+        }
+
+        // === 5. LOGOUT ===
+        // Removed local handleLogout() to use global_sidebar.js function
+
+        // UTILS
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+    </script>
+    <script>
+        // 1. INITIALIZATION
+        // Simulating login
+        const partner = typeof ZoiDB !== 'undefined' && ZoiDB.login ? ZoiDB.login('partner') : (typeof MOCK_USERS !== 'undefined' ? MOCK_USERS.partner : true);
+        if (!partner) window.location.href = 'login & registration.html';
+
+        // Current Restaurant Context (Simulated Login)
+        // Default to 101 if not set
+        let CURRENT_RESTAURANT_ID = localStorage.getItem('zoiPartnerRestId') || "101";
+
+        // Update Dashboard Text based on ID
+        const restNames = {
+            "101": "Spice Symphony",
+            "104": "La Pino'z Pizza",
+            "102": "Burger King"
+        };
+
+        // 1. Sidebar Title (Target Specific ID)
+        const sidebarNameEl = document.getElementById('sidebar-rest-name');
+        if (sidebarNameEl) sidebarNameEl.innerText = restNames[CURRENT_RESTAURANT_ID] || "Partner Portal";
+
+        // Also try general query for mobile navs
+        const otherTitles = document.querySelectorAll('aside p.text-[10px]:not(#sidebar-rest-name)');
+        otherTitles.forEach(el => { if (el) el.innerText = restNames[CURRENT_RESTAURANT_ID]; });
+
+        // Update H1 too for clarity
+        const sidebarHeaders = document.querySelectorAll('aside h1');
+        sidebarHeaders.forEach(el => {
+            if (el && restNames[CURRENT_RESTAURANT_ID]) el.innerText = "Partner Hub";
+        });
+
+        // 2. Dropdown Sync (Crucial)
+        const switcher = document.getElementById('rest-switcher');
+        if (switcher && switcher.value !== CURRENT_RESTAURANT_ID) {
+            switcher.value = CURRENT_RESTAURANT_ID;
+        }
+
+        function switchRestaurant(id) {
+
+            CURRENT_RESTAURANT_ID = id;
+            localStorage.setItem('zoiPartnerRestId', id);
+
+            // Update UI immediately (visual feedback)
+            document.querySelectorAll('aside p.text-[10px]').forEach(el => {
+                el.innerText = restNames[id];
+            });
+
+            // Force reload
+            setTimeout(() => location.reload(), 100);
+        }
+
+        // 2. LIVE ORDER POLLING & METRICS
+        updateDashboardMetrics(); // Initial Call
+        setInterval(() => {
+            checkLiveOrders();
+            updateDashboardMetrics();
+        }, 3000);
+
+        function checkLiveOrders() {
+            const order = ZoiOrders.getActiveOrder();
+
+            // FILTER: Only show orders for THIS restaurant (Loose Equality for String/Int safety)
+            if (order && order.restaurantId == CURRENT_RESTAURANT_ID) {
+                if (order.status === 'placed') {
+                    showIncomingOrderModal(order);
+                }
+                // Update specific dashboard sections if order is past 'placed'
+                renderDashboardOrders();
+            } else {
+                // Clear dashboard if order is gone or belongs to another rest
+                document.getElementById('kitchen-orders-grid').innerHTML = `<div class="text-gray-500 text-sm italic p-4 border border-dashed border-gray-700 rounded-xl col-span-3">No active orders</div>`;
+            }
+        }
+
+        // Inject Modal HTML dynamically if not present
+        if (!document.getElementById('incoming-order-modal')) {
+            document.body.insertAdjacentHTML('beforeend', `
+            <div id="incoming-order-modal" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4">
+                <div class="bg-[#1e1c19] border border-[#00f0ff] rounded-2xl p-6 w-full max-w-md shadow-[0_0_50px_rgba(0, 240, 255,0.2)] animate-pulse">
+                    <h2 class="text-2xl font-bold text-white mb-2">🔥 New Order!</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-[#00f0ff] font-mono text-xl font-bold" id="modal-order-id">#ORD-123</span>
+                        <span class="text-white font-bold text-xl" id="modal-order-total">₹500</span>
+                    </div>
+                    <div class="bg-black/30 p-3 rounded-xl mb-6 max-h-40 overflow-y-auto" id="modal-order-items">
+                        <!-- Items -->
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="rejectOrder()" class="py-3 rounded-xl border border-[#3e342b] text-gray-400 font-bold hover:bg-[#3e342b]">Reject</button>
+                        <button onclick="acceptOrder()" class="py-3 rounded-xl bg-[#00f0ff] text-black font-bold hover:bg-[#ff9933] shadow-lg">ACCEPT NOW</button>
+                    </div>
+                </div>
+            </div>
+        `);
+        }
+
+        function showIncomingOrderModal(order) {
+            const modal = document.getElementById('incoming-order-modal');
+            if (!modal.classList.contains('hidden')) return; // Already showing
+
+            document.getElementById('modal-order-id').innerText = order.id;
+            document.getElementById('modal-order-total').innerText = order.total;
+
+            const itemsList = document.getElementById('modal-order-items');
+            itemsList.innerHTML = "";
+            order.items.forEach(item => {
+                itemsList.innerHTML += `<div class="text-gray-300 text-sm mb-1">${item.qty}x ${item.name}</div>`;
+            });
+
+            // Play Loud Buzzer (3-beep pattern)
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                function beep(freq, startTime, duration) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.frequency.value = freq;
+                    g.gain.value = 0.15;
+                    o.start(ctx.currentTime + startTime);
+                    o.stop(ctx.currentTime + startTime + duration);
+                }
+                beep(880, 0, 0.15);
+                beep(1100, 0.2, 0.15);
+                beep(880, 0.4, 0.3);
+            } catch (e) { }
+
+            modal.classList.remove('hidden');
+        }
+
+        // 3. UI UPDATES
+        function renderDashboardOrders() {
+            const order = ZoiOrders.getActiveOrder();
+            const kitchenGrid = document.getElementById('kitchen-orders-grid');
+            const readyGrid = document.getElementById('ready-orders-grid');
+
+            // Only render if order exists and belongs to this restaurant
+            if (!order || order.restaurantId != CURRENT_RESTAURANT_ID) {
+                kitchenGrid.innerHTML = `<div class="text-gray-500 text-sm italic p-4 border border-dashed border-gray-700 rounded-xl col-span-3">No active orders</div>`;
+                readyGrid.innerHTML = "";
+                return;
+            }
+
+            // Render based on status
+            if (order.status === 'preparing') {
+                kitchenGrid.innerHTML = `
+                <div class="bg-[#1e1c19] border-l-4 border-yellow-500 rounded-xl p-4 shadow-lg animate-fade-in relative">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-white font-bold">#${order.id}</span>
+                        <span class="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded uppercase font-bold">Preparing</span>
+                    </div>
+                    <div class="text-gray-400 text-sm mb-4">
+                        ${order.items.map(i => `${i.qty}x ${i.name}`).join('<br>')}
+                    </div>
+                    <button onclick="markReady('${order.id}')" class="w-full py-2 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">check_circle</span> Mark Ready
+                    </button>
+                    <!-- Simulated Kitchen Timer -->
+                    <div class="absolute bottom-1 right-2 text-[10px] text-gray-600 font-mono">Auto-timer disabled</div>
+                </div>`;
+                readyGrid.innerHTML = "";
+            }
+            else if (order.status === 'ready_for_pickup') {
+                kitchenGrid.innerHTML = `<div class="text-gray-500 text-sm italic p-4 border border-dashed border-gray-700 rounded-xl col-span-3">No active orders</div>`;
+                readyGrid.innerHTML = `
+                <div class="bg-[#1e1c19] border-l-4 border-green-500 rounded-xl p-4 shadow-lg animate-fade-in">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-white font-bold">#${order.id}</span>
+                        <span class="text-xs bg-green-500/20 text-green-500 px-2 py-0.5 rounded uppercase font-bold">Ready</span>
+                    </div>
+                    <p class="text-gray-400 text-xs mb-3">Waiting for rider assignment...</p>
+                    <div class="flex items-center gap-2 text-primary text-sm font-bold animate-pulse">
+                        <span class="material-symbols-outlined">two_wheeler</span> Broadcasting to Riders...
+                    </div>
+                </div>`;
+            }
+        }
+
+        function acceptOrder() {
+            // FORCE REDIRECT to KDS
+
+            window.location.href = 'restaurant_live_orders_kds.html';
+        }
+
+        function markReady(orderId) {
+            ZoiOrders.updateStatus('ready_for_pickup'); // Update DB -> This triggers Rider!
+            renderDashboardOrders(); // Refresh UI
+        }
+
+        function rejectOrder() {
+            document.getElementById('incoming-order-modal').classList.add('hidden');
+        }
+
+    </script>
+
+
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+    <script src="js/zoi_partner_engine.js"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Hub - Zoi Hostel POS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="hostel_shared.js"></script>
+    <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { teal: "#00D4C5", bg: "#0B0C10", surface: "#1A1B23", border: "rgba(255,255,255,0.05)" }, fontFamily: { sans: ["Manrope", "sans-serif"] } } } }</script>
+    <style>
+        .glass-panel {
+            background: rgba(26, 27, 35, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+        }
+
+        .bouncy-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .bouncy-card:hover {
+            transform: translateY(-4px) scale(1.01);
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, rgb(20, 20, 30) 0%, rgb(11, 12, 16) 90%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-row {
+            animation: fadeUp 0.3s ease forwards;
+        }
+
+        .tab-btn {
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(168, 85, 247, 0.1));
+            color: #ec4899;
+            border-color: rgba(236, 72, 153, 0.3);
+            font-weight: 700;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+    <script src="js/zoi_config.js"></script>
+</head>
+
+<body class="text-white h-screen overflow-hidden flex font-sans antialiased selection:bg-pink-500/30">
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="h-20 flex items-center justify-between px-8 border-b border-border/50 flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-extrabold flex items-center gap-2">Communication Hub <span
+                        class="material-symbols-outlined text-pink-500 text-3xl">sms</span></h2>
+                <p class="text-gray-400 text-sm">Broadcast messages via SMS/WhatsApp, use templates, schedule
+                    announcements.</p>
+            </div>
+            <button onclick="openMsgModal()"
+                class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)]"><span
+                    class="material-symbols-outlined text-sm">send</span> Compose</button>
+        </header>
+
+        <!-- Stats -->
+        <div class="px-8 py-4 border-b border-border/30 flex items-center gap-5 flex-wrap flex-shrink-0">
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-green-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-green-400">check_circle</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Messages Sent</p>
+                    <p class="text-xl font-extrabold text-green-400" id="st-sent">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-amber-400">schedule</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Scheduled</p>
+                    <p class="text-xl font-extrabold text-amber-400" id="st-sched">0</p>
+                </div>
+            </div>
+            <div class="glass-panel px-5 py-3 flex items-center gap-3 bouncy-card">
+                <div class="h-10 w-10 rounded-xl bg-blue-500/15 flex items-center justify-center"><span
+                        class="material-symbols-outlined text-blue-400">groups</span></div>
+                <div>
+                    <p class="text-[10px] text-gray-500 uppercase font-bold">Reach</p>
+                    <p class="text-xl font-extrabold text-blue-400">42 hostelers</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="px-8 pt-4 flex gap-2 flex-shrink-0">
+            <button class="tab-btn active px-4 py-2 text-xs rounded-xl border border-white/10" data-tab="history"
+                onclick="switchTab('history')">Message History</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-tab="templates" onclick="switchTab('templates')">Templates</button>
+            <button class="tab-btn px-4 py-2 text-xs rounded-xl border border-white/10 text-gray-400"
+                data-tab="scheduled" onclick="switchTab('scheduled')">Scheduled</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-8 pb-24">
+            <!-- HISTORY -->
+            <div id="tab-history" class="tab-content space-y-3" onclick=""></div>
+
+            <!-- TEMPLATES -->
+            <div id="tab-templates" class="tab-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="template-grid"></div>
+            </div>
+
+            <!-- SCHEDULED -->
+            <div id="tab-scheduled" class="tab-content hidden space-y-3" id="sched-list"></div>
+        </div>
+    </main>
+
+    <!-- COMPOSE MODAL -->
+    <div id="msg-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-0">
+            <div class="p-5 border-b border-border flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2"><span
+                        class="material-symbols-outlined text-pink-500">send</span> Compose Message</h3><button
+                    onclick="closeMsgModal()"
+                    class="p-1 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-5 space-y-3.5">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="cm-channel"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option>SMS</option>
+                        <option>WhatsApp</option>
+                        <option>Both</option>
+                    </select>
+                    <select id="cm-audience"
+                        class="bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                        <option>All Hostelers</option>
+                        <option>Floor 1</option>
+                        <option>Floor 2</option>
+                        <option>Floor 3</option>
+                        <option>Individual</option>
+                    </select>
+                </div>
+                <input id="cm-to" type="text" placeholder="Hosteler name (only for Individual)"
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
+                <textarea id="cm-body" rows="4" placeholder="Type your message..."
+                    class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none resize-none"></textarea>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block">Schedule
+                            (optional)</label><input id="cm-sched" type="datetime-local"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                    </div>
+                    <div class="flex items-end"><select id="cm-template" onchange="applyTemplate()"
+                            class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
+                            <option value="">Use Template</option>
+                            <option value="rent">Rent Reminder</option>
+                            <option value="event">Event Invite</option>
+                            <option value="emergency">Emergency Alert</option>
+                            <option value="guest">Visitor Notice</option>
+                            <option value="meeting">Meeting Call</option>
+                        </select></div>
+                </div>
+            </div>
+            <div class="p-5 border-t border-border flex gap-3"><button onclick="closeMsgModal()"
+                    class="flex-1 py-3 text-sm font-bold text-gray-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10">Cancel</button><button
+                    onclick="sendMessage()"
+                    class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] flex items-center justify-center gap-2"><span
+                        class="material-symbols-outlined text-sm">send</span> Send</button></div>
+        </div>
+    </div>
+
+    <script>
+        const TEMPLATES_DATA = [
+            { id: 'rent', icon: 'payments', color: 'amber', title: 'Rent Reminder', body: 'Dear {name}, this is a reminder that your hostel rent of ₹{amount} for {month} is due by {date}. Please pay via UPI or at the admin office. Late payment will attract ₹200 fine. — Zoi Hostel' },
+            { id: 'event', icon: 'celebration', color: 'violet', title: 'Event Invite', body: '🎉 Dear {name}, you are invited to {event_name} on {date} at {time} in the hostel {venue}. All hostelers welcome! — Zoi Hostel' },
+            { id: 'emergency', icon: 'emergency', color: 'red', title: 'Emergency Alert', body: '⚠️ URGENT: {message}. Please follow all safety instructions and proceed to the assembly point immediately. — Zoi Hostel Management' },
+            { id: 'guest', icon: 'badge', color: 'blue', title: 'Visitor Notice', body: 'Dear {name}, you have a visitor ({visitor_name}) waiting at the reception. Please come to the reception area. — Zoi Hostel' },
+            { id: 'meeting', icon: 'groups', color: 'teal', title: 'Meeting Call', body: 'Dear all, there will be a hostel meeting on {date} at {time} in the {venue}. Attendance is mandatory. Agenda: {agenda}. — Zoi Hostel Management' },
+        ];
+
+        const MESSAGES = ZoiDB.get('messages', [
+            { id: 1, channel: 'WhatsApp', audience: 'All Hostelers', to: null, body: '🎉 Holi celebration on March 14th in the courtyard! Organic colors only. Lunch provided. All hostelers welcome!', time: '2026-03-04 10:30 AM', status: 'sent', sent: 42 },
+            { id: 2, channel: 'SMS', audience: 'All Hostelers', to: null, body: 'Rent for March 2026 is due by March 5th. Pay via UPI or at admin office. Late payment = ₹200 fine.', time: '2026-03-01 09:00 AM', status: 'sent', sent: 42 },
+            { id: 3, channel: 'WhatsApp', audience: 'Floor 2', to: null, body: 'Floor 2 bathroom renovation starts March 8. Use Floor 1 & Floor 3 bathrooms until March 15. Sorry for inconvenience.', time: '2026-03-01 11:00 AM', status: 'sent', sent: 14 },
+            { id: 4, channel: 'SMS', audience: 'Individual', to: 'Priya S. (Room 301)', body: 'Priya, your visitor (Ramesh P.) is waiting at the reception. Please come down.', time: '2026-02-28 02:30 PM', status: 'sent', sent: 1 },
+            { id: 5, channel: 'Both', audience: 'All Hostelers', to: null, body: '⚠️ Fire safety drill on March 7 at 6 PM. ALL hostelers must participate. Assembly point: Main parking area.', time: '2026-02-28 09:00 AM', status: 'sent', sent: 42 },
+        ]);
+
+        const SCHEDULED = ZoiDB.get('scheduled_messages', [
+            { id: 101, channel: 'SMS', audience: 'All Hostelers', body: 'Water supply will be interrupted tomorrow from 10 AM to 4 PM. Please store water in advance.', scheduledFor: '2026-03-05 07:00 AM' },
+            { id: 102, channel: 'WhatsApp', audience: 'All Hostelers', body: 'Monthly hostel meeting tomorrow at 7 PM in the common hall. Attendance mandatory.', scheduledFor: '2026-03-06 10:00 AM' },
+        ]);
+
+        const CHANNEL_ICON = { SMS: 'sms', WhatsApp: 'chat', Both: 'forum' };
+        const CHANNEL_COLOR = { SMS: 'blue', WhatsApp: 'green', Both: 'violet' };
+
+        function renderHistory() {
+            document.getElementById('tab-history').innerHTML = MESSAGES.map((m, i) => {
+                const cc = CHANNEL_COLOR[m.channel]; const ci = CHANNEL_ICON[m.channel];
+                return `<div class="glass-panel p-4 bouncy-card fade-row" style="animation-delay:${i * 40}ms">
+                    <div class="flex items-start gap-3">
+                        <div class="h-10 w-10 rounded-xl bg-${cc}-500/15 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-${cc}-400">${ci}</span></div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <span class="bg-${cc}-500/20 text-${cc}-400 px-2 py-0.5 rounded text-[10px] font-bold">${m.channel}</span>
+                                <span class="bg-white/10 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">${m.to || m.audience}</span>
+                                <span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">✓ Sent to ${m.sent}</span>
+                                <span class="ml-auto text-[10px] text-gray-500">${m.time}</span>
+                            </div>
+                            <p class="text-xs text-gray-300 leading-relaxed">${m.body}</p>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('st-sent').innerText = MESSAGES.length;
+        }
+
+        function renderTemplates() {
+            document.getElementById('template-grid').innerHTML = TEMPLATES_DATA.map((t, i) => `<div class="glass-panel p-5 bouncy-card fade-row cursor-pointer" style="animation-delay:${i * 40}ms" onclick="useTemplate('${t.id}')">
+                <div class="flex items-center gap-3 mb-3"><div class="h-10 w-10 rounded-xl bg-${t.color}-500/15 flex items-center justify-center"><span class="material-symbols-outlined text-${t.color}-400">${t.icon}</span></div><h4 class="font-bold text-white text-sm">${t.title}</h4></div>
+                <p class="text-xs text-gray-400 leading-relaxed">${t.body.substring(0, 100)}...</p>
+                <button class="mt-3 text-[10px] text-pink-400 bg-pink-500/10 px-3 py-1 rounded font-bold">Use Template →</button>
+            </div>`).join('');
+        }
+
+        function renderScheduled() {
+            const el = document.getElementById('tab-scheduled');
+            el.innerHTML = SCHEDULED.length ? SCHEDULED.map((s, i) => `<div class="glass-panel p-4 bouncy-card fade-row border-amber-500/20" style="animation-delay:${i * 40}ms">
+                <div class="flex items-start gap-3">
+                    <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-amber-400">schedule</span></div>
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1"><span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">⏰ ${s.scheduledFor}</span><span class="bg-white/10 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">${s.channel} → ${s.audience}</span></div>
+                        <p class="text-xs text-gray-300">${s.body}</p>
+                    </div>
+                    <button onclick="cancelScheduled(${s.id})" class="p-1.5 bg-red-500/10 rounded-lg text-red-400 hover:bg-red-500/20"><span class="material-symbols-outlined text-sm">close</span></button>
+                </div>
+            </div>`).join('') : '<div class="text-center text-gray-500 py-20"><span class="material-symbols-outlined text-6xl mb-3 block">schedule</span><p class="text-lg font-bold">No scheduled messages</p></div>';
+            document.getElementById('st-sched').innerText = SCHEDULED.length;
+        }
+
+        function cancelScheduled(id) {
+            const idx = SCHEDULED.findIndex(s => s.id === id);
+            if (idx > -1) {
+                SCHEDULED.splice(idx, 1);
+                ZoiDB.set('scheduled_messages', SCHEDULED);
+                renderScheduled();
+                showToast('Scheduled message cancelled', 'info');
+            }
+        }
+        function useTemplate(id) { openMsgModal(); const t = TEMPLATES_DATA.find(x => x.id === id); if (t) document.getElementById('cm-body').value = t.body; }
+        function applyTemplate() { const v = document.getElementById('cm-template').value; const t = TEMPLATES_DATA.find(x => x.id === v); if (t) document.getElementById('cm-body').value = t.body; }
+
+        function openMsgModal() { document.getElementById('msg-modal').classList.remove('hidden'); document.getElementById('msg-modal').classList.add('flex'); }
+        function closeMsgModal() { document.getElementById('msg-modal').classList.add('hidden'); document.getElementById('msg-modal').classList.remove('flex'); }
+
+        function sendMessage() {
+            const body = document.getElementById('cm-body').value.trim();
+            if (!body) { showToast('Type a message.', 'error'); return; }
+            const sched = document.getElementById('cm-sched').value;
+            const ch = document.getElementById('cm-channel').value;
+            const aud = document.getElementById('cm-audience').value;
+            const to = aud === 'Individual' ? document.getElementById('cm-to').value : null;
+            if (sched) {
+                SCHEDULED.unshift({ id: Date.now(), channel: ch, audience: aud, body, scheduledFor: sched.replace('T', ' ') });
+                ZoiDB.set('scheduled_messages', SCHEDULED);
+                showToast('📅 Message scheduled!', 'success');
+            } else {
+                MESSAGES.unshift({ id: Date.now(), channel: ch, audience: aud, to, body, time: new Date().toLocaleString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }), status: 'sent', sent: aud === 'Individual' ? 1 : 42 });
+                ZoiDB.set('messages', MESSAGES);
+                showToast('✅ Message sent!', 'success');
+            }
+            closeMsgModal();
+            // Reset modal data
+            document.getElementById('cm-body').value = '';
+            document.getElementById('cm-sched').value = '';
+            document.getElementById('cm-to').value = '';
+            document.getElementById('cm-template').value = '';
+            renderHistory();
+            renderScheduled();
+        }
+
+        function switchTab(t) { document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.getElementById('tab-' + t).classList.remove('hidden'); document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.classList.add('text-gray-400'); }); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.add('active'); document.querySelector(`.tab-btn[data-tab="${t}"]`).classList.remove('text-gray-400'); }
+        document.addEventListener('DOMContentLoaded', () => { renderHistory(); renderTemplates(); renderScheduled(); });
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

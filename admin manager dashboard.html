@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi - Manager Dashboard</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script>ZoiAuth.enforceAccess('Manager Dashboard');</script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                    },
+                    fontFamily: { sans: ['Manrope', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                },
+            },
+        };
+    </script>
+    <style>
+        * { scrollbar-width: thin; scrollbar-color: #2a2d35 transparent; }
+        .stat-glow { box-shadow: 0 0 25px rgba(0, 240, 255, 0.08); }
+        .task-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .pulse-dot { animation: pulse-dot 1.5s ease-in-out infinite; }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white font-sans h-screen flex overflow-hidden">
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="bg-surface border-b border-border px-6 py-4 flex items-center justify-between shrink-0">
+            <div>
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">admin_panel_settings</span>
+                    Manager Dashboard
+                </h2>
+                <p class="text-xs text-gray-500 mt-0.5">Logged in as: <span class="text-primary font-bold" id="current-manager-name">--</span> · <span class="text-gray-400" id="current-manager-role">--</span></p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <span class="material-symbols-outlined text-gray-400 text-2xl cursor-pointer hover:text-white transition-colors">notifications</span>
+                    <span class="absolute -top-1 -right-1 size-4 bg-danger rounded-full text-[9px] font-bold flex items-center justify-center pulse-dot" id="notif-count">0</span>
+                </div>
+                <div class="size-9 rounded-full bg-primary/20 border border-primary/50 text-primary flex items-center justify-center font-bold text-sm">
+                    <span class="material-symbols-outlined text-lg">shield_person</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-surface border border-border rounded-xl p-5 stat-glow">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">My Assigned Tickets</p>
+                    <h3 class="text-3xl font-mono font-bold text-white" id="stat-assigned">0</h3>
+                    <p class="text-xs text-gray-500 mt-1">Active escalations</p>
+                </div>
+                <div class="bg-surface border border-border rounded-xl p-5">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Resolved Today</p>
+                    <h3 class="text-3xl font-mono font-bold text-success" id="stat-resolved">0</h3>
+                    <p class="text-xs text-gray-500 mt-1">Closed cases</p>
+                </div>
+                <div class="bg-surface border border-border rounded-xl p-5">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">Avg Resolution Time</p>
+                    <h3 class="text-3xl font-mono font-bold text-warning">12m</h3>
+                    <p class="text-xs text-gray-500 mt-1">Target: &lt; 15 min</p>
+                </div>
+                <div class="bg-surface border border-border rounded-xl p-5">
+                    <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">SLA Compliance</p>
+                    <h3 class="text-3xl font-mono font-bold text-primary">94%</h3>
+                    <p class="text-xs text-green-500 mt-1 flex items-center gap-1"><span class="material-symbols-outlined text-sm">trending_up</span> +3% this week</p>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">assignment</span>
+                        Assigned Escalations
+                    </h3>
+                    <a href="admin dispute resolution.html" class="text-xs text-primary hover:underline font-bold">View All Disputes →</a>
+                </div>
+                <div class="space-y-3" id="task-list"></div>
+                <div class="hidden text-center py-12 text-gray-500" id="empty-tasks">
+                    <span class="material-symbols-outlined text-4xl mb-2 opacity-30">inbox</span>
+                    <p class="text-sm">No escalated tickets assigned to you. You're all caught up! 🎉</p>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-4">
+                    <span class="material-symbols-outlined text-primary">groups</span>
+                    Internal Team
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="team-grid"></div>
+            </div>
+        </div>
+    </main>
+
+    <div id="quick-resolve-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-lg p-6 shadow-2xl relative">
+            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">task_alt</span> Quick Resolve
+            </h3>
+            <p class="text-sm text-gray-400 mb-5">Ticket <span class="text-white font-mono font-bold" id="qr-ticket-id">--</span></p>
+
+            <div class="bg-bg border border-border rounded-lg p-4 mb-4">
+                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">AI Recommendation</p>
+                <p class="text-sm text-gray-300" id="qr-ai-text">--</p>
+            </div>
+
+            <div class="space-y-3 mb-6">
+                <label class="block text-xs font-bold text-gray-500 uppercase">Resolution</label>
+                <select id="qr-resolution" class="w-full bg-bg border border-border rounded-lg p-3 text-white text-sm focus:border-primary focus:ring-0">
+                    <option>Refund</option>
+                    <option>Promo Code</option>
+                    <option>Warning</option>
+                    <option>Ban Entity</option>
+                </select>
+                <textarea id="qr-note" rows="2" class="w-full bg-bg border border-border rounded-lg p-3 text-white text-sm focus:border-primary focus:ring-0" placeholder="Add a note..."></textarea>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeModal('quick-resolve-modal')" class="flex-1 py-3 rounded-lg border border-border text-gray-400 font-bold hover:text-white transition-colors">Cancel</button>
+                <button onclick="quickResolve()" class="flex-1 py-3 rounded-lg bg-primary hover:bg-primary/90 text-black font-bold transition-all">Resolve & Close</button>
+            </div>
+
+            <button onclick="closeModal('quick-resolve-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let myTickets = [];
+        let currentQuickTicketId = null;
+
+        window.onload = async () => {
+            await loadDashboard();
+        };
+
+        async function loadDashboard() {
+            const currentUser = JSON.parse(localStorage.getItem('zoiUser') || '{}');
+            const MANAGER_ID = currentUser.zoiId || "ADM-01";
+            
+            document.getElementById('current-manager-name').innerText = currentUser.name || "Admin";
+            document.getElementById('current-manager-role').innerText = currentUser.role || "Manager";
+
+            try {
+                const dispRes = await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes', {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
+                });
+                let allDisputes = [];
+                if (dispRes.ok) {
+                    const dbDisputes = await dispRes.json();
+                    allDisputes = dbDisputes.map(d => ({
+                        id: d.ticketId, title: d.title, user: d.user?.name || 'Unknown',
+                        time: new Date(d.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                        type: d.type, status: d.status, ai: d.aiSummary || 'Analysis pending...',
+                        items: d.items || [], assignedTo: d.assignedTo
+                    }));
+                }
+
+                const teamRes = await fetch(ZOI_CONFIG.API_BASE_URL + '/users', {
+                    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
+                });
+                let allStaff = [];
+                if (teamRes.ok) {
+                    const dbUsers = await teamRes.json();
+                    allStaff = dbUsers.filter(u => ['admin', 'Super Admin'].includes(u.role));
+                }
+
+                myTickets = allDisputes.filter(d => d.assignedTo === MANAGER_ID && d.status === 'Escalated');
+                const resolvedCount = allDisputes.filter(d => d.assignedTo === MANAGER_ID && d.status === 'Resolved').length;
+
+                document.getElementById('stat-assigned').innerText = myTickets.length;
+                document.getElementById('stat-resolved').innerText = resolvedCount;
+                document.getElementById('notif-count').innerText = myTickets.length;
+
+                const container = document.getElementById('task-list');
+                const empty = document.getElementById('empty-tasks');
+                container.innerHTML = '';
+                if (myTickets.length === 0) empty.classList.remove('hidden');
+                else {
+                    empty.classList.add('hidden');
+                    myTickets.forEach(ticket => {
+                        const typeBadge = ticket.type === 'Critical' 
+                            ? '<span class="text-[10px] font-bold text-white bg-red-600/20 px-1.5 py-0.5 rounded border border-red-600/30">CRITICAL</span>'
+                            : '<span class="text-[10px] font-bold text-orange-400 bg-orange-500/20 px-1.5 py-0.5 rounded border border-orange-500/30">ESCALATED</span>';
+                        container.innerHTML += `
+                            <div class="bg-surface border border-border rounded-xl p-5 task-card transition-all duration-200 cursor-pointer hover:border-primary/30" onclick="openQuickResolve('${ticket.id}')">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="text-xs font-mono text-primary">#${ticket.id}</span>
+                                            ${typeBadge}
+                                        </div>
+                                        <h4 class="text-white font-bold">${ticket.title}</h4>
+                                        <p class="text-xs text-gray-500 mt-0.5">${ticket.user} · ${ticket.time}</p>
+                                    </div>
+                                    <button class="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary hover:text-black transition-all"><span class="material-symbols-outlined text-lg">task_alt</span></button>
+                                </div>
+                                <div class="bg-bg rounded-lg p-3 border border-border">
+                                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">AI Recommendation</p>
+                                    <p class="text-xs text-gray-300 leading-relaxed">${ticket.ai}</p>
+                                </div>
+                            </div>`;
+                    });
+                }
+
+                const teamGrid = document.getElementById('team-grid');
+                teamGrid.innerHTML = '';
+                allStaff.forEach(emp => {
+                    const isMe = emp.zoiId === MANAGER_ID;
+                    teamGrid.innerHTML += `
+                        <div class="bg-surface border ${isMe ? 'border-primary/30 bg-primary/5' : 'border-border'} rounded-xl p-4">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="size-9 rounded-full ${isMe ? 'bg-primary/20 text-primary' : 'bg-white/5 text-gray-400'} border flex items-center justify-center font-bold text-sm">${emp.name.charAt(0)}</div>
+                                <div><p class="font-bold text-white text-sm">${emp.name}</p><p class="text-[10px] text-gray-500">${emp.zoiId || 'EMP'}</p></div>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-primary/30 text-primary bg-primary/10">${emp.role}</span>
+                        </div>`;
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        function openQuickResolve(id) {
+            currentQuickTicketId = id;
+            const ticket = myTickets.find(t => t.id === id);
+            if (!ticket) return;
+            document.getElementById('qr-ticket-id').innerText = '#' + ticket.id;
+            document.getElementById('qr-ai-text').innerText = ticket.ai;
+            document.getElementById('quick-resolve-modal').classList.remove('hidden');
+            document.getElementById('quick-resolve-modal').classList.add('flex');
+        }
+
+        async function quickResolve() {
+            const resType = document.getElementById('qr-resolution').value;
+            const note = document.getElementById('qr-note').value;
+            try {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes/' + currentQuickTicketId, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('zoiAuthToken') },
+                    body: JSON.stringify({ status: 'Resolved', resolution: resType, resolutionNote: note })
+                });
+                if (response.ok) {
+                    await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes/' + currentQuickTicketId + '/log', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('zoiAuthToken') },
+                        body: JSON.stringify({ role: 'system', msg: `Manager resolved via ${resType}: ${note}` })
+                    });
+                    closeModal('quick-resolve-modal');
+                    showToast('Resolved', `#${currentQuickTicketId} closed.`);
+                    await loadDashboard();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        function showToast(title, msg) {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.className = "fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-50 flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none";
+                toast.innerHTML = `<span class="material-symbols-outlined text-primary">check_circle</span><div><h4 class="font-bold text-sm" id="toast-title"></h4><p class="text-xs text-gray-400" id="toast-msg"></p></div>`;
+                document.body.appendChild(toast);
+            }
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            setTimeout(() => {
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+            }, 100);
+        }
+    </script>
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+    <script src="js/zoi_theme.js?v=5"></script>
+</body>
+</html>

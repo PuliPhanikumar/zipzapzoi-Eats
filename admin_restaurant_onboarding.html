@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Admin - Partner Verification</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+    <script src="js/zoi_api.js"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        bg: "#0f1115",
+                        surface: "#181a20",
+                        border: "#2a2d35",
+                        success: "#22c55e",
+                        danger: "#ef4444",
+                        warning: "#eab308",
+                        info: "#3b82f6"
+                    },
+                    fontFamily: { sans: ["Manrope", "sans-serif"], mono: ["JetBrains Mono", "monospace"] }
+                }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1115;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+
+        .doc-active {
+            background-color: rgba(0, 240, 255, 0.1);
+            border-color: #00f0ff;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans selection:bg-primary selection:text-black">
+
+    <div id="global-sidebar-container" class="shrink-0 z-20"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <header
+            class="h-16 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-6 z-20">
+            <div class="flex items-center gap-4">
+                <h1 class="text-xl font-bold text-white" id="page-title">Verification Queue</h1>
+                <div class="flex gap-1 bg-black/30 rounded-lg p-1 border border-border">
+                    <button onclick="switchQueue('restaurant')" id="tab-restaurant"
+                        class="px-4 py-1.5 rounded-md text-xs font-bold transition-all bg-primary text-black">🏪
+                        Restaurants</button>
+                    <button onclick="switchQueue('pos')" id="tab-pos"
+                        class="px-4 py-1.5 rounded-md text-xs font-bold transition-all text-gray-400 hover:text-white">💻
+                        POS Signups</button>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <div class="px-3 py-1.5 bg-black/30 border border-border rounded-lg text-xs font-mono text-gray-400">
+                    SLA Status: <span class="text-success">On Track</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 bg-bg">
+
+            <div class="grid grid-cols-4 gap-4 mb-8">
+                <div class="p-4 bg-surface border border-border rounded-xl">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Pending Review</p>
+                    <p class="text-2xl font-black text-warning" id="metric-pending">0</p>
+                </div>
+                <div class="p-4 bg-surface border border-border rounded-xl">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Documents Failed</p>
+                    <p class="text-2xl font-black text-danger">4</p>
+                </div>
+                <div class="p-4 bg-surface border border-border rounded-xl">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Approved Today</p>
+                    <p class="text-2xl font-black text-success">8</p>
+                </div>
+                <div class="p-4 bg-surface border border-border rounded-xl">
+                    <p class="text-xs text-gray-500 uppercase font-bold">Avg Review Time</p>
+                    <p class="text-2xl font-black text-white">4h 20m</p>
+                </div>
+            </div>
+
+            <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-2xl">
+                <div class="p-4 border-b border-border flex justify-between items-center">
+                    <h3 class="font-bold text-white">Pending Applications</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="search-input" onkeyup="handleSearch()" placeholder="Search ID or Name..."
+                            class="bg-black/30 border border-border rounded-lg px-3 py-1.5 text-xs text-white focus:border-primary w-64 focus:ring-0">
+                        <button
+                            class="p-1.5 bg-white/5 border border-border rounded-lg hover:text-white text-gray-400"><span
+                                class="material-symbols-outlined text-sm">filter_list</span></button>
+                    </div>
+                </div>
+
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-black/20 text-gray-500 uppercase font-bold text-xs" id="queue-thead">
+                        <tr>
+                            <th class="p-4">Rest. ID</th>
+                            <th class="p-4">Restaurant Name</th>
+                            <th class="p-4">Owner / Contact</th>
+                            <th class="p-4" id="col4-header">Zone</th>
+                            <th class="p-4" id="col5-header">Documents</th>
+                            <th class="p-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-border text-gray-300" id="queue-list">
+                    </tbody>
+                </table>
+                <div id="empty-state" class="hidden flex flex-col items-center justify-center p-10 text-gray-500">
+                    <span class="material-symbols-outlined text-4xl mb-2 opacity-50">task_alt</span>
+                    <p>All caught up! No pending applications.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="verify-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-4xl h-[85vh] flex flex-col shadow-2xl">
+            <div class="p-6 border-b border-border flex justify-between items-center bg-black/20">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-2xl font-bold text-white" id="modal-rest-name">Restaurant Name</h2>
+                        <span
+                            class="px-2 py-0.5 rounded bg-yellow-500/20 text-yellow-500 text-[10px] font-bold border border-yellow-500/30">PENDING
+                            APPROVAL</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Application ID: <span id="modal-req-id"
+                            class="font-mono text-gray-400">#000</span></p>
+                </div>
+                <button onclick="closeModal()"
+                    class="p-2 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white"><span
+                        class="material-symbols-outlined">close</span></button>
+            </div>
+
+            <div class="flex-1 overflow-hidden flex">
+                <div class="w-1/3 border-r border-border overflow-y-auto p-4 space-y-4 bg-black/10" id="modal-sidebar">
+                    <!-- Populated dynamically by openVerifyModal -->
+                </div>
+
+                <div class="flex-1 bg-black/40 p-6 flex flex-col items-center justify-center relative">
+                    <div class="absolute top-4 left-4 bg-black/60 px-3 py-1 rounded text-xs text-white font-mono z-10"
+                        id="doc-label">FSSAI License</div>
+                    <div
+                        class="w-full h-full border border-dashed border-gray-700 rounded-xl flex flex-col items-center justify-center text-gray-600 bg-black/20 overflow-hidden relative">
+                        <span class="material-symbols-outlined text-6xl mb-2 opacity-50"
+                            id="doc-icon">description</span>
+                        <p class="text-sm" id="doc-text">Preview</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-border bg-surface flex justify-between items-center">
+                <div class="flex gap-2">
+                    <button onclick="downloadAll()"
+                        class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-border rounded-lg text-white text-sm font-bold">Download
+                        All</button>
+                    <button onclick="emailPartner()"
+                        class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-border rounded-lg text-white text-sm font-bold">Email
+                        Partner</button>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="rejectApp()"
+                        class="px-6 py-2 bg-red-500/10 hover:bg-red-500 hover:text-white border border-red-500/30 text-red-500 text-sm font-bold rounded-lg transition-all">Reject</button>
+                    <button onclick="approveApp()" id="approve-btn"
+                        class="px-6 py-2 bg-success hover:bg-green-400 text-black text-sm font-bold rounded-lg transition-all shadow-[0_0_15px_rgba(34,197,94,0.4)]">Approve
+                        & Go Live</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="reject-modal" class="fixed inset-0 z-[60] bg-black/90 hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Reason for Rejection</h3>
+            <select id="reject-reason"
+                class="w-full bg-black/30 border border-border rounded-lg p-2.5 text-white text-sm mb-4">
+                <option>Blurry / Unreadable Documents</option>
+                <option>FSSAI Expired</option>
+                <option>Menu Policy Violation</option>
+                <option>Name Mismatch on PAN/GST</option>
+            </select>
+            <textarea id="reject-note" placeholder="Additional notes for partner..."
+                class="w-full bg-black/30 border border-border rounded-lg p-2.5 text-white text-sm mb-4 h-24"></textarea>
+            <div class="flex justify-end gap-2">
+                <button onclick="document.getElementById('reject-modal').classList.add('hidden')"
+                    class="px-4 py-2 text-gray-400 text-xs font-bold border border-border rounded-lg">Cancel</button>
+                <button onclick="confirmReject()"
+                    class="px-4 py-2 bg-red-500 text-white rounded-lg text-xs font-bold hover:bg-red-600">Send
+                    Rejection</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-success text-white px-6 py-4 rounded-xl shadow-2xl z-[70] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-success">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // === STATE ===
+        let applications = [];
+        let currentAppId = null;
+        let currentView = 'restaurant'; // 'restaurant' or 'pos'
+
+        const PLAN_LABELS = { yearly: '₹8,888/yr', half: '₹4,888/6mo', quarterly: '₹2,888/3mo' };
+
+        // === INIT ===
+        window.onload = async () => {
+            try {
+                // Fetch Real Restaurants from Backend (Pending ones typically)
+                const response = await fetch('' + ZOI_CONFIG.API_BASE_URL + '/restaurants');
+                if (response.ok) {
+                    const dbRestaurants = await response.json();
+
+                    // Map Postgres to frontend format
+                    applications = dbRestaurants.map(r => ({
+                        id: 'REQ-' + r.id,  // DB ID mapped to string REQ
+                        name: r.name,
+                        owner: 'Restaurant Owner',
+                        phone: '+91 9876543210',
+                        zone: r.zoneName || 'Connaught Place',
+                        isPosOnly: r.menuConfig === 'Standalone POS', // Assuming mock field mapping
+                        docs: { fssai: true, gst: true, bank: 'pending' },
+                        status: 'Pending',
+                        plan: 'yearly' // Default for mock POS
+                    }));
+                } else {
+                    throw new Error('API unreachable');
+                }
+            } catch (e) {
+                console.warn("Backend unavailable. Falling back to simulation data.", e);
+                applications = typeof ZoiRestaurants !== 'undefined' ? ZoiRestaurants.getApplications() : [];
+            }
+
+            // Auto-select POS tab if URL has ?view=pos
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('view') === 'pos') {
+                switchQueue('pos');
+            } else {
+                renderQueue();
+                updateNavCounts();
+            }
+        };
+
+        // === TAB SWITCH ===
+        function switchQueue(view) {
+            currentView = view;
+            const tabRest = document.getElementById('tab-restaurant');
+            const tabPos = document.getElementById('tab-pos');
+            const navRest = document.getElementById('nav-link-rest');
+            const navPos = document.getElementById('nav-link-pos');
+            const col4 = document.getElementById('col4-header');
+            const col5 = document.getElementById('col5-header');
+            const title = document.getElementById('page-title');
+
+            if (view === 'pos') {
+                tabPos.className = 'px-4 py-1.5 rounded-md text-xs font-bold transition-all bg-purple-500 text-white';
+                tabRest.className = 'px-4 py-1.5 rounded-md text-xs font-bold transition-all text-gray-400 hover:text-white';
+                navPos.className = 'flex items-center gap-3 px-3 py-2 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-lg font-bold transition-all';
+                navRest.className = 'flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition-all';
+                col4.innerText = 'Plan';
+                col5.innerText = 'Trial Status';
+                title.innerText = 'POS Signup Queue';
+            } else {
+                tabRest.className = 'px-4 py-1.5 rounded-md text-xs font-bold transition-all bg-primary text-black';
+                tabPos.className = 'px-4 py-1.5 rounded-md text-xs font-bold transition-all text-gray-400 hover:text-white';
+                navRest.className = 'flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary border border-primary/20 rounded-lg font-bold transition-all';
+                navPos.className = 'flex items-center gap-3 px-3 py-2 text-gray-400 hover:bg-white/5 hover:text-white rounded-lg transition-all';
+                col4.innerText = 'Zone';
+                col5.innerText = 'Documents';
+                title.innerText = 'Restaurant Verification Queue';
+            }
+            renderQueue();
+            updateNavCounts();
+        }
+
+        function updateNavCounts() {
+            const allApps = ZoiRestaurants.getApplications();
+            document.getElementById('nav-count-rest').innerText = allApps.filter(a => !a.isPosOnly).length;
+            document.getElementById('nav-count-pos').innerText = allApps.filter(a => a.isPosOnly).length;
+        }
+
+        // === RENDER ===
+        function renderQueue() {
+            const list = document.getElementById('queue-list');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            list.innerHTML = '';
+            let count = 0;
+            const isPosView = currentView === 'pos';
+
+            applications = ZoiRestaurants.getApplications();
+
+            applications.forEach(app => {
+                // Filter by view
+                if (isPosView && !app.isPosOnly) return;
+                if (!isPosView && app.isPosOnly) return;
+
+                if (search && !app.name.toLowerCase().includes(search) && !app.id.toLowerCase().includes(search)) return;
+                count++;
+
+                let col4, col5;
+                if (isPosView) {
+                    const planLabel = PLAN_LABELS[app.plan] || 'Unknown';
+                    col4 = `<span class="bg-purple-500/20 text-purple-400 px-2 py-1 rounded text-xs font-bold border border-purple-500/20">${planLabel}</span>`;
+                    col5 = `<span class="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs font-bold border border-green-500/20">10-Day Trial</span>`;
+                } else {
+                    const gstClass = app.docs.gst ? 'bg-green-500' : 'bg-red-500 animate-pulse';
+                    const bankClass = app.docs.bank === true ? 'bg-green-500' : (app.docs.bank === 'pending' ? 'bg-yellow-500' : 'bg-red-500');
+                    col4 = `<span class="bg-white/10 px-2 py-1 rounded text-xs">${app.zone}</span>`;
+                    col5 = `<div class="flex gap-1">
+                        <span class="size-2 rounded-full bg-green-500" title="FSSAI"></span>
+                        <span class="size-2 rounded-full ${gstClass}" title="GST"></span>
+                        <span class="size-2 rounded-full ${bankClass}" title="Bank Info"></span>
+                    </div>`;
+                }
+
+                const typeLabel = isPosView ? 'POS Standalone' : 'Restaurant Partner';
+                const typeBadge = isPosView ? '<span class="bg-purple-500/20 text-purple-400 border border-purple-500/20 px-1.5 py-0.5 rounded text-[9px] font-bold">POS</span>' : '';
+
+                list.innerHTML += `
+                    <tr class="hover:bg-white/5 transition-colors group">
+                        <td class="p-4 font-mono text-xs text-gray-500">${app.id}</td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-2">
+                                ${typeBadge}
+                                <div class="font-bold text-white">${app.name}</div>
+                            </div>
+                            <div class="text-xs text-gray-500">${typeLabel}</div>
+                        </td>
+                        <td class="p-4">
+                            <div class="text-white">${app.owner}</div>
+                            <div class="text-xs text-gray-500">${app.phone}</div>
+                        </td>
+                        <td class="p-4">${col4}</td>
+                        <td class="p-4">${col5}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="openVerifyModal('${app.id}')" class="px-4 py-2 ${isPosView ? 'bg-purple-500/10 text-purple-400 border-purple-500/30' : 'bg-primary/10 text-primary border-primary/30'} border rounded-lg text-xs font-bold hover:bg-${isPosView ? 'purple-500' : 'primary'} hover:text-${isPosView ? 'white' : 'black'} transition-all">Verify Now</button>
+                        </td>
+                    </tr>`;
+            });
+
+            document.getElementById('metric-pending').innerText = count;
+            document.getElementById('empty-state').style.display = count === 0 ? 'flex' : 'none';
+        }
+
+        function handleSearch() { renderQueue(); }
+
+        // === MODAL ===
+        function openVerifyModal(id) {
+            const app = applications.find(a => a.id === id);
+            if (!app) return;
+            currentAppId = id;
+            const isPOS = app.isPosOnly;
+
+            document.getElementById('modal-rest-name').innerText = app.name;
+            document.getElementById('modal-req-id').innerText = '#' + app.id;
+
+            // Dynamic sidebar content
+            const sidebar = document.getElementById('modal-sidebar');
+            if (isPOS) {
+                const planLabel = PLAN_LABELS[app.plan] || 'Not Selected';
+                sidebar.innerHTML = `
+                    <h3 class="text-xs font-bold text-purple-400 uppercase mb-3">POS Signup Details</h3>
+                    <div class="p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg mb-4">
+                        <p class="text-sm font-bold text-white mb-1">${app.name}</p>
+                        <p class="text-xs text-gray-400">Owner: ${app.owner}</p>
+                        <p class="text-xs text-gray-400">Phone: ${app.phone}</p>
+                    </div>
+                    <div class="p-3 bg-white/5 border border-border rounded-lg mb-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-bold text-white">Selected Plan</span>
+                            <span class="text-xs text-purple-400 font-bold">${planLabel}</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500">10-Day Free Trial Active</p>
+                    </div>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-2 mt-4">Business Verification</h3>
+                    <button id="btn-business" class="w-full text-left p-3 bg-white/5 border border-primary rounded-lg cursor-pointer hover:border-primary transition-all doc-active" onclick="viewDoc('business')">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-bold text-white">Business Proof</span>
+                            <span class="material-symbols-outlined text-yellow-500 text-sm">pending</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500">Trade License / Udyam / PAN</p>
+                    </button>
+                    <button id="btn-bank" class="w-full text-left p-3 bg-white/5 border border-border rounded-lg cursor-pointer hover:border-primary transition-all mt-3" onclick="viewDoc('bank')">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-bold text-white">Bank Account</span>
+                            <span class="material-symbols-outlined text-yellow-500 text-sm">pending</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500">Payout verification</p>
+                    </button>
+                    <div class="mt-6 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                        <p class="text-xs font-bold text-green-400 mb-1">✅ No FSSAI/GST required</p>
+                        <p class="text-[10px] text-gray-400">POS-only outlets don't need food aggregator compliance docs.</p>
+                    </div>`;
+
+                // Update approve button text
+                document.getElementById('approve-btn').innerText = 'Approve & Activate POS';
+                viewDoc('business');
+            } else {
+                sidebar.innerHTML = `
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-2">Legal Documents</h3>
+                    <button id="btn-fssai" class="w-full text-left p-3 bg-white/5 border border-primary rounded-lg cursor-pointer hover:border-primary transition-all doc-active" onclick="viewDoc('fssai')">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-bold text-white">FSSAI License</span>
+                            <span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500">Exp: 2028 • Valid</p>
+                    </button>
+                    <button id="btn-gst" class="w-full text-left p-3 bg-white/5 border border-border rounded-lg cursor-pointer hover:border-primary transition-all mt-3" onclick="viewDoc('gst')">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-bold text-white">GST Certificate</span>
+                            <span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500">Verified by API</p>
+                    </button>
+                    <button id="btn-bank" class="w-full text-left p-3 bg-white/5 border border-border rounded-lg cursor-pointer hover:border-primary transition-all mt-3" onclick="viewDoc('bank')">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-bold text-white">Cancelled Cheque</span>
+                            <span class="material-symbols-outlined text-yellow-500 text-sm">warning</span>
+                        </div>
+                        <p class="text-[10px] text-gray-500">Manual Check Required</p>
+                    </button>
+                    <div class="mt-6 pt-6 border-t border-border">
+                        <h3 class="text-xs font-bold text-gray-500 uppercase mb-2">Menu Audit</h3>
+                        <a href="restaurant_menu_manager.html" target="_blank" class="flex items-center gap-2 text-primary hover:text-white text-sm font-bold p-2 hover:bg-white/5 rounded-lg transition-all">
+                            <span class="material-symbols-outlined text-sm">open_in_new</span> View Uploaded Menu
+                        </a>
+                        <p class="text-[10px] text-gray-500 mt-1 px-2">Check for prohibited items.</p>
+                    </div>`;
+
+                document.getElementById('approve-btn').innerText = 'Approve & Go Live';
+                viewDoc('fssai');
+            }
+
+            document.getElementById('verify-modal').classList.remove('hidden');
+            document.getElementById('verify-modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('verify-modal').classList.add('hidden');
+            document.getElementById('verify-modal').classList.remove('flex');
+        }
+
+        function viewDoc(type) {
+            // Deactivate all doc buttons in sidebar
+            document.querySelectorAll('#modal-sidebar button[id]').forEach(btn => {
+                btn.classList.remove('doc-active', 'border-primary');
+                btn.classList.add('border-border');
+            });
+            // Activate current
+            const activeBtn = document.getElementById('btn-' + type);
+            if (activeBtn) {
+                activeBtn.classList.add('doc-active', 'border-primary');
+                activeBtn.classList.remove('border-border');
+            }
+
+            const labels = {
+                fssai: { t: 'FSSAI License', i: 'verified_user', d: 'License #2134556 Valid till 2028' },
+                gst: { t: 'GST Certificate', i: 'receipt_long', d: 'GSTIN Verified via API' },
+                bank: { t: 'Bank Details', i: 'account_balance', d: 'IFSC: HDFC000123' },
+                business: { t: 'Business Proof', i: 'storefront', d: 'Awaiting upload — Trade License / Udyam / PAN' }
+            };
+            const lbl = labels[type] || labels.business;
+            document.getElementById('doc-label').innerText = lbl.t;
+            document.getElementById('doc-icon').innerText = lbl.i;
+            document.getElementById('doc-text').innerText = lbl.d;
+        }
+
+        // === ACTIONS ===
+        function approveApp() {
+            const app = applications.find(a => a.id === currentAppId);
+            const isPOS = app && app.isPosOnly;
+            const msg = isPOS
+                ? 'Approve this POS signup? They will get full POS Terminal access.'
+                : 'Are you sure you want to approve this restaurant? This will grant them access to go live.';
+            if (!confirm(msg)) return;
+
+            ZoiRestaurants.approveApplication(currentAppId);
+            applications = ZoiRestaurants.getApplications();
+
+            closeModal();
+            renderQueue();
+            updateNavCounts();
+
+            if (isPOS) {
+                showToast('POS Activated', `${app.name} can now use the POS Terminal.`);
+            } else {
+                showToast('Restaurant Activated', 'Partner notified via email. Account is Live.');
+            }
+        }
+
+        function rejectApp() {
+            document.getElementById('reject-modal').classList.remove('hidden');
+            document.getElementById('reject-modal').classList.add('flex');
+        }
+
+        function confirmReject() {
+            const reason = document.getElementById('reject-reason').value;
+            ZoiRestaurants.rejectApplication(currentAppId);
+            applications = ZoiRestaurants.getApplications();
+
+            document.getElementById('reject-modal').classList.add('hidden');
+            closeModal();
+            renderQueue();
+            updateNavCounts();
+            showToast('Application Rejected', `Reason: ${reason} sent to applicant.`);
+        }
+
+        function downloadAll() { showToast('Downloading...', 'Zipping all documents...'); }
+
+        function emailPartner() {
+            const app = applications.find(a => a.id === currentAppId);
+            if (app) window.location.href = `mailto:partner@zipzapzoi.in?subject=Regarding Application ${app.id}&body=Hello ${app.owner},`;
+        }
+
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+

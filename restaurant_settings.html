@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi - Outlet Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: { colors: { primary: "#00f0ff", bg: "#0f1115", surface: "#181a20", border: "#2a2d35", success: "#22c55e", danger: "#ef4444" }, fontFamily: { sans: ["Inter", "sans-serif"] } }
+            }
+        };
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans selection:bg-primary selection:text-black">
+
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <header
+            class="h-16 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-6 z-20">
+            <h1 class="text-xl font-bold text-white">Outlet Configuration</h1>
+            <button onclick="saveAll()"
+                class="bg-primary hover:bg-orange-600 text-black px-6 py-2 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">save</span> Save All Changes
+            </button>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+            <div class="max-w-4xl mx-auto space-y-8">
+
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <div class="flex justify-between items-start mb-6 border-b border-border pb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Operational Status</h3>
+                            <p class="text-xs text-gray-400">Master switch for online orders.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-bold text-green-500" id="status-text">Accepting Orders</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer" id="master-toggle"
+                                    onchange="toggleOutlet()">
+                                <div
+                                    class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-success">
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-black/20 border border-border rounded-lg">
+                        <div>
+                            <p class="text-sm font-bold text-white">Holiday Mode</p>
+                            <p class="text-xs text-gray-500">Temporarily close outlet for specific dates.</p>
+                        </div>
+                        <button onclick="openModal('holiday-modal')"
+                            class="text-xs bg-white/5 border border-border px-3 py-1.5 rounded-lg hover:bg-white/10 text-white transition-colors">Schedule
+                            Close</button>
+                    </div>
+                </div>
+
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-white">Operating Hours</h3>
+                        <button onclick="toggleEditHours()" class="text-primary text-xs font-bold hover:underline"
+                            id="edit-hours-btn">Edit Hours</button>
+                    </div>
+                    <div class="space-y-3 opacity-100 transition-opacity" id="hours-container">
+                        <div class="grid grid-cols-12 gap-4 items-center">
+                            <div class="col-span-3 text-sm text-gray-300 font-medium">Monday - Sunday</div>
+                            <div class="col-span-9 grid grid-cols-2 gap-2">
+                                <div class="flex items-center gap-2 bg-black/30 p-2 rounded border border-border">
+                                    <span class="text-xs text-gray-500">Slot 1</span>
+                                    <input type="time" value="11:00"
+                                        class="bg-transparent border-none text-white text-sm p-0 focus:ring-0 time-input"
+                                        disabled>
+                                    <span class="text-gray-500">-</span>
+                                    <input type="time" value="15:00"
+                                        class="bg-transparent border-none text-white text-sm p-0 focus:ring-0 time-input"
+                                        disabled>
+                                </div>
+                                <div class="flex items-center gap-2 bg-black/30 p-2 rounded border border-border">
+                                    <span class="text-xs text-gray-500">Slot 2</span>
+                                    <input type="time" value="19:00"
+                                        class="bg-transparent border-none text-white text-sm p-0 focus:ring-0 time-input"
+                                        disabled>
+                                    <span class="text-gray-500">-</span>
+                                    <input type="time" value="23:30"
+                                        class="bg-transparent border-none text-white text-sm p-0 focus:ring-0 time-input"
+                                        disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4">Legal & Finance</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">GSTIN</label>
+                            <div class="flex gap-2">
+                                <input type="text" value="22AAAAA0000A1Z5"
+                                    class="flex-1 bg-black/30 border border-border rounded-lg p-3 text-white text-sm focus:border-primary"
+                                    readonly>
+                                <span
+                                    class="bg-green-500/10 border border-green-500/20 text-green-500 px-3 flex items-center justify-center rounded-lg"><span
+                                        class="material-symbols-outlined text-lg">verified</span></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">FSSAI License</label>
+                            <div class="flex gap-2">
+                                <input type="text" value="10012345678901"
+                                    class="flex-1 bg-black/30 border border-border rounded-lg p-3 text-white text-sm focus:border-primary">
+                                <button
+                                    class="px-3 bg-white/5 border border-border rounded-lg text-gray-400 hover:text-white"
+                                    title="Upload New Certificate"
+                                    onclick="document.getElementById('fssai-upload').click()">
+                                    <span class="material-symbols-outlined">upload_file</span>
+                                </button>
+                                <input type="file" id="fssai-upload" class="hidden"
+                                    onchange="showToast('Uploaded', 'FSSAI Certificate updated')">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-border">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Payout Bank Account</label>
+                        <div class="flex items-center gap-4 bg-black/30 p-3 rounded-lg border border-border">
+                            <div class="size-10 bg-white rounded flex items-center justify-center"><span
+                                    class="material-symbols-outlined text-black">account_balance</span></div>
+                            <div>
+                                <p class="text-sm font-bold text-white" id="bank-display">HDFC Bank •••• 9921</p>
+                                <p class="text-xs text-gray-500">Primary Payout Account</p>
+                            </div>
+                            <button onclick="openModal('bank-modal')"
+                                class="ml-auto text-primary text-xs font-bold hover:underline">Change Account</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-6">Hardware Configuration</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-black/20 rounded-lg border border-border">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-gray-400 text-2xl">print</span>
+                                <div>
+                                    <p class="text-sm font-bold text-white">Kitchen Printer (Thermal)</p>
+                                    <p class="text-xs text-gray-500">IP: 192.168.1.105</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="size-2 bg-green-500 rounded-full animate-pulse"></span>
+                                <span class="text-xs text-green-500 font-bold mr-2">Online</span>
+                                <button onclick="testPrinter()"
+                                    class="text-xs border border-border px-3 py-1.5 rounded hover:bg-white/5 text-white transition-colors"
+                                    id="print-btn">Test Print</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="holiday-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Schedule Holiday</h3>
+            <div class="space-y-3">
+                <div><label class="text-xs text-gray-500">Start Date</label><input type="date"
+                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white"></div>
+                <div><label class="text-xs text-gray-500">End Date</label><input type="date"
+                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white"></div>
+                <div><label class="text-xs text-gray-500">Reason</label><input type="text" placeholder="e.g. Renovation"
+                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white"></div>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModal('holiday-modal')"
+                    class="px-4 py-2 text-xs font-bold text-gray-400 border border-border rounded-lg">Cancel</button>
+                <button onclick="saveHoliday()"
+                    class="px-4 py-2 text-xs font-bold bg-primary text-black rounded-lg">Confirm Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="bank-modal"
+        class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Update Bank Details</h3>
+            <div class="space-y-3">
+                <input type="text" id="new-ac-no" placeholder="Account Number"
+                    class="w-full bg-black/30 border border-border rounded-lg p-2 text-white">
+                <input type="text" id="new-ifsc" placeholder="IFSC Code"
+                    class="w-full bg-black/30 border border-border rounded-lg p-2 text-white">
+                <div class="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-xs text-yellow-500">
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a2d35;
+            border-radius: 4px;
+        }
+    </style>
+    <script src="global_sidebar.js"></script>
+</head>
+
+<body class="bg-bg text-white h-screen flex overflow-hidden font-sans selection:bg-primary selection:text-black">
+
+    <div id="global-sidebar-container" class="shrink-0 z-30"></div>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <header
+            class="h-16 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-6 z-20">
+            <h1 class="text-xl font-bold text-white">Outlet Configuration</h1>
+            <button onclick="saveAll()"
+                class="bg-primary hover:bg-orange-600 text-black px-6 py-2 rounded-lg text-sm font-bold shadow-lg shadow-primary/20 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">save</span> Save All Changes
+            </button>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
+            <div class="max-w-4xl mx-auto space-y-8">
+
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <div class="flex justify-between items-start mb-6 border-b border-border pb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Operational Status</h3>
+                            <p class="text-xs text-gray-400">Master switch for online orders.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-bold text-green-500" id="status-text">Accepting Orders</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer" id="master-toggle"
+                                    onchange="toggleOutlet()">
+                                <div
+                                    class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-success">
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-black/20 border border-border rounded-lg">
+                        <div>
+                            <p class="text-sm font-bold text-white">Holiday Mode</p>
+                            <p class="text-xs text-gray-500">Temporarily close outlet for specific dates.</p>
+                        </div>
+                        <button onclick="openModal('holiday-modal')"
+                            class="text-xs bg-white/5 border border-border px-3 py-1.5 rounded-lg hover:bg-white/10 text-white transition-colors">Schedule
+                            Close</button>
+                    </div>
+                </div>
+
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-white">Operating Hours</h3>
+                        <button onclick="toggleEditHours()" class="text-primary text-xs font-bold hover:underline"
+                            id="edit-hours-btn">Edit Hours</button>
+                    </div>
+                    <div class="space-y-3 opacity-100 transition-opacity" id="hours-container">
+                        <div class="grid grid-cols-12 gap-4 items-center">
+                            <div class="col-span-3 text-sm text-gray-300 font-medium">Monday - Sunday</div>
+                            <div class="col-span-9 grid grid-cols-2 gap-2">
+                                <div class="flex items-center gap-2 bg-black/30 p-2 rounded border border-border">
+                                    <span class="text-xs text-gray-500">Slot 1</span>
+                                    <input type="time" value="11:00"
+                                        class="bg-transparent border-none text-white text-sm p-0 focus:ring-0 time-input"
+                                        disabled>
+                                    <span class="text-gray-500">-</span>
+                                    <input type="time" value="15:00"
+                                        class="bg-transparent border-none text-white text-sm p-0 focus:ring-0 time-input"
+                                        disabled>
+                                </div>
+                                <div class="flex items-center gap-2 bg-black/30 p-2 rounded border border-border">
+                                    <span class="text-xs text-gray-500">Slot 2</span>
+                                    <input type="time" value="19:00"
+                                        class="bg-transparent border-none text-white text-sm p-0 focus:ring-0 time-input"
+                                        disabled>
+                                    <span class="text-gray-500">-</span>
+                                    <input type="time" value="23:30"
+                                        class="bg-transparent border-none text-white text-sm p-0 focus:ring-0 time-input"
+                                        disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4">Legal & Finance</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">GSTIN</label>
+                            <div class="flex gap-2">
+                                <input type="text" value="22AAAAA0000A1Z5"
+                                    class="flex-1 bg-black/30 border border-border rounded-lg p-3 text-white text-sm focus:border-primary"
+                                    readonly>
+                                <span
+                                    class="bg-green-500/10 border border-green-500/20 text-green-500 px-3 flex items-center justify-center rounded-lg"><span
+                                        class="material-symbols-outlined text-lg">verified</span></span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">FSSAI License</label>
+                            <div class="flex gap-2">
+                                <input type="text" value="10012345678901"
+                                    class="flex-1 bg-black/30 border border-border rounded-lg p-3 text-white text-sm focus:border-primary">
+                                <button
+                                    class="px-3 bg-white/5 border border-border rounded-lg text-gray-400 hover:text-white"
+                                    title="Upload New Certificate"
+                                    onclick="document.getElementById('fssai-upload').click()">
+                                    <span class="material-symbols-outlined">upload_file</span>
+                                </button>
+                                <input type="file" id="fssai-upload" class="hidden"
+                                    onchange="showToast('Uploaded', 'FSSAI Certificate updated')">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-border">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Payout Bank Account</label>
+                        <div class="flex items-center gap-4 bg-black/30 p-3 rounded-lg border border-border">
+                            <div class="size-10 bg-white rounded flex items-center justify-center"><span
+                                    class="material-symbols-outlined text-black">account_balance</span></div>
+                            <div>
+                                <p class="text-sm font-bold text-white" id="bank-display">HDFC Bank •••• 9921</p>
+                                <p class="text-xs text-gray-500">Primary Payout Account</p>
+                            </div>
+                            <button onclick="openModal('bank-modal')"
+                                class="ml-auto text-primary text-xs font-bold hover:underline">Change Account</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-surface border border-border rounded-xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-6">Hardware Configuration</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-black/20 rounded-lg border border-border">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-gray-400 text-2xl">print</span>
+                                <div>
+                                    <p class="text-sm font-bold text-white">Kitchen Printer (Thermal)</p>
+                                    <p class="text-xs text-gray-500">IP: 192.168.1.105</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="size-2 bg-green-500 rounded-full animate-pulse"></span>
+                                <span class="text-xs text-green-500 font-bold mr-2">Online</span>
+                                <button onclick="testPrinter()"
+                                    class="text-xs border border-border px-3 py-1.5 rounded hover:bg-white/5 text-white transition-colors"
+                                    id="print-btn">Test Print</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="holiday-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Schedule Holiday</h3>
+            <div class="space-y-3">
+                <div><label class="text-xs text-gray-500">Start Date</label><input type="date"
+                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white"></div>
+                <div><label class="text-xs text-gray-500">End Date</label><input type="date"
+                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white"></div>
+                <div><label class="text-xs text-gray-500">Reason</label><input type="text" placeholder="e.g. Renovation"
+                        class="w-full bg-black/30 border border-border rounded-lg p-2 text-white"></div>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModal('holiday-modal')"
+                    class="px-4 py-2 text-xs font-bold text-gray-400 border border-border rounded-lg">Cancel</button>
+                <button onclick="saveHoliday()"
+                    class="px-4 py-2 text-xs font-bold bg-primary text-black rounded-lg">Confirm Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="bank-modal"
+        class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-white mb-4">Update Bank Details</h3>
+            <div class="space-y-3">
+                <input type="text" id="new-ac-no" placeholder="Account Number"
+                    class="w-full bg-black/30 border border-border rounded-lg p-2 text-white">
+                <input type="text" id="new-ifsc" placeholder="IFSC Code"
+                    class="w-full bg-black/30 border border-border rounded-lg p-2 text-white">
+                <div class="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-xs text-yellow-500">
+                    Warning: Changing this will pause payouts for 24 hours for verification.
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModal('bank-modal')"
+                    class="px-4 py-2 text-xs font-bold text-gray-400 border border-border rounded-lg">Cancel</button>
+                <button onclick="verifyBank()"
+                    class="px-4 py-2 text-xs font-bold bg-primary text-black rounded-lg">Verify & Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"
+        class="fixed bottom-32 right-6 bg-surface border border-primary text-white px-6 py-4 rounded-xl shadow-2xl z-[90] flex items-center gap-3 translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span class="material-symbols-outlined text-primary">check_circle</span>
+        <div>
+            <h4 class="font-bold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-gray-400" id="toast-msg">...</p>
+        </div>
+    </div>
+
+    <script>
+        // LOGIC
+        function initSettings() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('zoi_outlet_settings') || '{"online": true, "bank": "HDFC Bank \\u2022\\u2022\\u2022\\u2022 9921"}');
+                document.getElementById('master-toggle').checked = settings.online;
+                const text = document.getElementById('status-text');
+                if (settings.online) { text.innerText = "Accepting Orders"; text.className = "text-sm font-bold text-green-500"; }
+                else { text.innerText = "Not Accepting Orders"; text.className = "text-sm font-bold text-red-500"; }
+                document.getElementById('bank-display').innerText = settings.bank;
+            } catch(e) {}
+        }
+        window.addEventListener('DOMContentLoaded', initSettings);
+
+        function toggleOutlet() {
+            const status = document.getElementById('master-toggle').checked;
+            const text = document.getElementById('status-text');
+            if (status) { text.innerText = "Accepting Orders"; text.className = "text-sm font-bold text-green-500"; showToast("Online", "You are now receiving orders."); }
+            else { text.innerText = "Not Accepting Orders"; text.className = "text-sm font-bold text-red-500"; showToast("Offline", "Outlet is now closed."); }
+            saveAll(true);
+        }
+
+        let isEditingHours = false;
+        function toggleEditHours() {
+            isEditingHours = !isEditingHours;
+            const inputs = document.querySelectorAll('.time-input');
+            const btn = document.getElementById('edit-hours-btn');
+            inputs.forEach(i => i.disabled = !isEditingHours);
+            if (isEditingHours) {
+                btn.innerText = "Done";
+                inputs[0].focus();
+                document.getElementById('hours-container').classList.add('ring-1', 'ring-primary', 'rounded-lg', 'p-1');
+            } else {
+                btn.innerText = "Edit Hours";
+                document.getElementById('hours-container').classList.remove('ring-1', 'ring-primary', 'rounded-lg', 'p-1');
+                showToast("Updated", "Operating hours saved.");
+            }
+        }
+
+        function testPrinter() {
+            const btn = document.getElementById('print-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Sending...";
+            btn.classList.add("animate-pulse");
+            setTimeout(() => {
+                btn.innerText = "Success";
+                btn.classList.remove("animate-pulse");
+                btn.classList.add("text-green-500", "border-green-500");
+                showToast("Printed", "Test page sent to Kitchen Printer.");
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.remove("text-green-500", "border-green-500");
+                }, 2000);
+            }, 1500);
+        }
+
+        function saveAll(silent = false) {
+            const btn = document.querySelector('button[onclick="saveAll()"]');
+            if(btn && !silent) btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> Saving...`;
+            
+            const isOnline = document.getElementById('master-toggle').checked;
+            const bankElement = document.getElementById('bank-display');
+            const bankAcct = bankElement ? bankElement.innerText : "HDFC Bank •••• 9921";
+            localStorage.setItem('zoi_outlet_settings', JSON.stringify({
+                online: isOnline,
+                bank: bankAcct
+            }));
+
+            if(!silent) {
+                setTimeout(() => {
+                    if(btn) btn.innerHTML = `<span class="material-symbols-outlined text-lg">save</span> Save All Changes`;
+                    showToast("Saved", "All configurations updated successfully.");
+                }, 1000);
+            }
+        }
+
+        function verifyBank() {
+            const ac = document.getElementById('new-ac-no').value;
+            if (!ac) return alert("Enter Account Number");
+            const bankName = "Verified Bank";
+            document.getElementById('bank-display').innerText = `${bankName} •••• ${ac.slice(-4)}`;
+            saveAll(true);
+            closeModal('bank-modal');
+            showToast("Verification Pending", "Bank details submitted for review.");
+        }
+
+        function saveHoliday() {
+            closeModal('holiday-modal');
+            showToast("Scheduled", "Holiday closure added to calendar.");
+        }
+
+        // UTILS
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+        function showToast(title, msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+    </script>
+    <script>
+        // POS-ONLY SESSION GUARD
+        (function () {
+            try {
+                const u = JSON.parse(localStorage.getItem('zoiUser') || '{}');
+                if (u.role === 'pos_staff' || u.isPosOnly) {
+                    // Change header to POS Hub
+                    const hubTitle = document.querySelector('aside h1');
+                    if (hubTitle) hubTitle.textContent = 'POS Hub';
+                    // Redirect sidebar logo click to POS terminal
+                    const logoDiv = document.querySelector('aside > div[onclick]');
+                    if (logoDiv) logoDiv.setAttribute('onclick', "window.location.href='restaurant_pos_terminal.html'");
+                    // Hide online-only links
+                    document.querySelectorAll('aside nav a').forEach(link => {
+                        const text = link.textContent.trim();
+                        if (['Promotions', 'Loyalty', 'Reviews'].includes(text)) link.style.display = 'none';
+                        if (text === 'Dashboard') { link.href = 'restaurant_pos_terminal.html'; link.innerHTML = '<span class="material-symbols-outlined">point_of_sale</span> POS Terminal'; }
+                    });
+                    document.querySelectorAll('aside nav div').forEach(el => { if (el.textContent.trim() === 'Growth') el.style.display = 'none'; });
+                }
+            } catch (e) { }
+        })();
+    </script>
+
+    <script src="js/zoi_ai_assistant.js?v=4"></script>
+
+    <script src="js/zoi_config.js"></script>
+    <script src="js/zoi_partner_engine.js"></script>
+
+<script src="js/zoi_theme.js?v=5"></script>
+</body>
+
+</html>
+
+

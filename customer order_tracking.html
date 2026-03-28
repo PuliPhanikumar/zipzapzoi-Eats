@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>ZipZapZoi Eats - Live Tracker</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="js/zoi_config.js"></script>
+    <script src="js/db_simulation.js"></script>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00f0ff",
+                        background: "#f6f8f7",
+                        dark: "#0a0314",
+                        card: "#1a0b36",
+                        border: "#3c1e6e"
+                    },
+                    fontFamily: {
+                        display: "Manrope",
+                        body: ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" }
+                }
+            }
+        };
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+        }
+
+        .icon-filled {
+            font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0314;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3c1e6e;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+
+        /* Map & Markers */
+        #map {
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: #000;
+        }
+
+        /* Black bg to prevent white flash */
+
+        .driver-icon {
+            background-color: #00f0ff;
+            border: 2px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(57, 224, 121, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0a0314;
+            transition: all 0.5s ease;
+        }
+
+        .home-icon,
+        .rest-icon {
+            background-color: white;
+            border: 2px solid #0a0314;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .rest-icon {
+            background-color: #0a0314;
+            border-color: #00f0ff;
+            color: #00f0ff;
+        }
+
+        /* Animations */
+        .modal-enter {
+            animation: fadeScale 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #00f0ff;
+            box-shadow: 0 0 10px #00f0ff;
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0;
+            }
+
+            100% {
+                top: 100%;
+            }
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ETA Progress Bar */
+        .eta-progress-bar {
+            background: linear-gradient(90deg, #00f0ff, #2dd864, #24c756);
+            border-radius: 999px;
+            height: 100%;
+            transition: width 1s ease-in-out;
+            box-shadow: 0 0 12px rgba(57, 224, 121, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .eta-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            animation: progressShimmer 2s infinite;
+        }
+
+        @keyframes progressShimmer {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* Live Counter Glow */
+        .live-counter-dot {
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+            }
+        }
+
+        /* Rating Stars */
+        .star-btn {
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .star-btn:hover {
+            transform: scale(1.3);
+        }
+
+        .star-btn.active {
+            color: #facc15;
+        }
+
+        .star-btn.active .material-symbols-outlined {
+            font-variation-settings: "FILL" 1;
+        }
+
+        /* Feedback tags */
+        .feedback-tag {
+            transition: all 0.2s ease;
+        }
+
+        .feedback-tag.selected {
+            background: rgba(57, 224, 121, 0.2);
+            border-color: #00f0ff;
+            color: #00f0ff;
+        }
+
+        /* Delivered celebration card */
+        .celebration-glow {
+            animation: celebGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes celebGlow {
+            from {
+                box-shadow: 0 0 15px rgba(57, 224, 121, 0.2);
+            }
+
+            to {
+                box-shadow: 0 0 35px rgba(57, 224, 121, 0.4);
+            }
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background dark:bg-dark text-slate-900 dark:text-white font-display overflow-hidden h-screen flex flex-col">
+
+    <header
+        class="flex-none flex items-center justify-between whitespace-nowrap border-b border-solid border-border bg-[#0a0314] px-6 py-3 lg:px-10 z-50">
+        <div class="flex items-center gap-4 text-white cursor-pointer" onclick="window.location.href='index.html'">
+            <div class="size-8 text-primary">
+                <span class="material-symbols-outlined text-4xl">bolt</span>
+            </div>
+            <h2 class="text-white text-xl font-bold leading-tight tracking-[-0.015em]">ZipZapZoi Eats</h2>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="openSupportModal()"
+                class="hidden sm:flex items-center gap-2 px-4 py-2 bg-[#1a0b36] hover:bg-[#3a2d20] border border-border rounded-full text-xs font-bold text-white transition">
+                <span class="material-symbols-outlined text-[18px]">support_agent</span> Help
+            </button>
+            <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20"
+                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB4yhGoQWBtz3JB0sGG0iYq940jGKCbWOI54GYzcIE9GLnSVHho9EChjNKAPSwSufZUQ8815u2tAYpWumHB4Q_0ml2Jao3wdTDUDBT2_XXB8e4AeeD4c2IMISh2RqZchTYQA6eXiqq5ij1xZ3R7xO44TsNk_Qrd36fxuZD5dXWHmwohkYU6OH1ErRyIX03GFiybQLWwWqP9cUwRNt26oaSIKu7bpA6TQa_HtdTOT98pqBO3BFX2WRsp6jIuISdOCRycDXXSv0Xon-s");'>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden h-full relative">
+
+        <div
+            class="lg:col-span-5 xl:col-span-4 overflow-y-auto bg-dark border-r border-border flex flex-col h-full z-10 relative">
+            <div class="p-6 lg:p-8 flex flex-col gap-8">
+
+                <div id="status-alert"
+                    class="hidden w-full bg-yellow-400 text-[#0a0314] rounded-xl p-5 shadow-lg border-l-4 border-[#0a0314] relative overflow-hidden animate-bounce">
+                    <div class="flex items-start gap-4 relative z-10">
+                        <div
+                            class="size-10 rounded-full bg-[#0a0314] text-yellow-400 flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                            <span class="material-symbols-outlined icon-filled text-[24px]">sentiment_worried</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-extrabold text-lg leading-tight mb-1">High Demand!</h3>
+                            <p class="text-xs font-bold text-[#0a0314]/80">Zap AI detected a surge. Adding +5 mins to
+                                ETA.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span
+                                class="inline-flex items-center rounded-full bg-primary/20 px-2.5 py-0.5 text-xs font-medium text-primary animate-pulse">Live
+                                Status</span>
+                            <span class="text-gray-400 text-xs font-medium" id="order-id">Order #...</span>
+                        </div>
+                        <button onclick="openShareModal()"
+                            class="text-primary hover:text-white transition text-xs font-bold flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20">
+                            <span class="material-symbols-outlined text-[16px]">share</span> Share Live Link
+                        </button>
+                    </div>
+                    <h1 class="text-white text-3xl lg:text-4xl font-black leading-tight tracking-[-0.033em]"
+                        id="main-status-text">
+                        Confirming Order...
+                    </h1>
+                    <p class="text-gray-400 font-medium">Coming from <span class="text-white"
+                            id="tracking-rest-name">Loading Restaurant...</span></p>
+                </div>
+
+                <!-- ETA Progress Bar (Zomato/DoorDash style) -->
+                <div class="bg-card rounded-xl p-4 border border-border shadow-sm" id="eta-progress-section">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Estimated Delivery</span>
+                        <span class="text-white text-sm font-bold" id="eta-bar-time">~30 min</span>
+                    </div>
+                    <div class="w-full bg-border rounded-full h-2.5 overflow-hidden">
+                        <div class="eta-progress-bar" id="eta-progress-fill" style="width: 10%"></div>
+                    </div>
+                    <p class="text-gray-500 text-[10px] mt-1.5 text-right" id="eta-bar-label">Order placed</p>
+                </div>
+
+                <!-- Live Order Counter (Zomato exclusive) -->
+                <div class="flex items-center gap-3 bg-gradient-to-r from-[#1a0b36] to-[#1e160e] rounded-xl px-4 py-3 border border-border/50"
+                    id="live-counter-section">
+                    <div class="size-2.5 rounded-full bg-red-500 live-counter-dot shrink-0"></div>
+                    <p class="text-gray-400 text-xs">You're one of <span class="text-white font-bold"
+                            id="live-order-count">14,832</span> orders happening right now across India ⚡</p>
+                </div>
+
+                <!-- Safety Badge (Swiggy style) -->
+                <div class="flex items-center gap-3 bg-green-900/10 rounded-xl px-4 py-2.5 border border-green-500/10">
+                    <span class="material-symbols-outlined text-green-500 text-[20px] icon-filled">verified_user</span>
+                    <div class="flex-1">
+                        <p class="text-green-400 text-xs font-bold">Rider Verified ✓</p>
+                        <p class="text-gray-500 text-[10px]">Background checked • OTP protected delivery</p>
+                    </div>
+                    <span
+                        class="text-[10px] bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full font-bold border border-green-500/20">SAFE</span>
+                </div>
+
+                <div class="bg-card rounded-xl p-4 border border-border shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-gray-400 text-sm uppercase tracking-wider font-bold">Your Delivery Partner</h3>
+                        <div class="flex items-center text-primary gap-1">
+                            <span class="material-symbols-outlined icon-filled text-[18px]">star</span>
+                            <span class="font-bold text-white">4.9</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="relative">
+                            <div class="size-16 rounded-full bg-cover bg-center border-2 border-border"
+                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCY3v3mnL-9LDpE4630y1umbgr1KaqN-xMVc8kOlIjoadUdBnwRb7dIabZ5uGVpiOW_y2Ti5nqS7qeOOHbqyl38O8BMUA0mq6EUPhIO5-Tzf3yIgs2aGIRf8IcPpnC1blcxEhUVA_kzEXEhsIov5Hl--BuajIF3to5HOzCvNDQ2cNPN6owJiGgmpcsiDvnOzPBlPuQ75ouJZZxNon1Vk4k1LYISkECIqRtXNdJoF_GQVRsHVa49DiuXI7jzYBuyRU_gZ1KNvyye4jE");'>
+                            </div>
+                            <div
+                                class="absolute -bottom-1 -right-1 bg-primary text-[#0a0314] rounded-full p-1 border-2 border-[#0a0314]">
+                                <span class="material-symbols-outlined text-[16px]">electric_moped</span>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-white font-bold text-lg" id="rider-name">Assigning Rider...</p>
+                            <p class="text-gray-400 text-sm font-mono" id="rider-phone">--</p>
+                        </div>
+                        <div class="flex gap-2" id="rider-actions" class="hidden">
+                            <a href="#"
+                                class="size-10 rounded-full bg-[#3a2d20] hover:bg-[#3c1e6e] flex items-center justify-center text-white transition border border-border"
+                                title="Message Driver">
+                                <span class="material-symbols-outlined">sms</span>
+                            </a>
+                            <a href="#"
+                                class="size-10 rounded-full bg-primary hover:bg-opacity-90 flex items-center justify-center text-[#0a0314] transition shadow-lg"
+                                title="Call Driver">
+                                <span class="material-symbols-outlined icon-filled">call</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="border-t border-border pt-3">
+                        <p class="text-xs text-gray-400 mb-2" id="tip-label">Tip your rider for good service</p>
+                        <div class="flex gap-2">
+                            <button onclick="addTip(20)"
+                                class="flex-1 py-1.5 rounded-lg border border-border hover:bg-primary hover:text-black hover:border-primary text-xs font-bold text-white transition">₹20</button>
+                            <button onclick="addTip(50)"
+                                class="flex-1 py-1.5 rounded-lg border border-border hover:bg-primary hover:text-black hover:border-primary text-xs font-bold text-white transition">₹50</button>
+                            <button onclick="addTip(100)"
+                                class="flex-1 py-1.5 rounded-lg border border-border hover:bg-primary hover:text-black hover:border-primary text-xs font-bold text-white transition">₹100</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col">
+                    <h3 class="text-white text-lg font-bold mb-4">Delivery Progress</h3>
+                    <div class="grid grid-cols-[40px_1fr] gap-x-2" id="timeline-container">
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="size-8 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center border border-green-500/30 transition-all"
+                                id="step-icon-1">
+                                <span class="material-symbols-outlined text-[18px]">check</span>
+                            </div>
+                            <div class="w-[2px] bg-border h-full min-h-[24px]" id="step-line-1"></div>
+                        </div>
+                        <div class="flex flex-col pb-6 pt-1 opacity-50 transition-all" id="step-text-1">
+                            <p class="text-white text-base font-medium leading-none">Order Confirmed</p>
+                            <p class="text-gray-500 text-xs mt-1" id="time-1">--</p>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="size-8 rounded-full bg-card text-gray-500 flex items-center justify-center border border-border transition-all"
+                                id="step-icon-2">
+                                <span class="material-symbols-outlined text-[18px]">skillet</span>
+                            </div>
+                            <div class="w-[2px] bg-border h-full min-h-[24px]" id="step-line-2"></div>
+                        </div>
+                        <div class="flex flex-col pb-6 pt-1 opacity-50 transition-all" id="step-text-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-white text-base font-medium leading-none">Preparing your food</p>
+                                    <p class="text-gray-500 text-xs mt-1" id="time-2">Estimating...</p>
+                                </div>
+                                <button onclick="openKitchenCam()" id="kitchen-cam-btn"
+                                    class="hidden text-[10px] bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20 hover:bg-primary/20 transition flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-[12px]">videocam</span> AI Scan
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="size-8 rounded-full bg-card text-gray-500 flex items-center justify-center border border-border transition-all"
+                                id="step-icon-3">
+                                <span class="material-symbols-outlined text-[18px]">two_wheeler</span>
+                            </div>
+                            <div class="w-[2px] bg-border h-full min-h-[24px]" id="step-line-3"></div>
+                        </div>
+                        <div class="flex flex-col pb-6 pt-1 opacity-50 transition-all" id="step-text-3">
+                            <p class="text-white text-base font-medium leading-none">Out for delivery</p>
+                            <p class="text-gray-500 text-xs mt-1" id="time-3">Rider is on the way</p>
+                        </div>
+                        <!-- Step 4: Delivered -->
+                        <div class="flex flex-col items-center gap-1">
+                            <div class="size-8 rounded-full bg-card text-gray-500 flex items-center justify-center border border-border transition-all"
+                                id="step-icon-4">
+                                <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col pb-6 pt-1 opacity-50 transition-all" id="step-text-4">
+                            <p class="text-white text-base font-medium leading-none">Delivered!</p>
+                            <p class="text-gray-500 text-xs mt-1" id="time-4">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-border pt-6 mt-2 pb-6">
+                    <div class="flex items-center justify-between mb-4 cursor-pointer group"
+                        onclick="document.getElementById('order-summary-content').classList.toggle('hidden')">
+                        <h3 class="text-white font-bold group-hover:text-primary transition-colors">Order Summary</h3>
+                        <span
+                            class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">expand_more</span>
+                    </div>
+                    <div class="space-y-3 hidden" id="order-summary-content">
+                    </div>
+                    <div class="flex justify-between items-center pt-2 mt-2 border-t border-border/50">
+                        <span class="text-gray-400 text-sm">Total Paid</span>
+                        <span class="text-white font-bold" id="summary-total">₹0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-7 xl:col-span-8 h-[50vh] lg:h-full relative bg-[#1a1a1a]">
+
+            <div id="map" class="absolute inset-0 w-full h-full z-0"></div>
+
+            <div
+                class="absolute top-4 left-4 z-10 w-[280px] bg-card/90 backdrop-blur-md rounded-xl border border-primary/20 shadow-2xl p-4">
+                <div class="flex items-center gap-2 text-primary mb-2">
+                    <span class="material-symbols-outlined icon-filled text-lg animate-pulse">auto_awesome</span>
+                    <span class="text-xs font-bold uppercase tracking-wider">AI Predictive Arrival</span>
+                </div>
+                <h2 class="text-4xl font-black text-white tracking-tight" id="eta-display">--:--</h2>
+                <p class="text-xs text-gray-400 mt-1 font-medium">98% confidence score</p>
+            </div>
+
+            <div id="chat-widget"
+                class="absolute bottom-6 right-6 w-[340px] md:w-[380px] bg-card rounded-xl shadow-2xl border border-border flex flex-col overflow-hidden z-20 transition-all duration-300">
+                <div class="bg-[#0a0314] p-4 flex items-center justify-between border-b border-border cursor-pointer"
+                    onclick="toggleChat()">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <div class="size-10 rounded-full bg-cover bg-center border border-border"
+                                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCY3v3mnL-9LDpE4630y1umbgr1KaqN-xMVc8kOlIjoadUdBnwRb7dIabZ5uGVpiOW_y2Ti5nqS7qeOOHbqyl38O8BMUA0mq6EUPhIO5-Tzf3yIgs2aGIRf8IcPpnC1blcxEhUVA_kzEXEhsIov5Hl--BuajIF3to5HOzCvNDQ2cNPN6owJiGgmpcsiDvnOzPBlPuQ75ouJZZxNon1Vk4k1LYISkECIqRtXNdJoF_GQVRsHVa49DiuXI7jzYBuyRU_gZ1KNvyye4jE");'>
+                            </div>
+                            <div
+                                class="absolute bottom-0 right-0 size-2.5 bg-green-500 border-2 border-[#0a0314] rounded-full">
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold text-sm" id="chat-rider-name">Chat with Rider</h3>
+                            <p class="text-primary text-xs font-medium">Online</p>
+                        </div>
+                    </div>
+                    <button class="text-gray-400 hover:text-white p-2 rounded-lg hover:bg-[#3a2d20]">
+                        <span class="material-symbols-outlined" id="chat-toggle-icon">remove</span>
+                    </button>
+                </div>
+
+                <div class="chat-body-container transition-all duration-300 ease-in-out h-[350px]">
+                    <div class="flex-1 bg-[#1e160e] p-4 overflow-y-auto h-[280px] flex flex-col gap-3 custom-scrollbar"
+                        id="chat-box">
+                        <div class="flex justify-center"><span
+                                class="text-[10px] font-bold text-gray-500 bg-[#1a0b36] px-2 py-1 rounded">TODAY</span>
+                        </div>
+                        <div class="flex items-end gap-2 max-w-[85%] self-start">
+                            <div class="bg-[#3a2d20] p-3 rounded-2xl rounded-bl-none border border-border">
+                                <p class="text-gray-200 text-sm">Hello! I'm waiting at the restaurant. 🛵</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-[#0a0314] p-3 border-t border-border">
+                        <div
+                            class="flex gap-2 items-center bg-[#1a1a1a] rounded-full px-1 py-1 border border-border focus-within:border-primary">
+                            <input id="chat-input"
+                                class="bg-transparent border-none focus:ring-0 text-white text-sm w-full pl-4 placeholder:text-gray-500"
+                                placeholder="Type a message..." type="text" onkeypress="handleChat(event)" />
+                            <button onclick="sendMessage()"
+                                class="size-9 rounded-full bg-primary text-[#0a0314] flex items-center justify-center hover:bg-opacity-90 transition shadow-lg shrink-0">
+                                <span class="material-symbols-outlined text-[20px] icon-filled">send</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="share-modal"
+        class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"
+        onclick="document.getElementById('share-modal').classList.add('hidden')">
+        <div class="bg-card border border-border rounded-2xl p-6 w-full max-w-sm modal-enter"
+            onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">Share Live Status</h3>
+                <button onclick="document.getElementById('share-modal').classList.add('hidden')"
+                    class="text-gray-400 hover:text-white"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <p class="text-gray-400 text-sm mb-4">Let friends or family track this order in real-time.</p>
+            <div class="grid gap-3">
+                <a id="share-wa" href="#" target="_blank"
+                    class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#25D366] text-white font-bold hover:opacity-90 transition">
+                    <span class="material-symbols-outlined">chat</span> WhatsApp
+                </a>
+                <a id="share-sms" href="#"
+                    class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-blue-500 text-white font-bold hover:opacity-90 transition">
+                    <span class="material-symbols-outlined">sms</span> Message
+                </a>
+                <a href="#"
+                    class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-sky-500 text-white font-bold hover:opacity-90 transition">
+                    <span class="material-symbols-outlined">flutter_dash</span> Twitter
+                </a>
+                <button onclick="copyTrackingLink()"
+                    class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#1a1a1a] text-white border border-border font-bold hover:bg-[#1a0b36] transition">
+                    <span class="material-symbols-outlined">content_copy</span> Copy Link
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="kitchen-modal"
+        class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4"
+        onclick="document.getElementById('kitchen-modal').classList.add('hidden')">
+        <div class="bg-card border border-primary/50 rounded-2xl p-1 w-full max-w-sm relative overflow-hidden"
+            onclick="event.stopPropagation()">
+            <div class="relative h-64 bg-gray-900 rounded-xl overflow-hidden">
+                <div class="absolute inset-0 bg-cover bg-center"
+                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKO5w3PjAegdWNtmjpyygcoqbWDbb1MMykp1Ra9F3QjtGred4ExZyv6xsp55ec6MQj__XypBAvDihrl8j2HS434CoBWARyYMu14hsj4d-q8o0eBQeff024K-JdssN8pZmm-E1eeoitvTeuVrygnhdtMXo7jW3emz7KKG7vMm4R465g2e1vlL4xNht0rGjjnY4p54Nw9xBRM90IqXs1c0wLTzZiBc-zJUsoX6K2G1uzBH_6v_WyaSD6kXP0dxGcogDA5B5Ck094Qsg'); opacity: 0.6;">
+                </div>
+                <div class="scan-line"></div>
+                <div
+                    class="absolute top-4 left-4 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs text-primary font-mono border border-primary/30">
+                    AI VISION ACTIVE</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="support-modal"
+        class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"
+        onclick="document.getElementById('support-modal').classList.add('hidden')">
+        <div class="bg-card border border-border rounded-2xl w-full max-w-sm h-[500px] flex flex-col shadow-2xl"
+            onclick="event.stopPropagation()">
+            <div class="p-4 bg-[#0a0314] border-b border-border flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary"><span
+                            class="material-symbols-outlined">smart_toy</span></div>
+                    <div>
+                        <h3 class="text-white font-bold text-sm">Zoi Support Bot</h3>
+                        <p class="text-xs text-green-500">Instant Replies</p>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('support-modal').classList.add('hidden')"
+                    class="text-gray-400 hover:text-white"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="flex-1 bg-[#1e160e] p-4 overflow-y-auto space-y-4">
+                <div class="flex gap-2 max-w-[85%]">
+                    <div
+                        class="bg-primary/10 p-3 rounded-2xl rounded-tl-none border border-primary/10 text-gray-200 text-sm">
+                        Hi! I'm Zoi. I see your order is on the way. How can I help?
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Rating & Feedback Modal (All platforms) -->
+    <div id="rating-modal"
+        class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-card border border-border rounded-2xl w-full max-w-sm shadow-2xl modal-enter"
+            onclick="event.stopPropagation()">
+            <div class="p-6 text-center">
+                <div class="size-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                    <span
+                        class="material-symbols-outlined text-primary text-4xl icon-filled">sentiment_very_satisfied</span>
+                </div>
+                <h2 class="text-white text-xl font-black mb-1">How was your order?</h2>
+                <p class="text-gray-400 text-sm mb-5">Rate your experience</p>
+
+                <!-- Food Rating -->
+                <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Food Quality</p>
+                <div class="flex justify-center gap-2 mb-4" id="food-stars">
+                    <span class="star-btn text-gray-600" onclick="rateStar('food', 1)"><span
+                            class="material-symbols-outlined text-3xl">star</span></span>
+                    <span class="star-btn text-gray-600" onclick="rateStar('food', 2)"><span
+                            class="material-symbols-outlined text-3xl">star</span></span>
+                    <span class="star-btn text-gray-600" onclick="rateStar('food', 3)"><span
+                            class="material-symbols-outlined text-3xl">star</span></span>
+                    <span class="star-btn text-gray-600" onclick="rateStar('food', 4)"><span
+                            class="material-symbols-outlined text-3xl">star</span></span>
+                    <span class="star-btn text-gray-600" onclick="rateStar('food', 5)"><span
+                            class="material-symbols-outlined text-3xl">star</span></span>
+                </div>
+
+                <!-- Rider Rating -->
+                <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Delivery Partner</p>
+                <div class="flex justify-center gap-2 mb-5" id="rider-stars">
+                    <span class="star-btn text-gray-600" onclick="rateStar('rider', 1)"><span
+                            class="material-symbols-outlined text-3xl">star</span></span>
+                    <span class="star-btn text-gray-600" onclick="rateStar('rider', 2)"><span
+                            class="material-symbols-outlined text-3xl">star</span></span>
+                    <span class="star-btn text-gray-600" onclick="rateStar('rider', 3)"><span
+                            class="material-symbols-outlined text-3xl">star</span></span>
+                    <span class="star-btn text-gray-600" onclick="rateStar('rider', 4)"><span
+                            class="material-symbols-outlined text-3xl">star</span></span>
+                    <span class="star-btn text-gray-600" onclick="rateStar('rider', 5)"><span
+                            class="material-symbols-outlined text-3xl">star</span></span>
+                </div>
+
+                <!-- Quick Feedback Tags -->
+                <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Quick Feedback</p>
+                <div class="flex flex-wrap justify-center gap-2 mb-6">
+                    <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
+                        onclick="this.classList.toggle('selected')">🔥 Hot Food</button>
+                    <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
+                        onclick="this.classList.toggle('selected')">⚡ Fast Delivery</button>
+                    <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
+                        onclick="this.classList.toggle('selected')">📦 Good Packaging</button>
+                    <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
+                        onclick="this.classList.toggle('selected')">😊 Polite Rider</button>
+                    <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
+                        onclick="this.classList.toggle('selected')">👍 Great Taste</button>
+                    <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
+                        onclick="this.classList.toggle('selected')">🥗 Fresh Ingredients</button>
+                </div>
+
+                <button onclick="submitRating()"
+                    class="w-full py-3 bg-primary text-[#0a0314] font-bold rounded-xl text-sm hover:bg-opacity-90 transition shadow-lg">Submit
+                    Rating</button>
+                <button onclick="skipRating()"
+                    class="w-full py-2 text-gray-500 text-xs mt-2 hover:text-white transition">Maybe Later</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. DATA
+        let map, driverMarker;
+        let isChatOpen = true;
+        let currentTip = 0;
+        let _currentOrder = null;
+
+        // Bangalore Coordinates
+        const homeCoords = [12.9716, 77.5946];
+        const restCoords = [12.9816, 77.6046];
+
+        window.onload = function () {
+            const activeOrder = ZoiOrders.getActiveOrder();
+            if (!activeOrder) {
+
+                window.location.href = 'index.html';
+                return;
+            }
+            _currentOrder = activeOrder;
+            initTracking(activeOrder);
+            initMap();
+            startLiveCounter();
+            setInterval(pollOrderStatus, 3000);
+        };
+
+        // 2. REAL MAP (LEAFLET + ESRI SATELLITE)
+        function initMap() {
+            map = L.map('map', { zoomControl: false }).setView(restCoords, 14);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri',
+                maxZoom: 18
+            }).addTo(map);
+
+            const driverIcon = L.divIcon({ className: 'driver-icon', html: '<span class="material-symbols-outlined" style="font-size:20px">electric_moped</span>', iconSize: [44, 44] });
+            const homeIcon = L.divIcon({ className: 'home-icon', html: '<span class="material-symbols-outlined">home</span>', iconSize: [36, 36] });
+            const restIcon = L.divIcon({ className: 'rest-icon', html: '<span class="material-symbols-outlined">restaurant</span>', iconSize: [36, 36] });
+
+            L.marker(homeCoords, { icon: homeIcon }).addTo(map);
+            L.marker(restCoords, { icon: restIcon }).addTo(map);
+            driverMarker = L.marker(restCoords, { icon: driverIcon }).addTo(map);
+
+            // Route Polyline (Swiggy/Zomato style)
+            const routePoints = generateCurvedRoute(restCoords, homeCoords, 20);
+            L.polyline(routePoints, {
+                color: '#00f0ff',
+                weight: 3,
+                opacity: 0.6,
+                dashArray: '8, 12',
+                lineCap: 'round'
+            }).addTo(map);
+
+            const bounds = L.latLngBounds([homeCoords, restCoords]);
+            map.fitBounds(bounds, { padding: [50, 50] });
+
+            // Only simulate if already out
+            if (_currentOrder && (_currentOrder.status === 'out_for_delivery' || _currentOrder.status === 'delivered')) {
+                simulateDriverMovement();
+            }
+        }
+
+        function simulateDriverMovement() {
+            if (!driverMarker) return;
+            let steps = 100;
+            let step = 0;
+            setInterval(() => {
+                if (step > steps) return;
+                const lat = restCoords[0] + (homeCoords[0] - restCoords[0]) * (step / steps);
+                const lng = restCoords[1] + (homeCoords[1] - restCoords[1]) * (step / steps);
+                driverMarker.setLatLng([lat, lng]);
+                step++;
+            }, 300);
+        }
+
+        // 3. FEATURES LOGIC
+        function openShareModal() {
+            const trackLink = `https://zipzapzoi.in/track/${_currentOrder ? _currentOrder.id : '123'}`;
+            const msg = encodeURIComponent(`Track my food live! 🍕 ${trackLink}`);
+            document.getElementById('share-wa').href = `https://wa.me/?text=${msg}`;
+            document.getElementById('share-sms').href = `sms:?body=${msg}`;
+            document.getElementById('share-modal').classList.remove('hidden');
+            document.getElementById('share-modal').classList.add('flex');
+        }
+
+        function copyTrackingLink() {
+            const trackLink = `https://zipzapzoi.in/track/${_currentOrder ? _currentOrder.id : '123'}`;
+            navigator.clipboard.writeText(trackLink);
+            showTrackingToast("Link copied!");
+        }
+
+        function toggleChat() {
+            const container = document.querySelector('.chat-body-container');
+            const icon = document.getElementById('chat-toggle-icon');
+            if (isChatOpen) {
+                container.style.height = '0px';
+                icon.innerText = 'expand_less';
+            } else {
+                container.style.height = '350px';
+                icon.innerText = 'remove';
+            }
+            isChatOpen = !isChatOpen;
+        }
+
+        function handleChat(e) { if (e.key === 'Enter') sendMessage(); }
+
+        // --- SMART CHAT (Contextual AI Replies) ---
+        function getSmartReply(userMsg) {
+            const msg = userMsg.toLowerCase();
+            const order = _currentOrder;
+            const riderName = order ? (order.riderName || "Rider").split(' ')[0] : "Rider";
+
+            // Location / ETA
+            if (msg.includes('where') || msg.includes('location') || msg.includes('kahan')) {
+                if (order && order.status === 'out_for_delivery') return `I'm about 5-10 mins away from your location. Almost there! 🏍️`;
+                if (order && order.status === 'preparing') return `I'm at the restaurant waiting for your food to be packed. Will update you once I pick it up! 🍳`;
+                if (order && order.status === 'ready_for_pickup') return `Just picked up your order! Starting my ride now. 🛵`;
+                return `I'll be on my way soon! Waiting for the restaurant. 😊`;
+            }
+            if (msg.includes('eta') || msg.includes('time') || msg.includes('how long') || msg.includes('kitna time')) {
+                if (order && order.status === 'out_for_delivery') return `About 5-10 minutes! Riding as fast as I can 🏎️`;
+                if (order && order.status === 'preparing') return `Your food is still being prepared. Estimated 15-20 mins total. 🕐`;
+                return `Should be there in about 20-25 minutes. Hang tight! ⏰`;
+            }
+            // Delivery instructions
+            if (msg.includes('gate') || msg.includes('door') || msg.includes('entrance') || msg.includes('floor')) {
+                return `Got it! I'll follow your instructions when I arrive. Thanks for the heads up! 👍`;
+            }
+            // Spice / Extra
+            if (msg.includes('extra') || msg.includes('add') || msg.includes('spice') || msg.includes('sauce')) {
+                return `I'll request the restaurant if possible, but I'm already at pickup. You can call the restaurant directly for changes. 📞`;
+            }
+            // Delay
+            if (msg.includes('late') || msg.includes('delay') || msg.includes('slow')) {
+                return `Sorry for the wait! There's a bit of traffic. I'm doing my best to reach you quickly. 🙏`;
+            }
+            // Thanks / Greeting
+            if (msg.includes('thank') || msg.includes('thanks') || msg.includes('thx')) {
+                return `You're welcome! Happy to deliver to you. 😊🙏`;
+            }
+            if (msg.includes('hi') || msg.includes('hello') || msg.includes('hey')) {
+                return `Hey there! I'm ${riderName}, your delivery partner. How can I help? 😊`;
+            }
+            // Cancel
+            if (msg.includes('cancel')) {
+                return `I can't cancel from my side. Please contact ZipZapZoi Support via the Help button above. 📲`;
+            }
+            // Call
+            if (msg.includes('call')) {
+                return `Sure, you can tap the green call button to reach me directly. I'm available! 📱`;
+            }
+            // Default
+            const defaults = [
+                `Got it! I'll keep that in mind. 📝`,
+                `Understood! On my way to you. 🛵`,
+                `Thanks for letting me know! Will take care of it. 👍`,
+                `Noted! Anything else you need? 😊`,
+                `Sure thing! Almost there. 🚀`
+            ];
+            return defaults[Math.floor(Math.random() * defaults.length)];
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += `
+                <div class="bg-primary p-3 rounded-2xl rounded-br-none max-w-[85%] self-end shadow-md">
+                    <p class="text-[#0a0314] font-bold text-sm leading-relaxed">${text}</p>
+                </div>
+            `;
+            input.value = "";
+            setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 100);
+
+            // Show typing indicator
+            const typingId = 'typing-' + Date.now();
+            chatBox.innerHTML += `
+                <div class="flex items-end gap-2 max-w-[85%] self-start" id="${typingId}">
+                    <div class="bg-[#3a2d20] p-3 rounded-2xl rounded-bl-none border border-border">
+                        <p class="text-gray-400 text-sm animate-pulse">typing...</p>
+                    </div>
+                </div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const reply = getSmartReply(text);
+
+            setTimeout(() => {
+                // Remove typing indicator
+                const typingEl = document.getElementById(typingId);
+                if (typingEl) typingEl.remove();
+
+                chatBox.innerHTML += `
+                <div class="flex items-end gap-2 max-w-[85%] self-start">
+                    <div class="size-6 rounded-full bg-cover bg-center shrink-0 mb-1" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCY3v3mnL-9LDpE4630y1umbgr1KaqN-xMVc8kOlIjoadUdBnwRb7dIabZ5uGVpiOW_y2Ti5nqS7qeOOHbqyl38O8BMUA0mq6EUPhIO5-Tzf3yIgs2aGIRf8IcPpnC1blcxEhUVA_kzEXEhsIov5Hl--BuajIF3to5HOzCvNDQ2cNPN6owJiGgmpcsiDvnOzPBlPuQ75ouJZZxNon1Vk4k1LYISkECIqRtXNdJoF_GQVRsHVa49DiuXI7jzYBuyRU_gZ1KNvyye4jE");'></div>
+                    <div class="bg-[#3a2d20] p-3 rounded-2xl rounded-bl-none border border-border">
+                        <p class="text-gray-200 text-sm leading-relaxed">${reply}</p>
+                    </div>
+                </div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 1200 + Math.random() * 800);
+        }
+
+        // 4. CORE TRACKING
+        function initTracking(order) {
+            document.getElementById('order-id').innerText = `Order #${order.id}`;
+            document.getElementById('summary-total').innerText = `₹${order.total}`;
+
+            // Determine effective status for UI
+            // Determine effective status for UI
+            let effectiveStatus = order.status;
+            // Only override if not yet picked up
+            if (['placed', 'confirmed', 'preparing', 'ready_for_pickup'].includes(order.status)) {
+                if (order.riderAtRestaurant) effectiveStatus = 'rider_at_restaurant';
+                else if (order.riderHeadingToRestaurant) effectiveStatus = 'heading_to_restaurant';
+            }
+
+            document.getElementById('main-status-text').innerText = getStatusText(effectiveStatus);
+            document.getElementById('tracking-rest-name').innerText = order.restaurantName || "Restaurant";
+            document.getElementById('time-1').innerText = order.time || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            // Rider Info (Dynamic)
+            const riderName = order.riderName || "Assigning...";
+            const riderPhone = order.riderPhone || "--";
+            document.getElementById('rider-name').innerText = riderName;
+            document.getElementById('rider-phone').innerText = `+91 ${riderPhone.replace(/(\d{5})(\d{5})/, '$1 $2')}`;
+            document.getElementById('chat-rider-name').innerText = `Chat with ${riderName.split(' ')[0]}`;
+            document.getElementById('tip-label').innerText = `Tip ${riderName.split(' ')[0]} for good service`;
+
+            // Update call/sms links
+            // Update call/sms links
+            if (riderPhone && riderPhone !== '--') {
+                document.querySelector('a[title="Call Driver"]').href = `tel:+91${riderPhone}`;
+                document.querySelector('a[title="Message Driver"]').href = `sms:+91${riderPhone}`;
+                document.getElementById('rider-actions').classList.remove('hidden');
+                document.getElementById('rider-actions').classList.add('flex');
+            } else {
+                document.getElementById('rider-actions').classList.add('hidden');
+                document.getElementById('rider-actions').classList.remove('flex');
+            }
+
+            // Order Summary
+            const summaryContainer = document.getElementById('order-summary-content');
+            summaryContainer.innerHTML = "";
+            order.items.forEach(item => {
+                summaryContainer.innerHTML += `
+                    <div class="flex justify-between items-start text-sm">
+                        <div class="flex gap-2">
+                            <div class="bg-border-dark text-white text-[10px] font-bold px-1.5 py-0.5 rounded h-fit mt-0.5">${item.qty}x</div>
+                            <span class="text-gray-300">${item.name}</span>
+                        </div>
+                        <span class="text-white font-medium">₹${item.price * item.qty}</span>
+                    </div>
+                `;
+            });
+
+            updateStatusUI(effectiveStatus);
+            updateETA(effectiveStatus);
+        }
+
+        function pollOrderStatus() {
+            const order = ZoiOrders.getActiveOrder();
+            if (!order) return;
+            _currentOrder = order;
+
+            // Determine effective status for UI
+            // Determine effective status for UI
+            let effectiveStatus = order.status;
+            // Only override if not yet picked up
+            if (['placed', 'confirmed', 'preparing', 'ready_for_pickup'].includes(order.status)) {
+                if (order.riderAtRestaurant) effectiveStatus = 'rider_at_restaurant';
+                else if (order.riderHeadingToRestaurant) effectiveStatus = 'heading_to_restaurant';
+            }
+
+            document.getElementById('main-status-text').innerText = getStatusText(effectiveStatus);
+
+            const restNameEl = document.getElementById('tracking-rest-name');
+            if (restNameEl) restNameEl.innerText = order.restaurantName || "Restaurant";
+
+            updateStatusUI(effectiveStatus);
+            updateETA(effectiveStatus);
+        }
+
+        function getStatusText(status) {
+            switch (status) {
+                case 'placed': return "Order Placed";
+                case 'confirmed': return "Order Confirmed";
+                case 'preparing': return "Chef is Cooking... 🍳";
+                case 'heading_to_restaurant': return "Rider Heading to Restaurant 🛵";
+                case 'rider_at_restaurant': return "Rider at Restaurant 🥡";
+                case 'ready_for_pickup': return "Food is Ready! 📦";
+                case 'out_for_delivery': return "On the Way! 🛵";
+                case 'delivered': return "Delivered! Enjoy 🎉";
+                default: return "Processing...";
+            }
+        }
+
+        function updateStatusUI(status) {
+            let step = 1;
+            if (status === 'confirmed') step = 1;
+            if (status === 'preparing') step = 2;
+            if (status === 'heading_to_restaurant') step = 2; // Treat as step 2 (Preparing/Pickup phase)
+            if (status === 'rider_at_restaurant') step = 2;
+            if (status === 'ready_for_pickup') step = 2;
+            if (status === 'out_for_delivery') step = 3;
+            if (status === 'delivered') step = 4;
+
+            for (let i = 1; i <= 4; i++) {
+                updateStep(i, i <= step);
+            }
+
+            // Update timeline sub-texts based on status
+            if (status === 'preparing') {
+                document.getElementById('time-2').innerText = "Chef is working on it...";
+                document.getElementById('kitchen-cam-btn').classList.remove('hidden');
+            }
+            if (status === 'heading_to_restaurant') {
+                document.getElementById('time-2').innerText = "Rider is heading to restaurant";
+                document.getElementById('kitchen-cam-btn').classList.add('hidden'); // Hide cam, rider is focus
+                // Keep step 2 active
+            }
+            if (status === 'rider_at_restaurant') {
+                document.getElementById('time-2').innerText = "Rider waiting at restaurant";
+                // Keep step 2 active
+            }
+            if (status === 'ready_for_pickup') {
+                document.getElementById('time-2').innerText = "✅ Food Ready";
+                document.getElementById('time-3').innerText = "Rider picking up...";
+            }
+            if (status === 'out_for_delivery') {
+                document.getElementById('time-2').innerText = "✅ Done!";
+                const rName = _currentOrder ? (_currentOrder.riderName || "Rider").split(' ')[0] : "Rider";
+                document.getElementById('time-3').innerText = `${rName} is on the way`;
+                document.getElementById('status-alert').classList.remove('hidden');
+            }
+            if (status === 'delivered') {
+                document.getElementById('time-2').innerText = "✅ Done!";
+                document.getElementById('time-3').innerText = "✅ Picked up";
+                document.getElementById('time-4').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('status-alert').classList.add('hidden');
+
+                // Swap main status to a celebration
+                document.getElementById('main-status-text').innerHTML = `<span class="text-primary">Delivered!</span> Enjoy your meal 🎉`;
+                document.getElementById('eta-display').innerText = "✅ Done";
+
+                // Fire confetti!
+                launchConfetti();
+
+                // Show rating modal after 3s
+                setTimeout(() => {
+                    document.getElementById('rating-modal').classList.remove('hidden');
+                    document.getElementById('rating-modal').classList.add('flex');
+                }, 3000);
+
+                // Inject celebration card + reorder CTA
+                injectDeliveredCard();
+            }
+
+            // Update progress bar
+            updateProgressBar(status);
+
+            // Trigger Map Simulation if Out for Delivery
+            if (status === 'out_for_delivery' && !_deliverySimulationStarted) {
+                _deliverySimulationStarted = true;
+                simulateDriverMovement();
+            }
+        }
+
+        let _deliverySimulationStarted = false;
+
+        function startStatusSimulation() {
+            // Disabled in favor of real polling
+        }
+
+        function updateStep(stepNum, isActive) {
+            const icon = document.getElementById(`step-icon-${stepNum}`);
+            const text = document.getElementById(`step-text-${stepNum}`);
+            const line = document.getElementById(`step-line-${stepNum}`);
+            if (!icon || !text) return;
+
+            if (isActive) {
+                icon.className = "size-8 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center border border-green-500/30 transition-all scale-110 shadow-[0_0_10px_rgba(34,197,94,0.4)]";
+                if (line) line.className = "w-[2px] bg-green-500/30 h-full min-h-[24px] transition-colors";
+                text.className = "flex flex-col pb-6 pt-1 opacity-100 transition-all";
+            }
+        }
+
+        function updateETA(status) {
+            const etaEl = document.getElementById('eta-display');
+            if (!etaEl) return;
+
+            if (status === 'delivered') {
+                etaEl.innerText = "✅ Done";
+                return;
+            }
+
+            let minsToAdd = 25;
+            if (status === 'preparing') minsToAdd = 20;
+            if (status === 'ready_for_pickup') minsToAdd = 12;
+            if (status === 'out_for_delivery') minsToAdd = 5;
+            if (status === 'placed' || status === 'confirmed') minsToAdd = 30;
+
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + minsToAdd);
+            const eta = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            etaEl.innerText = eta;
+        }
+
+        function openKitchenCam() {
+            document.getElementById('kitchen-modal').classList.remove('hidden');
+            document.getElementById('kitchen-modal').classList.add('flex');
+        }
+        function openSupportModal() {
+            document.getElementById('support-modal').classList.remove('hidden');
+            document.getElementById('support-modal').classList.add('flex');
+        }
+        function addTip(amount) {
+            currentTip += amount;
+            const rName = _currentOrder && _currentOrder.riderName ? _currentOrder.riderName.split(' ')[0] : "Rider";
+            showTrackingToast(`Added ₹${amount} tip for ${rName}! Total tip: ₹${currentTip}`);
+        }
+
+        // --- TOAST NOTIFICATION ---
+        function showTrackingToast(message) {
+            // Check if toast already exists
+            let toast = document.getElementById('tracking-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'tracking-toast';
+                toast.className = 'fixed top-6 left-1/2 -translate-x-1/2 bg-surface border border-primary text-primary px-6 py-3 rounded-full text-sm font-bold shadow-[0_4px_20px_rgba(0, 240, 255,0.3)] z-[9999] flex items-center gap-2 fade-in';
+                toast.style.transition = 'all 0.3s ease';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<span class="material-symbols-outlined text-sm">info</span> ${message}`;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, 0)';
+
+            // Clear any existing timeout
+            if (window._trackingToastTimeout) clearTimeout(window._trackingToastTimeout);
+
+            window._trackingToastTimeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, -20px)';
+            }, 3000);
+        }
+
+        // ============================================
+        // 6. PREMIUM FEATURES (Industry-Grade Upgrades)
+        // ============================================
+
+        // --- Route Polyline Helper ---
+        function generateCurvedRoute(start, end, numPoints) {
+            const points = [];
+            const midLat = (start[0] + end[0]) / 2;
+            const midLng = (start[1] + end[1]) / 2;
+            const offset = 0.003; // Slight curve
+            for (let i = 0; i <= numPoints; i++) {
+                const t = i / numPoints;
+                const lat = (1 - t) * (1 - t) * start[0] + 2 * (1 - t) * t * (midLat + offset) + t * t * end[0];
+                const lng = (1 - t) * (1 - t) * start[1] + 2 * (1 - t) * t * (midLng - offset) + t * t * end[1];
+                points.push([lat, lng]);
+            }
+            return points;
+        }
+
+        // --- Live Order Counter ---
+        function startLiveCounter() {
+            const el = document.getElementById('live-order-count');
+            if (!el) return;
+            let count = 12000 + Math.floor(Math.random() * 5000);
+            el.innerText = count.toLocaleString('en-IN');
+            setInterval(() => {
+                count += Math.floor(Math.random() * 7) - 2; // random +/- change
+                if (count < 10000) count = 10000;
+                el.innerText = count.toLocaleString('en-IN');
+            }, 2500);
+        }
+
+        // --- Progress Bar ---
+        function updateProgressBar(status) {
+            const fill = document.getElementById('eta-progress-fill');
+            const timeEl = document.getElementById('eta-bar-time');
+            const labelEl = document.getElementById('eta-bar-label');
+            if (!fill) return;
+
+            const map = {
+                'placed': { pct: 10, time: '~30 min', label: 'Order placed' },
+                'confirmed': { pct: 20, time: '~28 min', label: 'Restaurant confirmed' },
+                'preparing': { pct: 40, time: '~20 min', label: 'Chef is cooking' },
+                'heading_to_restaurant': { pct: 45, time: '~18 min', label: 'Rider on the way to restaurant' },
+                'rider_at_restaurant': { pct: 70, time: '~15 min', label: 'Rider waiting at restaurant' },
+                'ready_for_pickup': { pct: 60, time: '~12 min', label: 'Ready for pickup' },
+                'out_for_delivery': { pct: 80, time: '~5 min', label: 'Rider on the way' },
+                'delivered': { pct: 100, time: 'Arrived!', label: '✅ Delivered' }
+            };
+            const data = map[status] || map['placed'];
+            fill.style.width = data.pct + '%';
+            if (timeEl) timeEl.innerText = data.time;
+            if (labelEl) labelEl.innerText = data.label;
+        }
+
+        // --- Confetti Engine ---
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#00f0ff', '#facc15', '#f472b6', '#60a5fa', '#fb923c', '#a78bfa', '#ffffff'];
+
+            for (let i = 0; i < 150; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    w: Math.random() * 8 + 4,
+                    h: Math.random() * 4 + 2,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vy: Math.random() * 3 + 2,
+                    vx: Math.random() * 2 - 1,
+                    rot: Math.random() * 360,
+                    rotSpeed: Math.random() * 6 - 3,
+                    opacity: 1
+                });
+            }
+
+            let frame = 0;
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+                particles.forEach(p => {
+                    if (p.opacity <= 0) return;
+                    alive = true;
+                    p.y += p.vy;
+                    p.x += p.vx;
+                    p.rot += p.rotSpeed;
+                    if (frame > 100) p.opacity -= 0.01;
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot * Math.PI / 180);
+                    ctx.globalAlpha = Math.max(0, p.opacity);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    ctx.restore();
+                });
+                frame++;
+                if (alive) requestAnimationFrame(animate);
+                else ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            animate();
+        }
+
+        // --- Star Rating System ---
+        let ratings = { food: 0, rider: 0 };
+
+        function rateStar(type, value) {
+            ratings[type] = value;
+            const container = document.getElementById(type === 'food' ? 'food-stars' : 'rider-stars');
+            const stars = container.querySelectorAll('.star-btn');
+            stars.forEach((star, idx) => {
+                if (idx < value) {
+                    star.classList.add('active');
+                    star.classList.remove('text-gray-600');
+                } else {
+                    star.classList.remove('active');
+                    star.classList.add('text-gray-600');
+                }
+            });
+        }
+
+        function submitRating() {
+            const tags = [];
+            document.querySelectorAll('.feedback-tag.selected').forEach(t => tags.push(t.innerText));
+
+            document.getElementById('rating-modal').classList.add('hidden');
+
+            // Complete the order to history
+            const finalRating = ratings.food || 0;
+            ZoiOrders.completeActiveOrder(finalRating);
+
+            // Success toast
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-primary text-[#0a0314] px-6 py-3 rounded-xl font-bold text-sm shadow-2xl z-50 animate-bounce';
+            toast.innerText = 'Thanks for your feedback! 🙏';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function skipRating() {
+            document.getElementById('rating-modal').classList.add('hidden');
+            ZoiOrders.completeActiveOrder(0);
+        }
+
+        // --- Delivered Card + Reorder CTA ---
+        let _deliveredCardInjected = false;
+        function injectDeliveredCard() {
+            if (_deliveredCardInjected) return;
+            _deliveredCardInjected = true;
+
+            const order = _currentOrder;
+            const restName = order ? order.restaurantName : 'Restaurant';
+            const restId = order ? order.restaurantId : '101';
+
+            const container = document.getElementById('eta-progress-section');
+            if (!container) return;
+
+            container.outerHTML = `
+                <div class="bg-gradient-to-br from-green-900/20 to-card rounded-xl p-5 border border-green-500/20 celebration-glow">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="size-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-green-500 text-2xl icon-filled">check_circle</span>
+                        </div>
+                        <div>
+                            <p class="text-white font-black text-lg">Order Delivered! 🎉</p>
+                            <p class="text-gray-400 text-xs">Enjoy your meal from ${restName}</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <a href="customer_restaurant_listing.html?id=${restId}"
+                           class="flex-1 py-2.5 bg-primary text-[#0a0314] font-bold text-xs rounded-xl text-center hover:bg-opacity-90 transition shadow-lg flex items-center justify-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">replay</span> Order Again
+                        </a>
+                        <button onclick="document.getElementById('rating-modal').classList.remove('hidden'); document.getElementById('rating-modal').classList.add('flex');"
+                            class="flex-1 py-2.5 border border-border text-white font-bold text-xs rounded-xl hover:bg-[#3a2d20] transition flex items-center justify-center gap-1">
+                            <span class="material-symbols-outlined text-[16px]">star</span> Rate Order
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Hide live counter after delivery
+            const counterEl = document.getElementById('live-counter-section');
+            if (counterEl) counterEl.style.display = 'none';
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const order = ZoiOrders.getActiveOrder();
+
+            if (order) {
+                // Check if current page is compatible (mock check)
+                _currentOrder = order;
+                initTracking(order);
+
+                // Start Polling (every 3s)
+                setInterval(pollOrderStatus, 3000);
+
+                // Start other simulations
+                if (typeof startLiveCounter === 'function') startLiveCounter();
+
+                // Check if already delivered (for reloads)
+                if (order.status === 'delivered') {
+                    injectDeliveredCard();
+                }
+            } else {
+                // No order found - Show empty state or redirect
+                // For now, let's just show a toast and redirect after 2s
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white px-6 py-4 rounded-xl font-bold shadow-2xl z-50 animate-bounce';
+                toast.innerHTML = 'No active order found! <br>Redirecting to Home...';
+                document.body.appendChild(toast);
+                setTimeout(() => window.location.href = 'index.html', 2500);
+            }
+        });
+    </script>
+<script src="js/zoi_customer_engine.js"></script>
+    <script src="js/zoi_api.js"></script>
+<script src="js/zoi_ai_assistant.js?v=4"></script>
+<script src="js/zoi_theme.js"></script>
+</body>
+
+</html>
