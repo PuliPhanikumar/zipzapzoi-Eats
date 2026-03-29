@@ -126,9 +126,10 @@
             }
             const localSess = JSON.parse(localStorage.getItem('zoiCustomerSession')) || JSON.parse(localStorage.getItem('zoiUser'));
             
-            // Auto-clear invalid local sessions if token missing — but do NOT call logout() here
-            // because logout() redirects to the login page, causing an infinite loop
-            if (localSess && typeof ZoiToken !== 'undefined' && !ZoiToken.isValid()) {
+            // We removed the auto-clear logic here to prevent infinite logout loops.
+            // If the local session exists, we trust it to render the UI. API calls can fail gracefully.
+            if (localSess && typeof ZoiToken !== 'undefined' && !ZoiToken.get()) {
+                // Only clear if the token is literally missing, not just "invalid" (which might happen if backend changes format)
                 localStorage.removeItem('zoiCustomerSession');
                 localStorage.removeItem('zoiUser');
                 return null;

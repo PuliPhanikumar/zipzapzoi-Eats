@@ -273,11 +273,11 @@
         let currentRateIdx = -1;
 
         document.addEventListener('DOMContentLoaded', async () => {
-            if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+            if (typeof ZoiCustomer === 'undefined' || !ZoiCustomer.isLoggedIn()) {
                 window.location.href = 'login & registration.html';
                 return;
             }
-            const activeUser = ZoiToken.getUser();
+            const activeUser = ZoiCustomer.getSession() || { name: 'Guest', id: '' };
 
             // Update avatar in header
             const avatarEl = document.querySelector('.size-9.rounded-full');

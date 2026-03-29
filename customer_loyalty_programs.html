@@ -398,11 +398,11 @@
 
     // === AUTH GUARD + USER BIND ===
     document.addEventListener('DOMContentLoaded', () => {
-        if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+        if (typeof ZoiCustomer === 'undefined' || !ZoiCustomer.isLoggedIn()) {
             window.location.href = 'login & registration.html';
             return;
         }
-        const user = ZoiToken.getUser();
+        const user = ZoiCustomer.getSession() || { name: 'Guest' };
         // Bind profile link user indicator
         const profileLink = document.getElementById('header-profile-link');
         if (profileLink) {

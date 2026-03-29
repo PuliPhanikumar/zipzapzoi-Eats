@@ -761,13 +761,11 @@
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
         // Zoi Engine Init - Global Auth Integration
-        if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+        if (typeof ZoiCustomer === 'undefined' || !ZoiCustomer.isLoggedIn()) {
             window.location.href = 'login & registration.html';
             return;
         }
-
-        const activeSession = ZoiToken.getUser();
-
+        const activeSession = ZoiCustomer.getSession() || { name: 'Guest', email: '', phone: '' };
         // DOM Elements
         const welcomeName = document.getElementById('welcome-name');
         const sidebarName = document.getElementById('sidebar-name');

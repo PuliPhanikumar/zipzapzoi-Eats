@@ -285,11 +285,11 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         // Auth Guard
-        if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+        if (typeof ZoiCustomer === 'undefined' || !ZoiCustomer.isLoggedIn()) {
             window.location.href = 'login & registration.html';
             return;
         }
-        const user = ZoiToken.getUser();
+        const user = ZoiCustomer.getSession() || { name: 'Guest'};
 
         // Bind header
         const headerAvatar = document.getElementById('header-avatar');

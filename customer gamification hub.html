@@ -513,11 +513,11 @@
         let activeUser = null;
 
         window.onload = function () {
-            if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+            if (typeof ZoiCustomer === 'undefined' || !ZoiCustomer.isLoggedIn()) {
                 window.location.href = 'login & registration.html';
                 return;
             }
-            activeUser = ZoiToken.getUser();
+            activeUser = ZoiCustomer.getSession() || { name: 'Guest'};
 
             // Setup Header Avatar and Name
             const headerAvatar = document.querySelector('.size-10.rounded-full.bg-cover.border-2.border-primary');
@@ -774,11 +774,11 @@
 <script src="js/zoi_customer_engine.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+        if (typeof ZoiCustomer === 'undefined' || !ZoiCustomer.isLoggedIn()) {
             window.location.href = 'login & registration.html';
             return;
         }
-        const activeUser = ZoiToken.getUser();
+        const activeUser = ZoiCustomer.getSession() || { name: 'Guest'};
 
         // --- Bind user info ---
         const sidebarName = document.getElementById('sidebar-name');

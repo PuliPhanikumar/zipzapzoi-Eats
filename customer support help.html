@@ -628,12 +628,12 @@
     let _localChat = true; // Fallback to local AI chat if no WebSocket
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (typeof ZoiToken === 'undefined' || !ZoiToken.isValid()) {
+        if (typeof ZoiCustomer === 'undefined' || !ZoiCustomer.isLoggedIn()) {
             window.location.href = 'login & registration.html';
             return;
         }
         
-        const activeSession = ZoiToken.getUser();
+        const activeSession = ZoiCustomer.getSession() || { name: 'Guest'};
         if (activeSession && activeSession.name) userName = activeSession.name;
         
         // Populate sidebar name and avatars from session
