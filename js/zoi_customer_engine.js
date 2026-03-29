@@ -126,9 +126,11 @@
             }
             const localSess = JSON.parse(localStorage.getItem('zoiCustomerSession')) || JSON.parse(localStorage.getItem('zoiUser'));
             
-            // Auto-clear invalid local sessions if token missing
+            // Auto-clear invalid local sessions if token missing — but do NOT call logout() here
+            // because logout() redirects to the login page, causing an infinite loop
             if (localSess && typeof ZoiToken !== 'undefined' && !ZoiToken.isValid()) {
-                ZoiCustomer.logout();
+                localStorage.removeItem('zoiCustomerSession');
+                localStorage.removeItem('zoiUser');
                 return null;
             }
             
@@ -164,8 +166,12 @@
                 }
             } catch(e) {}
             
-            showToast('Logged out successfully', 'info');
-            setTimeout(() => window.location.href = 'login & registration.html', 800);
+            // Only show toast and redirect if NOT already on the login page
+            const onLoginPage = window.location.pathname.toLowerCase().includes('login');
+            if (!onLoginPage) {
+                showToast('Logged out successfully', 'info');
+                setTimeout(() => window.location.href = 'login & registration.html', 800);
+            }
         },
         updateUI: () => {
             let session = ZoiCustomer.getSession();
@@ -1191,13 +1197,13 @@
 
     // ─── GLOBAL INIT ────────────────────────────────────────
     function init() {
-        // Don't init on admin/partner/POS pages
+        // Don't init on admin/partner/POS/login pages
         const path = window.location.pathname.toLowerCase();
         if (path.includes('admin') || path.includes('partner') || path.includes('pos-') ||
             path.includes('hostel') || path.includes('rider') || path.includes('restaurant_management') ||
             path.includes('restaurant_settings') || path.includes('restaurant_staff') ||
             path.includes('restaurant_financials') || path.includes('restaurant_menu_manager') ||
-            path.includes('restaurant_order')) return;
+            path.includes('restaurant_order') || path.includes('login')) return;
 
         // Injected Styles
         const style = document.createElement('style');
