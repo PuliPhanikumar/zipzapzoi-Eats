@@ -48,7 +48,7 @@ const googleClient = process.env.GOOGLE_CLIENT_ID
 
 // ─── MIDDLEWARE ──────────────────────────────────────────
 // Trust proxy is required for Render so express-rate-limit tracks the actual user IP, not the load balancer
-app.set('trust proxy', 1);
+app.set('trust proxy', true);
 app.use(helmet({ contentSecurityPolicy: false })); // CSP off for static HTML pages
 app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
@@ -62,15 +62,23 @@ app.use(express.static(path.join(__dirname, '..'), {
     etag: true
 }));
 
+const getClientIp = (req) => {
+    return req.headers['cf-connecting-ip'] || 
+           (req.headers['x-forwarded-for'] ? req.headers['x-forwarded-for'].split(',')[0].trim() : null) || 
+           req.ip;
+};
+
 // Rate limiting
 const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 200,
+    max: 500, // Increased limit for production
+    keyGenerator: getClientIp,
     message: { error: 'Too many requests, please try again later.' }
 });
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 30,
+    max: 100, // Increased auth limit to avoid accidental blocking on shared networks
+    keyGenerator: getClientIp,
     message: { error: 'Too many auth attempts, please try again later.' }
 });
 app.use('/api/', apiLimiter);
