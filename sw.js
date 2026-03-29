@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zoi-eats-v3';
+const CACHE_NAME = 'zoi-eats-v5'; // Bumped version to force cache invalidation universally
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -15,8 +15,7 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('Opened cache');
-                // We use addAll but fail silently if an external URL fails
+                console.log('Opened cache v5');
                 return cache.addAll(ASSETS_TO_CACHE).catch(err => console.error("Cache add missing assets", err));
             })
     );
@@ -39,7 +38,7 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-    // Only cache GET requests
+    // Only intercept GET requests
     if (event.request.method !== 'GET') return;
     
     // Do not intercept API requests or socket.io
@@ -47,35 +46,27 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    // NETWORK-FIRST STRATEGY (Better for rapidly updating apps)
     event.respondWith(
-        caches.match(event.request)
+        fetch(event.request)
             .then(response => {
-                // Cache hit - return response
-                if (response) {
+                // Check if we received a valid response
+                if (!response || response.status !== 200 || response.type !== 'basic') {
                     return response;
                 }
-
-                // Clone the request because it's a stream and can only be consumed once
-                const fetchRequest = event.request.clone();
-
-                return fetch(fetchRequest).then(
-                    response => {
-                        // Check if we received a valid response
-                        if(!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
-
-                        // Clone the response
-                        const responseToCache = response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(cache => {
-                                cache.put(event.request, responseToCache);
-                            });
-
-                        return response;
-                    }
-                );
+                
+                // Clone the response and save to cache for later offline use
+                const responseToCache = response.clone();
+                caches.open(CACHE_NAME)
+                    .then(cache => {
+                        cache.put(event.request, responseToCache);
+                    });
+                    
+                return response;
+            })
+            .catch(() => {
+                // If Network fails (offline), fallback to cache
+                return caches.match(event.request);
             })
     );
 });
