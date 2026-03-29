@@ -17,14 +17,14 @@
 
     // ─── CONFIGURATION ─────────────────────────────────
     const ZOI_CONFIG = {
-        // Auto-detect: use localhost for dev, production URL for deployed
+        // Auto-detect: use localhost for dev, and explicit Render URL for production
         API_BASE_URL: isLocalhost || isFileProtocol
             ? 'http://localhost:5000/api'
-            : `${window.location.protocol}//${hostname}/api`,
+            : 'https://zipzapzoi-eats.onrender.com/api',
 
         SOCKET_URL: isLocalhost || isFileProtocol
             ? 'http://localhost:5000'
-            : `${window.location.protocol}//${hostname}`,
+            : 'https://zipzapzoi-eats.onrender.com',
 
         RAZORPAY_KEY_ID: '', // Loaded dynamically from backend /api/payments/config
 

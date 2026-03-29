@@ -446,7 +446,7 @@
                 loginTime: new Date().toISOString()
             };
 
-            const role = session.type;
+            const role = session.type ? session.type.toLowerCase() : 'customer';
             
             if (role === 'customer') {
                 localStorage.setItem('zoiCustomerSession', JSON.stringify(session));

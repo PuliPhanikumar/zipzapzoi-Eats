@@ -122,7 +122,7 @@
         getSession: () => {
             if (typeof ZoiToken !== 'undefined' && ZoiToken.isValid()) {
                 const user = ZoiToken.getUser();
-                if (user && (user.role === 'customer' || user.type === 'customer')) return user;
+                if (user && (user.role?.toLowerCase() === 'customer' || user.type?.toLowerCase() === 'customer')) return user;
             }
             const localSess = JSON.parse(localStorage.getItem('zoiCustomerSession')) || JSON.parse(localStorage.getItem('zoiUser'));
             
