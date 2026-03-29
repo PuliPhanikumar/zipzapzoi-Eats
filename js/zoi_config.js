@@ -147,8 +147,8 @@
                 headers
             });
 
-            // Handle 401 — token expired (only for non-auth endpoints)
-            if (response.status === 401 && !path.includes('/auth/')) {
+            // Handle 401 — token expired (only for non-auth explicitly active endpoints)
+            if (response.status === 401 && !path.includes('/auth/') && !options.silent) {
                 ZoiToken.remove();
                 console.warn('[ZOI] Auth expired. Redirecting to login...');
                 if (typeof showToast === 'function') {
@@ -177,7 +177,7 @@
      */
     async function zoiApiSilent(path, options = {}) {
         try {
-            return await zoiApi(path, options);
+            return await zoiApi(path, { ...options, silent: true });
         } catch (e) {
             console.warn(`[ZOI] Silent API fallback for ${path}`);
             return null;
