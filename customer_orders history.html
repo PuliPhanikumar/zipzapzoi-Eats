@@ -297,7 +297,7 @@
 
             // === LOAD ORDERS ===
             try {
-                const apiRes = await zoiApi('GET', '/api/orders');
+                const apiRes = await zoiApi('/orders');
                 if (apiRes && apiRes.orders) {
                     completedOrders = apiRes.orders.filter(o => o.userId === activeUser.id || o.user?.zoiId === activeUser.zoiId);
                 }

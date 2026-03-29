@@ -629,7 +629,7 @@
             btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-xs">progress_activity</span>`;
             
             try {
-                await zoiApi('POST', '/auth/otp/send', { phone: input });
+                await zoiApi('/auth/otp/send', { method: 'POST', body: JSON.stringify({ phone: input }) });
                 
                 btn.innerHTML = `Sent!`;
                 btn.classList.add('text-green-500', 'border-green-500/50');
@@ -670,9 +670,9 @@
                 let data;
                 if (isOtpMode) {
                     if (!otp || otp.length < 4) throw new Error('Please enter a valid OTP.');
-                    data = await zoiApi('POST', '/auth/otp/verify', { phone: input, otp: otp, role: currentRole });
+                    data = await zoiApi('/auth/otp/verify', { method: 'POST', body: JSON.stringify({ phone: input, otp: otp, role: currentRole }) });
                 } else {
-                    data = await zoiApi('POST', '/auth/login', { identifier: input, password: password });
+                    data = await zoiApi('/auth/login', { method: 'POST', body: JSON.stringify({ identifier: input, password: password }) });
                 }
 
                 // Store JWT Token
@@ -744,12 +744,15 @@
             if (password !== confirmPass) return showToast('Error', 'Passwords do not match.');
 
             try {
-                const data = await zoiApi('POST', '/auth/register', {
-                    name: fname + ' ' + lname,
-                    email: email,
-                    phone: phone,
-                    password: password,
-                    role: currentRole
+                const data = await zoiApi('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: fname + ' ' + lname,
+                        email: email,
+                        phone: phone,
+                        password: password,
+                        role: currentRole
+                    })
                 });
                 
                 // Store JWT
@@ -811,7 +814,7 @@
         async function initGoogleSignIn() {
             try {
                 // Fetch services config to check if Google OAuth is configured
-                const config = await zoiApi('GET', '/config/services');
+                const config = await zoiApi('/config/services');
                 if (config.oauth && config.oauth.google) {
                     // Server has GOOGLE_CLIENT_ID — fetch it for client-side init
                     // Note: Client ID is public and safe to expose
@@ -841,7 +844,7 @@
         async function handleGoogleCredentialResponse(response) {
             showToast("Authenticating...", "Verifying with Google...");
             try {
-                const data = await zoiApi('POST', '/auth/google', { credential: response.credential });
+                const data = await zoiApi('/auth/google', { method: 'POST', body: JSON.stringify({ credential: response.credential }) });
                 saveToken(data.token);
                 const zoiUser = data.user || data;
                 createSession({ id: zoiUser.zoiId || zoiUser.id, name: zoiUser.name, email: zoiUser.email, type: 'customer' });
@@ -886,7 +889,7 @@
 
             setTimeout(async () => {
                 try {
-                    const data = await zoiApi('POST', '/auth/google', { credential: mockToken });
+                    const data = await zoiApi('/auth/google', { method: 'POST', body: JSON.stringify({ credential: mockToken }) });
                     saveToken(data.token);
                     const zoiUser = data.user || data;
                     createSession({ id: zoiUser.zoiId || zoiUser.id, name: zoiUser.name, email: zoiUser.email, type: 'customer' });

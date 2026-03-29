@@ -795,7 +795,7 @@
         // Fetch Real Profile Data from Backend
         const zoiProfile = JSON.parse(localStorage.getItem('zoiUserProfile') || '{}');
         try {
-            const apiProfile = await zoiApi('GET', '/api/auth/me');
+            const apiProfile = await zoiApi('/auth/me');
             if (apiProfile && apiProfile.data && apiProfile.data.user) {
                 const user = apiProfile.data.user;
                 if (profileName && user.name) profileName.value = user.name;
@@ -835,7 +835,7 @@
                 
                 try {
                     // Update backend
-                    await zoiApi('PUT', '/api/auth/me', updatedData);
+                    await zoiApi('/auth/me', { method: 'PUT', body: JSON.stringify(updatedData) });
                 } catch(e) {
                     // Backend may not be running — continue with local save
                 }

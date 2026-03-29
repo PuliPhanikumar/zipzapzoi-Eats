@@ -147,16 +147,12 @@
                 headers
             });
 
-            // Handle 401 — token expired
-            if (response.status === 401) {
+            // Handle 401 — token expired (only for non-auth endpoints)
+            if (response.status === 401 && !path.includes('/auth/')) {
                 ZoiToken.remove();
-                // Don't redirect on login attempts
-                if (!path.includes('/auth/')) {
-                    console.warn('[ZOI] Auth expired. Redirecting to login...');
-                    // Give toast a chance to show
-                    if (typeof showToast === 'function') {
-                        showToast('Session expired. Please login again.', 'warning');
-                    }
+                console.warn('[ZOI] Auth expired. Redirecting to login...');
+                if (typeof showToast === 'function') {
+                    showToast('Session expired. Please login again.', 'warning');
                 }
             }
 
