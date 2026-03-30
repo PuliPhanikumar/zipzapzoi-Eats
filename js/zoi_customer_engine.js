@@ -170,13 +170,16 @@
             localStorage.removeItem('zoiAppliedCoupon');
             if (typeof ZoiToken !== 'undefined') ZoiToken.remove();
 
-            // Check if legacy zoiUser holds a customer session, if so, purge that too to prevent ghost logins
-            try {
-                const legacyUser = JSON.parse(localStorage.getItem('zoiUser') || 'null');
-                if (legacyUser && (legacyUser.type === 'customer' || legacyUser.role === 'customer')) {
-                    localStorage.removeItem('zoiUser');
-                }
-            } catch(e) {}
+            // Purge legacy zoiUser unconditionally to prevent ghost logins
+            localStorage.removeItem('zoiUser');
+            
+            // Purge other session markers just to be safe
+            localStorage.removeItem('zoiAuthToken');
+            localStorage.removeItem('zoiToken');
+            
+            // Optional: Also clear registered users list for testing if needed
+            // localStorage.removeItem('zoiRegisteredUsers');
+
             
             // Only show toast and redirect if NOT already on the login page
             const onLoginPage = window.location.pathname.toLowerCase().includes('login');

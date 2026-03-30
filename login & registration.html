@@ -697,7 +697,14 @@
             } catch (error) {
                 if (error.status === 0 || (error.error && error.error.includes('Network'))) {
                     console.log('Backend offline, using local simulation for login');
-                    const mockUser = typeof ZoiUsers !== 'undefined' ? ZoiUsers.authenticate(input, currentRole) : null;
+                    // Check registered users first
+                    const registeredUsers = getRegisteredUsers();
+                    let mockUser = registeredUsers.find(u => u.email === input && u.type === currentRole);
+                    
+                    if (!mockUser) {
+                        mockUser = typeof ZoiUsers !== 'undefined' ? ZoiUsers.authenticate(input, currentRole) : null;
+                    }
+                    
                     if (mockUser) {
                         const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
                         const payload = btoa(JSON.stringify({ id: mockUser.id, zoiId: mockUser.id, role: currentRole, type: currentRole, name: mockUser.name, email: mockUser.email }));
