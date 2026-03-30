@@ -83,9 +83,9 @@
                     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                 }).join(''));
                 const payload = JSON.parse(jsonPayload);
-                // Check expiry
+                // Check expiry — return null but NEVER delete the token here.
+                // Only ZoiCustomer.logout() should clear auth state.
                 if (payload.exp && payload.exp * 1000 < Date.now()) {
-                    ZoiToken.remove();
                     return null;
                 }
                 return payload;
@@ -147,13 +147,11 @@
                 headers
             });
 
-            // Handle 401 — token expired (only for non-auth explicitly active endpoints)
-            if (response.status === 401 && !path.includes('/auth/') && !options.silent) {
-                ZoiToken.remove();
-                console.warn('[ZOI] Auth expired. Redirecting to login...');
-                if (typeof showToast === 'function') {
-                    showToast('Session expired. Please login again.', 'warning');
-                }
+            // Handle 401 — log warning but NEVER auto-delete token or redirect.
+            // Background API calls (zones, sync, etc.) can fail with 401 without
+            // destroying the user's local session. Only explicit logout should clear state.
+            if (response.status === 401 && !path.includes('/auth/')) {
+                console.warn('[ZOI] API returned 401 for', path, '— session NOT cleared (silent failover).');
             }
 
             const data = await response.json().catch(() => ({}));

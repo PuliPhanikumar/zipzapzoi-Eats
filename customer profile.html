@@ -754,10 +754,10 @@
 </div>
 </div></main>
 </div>
-<script src="js/zoi_config.js?v=5"></script>
+<script src="js/zoi_config.js?v=10"></script>
 <script src="js/zoi_api.js"></script>
     <script src="js/db_simulation.js"></script>
-<script src="js/zoi_customer_engine.js?v=5"></script>
+<script src="js/zoi_customer_engine.js?v=10"></script>
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
         // Zoi Engine Init - Global Auth Integration
@@ -852,10 +852,11 @@
                 saveProfileData(profileData);
                 renderAddresses();
 
-                // Update session token
+                // Update session in localStorage so other pages pick up the changes
                 const updatedSession = { ...activeSession, name: updatedData.name, email: updatedData.email, phone: updatedData.phone };
                 try {
-                    ZoiToken.save(ZoiToken.get(), updatedSession);
+                    localStorage.setItem('zoiCustomerSession', JSON.stringify(updatedSession));
+                    localStorage.setItem('zoiUser', JSON.stringify(updatedSession));
                 } catch(e) {}
 
                 if (typeof showToast !== 'undefined') {

@@ -120,22 +120,33 @@
     const ZoiCustomer = {
         KEY: 'zoiCustomerSession',
         getSession: () => {
-            if (typeof ZoiToken !== 'undefined' && ZoiToken.isValid()) {
-                const user = ZoiToken.getUser();
-                if (user && (user.role?.toLowerCase() === 'customer' || user.type?.toLowerCase() === 'customer')) return user;
-            }
-            const localSess = JSON.parse(localStorage.getItem('zoiCustomerSession')) || JSON.parse(localStorage.getItem('zoiUser'));
-            
-            // We removed the auto-clear logic here to prevent infinite logout loops.
-            // If the local session exists, we trust it to render the UI. API calls can fail gracefully.
-            if (localSess && typeof ZoiToken !== 'undefined' && !ZoiToken.get()) {
-                // Only clear if the token is literally missing, not just "invalid" (which might happen if backend changes format)
-                localStorage.removeItem('zoiCustomerSession');
-                localStorage.removeItem('zoiUser');
-                return null;
-            }
-            
-            return localSess;
+            // Priority 1: Try decoding the JWT token for fresh user data
+            try {
+                if (typeof ZoiToken !== 'undefined' && ZoiToken.isValid()) {
+                    const user = ZoiToken.getUser();
+                    if (user && user.name) return user;
+                }
+            } catch (e) { /* Token decode failed, fall through to localStorage */ }
+
+            // Priority 2: Local session from login page (zoiCustomerSession)
+            try {
+                const localSess = JSON.parse(localStorage.getItem('zoiCustomerSession'));
+                if (localSess && localSess.name) return localSess;
+            } catch (e) { /* corrupt JSON, fall through */ }
+
+            // Priority 3: Legacy zoiUser key (older login flow saved here)
+            try {
+                const legacyUser = JSON.parse(localStorage.getItem('zoiUser'));
+                if (legacyUser && legacyUser.name && legacyUser.name !== 'New User') {
+                    // Sync to zoiCustomerSession for future reads
+                    localStorage.setItem('zoiCustomerSession', JSON.stringify(legacyUser));
+                    return legacyUser;
+                }
+            } catch (e) { /* corrupt JSON, fall through */ }
+
+            // IMPORTANT: We NEVER delete any session data here.
+            // Only ZoiCustomer.logout() has permission to clear auth state.
+            return null;
         },
         isLoggedIn: () => !!ZoiCustomer.getSession(),
         login: (userData) => {

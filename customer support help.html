@@ -618,8 +618,8 @@
     </footer>
 </div>
 </div>
-<script src="js/zoi_config.js"></script>
-<script src="js/zoi_customer_engine.js"></script>
+<script src="js/zoi_config.js?v=10"></script>
+<script src="js/zoi_customer_engine.js?v=10"></script>
 <script src="js/zoi_ai_assistant.js?v=4"></script>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
@@ -871,7 +871,7 @@
         try {
              const sysOrders = JSON.parse(localStorage.getItem('zoiCompletedOrders') || '[]');
              const histOrders = JSON.parse(localStorage.getItem('zoiOrderHistory') || '[]');
-             const activeSession = typeof ZoiToken !== 'undefined' ? ZoiToken.getUser() || {name: 'Guest'} : {name: 'Guest'};
+             const activeSession = typeof ZoiCustomer !== 'undefined' ? ZoiCustomer.getSession() || {name: 'Guest'} : {name: 'Guest'};
              let myOrders = [...sysOrders, ...histOrders].filter(o => o.customer === activeSession.name || o.userId === activeSession.id || o.userName === activeSession.name);
              myOrders = Array.from(new Map(myOrders.map(item => [item.id, item])).values());
              myOrders.sort((a,b) => new Date(b.date || b.timestamp) - new Date(a.date || a.timestamp));
