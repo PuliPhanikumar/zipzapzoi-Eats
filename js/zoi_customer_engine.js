@@ -1245,8 +1245,7 @@
         // Update user state
         ZoiCustomer.updateUI();
 
-        // Apply session guard
-        ZoiCustomer.guard();
+        // Session guard removed - auth is handled by each page's inline script
 
         // Wire current page
         wireCurrentPage();
