@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script src="js/zoi_config.js?v=10"></script>
+    <script src="js/zoi_config.js?v=11"></script>
     <script src="js/zoi_api.js"></script>
     <script src="js/db_simulation.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -430,6 +430,37 @@
             localStorage.setItem(USERS_KEY, JSON.stringify(users));
         }
 
+        // Helper: Client-side password hash (SHA-256, NOT for server use — localStorage only)
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password + '_zoiSalt_2026');
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Helper: Generate a mock JWT from user data
+        function generateMockToken(user) {
+            const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+            const payload = btoa(JSON.stringify({
+                id: user.id, zoiId: user.id, role: user.type || 'customer',
+                type: user.type || 'customer', name: user.name, email: user.email,
+                iat: Math.floor(Date.now() / 1000),
+                exp: Math.floor(Date.now() / 1000) + 86400 // 24h
+            }));
+            return header + '.' + payload + '.local_signature';
+        }
+
+        // Helper: Find a registered user by email (case-insensitive)
+        function findRegisteredUser(email, role) {
+            const users = getRegisteredUsers();
+            const emailLower = email.toLowerCase();
+            return users.find(u =>
+                u.email.toLowerCase() === emailLower &&
+                (u.type === role || u.role === role || role === 'customer')
+            );
+        }
+
         // Helper: Create session and sync with respective engines
         function createSession(user) {
             // Save to generic legacy key just in case older scripts rely on it
@@ -450,13 +481,15 @@
             
             if (role === 'customer') {
                 localStorage.setItem('zoiCustomerSession', JSON.stringify(session));
+                // Always ensure zoiUserProfile exists and has correct name
                 try {
-                    const profile = JSON.parse(localStorage.getItem('zoiUserProfile') || 'null');
-                    if (profile) {
-                        profile.name = user.name;
-                        profile.email = user.email || profile.email;
-                        localStorage.setItem('zoiUserProfile', JSON.stringify(profile));
-                    }
+                    const existing = JSON.parse(localStorage.getItem('zoiUserProfile') || 'null');
+                    const profile = existing || {};
+                    profile.name = user.name;
+                    profile.email = user.email || profile.email || '';
+                    profile.phone = user.phone || profile.phone || '';
+                    profile.id = sessionId;
+                    localStorage.setItem('zoiUserProfile', JSON.stringify(profile));
                 } catch (e) {}
             } else if (role === 'partner' || role === 'pos_staff') {
                 localStorage.setItem(role === 'partner' ? 'zoiPartnerSession' : 'zoiPOSSession', sessionId);
@@ -660,81 +693,100 @@
             const password = document.getElementById('password-input').value;
             const otp = document.getElementById('otp-input')?.value;
             const btn = document.getElementById('btn-submit-login');
+            const resetBtn = () => {
+                btn.innerHTML = `<span class="relative flex items-center gap-2">Secure Login <span class="material-symbols-outlined text-lg">arrow_forward</span></span>`;
+                btn.disabled = false;
+            };
 
-            if (!input) return showToast('Error', 'Please enter your email or ID.');
+            if (!input) return showToast('Error', 'Please enter your email or mobile number.');
+            if (!isOtpMode && !password) return showToast('Error', 'Please enter your password.');
 
             btn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Verifying...`;
             btn.disabled = true;
 
-            try {
-                let data;
-                if (isOtpMode) {
-                    if (!otp || otp.length < 4) throw new Error('Please enter a valid OTP.');
-                    data = await zoiApi('/auth/otp/verify', { method: 'POST', body: JSON.stringify({ phone: input, otp: otp, role: currentRole }) });
-                } else {
-                    data = await zoiApi('/auth/login', { method: 'POST', body: JSON.stringify({ identifier: input, password: password }) });
+            // OTP mode: verify OTP code
+            if (isOtpMode) {
+                if (!otp || otp.length < 4) { resetBtn(); return showToast('Error', 'Enter a valid 4-digit OTP.'); }
+                if (otp !== '1234') { resetBtn(); return showToast('OTP Invalid', 'Incorrect OTP. Use 1234 for demo.'); }
+                // OTP verified — find or create user by phone
+                let user = findRegisteredUser(input, currentRole);
+                if (!user) {
+                    // Auto-create user from phone (like real OTP flow)
+                    user = {
+                        id: 'CUST-' + Math.floor(100000 + Math.random() * 900000),
+                        name: 'User ' + input.slice(-4),
+                        email: input + '@zipzapzoi.temp',
+                        phone: input,
+                        type: currentRole,
+                        role: currentRole,
+                        registeredAt: new Date().toISOString()
+                    };
+                    const users = getRegisteredUsers();
+                    users.push(user);
+                    saveRegisteredUsers(users);
                 }
-
-                // Store JWT Token
-                saveToken(data.token);
-
-                // Create frontend session compatibility
-                const zoiUser = data.user || data;
-                const user = {
-                    id: zoiUser.zoiId || zoiUser.id,
-                    name: zoiUser.name,
-                    role: zoiUser.role,
-                    email: zoiUser.email,
-                    phone: zoiUser.phone,
-                    restaurantId: zoiUser.restaurantId,
-                    zoiId: zoiUser.zoiId || zoiUser.id
-                };
-                
+                saveToken(generateMockToken(user));
                 createSession(user);
-                showToast('Login Successful', `Welcome back, ${user.name}!`);
+                showToast('OTP Verified ✅', `Welcome, ${user.name}!`);
                 setTimeout(() => routeToDashboard(currentRole), 1200);
-
-            } catch (error) {
-                if (error.status === 0 || (error.error && error.error.includes('Network'))) {
-                    console.log('Backend offline, using local simulation for login');
-                    // Check registered users first
-                    const registeredUsers = getRegisteredUsers();
-                    let mockUser = registeredUsers.find(u => u.email === input && u.type === currentRole);
-                    
-                    if (!mockUser) {
-                        mockUser = typeof ZoiUsers !== 'undefined' ? ZoiUsers.authenticate(input, currentRole) : null;
-                    }
-                    
-                    if (mockUser) {
-                        const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-                        const payload = btoa(JSON.stringify({ id: mockUser.id, zoiId: mockUser.id, role: currentRole, type: currentRole, name: mockUser.name, email: mockUser.email }));
-                        const mockToken = header + '.' + payload + '.mock_signature';
-                        saveToken(mockToken);
-                        
-                        const sessionUser = {
-                            id: mockUser.id || mockUser.zoiId,
-                            zoiId: mockUser.zoiId || mockUser.id,
-                            name: mockUser.name,
-                            email: mockUser.email,
-                            phone: mockUser.phone,
-                            role: mockUser.role,
-                            type: currentRole
-                        };
-                        createSession(sessionUser);
-                        showToast('Login Successful', `Welcome back, ${sessionUser.name}! (Offline Mode)`);
-                        setTimeout(() => routeToDashboard(currentRole), 1200);
-                        return;
-                    } else {
-                        btn.innerHTML = `<span class="relative flex items-center gap-2">Secure Login <span class="material-symbols-outlined text-lg">arrow_forward</span></span>`;
-                        btn.disabled = false;
-                        return showToast('Login Failed', 'Account not found. Consider signing up!');
-                    }
-                }
-
-                btn.innerHTML = `<span class="relative flex items-center gap-2">Secure Login <span class="material-symbols-outlined text-lg">arrow_forward</span></span>`;
-                btn.disabled = false;
-                showToast('Login Failed', error.message || error.error);
+                return;
             }
+
+            // Password mode: check registered users FIRST
+            const registeredUser = findRegisteredUser(input, currentRole);
+
+            if (registeredUser) {
+                // Verify password
+                const inputHash = await hashPassword(password);
+                if (registeredUser.passwordHash && registeredUser.passwordHash !== inputHash) {
+                    resetBtn();
+                    return showToast('Login Failed', 'Incorrect password. Please try again.');
+                }
+                // Password match — login success
+                saveToken(generateMockToken(registeredUser));
+                const sessionUser = {
+                    id: registeredUser.id,
+                    zoiId: registeredUser.id,
+                    name: registeredUser.name,
+                    email: registeredUser.email,
+                    phone: registeredUser.phone || '',
+                    type: currentRole,
+                    role: currentRole
+                };
+                createSession(sessionUser);
+                showToast('Login Successful ✅', `Welcome back, ${registeredUser.name}!`);
+                setTimeout(() => routeToDashboard(currentRole), 1200);
+                return;
+            }
+
+            // Fallback: check demo/mock users (DB_USERS from db_simulation.js)
+            try {
+                const mockUser = typeof ZoiUsers !== 'undefined' ? ZoiUsers.authenticate(input, currentRole) : null;
+                if (mockUser) {
+                    saveToken(generateMockToken(mockUser));
+                    const sessionUser = {
+                        id: mockUser.id || mockUser.zoiId,
+                        zoiId: mockUser.zoiId || mockUser.id,
+                        name: mockUser.name,
+                        email: mockUser.email,
+                        phone: mockUser.phone || '',
+                        role: mockUser.role,
+                        type: currentRole
+                    };
+                    createSession(sessionUser);
+                    showToast('Login Successful ✅', `Welcome back, ${sessionUser.name}!`);
+                    setTimeout(() => routeToDashboard(currentRole), 1200);
+                    return;
+                }
+            } catch (authErr) {
+                // Suspended/Banned user
+                resetBtn();
+                return showToast('Login Failed', authErr.message);
+            }
+
+            // No user found anywhere
+            resetBtn();
+            showToast('Account Not Found', 'No account with this email. Please sign up first!');
         }
 
         async function handleRegister(e) {
@@ -746,71 +798,54 @@
             const password = (document.getElementById('reg-pass')?.value || '');
             const confirmPass = (document.getElementById('reg-pass-confirm')?.value || '');
 
-            if (!fname || !email || !password) return showToast('Error', 'Please fill in required fields.');
-            if (password.length < 6) return showToast('Error', 'Password min 6 chars.');
+            // Validation
+            if (!fname || !email || !password) return showToast('Error', 'Please fill in all required fields.');
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast('Error', 'Please enter a valid email address.');
+            if (password.length < 6) return showToast('Error', 'Password must be at least 6 characters.');
             if (password !== confirmPass) return showToast('Error', 'Passwords do not match.');
 
-            try {
-                const data = await zoiApi('/auth/register', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        name: fname + ' ' + lname,
-                        email: email,
-                        phone: phone,
-                        password: password,
-                        role: currentRole
-                    })
-                });
-                
-                // Store JWT
-                saveToken(data.token);
-
-                // Create session
-                const zoiUser = data.user || data;
-                const sessionUser = {
-                    id: zoiUser.zoiId || zoiUser.id || 'CUST-' + Math.floor(Math.random()*10000),
-                    name: zoiUser.name,
-                    email: email,
-                    phone: phone,
-                    type: currentRole
-                };
-                createSession(sessionUser);
-
-                showToast('Account Created! 🎉', 'Welcome, ' + fname + '!');
-                setTimeout(() => routeToDashboard(currentRole), 1500);
-
-            } catch (error) {
-                if (error.status === 0 || (error.error && error.error.includes('Network'))) {
-                    console.log('Backend offline, using local simulation for registration');
-                    const mockUserId = 'CUST-' + Math.floor(Math.random()*10000);
-                    const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-                    const payload = btoa(JSON.stringify({ id: mockUserId, zoiId: mockUserId, role: currentRole, type: currentRole, name: fname + ' ' + lname, email: email }));
-                    const mockToken = header + '.' + payload + '.mock_signature';
-                    saveToken(mockToken);
-
-                    const sessionUser = {
-                        id: mockUserId,
-                        zoiId: mockUserId,
-                        name: fname + ' ' + lname,
-                        email: email,
-                        phone: phone,
-                        type: currentRole,
-                        role: currentRole
-                    };
-                    createSession(sessionUser);
-
-                    if (typeof ZoiUsers !== 'undefined') {
-                        const allUsers = ZoiUsers.getAll();
-                        allUsers.push({ ...sessionUser, status: 'Active', score: 100, orders: 0, spend: "₹0" });
-                        localStorage.setItem('zoiUsers', JSON.stringify(allUsers));
-                    }
-
-                    showToast('Account Created! 🎉', 'Welcome, ' + fname + '! (Offline Mode)');
-                    setTimeout(() => routeToDashboard(currentRole), 1500);
-                } else {
-                    showToast('Registration Error', error.message || error.error);
-                }
+            // Check for duplicate email
+            const existingUser = findRegisteredUser(email, currentRole);
+            if (existingUser) {
+                return showToast('Already Registered', 'An account with this email already exists. Please log in instead.');
             }
+
+            // Create new user with hashed password
+            const userId = 'CUST-' + Math.floor(100000 + Math.random() * 900000);
+            const passwordHash = await hashPassword(password);
+            const fullName = fname + (lname ? ' ' + lname : '');
+
+            const newUser = {
+                id: userId,
+                zoiId: userId,
+                name: fullName,
+                email: email,
+                phone: phone,
+                type: currentRole,
+                role: currentRole,
+                passwordHash: passwordHash,
+                registeredAt: new Date().toISOString(),
+                status: 'Active'
+            };
+
+            // Save to registered users list
+            const users = getRegisteredUsers();
+            users.push(newUser);
+            saveRegisteredUsers(users);
+
+            // Also add to the admin-visible users DB (for admin console)
+            if (typeof ZoiUsers !== 'undefined') {
+                const allUsers = ZoiUsers.getAll();
+                allUsers.push({ ...newUser, score: 100, orders: 0, spend: "₹0", lastActive: "Just now" });
+                localStorage.setItem('zoiUsers', JSON.stringify(allUsers));
+            }
+
+            // Create session and token
+            saveToken(generateMockToken(newUser));
+            createSession(newUser);
+
+            showToast('Account Created! 🎉', `Welcome to ZipZapZoi, ${fname}!`);
+            setTimeout(() => routeToDashboard(currentRole), 1500);
         }
 
         // ═══ GOOGLE IDENTITY SERVICES INTEGRATION ═══
@@ -884,27 +919,21 @@
                 return;
             }
 
-            // ═══ DEMO FALLBACK: Mock Google JWT for local testing ═══
+            // ═══ DEMO FALLBACK: Create a demo Google user locally ═══
             showToast("Connecting...", "Initiating Google OAuth flow...");
-            const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-            const payload = btoa(JSON.stringify({
-                email: "demo.oauth@zipzapzoi.in",
-                name: "Web Demo User",
-                picture: "https://lh3.googleusercontent.com/a-/mock_picture",
-            }));
-            const mockToken = `${header}.${payload}.mocksig`;
-
-            setTimeout(async () => {
-                try {
-                    const data = await zoiApi('/auth/google', { method: 'POST', body: JSON.stringify({ credential: mockToken }) });
-                    saveToken(data.token);
-                    const zoiUser = data.user || data;
-                    createSession({ id: zoiUser.zoiId || zoiUser.id, name: zoiUser.name, email: zoiUser.email, type: 'customer' });
-                    showToast('OAuth Success! 🎉', `Authenticated securely as ${zoiUser.name}`);
-                    setTimeout(() => window.location.href = 'index.html', 1500);
-                } catch (error) {
-                    showToast('OAuth Failed', error.message);
-                }
+            setTimeout(() => {
+                const googleUser = {
+                    id: 'CUST-G' + Math.floor(10000 + Math.random() * 90000),
+                    name: "Google User",
+                    email: "demo.google@zipzapzoi.in",
+                    phone: '',
+                    type: 'customer',
+                    role: 'customer'
+                };
+                saveToken(generateMockToken(googleUser));
+                createSession(googleUser);
+                showToast('Google Login ✅', `Welcome, ${googleUser.name}!`);
+                setTimeout(() => window.location.href = 'index.html', 1200);
             }, 800);
         }
 
@@ -914,12 +943,20 @@
         });
 
         function socialLogin(provider) {
-            showToast('Connecting...', `Authenticating with ${provider}`);
+            showToast('Connecting...', `Authenticating with ${provider}...`);
             setTimeout(() => {
-                const user = { name: provider + " User", email: provider.toLowerCase() + ".user@zipzapzoi.in", type: "customer" };
+                const user = {
+                    id: 'CUST-S' + Math.floor(10000 + Math.random() * 90000),
+                    name: provider + " User",
+                    email: provider.toLowerCase() + ".user@zipzapzoi.in",
+                    type: "customer",
+                    role: "customer"
+                };
+                saveToken(generateMockToken(user));
                 createSession(user);
-                window.location.href = 'index.html';
-            }, 2000);
+                showToast(`${provider} Login ✅`, `Welcome, ${user.name}!`);
+                setTimeout(() => window.location.href = 'index.html', 1200);
+            }, 800);
         }
 
         function biometricLogin() {
@@ -961,7 +998,7 @@
             }
         })();
     </script>
-<script src="js/zoi_customer_engine.js?v=10"></script>
+<script src="js/zoi_customer_engine.js?v=11"></script>
 <script src="js/zoi_ai_assistant.js?v=4"></script>
 <script src="js/zoi_theme.js"></script>
 </body>
