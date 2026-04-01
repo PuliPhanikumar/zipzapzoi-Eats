@@ -657,7 +657,9 @@ const DB_USERS = [
     { id: "RIDE-991", name: "Vikram Singh", email: "vikram@zoi.com", role: "rider", status: "Active", score: 75, lastActive: "Online", spend: "₹12k", orders: 110 },
     { id: "RIDE-202", name: "Suresh Kumar", email: "suresh@zoi.com", role: "rider", status: "Pending", score: 100, lastActive: "Offline", spend: "₹0", orders: 0 },
     // POS
-    { id: "POS-01", name: "Neha Cashier", email: "neha@spicy.com", role: "pos_staff", status: "Active", score: 100, lastActive: "1m ago", spend: "₹0", orders: 0 }
+    { id: "POS-01", name: "Neha Cashier", email: "neha@spicy.com", role: "pos_staff", status: "Active", score: 100, lastActive: "1m ago", spend: "₹0", orders: 0 },
+    // Hostel POS
+    { id: "HPOS-01", name: "Campus Hostel POS", email: "admin@campushostel.com", role: "hostel", status: "Active", score: 98, lastActive: "10m ago", spend: "₹0", orders: 0 }
 ];
 
 const ZoiUsers = {
