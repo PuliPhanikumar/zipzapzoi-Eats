@@ -405,10 +405,10 @@
                                 ${item.veg ? '<span class="text-xs bg-green-900/30 text-green-400 px-2 py-1 rounded border border-green-500/20">Veg</span>' : ''}
                             </div>
                         </div>
-                        <div class="flex items-center justify-between pt-2 border-t border-white/5">
-                            <span class="text-xs text-[#92c9a7]">${idx < 2 ? '🔥 Popular Choice' : 'AI Recommended'}</span>
-                            <button onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price}, '${item.img}')" class="bg-primary hover:bg-green-400 text-black font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all transform hover:scale-105 shadow-[0_0_15px_rgba(43,238,117,0.3)]">
-                                Add <span class="material-symbols-outlined text-sm">add</span>
+                        <div class="flex items-center justify-between pt-4 border-t border-white/5">
+                            <span class="text-xs text-[#92c9a7] uppercase tracking-wider font-bold">${idx < 2 ? '🔥 Popular' : '✨ Recommended'}</span>
+                            <button onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price}, '${item.img}')" class="bg-primary hover:bg-[#00d4c5] text-black font-extrabold py-2.5 px-6 rounded-xl flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 shadow-[0_4px_15px_rgba(0,240,255,0.25)] border border-green-300">
+                                Add <span class="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
                             </button>
                         </div>
                     </div>
@@ -481,18 +481,29 @@
             } else {
                 container.innerHTML = "";
                 let total = 0;
-                cart.forEach(item => {
+                cart.forEach((item, index) => {
                     total += item.price * (item.qty || 1);
                     container.innerHTML += `
-                    <div class="flex justify-between items-center bg-black/20 p-2 rounded-lg mb-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded bg-cover bg-center" style="background-image: url('${item.image}')"></div>
+                    <div class="flex justify-between items-center bg-black/40 p-3 rounded-xl mb-3 border border-white/5 hover:border-primary/20 transition-all">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-lg bg-cover bg-center border border-white/10" style="background-image: url('${item.image}')"></div>
                             <div class="flex flex-col">
-                                <span class="text-white text-xs">${item.name}</span>
-                                <span class="text-gray-500 text-[10px]">Qty: ${item.qty || 1}</span>
+                                <span class="text-white text-sm font-bold truncate max-w-[120px]">${item.name}</span>
+                                <span class="text-gray-400 text-[10px] uppercase font-bold tracking-wider mt-0.5">₹${item.price} each</span>
                             </div>
                         </div>
-                        <span class="text-primary font-mono text-sm">₹${item.price * (item.qty || 1)}</span>
+                        <div class="flex flex-col items-end gap-2">
+                            <span class="text-primary font-mono font-bold text-sm">₹${item.price * (item.qty || 1)}</span>
+                            <div class="flex items-center gap-2 bg-background-dark border border-white/10 rounded-lg p-1">
+                                <button onclick="updateQty(${index}, -1)" class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-white rounded bg-white/5 hover:bg-red-500/20 transition-colors">
+                                    <span class="material-symbols-outlined text-[14px]">${(item.qty || 1) === 1 ? 'delete' : 'remove'}</span>
+                                </button>
+                                <span class="text-xs font-bold text-white w-4 text-center">${item.qty || 1}</span>
+                                <button onclick="updateQty(${index}, 1)" class="w-6 h-6 flex items-center justify-center text-primary hover:bg-primary/20 rounded bg-primary/10 transition-colors">
+                                    <span class="material-symbols-outlined text-[14px]">add</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 `;
                 });
@@ -510,6 +521,16 @@
                     healthText.innerText = "Good";
                     aiTip.innerHTML = `<span class="text-primary font-bold">Tip:</span> Add ₹${500 - total} more for free delivery.`;
                 }
+            }
+        }
+
+        // Update Quantity Function
+        function updateQty(index, change) {
+            if (cart[index]) {
+                cart[index].qty = (cart[index].qty || 1) + change;
+                if (cart[index].qty <= 0) cart.splice(index, 1);
+                saveCart();
+                updateCartUI();
             }
         }
 
