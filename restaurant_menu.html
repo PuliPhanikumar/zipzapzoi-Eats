@@ -233,8 +233,25 @@
             </div>
         </div>
 
+        <!-- Mobile Sticky View Cart Button -->
+        <button onclick="document.getElementById('cart-section').scrollIntoView({behavior: 'smooth'})" id="mobile-cart-btn" class="fixed bottom-6 right-6 lg:hidden bg-primary text-black rounded-full p-4 shadow-[0_10px_25px_rgba(0,240,255,0.4)] z-[9000] flex items-center justify-center transform hover:scale-105 active:scale-95 transition-all hidden">
+            <span class="material-symbols-outlined text-[28px]">shopping_cart</span>
+            <span id="mobile-cart-badge" class="absolute -top-1 -right-1 bg-neon-pink text-white text-[10px] font-bold w-6 h-6 flex items-center justify-center rounded-full border-2 border-surface-dark">0</span>
+        </button>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed top-24 right-4 bg-surface-dark border border-white/10 p-4 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] transform translate-x-[150%] opacity-0 transition-all duration-300 z-[9999] font-sans flex items-start gap-3">
+            <div class="p-2 rounded-full bg-primary/20 text-primary">
+                <span class="material-symbols-outlined text-[20px]">check_circle</span>
+            </div>
+            <div class="pr-6">
+                <h4 class="text-white font-bold text-sm m-0" id="toast-title">Added to Cart</h4>
+                <p class="text-gray-400 text-xs mt-1 m-0" id="toast-message">Item was added successfully.</p>
+            </div>
+        </div>
+
         <!-- 🛒 CART SIDEBAR (lg:col-span-5) -->
-        <div class="col-span-1 lg:col-span-5 flex flex-col gap-6 sticky top-24">
+        <div id="cart-section" class="col-span-1 lg:col-span-5 flex flex-col gap-6 sticky top-24">
             <div class="bg-surface-dark border border-white/5 shadow-2xl rounded-3xl p-6 relative overflow-hidden flex flex-col gap-6">
                 <!-- AI Glow Header -->
                 <div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 blur-3xl rounded-full"></div>
@@ -446,6 +463,21 @@
 
             saveCart(); // Save immediately
             updateCartUI();
+            
+            // Show Feedback
+            showToast('Added to Request 🛒', `${name} has been added!`);
+        }
+
+        function showToast(title, message) {
+            const toast = document.getElementById('toast');
+            if(!toast) return;
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-message').innerText = message;
+            toast.classList.remove('translate-x-[150%]', 'opacity-0');
+            clearTimeout(window.toastTimer);
+            window.toastTimer = setTimeout(() => {
+                toast.classList.add('translate-x-[150%]', 'opacity-0');
+            }, 2500);
         }
 
         function saveCart() {
@@ -469,6 +501,18 @@
             // Update Badge
             const totalCount = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
             badge.innerText = `${totalCount} items`;
+
+            // Mobile FAB Sync
+            const mobileBtn = document.getElementById('mobile-cart-btn');
+            const mobileBadge = document.getElementById('mobile-cart-badge');
+            if (mobileBtn && mobileBadge) {
+                if (totalCount > 0) {
+                    mobileBtn.classList.remove('hidden');
+                    mobileBadge.innerText = totalCount;
+                } else {
+                    mobileBtn.classList.add('hidden');
+                }
+            }
 
             // Render Items
             if (cart.length === 0) {
