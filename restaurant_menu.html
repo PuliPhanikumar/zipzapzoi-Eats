@@ -123,10 +123,12 @@
                         <p class="text-xs text-[#92c9a7]">Points</p>
                         <p class="text-sm font-bold text-primary" id="header-user-points">0 Zaps</p>
                     </div>
-                    <div id="header-user-avatar" class="bg-surface-dark bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20 flex items-center justify-center text-primary font-bold overflow-hidden"
-                        style="background-image: none">
-                        G
-                    </div>
+                    <a href="customer profile.html" class="block hover:opacity-80 transition-opacity">
+                        <div id="header-user-avatar" class="bg-surface-dark bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20 flex items-center justify-center text-primary font-bold overflow-hidden"
+                            style="background-image: none">
+                            G
+                        </div>
+                    </a>
                 </div>
             </div>
         </header>
@@ -405,7 +407,7 @@
                         </div>
                         <div class="flex items-center justify-between pt-2 border-t border-white/5">
                             <span class="text-xs text-[#92c9a7]">${idx < 2 ? '🔥 Popular Choice' : 'AI Recommended'}</span>
-                            <button onclick="addToCart('${item.name}', ${item.price}, '${item.img}')" class="bg-primary hover:bg-green-400 text-black font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all transform hover:scale-105 shadow-[0_0_15px_rgba(43,238,117,0.3)]">
+                            <button onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price}, '${item.img}')" class="bg-primary hover:bg-green-400 text-black font-bold py-2 px-6 rounded-full flex items-center gap-2 transition-all transform hover:scale-105 shadow-[0_0_15px_rgba(43,238,117,0.3)]">
                                 Add <span class="material-symbols-outlined text-sm">add</span>
                             </button>
                         </div>
