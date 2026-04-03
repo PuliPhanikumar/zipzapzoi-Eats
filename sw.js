@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zoi-eats-v5'; // Bumped version to force cache invalidation universally
+const CACHE_NAME = 'zoi-eats-v6'; // Bumped version to v6 to force universal cache invalidation
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
