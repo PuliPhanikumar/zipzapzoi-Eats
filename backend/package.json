@@ -13,11 +13,16 @@
     "generate": "npx prisma generate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["food-delivery", "zipzapzoi", "eats"],
+  "keywords": [
+    "food-delivery",
+    "zipzapzoi",
+    "eats"
+  ],
   "author": "ZipZapZoi Team",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@google/genai": "^1.50.1",
     "@prisma/client": "^5.22.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.9.0",

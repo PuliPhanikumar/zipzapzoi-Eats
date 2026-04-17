@@ -321,21 +321,15 @@
     const ZoiProfile = {
         KEY: 'zoiUserProfile',
         get: () => JSON.parse(localStorage.getItem('zoiUserProfile')) || {
-            name: 'Aditi Rao', email: 'aditi@example.com', phone: '+91 98765 43210',
-            addresses: [
-                { id: 1, label: 'Home', address: '42 MG Road, Indiranagar, Bangalore 560038', default: true },
-                { id: 2, label: 'Work', address: 'WeWork Galaxy, Residency Road, Bangalore 560025', default: false }
-            ],
-            payments: [
-                { id: 1, type: 'UPI', detail: 'aditi@upi', default: true },
-                { id: 2, type: 'Card', detail: '•••• 4521', default: false }
-            ],
+            name: '', email: '', phone: '',
+            addresses: [],
+            payments: [],
             dietary: { veg: false, vegan: false, glutenFree: false, lactoseFree: false },
             notifications: { orders: true, promos: true, social: false, sms: true },
-            points: 2450,
-            memberSince: 'Jan 2025',
-            totalOrders: 47,
-            savedAmount: '₹3,200'
+            points: 0,
+            memberSince: new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+            totalOrders: 0,
+            savedAmount: '₹0'
         },
         save: (profile) => {
             localStorage.setItem('zoiUserProfile', JSON.stringify(profile));
@@ -1086,6 +1080,7 @@
 
     // ─── WIRE: LOYALTY PAGE ─────────────────────────────────
     function wireLoyaltyPage() {
+        // Wire join/leave buttons
         document.querySelectorAll('button').forEach(btn => {
             const text = btn.textContent.trim().toLowerCase();
 
@@ -1110,10 +1105,8 @@
                 });
             }
         });
-    }
 
-    // ─── WIRE: LOYALTY PAGE ──────────────────────────────────
-    function wireLoyaltyPage() {
+        // Wire search/filter
         const searchInput = document.querySelector('input[placeholder*="Filter"]');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {

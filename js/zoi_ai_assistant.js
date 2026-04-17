@@ -838,12 +838,36 @@
 
         let html = '';
 
-        // Markdown: Bold, italic, links
-        let text = (content.text || '')
-            .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#00f0ff">$1</strong>')
-            .replace(/\*(.+?)\*/g, '<em style="color:#b4a5d8">$1</em>')
-            .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#00f0ff;text-decoration:underline">$1</a>')
-            .replace(/\n/g, '<br>');
+        // Markdown: Enhanced rendering for Gemini responses
+        let rawText = content.text || '';
+        
+        // Code blocks (``` ... ```)
+        rawText = rawText.replace(/```(\w*)\n?([\s\S]*?)```/g, (m, lang, code) => {
+            return `<pre style="background:#1a0b36;border:1px solid #3c1e6e;border-radius:8px;padding:10px;margin:6px 0;overflow-x:auto;font-size:12px;font-family:'JetBrains Mono',monospace;color:#e0d4ff"><code>${code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code></pre>`;
+        });
+        // Inline code
+        rawText = rawText.replace(/`([^`]+)`/g, '<code style="background:#1a0b36;border:1px solid #3c1e6e;padding:1px 5px;border-radius:4px;font-size:12px;color:#00f0ff;font-family:monospace">$1</code>');
+        // Headings (### then ## then #)
+        rawText = rawText.replace(/^### (.+)$/gm, '<h4 style="color:#00f0ff;font-size:13px;font-weight:800;margin:8px 0 4px">$1</h4>');
+        rawText = rawText.replace(/^## (.+)$/gm, '<h3 style="color:#00f0ff;font-size:14px;font-weight:800;margin:8px 0 4px">$1</h3>');
+        rawText = rawText.replace(/^# (.+)$/gm, '<h2 style="color:#00f0ff;font-size:15px;font-weight:800;margin:8px 0 4px">$1</h2>');
+        // Bold & italic
+        rawText = rawText.replace(/\*\*(.+?)\*\*/g, '<strong style="color:#00f0ff">$1</strong>');
+        rawText = rawText.replace(/\*(.+?)\*/g, '<em style="color:#b4a5d8">$1</em>');
+        // Links
+        rawText = rawText.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#00f0ff;text-decoration:underline" target="_blank">$1</a>');
+        // Unordered lists (- or *)
+        rawText = rawText.replace(/^[\-\*]\s+(.+)$/gm, '<li style="margin-left:16px;list-style:disc;color:#ccc">$1</li>');
+        // Ordered lists (1. 2. etc.)
+        rawText = rawText.replace(/^\d+\.\s+(.+)$/gm, '<li style="margin-left:16px;list-style:decimal;color:#ccc">$1</li>');
+        // Wrap consecutive <li> in <ul>/<ol>
+        rawText = rawText.replace(/((?:<li[^>]*>.*<\/li>\n?)+)/g, '<ul style="margin:4px 0;padding-left:8px">$1</ul>');
+        // Line breaks
+        rawText = rawText.replace(/\n/g, '<br>');
+        // Clean up excessive <br> after block elements
+        rawText = rawText.replace(/(<\/(?:h[2-4]|pre|ul|ol|li)>)<br>/g, '$1');
+
+        let text = rawText;
         html += `<div>${text}</div>`;
 
         // Confidence badge
@@ -968,14 +992,24 @@
         // Show typing indicator
         showTyping();
 
-        // AI processing with simulated delay
-        const delay = 400 + Math.random() * 600;
-        setTimeout(() => {
+        // Call Backend Gemini API
+        fetch('/api/zoi-ai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ history: conversationContext.history })
+        })
+        .then(res => res.json())
+        .then(data => {
             hideTyping();
-            const intent = detectIntent(text);
-            const response = generateResponse(intent);
-            renderMessage('bot', response);
-        }, delay);
+            const reply = data.response || "Sorry, I couldn't formulate a response right now.";
+            pushContext('bot', reply, null);
+            renderMessage('bot', { text: reply });
+        })
+        .catch(err => {
+            console.error("Zoi AI Fetch Error:", err);
+            hideTyping();
+            renderMessage('bot', { text: "🔴 **Network Error!**\n\nI couldn't reach the Zoi Brain server. Please ensure the backend is running." });
+        });
     }
 
     function togglePanel() {

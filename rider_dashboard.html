@@ -764,8 +764,8 @@
                 if (response.ok) {
                     const data = await response.json();
 
-                    // Rider should only see PENDING orders
-                    const pendingOrders = data.data.filter(o => o.status === 'PENDING');
+                    // Rider should only see Pending orders (Title Case to match backend schema)
+                    const pendingOrders = data.data.filter(o => o.status === 'Pending');
 
                     if (pendingOrders.length > 0) {
                         // Show the first available pending order

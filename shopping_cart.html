@@ -579,9 +579,9 @@
             const delivery = itemTotal > 0 ? 40 : 0;
             const tax = Math.round(itemTotal * 0.05);
 
-            // Check Surge
+            // Check Surge — safe fallback if ZoiSystem isn't loaded
             let surge = 0;
-            const config = ZoiSystem.getConfig();
+            const config = (typeof ZoiSystem !== 'undefined' && ZoiSystem.getConfig) ? ZoiSystem.getConfig() : { surgeMultiplier: 1.0 };
             if (config.surgeMultiplier > 1.0) {
                 surge = Math.round(itemTotal * (config.surgeMultiplier - 1));
                 document.getElementById('surge-row').classList.remove('hidden');
