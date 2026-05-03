@@ -335,7 +335,33 @@
         { domain: 'general', keywords: ['about', 'what is zoieats', 'zipzapzoi', 'company', 'who are you'], answer: "⚡ **About ZipZapZoi Eats**\n\nZipZapZoi Eats is an AI-powered food delivery platform bringing authentic Indian flavors to your doorstep. We connect customers with local restaurants through intelligent recommendations, real-time tracking, and a gamified loyalty experience.\n\n📖 *Source: About Us*", weight: 0.8, source: 'About' },
         { domain: 'general', keywords: ['contact', 'phone number', 'email', 'reach us', 'customer care'], answer: "📞 **Contact Us**\n\n• Email: reachus@zipzapzoi.com\n• Support: Available 24/7 via Zoi AI Chat\n• Ticket: Submit via **Support Help** page\n• Response time: Within 2 hours\n\n📖 *Source: Contact Information*", weight: 0.8, source: 'Contact' },
         { domain: 'general', keywords: ['hours', 'operating hours', 'delivery time', 'available', 'open'], answer: "🕐 **Operating Hours**\n\nZoiEats operates **24/7** in most metro areas. Restaurant availability varies — check individual restaurant pages for their operating hours. Late-night delivery (11PM-6AM) may have limited options.\n\n📖 *Source: Service Hours*", weight: 0.8, source: 'Service Info' },
+        // ══════ DOMAIN: RECIPES & COOKING ══════
+        { domain: 'food', keywords: ['recipe', 'how to make', 'how to cook', 'prepare', 'cooking', 'homemade'], answer: "👨‍🍳 **Recipe Helper**\n\nI can help with popular recipes! Here are some quick ones:\n\n**🍗 Butter Chicken:** Marinate chicken in yogurt+spices 2hrs → sear → simmer in tomato-cream-butter sauce 20min.\n\n**🍚 Biryani:** Layer basmati rice + spiced meat/veggies + saffron milk + fried onions → dum cook 25min on low.\n\n**🥘 Dal Tadka:** Boil toor dal → temper with ghee, cumin, garlic, chili, curry leaves → mix.\n\nAsk me for a specific dish recipe!\n\n📖 *Source: Zoi Recipe Database*", weight: 1.0, source: 'Recipes' },
+        { domain: 'food', keywords: ['biryani recipe', 'make biryani', 'cook biryani', 'biryani at home'], answer: "🍚 **Hyderabadi Biryani Recipe**\n\n**Ingredients:** 500g basmati rice, 500g chicken/mutton, 2 onions, 1 cup yogurt, biryani masala, saffron, mint, coriander, ghee\n\n**Steps:**\n1. Marinate meat in yogurt + spices for 2 hours\n2. Parboil rice (70% cooked) with whole spices\n3. Fry onions golden brown, set aside\n4. Layer: meat → rice → fried onions → saffron milk → mint\n5. Seal with dough, cook on low flame 25 min (dum)\n6. Rest 10 min, then gently mix and serve with raita\n\n**Calories:** ~520 kcal per serving\n\n📖 *Source: Zoi Recipe Database*", weight: 1.2, source: 'Recipes' },
+        { domain: 'food', keywords: ['butter chicken recipe', 'murgh makhani', 'make butter chicken'], answer: "🍗 **Butter Chicken Recipe**\n\n**Marinade:** 500g chicken + yogurt + ginger-garlic paste + red chili + turmeric (2hrs)\n\n**Gravy:**\n1. Blend: tomatoes + cashews + cream\n2. Sear marinated chicken in tandoor/oven/pan\n3. Cook gravy: butter → garlic → tomato paste → spices\n4. Add cream, sugar, kasuri methi\n5. Add chicken, simmer 15 min\n\n**Pro tip:** Add honey for restaurant-style sweetness!\n\n**Calories:** ~450 kcal per serving\n\n📖 *Source: Zoi Recipe Database*", weight: 1.2, source: 'Recipes' },
+        { domain: 'food', keywords: ['pizza recipe', 'make pizza', 'pizza dough', 'homemade pizza'], answer: "🍕 **Homemade Pizza Recipe**\n\n**Dough:** 2 cups flour + 1 tsp yeast + warm water + olive oil + salt → knead 10min → rest 1hr\n\n**Sauce:** Blend tomatoes + garlic + basil + oregano + salt\n\n**Assembly:**\n1. Stretch dough into circle on floured surface\n2. Spread sauce, add mozzarella\n3. Add toppings (pepperoni, veggies, mushrooms)\n4. Bake at 250°C for 12-15 min\n\n**Calories:** ~680 kcal per serving (2 slices)\n\n📖 *Source: Zoi Recipe Database*", weight: 1.2, source: 'Recipes' },
+        // ══════ DOMAIN: DETAILED NUTRITION ══════
+        { domain: 'food', keywords: ['calories in biryani', 'biryani calories', 'biryani nutrition'], answer: "🔥 **Biryani Nutrition (per serving)**\n\n• Calories: **520 kcal**\n• Protein: 28g\n• Carbs: 62g\n• Fat: 18g\n• Fiber: 3g\n\n**Variations:**\n• Veg Biryani: ~420 kcal\n• Egg Biryani: ~480 kcal\n• Mutton Biryani: ~580 kcal\n\n💡 *Tip: Pair with raita (50 kcal) instead of salan (150 kcal) to keep it lighter!*", weight: 1.2, source: 'Nutrition DB' },
+        { domain: 'food', keywords: ['calories in pizza', 'pizza calories', 'pizza nutrition'], answer: "🔥 **Pizza Nutrition (per slice)**\n\n• Regular: **250-300 kcal**\n• Thin crust: **180-220 kcal**\n• Cheese burst: **350-400 kcal**\n• Farmhouse: **280 kcal**\n\n**Full pizza (8 slices):** 2000-2400 kcal\n\n💡 *Tip: Thin crust + veggie toppings saves ~150 kcal per slice!*", weight: 1.2, source: 'Nutrition DB' },
+        { domain: 'food', keywords: ['calories in burger', 'burger calories', 'burger nutrition'], answer: "🔥 **Burger Nutrition**\n\n• Classic Veg Burger: **380 kcal**\n• Chicken Burger: **450 kcal**\n• Double Patty: **680 kcal**\n• McAloo Tikki: **340 kcal**\n• Whopper: **650 kcal**\n\n💡 *Tip: Skip the cheese (-100 kcal) and mayo (-80 kcal) for a lighter option!*", weight: 1.2, source: 'Nutrition DB' },
+        { domain: 'food', keywords: ['calories in dal', 'dal calories', 'lentil calories', 'dal nutrition'], answer: "🔥 **Dal Nutrition (per bowl ~200ml)**\n\n• Dal Tadka: **180 kcal** (protein: 12g)\n• Dal Makhani: **280 kcal** (protein: 14g)\n• Moong Dal: **150 kcal** (protein: 14g)\n• Chana Dal: **200 kcal** (protein: 16g)\n• Sambar: **160 kcal** (protein: 8g)\n\n💡 *Dal is one of the best protein sources for vegetarians!*", weight: 1.2, source: 'Nutrition DB' },
+        { domain: 'food', keywords: ['calories in rice', 'rice calories', 'rice nutrition', 'chapati calories', 'roti calories'], answer: "🔥 **Staples Nutrition**\n\n• White Rice (1 cup): **240 kcal**, 4g protein\n• Brown Rice (1 cup): **220 kcal**, 5g protein, 3.5g fiber\n• Chapati (1 pc): **120 kcal**, 3g protein\n• Naan (1 pc): **260 kcal**, 8g protein\n• Paratha (1 pc): **200 kcal**, 4g protein\n• Dosa (1 pc): **130 kcal**, 4g protein\n• Idli (2 pcs): **120 kcal**, 4g protein\n\n💡 *Replace rice with millets to save 30% calories!*", weight: 1.2, source: 'Nutrition DB' },
+        { domain: 'food', keywords: ['daily calories', 'how many calories per day', 'calorie intake', 'bmr', 'tdee'], answer: "📊 **Daily Calorie Guide**\n\n**Recommended intake:**\n• Sedentary women: **1,600-2,000 kcal/day**\n• Sedentary men: **2,000-2,400 kcal/day**\n• Active women: **2,000-2,400 kcal/day**\n• Active men: **2,400-3,000 kcal/day**\n\n**For weight loss:** Reduce by 500 kcal/day → ~0.5 kg/week\n**For muscle gain:** Add 300-500 kcal + high protein\n\n💡 *Use ZoiEats nutrition filters to stay on track!*", weight: 1.0, source: 'Nutrition Guide' },
+        // ══════ DOMAIN: INDIAN CUISINE GUIDE ══════
+        { domain: 'food', keywords: ['indian food', 'indian cuisine', 'types of indian food', 'regional food'], answer: "🇮🇳 **Indian Cuisine Guide**\n\n**North Indian:** Butter Chicken, Dal Makhani, Naan, Chole Bhature, Biryani\n**South Indian:** Dosa, Idli, Vada, Sambar, Hyderabadi Biryani\n**West Indian:** Pav Bhaji, Vada Pav, Dhokla, Thepla\n**East Indian:** Rasgulla, Macher Jhol, Litti Chokha\n**Street Food:** Pani Puri, Chaat, Samosa, Kachori\n\nAsk me about any specific cuisine for detailed info!", weight: 0.9, source: 'Cuisine Guide' },
+        { domain: 'food', keywords: ['meal plan', 'meal prep', 'what to eat', 'breakfast lunch dinner', 'diet plan'], answer: "📅 **Sample Meal Plan (~1800 kcal)**\n\n**Breakfast (400 kcal):**\n• 2 Idli + Sambar + Coconut Chutney\n• OR Oats + Banana + Almonds\n\n**Lunch (600 kcal):**\n• 1 cup Rice + Dal + Sabzi + Salad + Curd\n• OR 2 Chapati + Paneer + Raita\n\n**Snack (200 kcal):**\n• Fruits + Green Tea\n• OR Sprouts Chaat\n\n**Dinner (500 kcal):**\n• 2 Chapati + Chicken Curry + Salad\n• OR Khichdi + Buttermilk\n\n💡 *Order healthy meals from ZoiEats with our nutrition filters!*", weight: 1.0, source: 'Nutrition Guide' },
+        { domain: 'food', keywords: ['food safety', 'food hygiene', 'safe to eat', 'expired', 'food poisoning', 'storage'], answer: "🛡️ **Food Safety Tips**\n\n• **2-Hour Rule:** Don't eat food left at room temp for 2+ hours\n• **Reheat properly:** Heat to 74°C (165°F) to kill bacteria\n• **Fridge:** Store cooked food within 1 hour, eat within 3-4 days\n• **Wash:** Always wash fruits & vegetables before eating\n• **Check:** Smell, color, texture — when in doubt, throw it out\n\nAll ZoiEats partner restaurants are **FSSAI certified** and follow strict hygiene protocols.", weight: 0.9, source: 'Food Safety' },
+        { domain: 'food', keywords: ['sugar free', 'diabetes', 'diabetic food', 'low sugar', 'blood sugar'], answer: "🩺 **Diabetic-Friendly Options**\n\n**Good choices:**\n• Grilled chicken/fish (no breading)\n• Dal + Brown rice/Millets\n• Salads with olive oil dressing\n• Tandoori items (no cream sauces)\n\n**Avoid:**\n• White rice in large portions\n• Sugary drinks & desserts\n• Fried items (samosa, pakora)\n• Thick gravies with cream\n\n💡 *Filter by 'Healthy' on ZoiEats for diabetic-safe meals!*", weight: 1.0, source: 'Nutrition Guide' },
+        // ══════ DOMAIN: COMMON QUESTIONS ══════
+        { domain: 'general', keywords: ['thank', 'thanks', 'thank you', 'awesome', 'great', 'perfect', 'nice'], answer: "😊 You're welcome! Happy to help. Is there anything else I can assist you with? 🚀", weight: 0.7, source: 'Conversational' },
+        { domain: 'general', keywords: ['bye', 'goodbye', 'see you', 'later', 'good night'], answer: "👋 Goodbye! Enjoy your meal and have a great day! Remember, I'm always here whenever you need food help. 🍕✨", weight: 0.7, source: 'Conversational' },
+        { domain: 'general', keywords: ['who made you', 'who built you', 'who created you', 'your creator', 'developer'], answer: "🤖 I'm **Zoi**, built by the **ZipZapZoi** engineering team! I'm designed to be your personal food concierge — helping you discover meals, track nutrition, manage orders, and navigate the entire ZoiEats ecosystem. I learn from your feedback to get better every day! ⚡", weight: 0.9, source: 'About' },
+        { domain: 'general', keywords: ['joke', 'funny', 'make me laugh', 'tell me a joke'], answer: "😄 Here's a food joke!\n\n*Why did the tomato turn red?*\n🍅 Because it saw the salad dressing! 😂\n\n*What did the grape say when it got stepped on?*\n🍇 Nothing, it just let out a little wine! 🍷\n\nWant me to help you find something delicious instead? 🍕", weight: 0.7, source: 'Conversational' },
+        { domain: 'customer', keywords: ['minimum order', 'min order', 'order limit', 'delivery fee', 'delivery charge', 'delivery cost'], answer: "🚚 **Delivery Information**\n\n• **Minimum Order:** Varies by restaurant (usually ₹99-199)\n• **Delivery Fee:** ₹20-60 based on distance\n• **Free Delivery:** On orders above ₹299 (or always free with ZoiPass!)\n• **Surge Fee:** May apply during peak hours (11AM-2PM, 7PM-10PM)\n\n💡 *Get ZoiPass for unlimited free deliveries!*", weight: 1.0, source: 'Delivery Info' },
+        { domain: 'customer', keywords: ['wallet', 'zoi wallet', 'wallet balance', 'add money', 'top up'], answer: "💰 **Zoi Wallet**\n\n• **Add money:** Profile → ZapWallet → Add Funds via UPI/Card\n• **Earn cashback:** Automatic on select orders\n• **Refunds:** Credited to wallet within 24 hours\n• **Use at checkout:** Toggle 'Pay with Wallet' on the payment page\n\nWallet balance never expires!\n\n📖 *Source: Wallet Guide*", weight: 1.0, source: 'Wallet' },
+        { domain: 'customer', keywords: ['notification', 'notifications', 'push notification', 'alert', 'sms', 'email notification'], answer: "🔔 **Notifications**\n\n• **Order updates:** Automatic push for each status change\n• **In-app:** Click the 🔔 bell icon for all notifications\n• **Promos:** Get flash deal alerts when new offers drop\n• **Settings:** Manage in Profile → Settings → Notifications\n\n📖 *Source: Notification Settings*", weight: 0.9, source: 'Notifications' },
     ];
+
 
     // ─── RAG SCORING ENGINE ──────────────────────────────────
     const CONFIDENCE = { HIGH: 0.8, MEDIUM: 0.5, LOW: 0.3 };
@@ -989,26 +1015,94 @@
         renderMessage('user', { text });
         input.value = '';
 
-        // Show typing indicator
+        // ═══════════════════════════════════════════════════
+        // HYBRID AI ENGINE: Local RAG first → Gemini fallback
+        // ═══════════════════════════════════════════════════
+
+        // STEP 1: Try local intent detection (instant, no network)
+        const intent = detectIntent(text);
+
+        // If local engine has a confident answer → respond immediately
+        if (intent.intent !== 'general') {
+            showTyping();
+            const delay = 300 + Math.random() * 500; // Simulate "thinking"
+            setTimeout(() => {
+                hideTyping();
+                const response = generateResponse(intent);
+                pushContext('bot', response.text || '', intent.domain || null);
+                renderMessage('bot', response);
+            }, delay);
+            return;
+        }
+
+        // STEP 2: For 'general' intent → try Gemini backend for rich answers
         showTyping();
 
-        // Call Backend Gemini API
-        fetch('/api/zoi-ai', {
+        // Build API base URL
+        const apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL)
+            ? ZOI_CONFIG.API_BASE_URL
+            : 'http://localhost:5000/api';
+
+        fetch(`${apiBase}/zoi-ai`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ history: conversationContext.history })
+            headers: {
+                'Content-Type': 'application/json',
+                ...(typeof ZoiToken !== 'undefined' && ZoiToken.get() ? { 'Authorization': `Bearer ${ZoiToken.get()}` } : {})
+            },
+            body: JSON.stringify({ 
+                message: text,
+                history: conversationContext.history,
+                context: {
+                    page: window.location.pathname,
+                    domain: getPageDomain(),
+                    user: getUserProfile()?.name || 'Guest'
+                }
+            }),
+            signal: AbortSignal.timeout(12000) // 12s timeout
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error(`API ${res.status}`);
+            return res.json();
+        })
         .then(data => {
             hideTyping();
-            const reply = data.response || "Sorry, I couldn't formulate a response right now.";
-            pushContext('bot', reply, null);
-            renderMessage('bot', { text: reply });
+            const reply = data.response || "I processed your request but got an empty response.";
+            pushContext('bot', reply, data.domain || null);
+            renderMessage('bot', { 
+                text: reply, 
+                feedbackSource: data.source || 'gemini_response',
+                confidenceBadge: data.confidence || 'high'
+            });
         })
         .catch(err => {
-            console.error("Zoi AI Fetch Error:", err);
+            console.warn("Zoi AI backend unavailable, using local fallback:", err.message);
             hideTyping();
-            renderMessage('bot', { text: "🔴 **Network Error!**\n\nI couldn't reach the Zoi Brain server. Please ensure the backend is running." });
+
+            // STEP 3: Local fallback — use RAG even with LOW confidence
+            const ragResult = retrieveKnowledge(text);
+            if (ragResult.entry && ragResult.score > 0) {
+                const response = generateResponse({
+                    intent: 'knowledge_answer',
+                    text: ragResult.entry.answer,
+                    confidence: ragResult.level,
+                    source: ragResult.entry.source,
+                    domain: ragResult.entry.domain
+                });
+                pushContext('bot', response.text || '', ragResult.entry.domain);
+                renderMessage('bot', response);
+            } else {
+                // STEP 4: Graceful final fallback
+                renderMessage('bot', {
+                    text: "🤖 **I'm working in offline mode right now.**\n\nI can still help you with ZipZapZoi-specific topics! Try asking me about:\n\n• **Orders** — tracking, cancellation, refunds\n• **Food** — search restaurants, nutrition info\n• **Account** — ZoiPass, points, addresses\n• **Partners** — menu, payouts, staff\n\nFor general food knowledge (recipes, detailed calories), I'll need a network connection.",
+                    tags: [
+                        { label: '🎫 ZoiPass', query: 'What is ZoiPass?' },
+                        { label: '💰 Refunds', query: 'How do refunds work?' },
+                        { label: '🍕 Find Food', query: 'Show me pizza' },
+                        { label: '📦 Track Order', query: 'Track my order' },
+                        { label: '🏪 Partner Help', query: 'Restaurant onboarding' }
+                    ]
+                });
+            }
         });
     }
 
