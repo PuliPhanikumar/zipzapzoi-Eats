@@ -85,6 +85,13 @@ const authLimiter = rateLimit({
 app.use('/api/', apiLimiter);
 app.use('/api/auth/', authLimiter);
 
+// ─── PAGINATION HELPER ──────────────────────────────────
+function paginate(query) {
+    const page = Math.max(1, parseInt(query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(query.limit) || 20));
+    return { skip: (page - 1) * limit, take: limit, page, limit };
+}
+
 // ─── WEBSOCKETS ─────────────────────────────────────────
 io.on('connection', (socket) => {
     console.log('📡 Client connected:', socket.id);
@@ -408,11 +415,15 @@ app.put('/api/auth/me', verifyToken, async (req, res, next) => {
 app.get('/api/users', verifyToken, requireRole('Super Admin', 'admin'), async (req, res, next) => {
     try {
         const { role, status } = req.query;
+        const { skip, take, page, limit } = paginate(req.query);
         const where = {};
         if (role) where.role = role;
         if (status) where.status = status;
-        const users = await prisma.user.findMany({ where, orderBy: { createdAt: 'desc' } });
-        res.json(users);
+        const [users, total] = await Promise.all([
+            prisma.user.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take }),
+            prisma.user.count({ where })
+        ]);
+        res.json({ data: users, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
     } catch (error) { next(error); }
 });
 
@@ -430,11 +441,15 @@ app.put('/api/users/:id/status', verifyToken, requireRole('Super Admin', 'admin'
 app.get('/api/restaurants', async (req, res, next) => {
     try {
         const { status, zone } = req.query;
+        const { skip, take, page, limit } = paginate(req.query);
         const where = {};
         if (status) where.status = status;
         if (zone) where.zone = zone;
-        const restaurants = await prisma.restaurant.findMany({ where, include: { menus: true }, orderBy: { createdAt: 'desc' } });
-        res.json(restaurants);
+        const [restaurants, total] = await Promise.all([
+            prisma.restaurant.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take }),
+            prisma.restaurant.count({ where })
+        ]);
+        res.json({ data: restaurants, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
     } catch (error) { next(error); }
 });
 
@@ -462,6 +477,15 @@ app.put('/api/restaurants/:id', verifyToken, requireRole('Super Admin', 'admin',
     try {
         const updated = await prisma.restaurant.update({ where: { id: parseInt(req.params.id) }, data: req.body });
         res.json(updated);
+    } catch (error) { next(error); }
+});
+
+app.delete('/api/restaurants/:id', verifyToken, requireRole('Super Admin', 'admin'), async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id);
+        // Soft-delete: set status to Suspended instead of hard delete to preserve order history
+        const restaurant = await prisma.restaurant.update({ where: { id }, data: { status: 'Suspended' } });
+        res.json({ message: 'Restaurant suspended', restaurant });
     } catch (error) { next(error); }
 });
 
@@ -542,6 +566,7 @@ app.delete('/api/tables/:id', verifyToken, requireRole('Super Admin', 'admin', '
 app.get('/api/orders', verifyToken, async (req, res, next) => {
     try {
         const { zone, status, restaurantId } = req.query;
+        const { skip, take, page, limit } = paginate(req.query);
         const where = {};
         if (zone) where.zone = zone;
         if (status) where.status = status;
@@ -551,12 +576,10 @@ app.get('/api/orders', verifyToken, async (req, res, next) => {
         const userRole = (req.user.role || '').toLowerCase();
         if (!['super admin', 'admin'].includes(userRole)) {
             if (userRole === 'rider') {
-                // Riders see orders assigned to them OR unassigned pending orders in their zone
                 where.OR = [
                     { riderId: req.user.id },
                     { status: 'Pending', riderId: null, zone: zone || undefined }
                 ];
-                // Remove the top-level zone/status/riderId if we are using OR
                 if (zone) delete where.zone;
                 if (status) delete where.status;
             } else {
@@ -564,8 +587,11 @@ app.get('/api/orders', verifyToken, async (req, res, next) => {
             }
         }
 
-        const orders = await prisma.order.findMany({ where, orderBy: { createdAt: 'desc' }, take: 100 });
-        res.json({ data: orders });
+        const [orders, total] = await Promise.all([
+            prisma.order.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take }),
+            prisma.order.count({ where })
+        ]);
+        res.json({ data: orders, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
     } catch (error) { next(error); }
 });
 
@@ -576,6 +602,18 @@ app.get('/api/orders/:id', verifyToken, async (req, res, next) => {
             include: { restaurant: { select: { name: true, phone: true } }, user: { select: { name: true, phone: true, email: true } } }
         });
         if (!order) return res.status(404).json({ error: 'Order not found' });
+        res.json(order);
+    } catch (error) { next(error); }
+});
+
+// Guest order tracking — no auth required, lookup by zoiId
+app.get('/api/orders/track/:zoiId', async (req, res, next) => {
+    try {
+        const order = await prisma.order.findUnique({
+            where: { zoiId: req.params.zoiId },
+            select: { id: true, zoiId: true, status: true, tracking: true, type: true, total: true, createdAt: true, restaurant: { select: { name: true } } }
+        });
+        if (!order) return res.status(404).json({ error: 'Order not found. Check your Order ID.' });
         res.json(order);
     } catch (error) { next(error); }
 });
@@ -685,17 +723,75 @@ app.put('/api/orders/:id/status', verifyToken, validate.validateUpdateOrderStatu
 app.get('/api/orders/user/:userId', verifyToken, async (req, res, next) => {
     try {
         const userId = parseInt(req.params.userId);
-        // Users can only see their own, admins can see anyone's
         const userRole = (req.user.role || '').toLowerCase();
         if (req.user.id !== userId && !['super admin', 'admin'].includes(userRole)) {
             return res.status(403).json({ error: 'Access denied' });
         }
-        const orders = await prisma.order.findMany({
-            where: { userId },
-            orderBy: { createdAt: 'desc' },
-            include: { restaurant: { select: { name: true, image: true } } }
+        const { skip, take, page, limit } = paginate(req.query);
+        const [orders, total] = await Promise.all([
+            prisma.order.findMany({
+                where: { userId },
+                orderBy: { createdAt: 'desc' },
+                include: { restaurant: { select: { name: true, image: true } } },
+                skip, take
+            }),
+            prisma.order.count({ where: { userId } })
+        ]);
+        res.json({ data: orders, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+    } catch (error) { next(error); }
+});
+
+// ════════════════════════════════════════════════════════
+// ORDER CANCELLATION
+// ════════════════════════════════════════════════════════
+app.post('/api/orders/:id/cancel', verifyToken, async (req, res, next) => {
+    try {
+        const orderId = parseInt(req.params.id);
+        const { reason } = req.body;
+        const order = await prisma.order.findUnique({ where: { id: orderId } });
+        if (!order) return res.status(404).json({ error: 'Order not found' });
+
+        // Only allow cancellation for Pending or Confirmed orders
+        if (!['Pending', 'Confirmed'].includes(order.status)) {
+            return res.status(400).json({ error: `Cannot cancel order in '${order.status}' status. Only Pending or Confirmed orders can be cancelled.` });
+        }
+
+        // Only the order owner or admin can cancel
+        const userRole = (req.user.role || '').toLowerCase();
+        if (order.userId !== req.user.id && !['super admin', 'admin'].includes(userRole)) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        // Update order status
+        const tracking = Array.isArray(order.tracking) ? order.tracking : [];
+        tracking.push({ status: 'Cancelled', time: new Date().toISOString(), desc: reason || 'Cancelled by user' });
+
+        const cancelled = await prisma.order.update({
+            where: { id: orderId },
+            data: { status: 'Cancelled', tracking }
         });
-        res.json({ data: orders });
+
+        // Auto-create refund if payment was made
+        if (order.paymentStatus === 'Paid') {
+            const refundId = 'R-' + Math.floor(10000 + Math.random() * 90000);
+            await prisma.refund.create({
+                data: {
+                    refundId,
+                    orderId: order.zoiId,
+                    customerName: req.user.name || 'Customer',
+                    reason: reason || 'Order cancelled',
+                    amount: order.total,
+                    paymentMethod: order.paymentMethod,
+                    status: 'Pending',
+                    description: `Auto-refund for cancelled order ${order.zoiId}`
+                }
+            });
+            // Mark payment as refunded
+            await prisma.order.update({ where: { id: orderId }, data: { paymentStatus: 'Refunded' } });
+        }
+
+        res.json({ message: 'Order cancelled successfully', order: cancelled });
+        io.emit('order_status_update', cancelled);
     } catch (error) { next(error); }
 });
 
@@ -766,6 +862,30 @@ app.get('/api/wallet/:entityId', verifyToken, async (req, res, next) => {
         });
         if (!wallet) wallet = { balance: 0, transactions: [] };
         res.json(wallet);
+    } catch (error) { next(error); }
+});
+
+// Wallet withdrawal request
+app.post('/api/wallet/:entityId/withdraw', verifyToken, async (req, res, next) => {
+    try {
+        const { entityId } = req.params;
+        const { amount } = req.body;
+        if (!amount || amount <= 0) return res.status(400).json({ error: 'Invalid amount' });
+
+        const wallet = await prisma.wallet.findUnique({ where: { entityId } });
+        if (!wallet) return res.status(404).json({ error: 'Wallet not found' });
+        if (wallet.balance < amount) return res.status(400).json({ error: `Insufficient balance. Available: ₹${wallet.balance.toFixed(2)}` });
+
+        // Atomic debit
+        await prisma.$transaction(async (tx) => {
+            await tx.wallet.update({ where: { id: wallet.id }, data: { balance: { decrement: amount } } });
+            await tx.transaction.create({
+                data: { walletId: wallet.id, type: 'DEBIT', amount, description: `Withdrawal of ₹${amount}` }
+            });
+        });
+
+        const updated = await prisma.wallet.findUnique({ where: { entityId }, include: { transactions: { orderBy: { createdAt: 'desc' }, take: 5 } } });
+        res.json({ message: `₹${amount} withdrawn successfully`, wallet: updated });
     } catch (error) { next(error); }
 });
 
@@ -904,7 +1024,8 @@ app.get('/api/search', async (req, res, next) => {
             where: {
                 OR: [
                     { itemName: { contains: q, mode: 'insensitive' } },
-                    { category: { contains: q, mode: 'insensitive' } }
+                    { category: { contains: q, mode: 'insensitive' } },
+                    { description: { contains: q, mode: 'insensitive' } }
                 ],
                 restaurant: { status: 'Active' }
             },
@@ -1099,6 +1220,23 @@ app.post('/api/promotions/validate', async (req, res, next) => {
         if (promo.expiresAt && new Date(promo.expiresAt) < new Date()) return res.status(400).json({ error: 'Promo code expired' });
 
         res.json({ valid: true, promo });
+    } catch (error) { next(error); }
+});
+
+// Redeem a promo code (increments the used counter)
+app.post('/api/promotions/redeem', optionalToken, async (req, res, next) => {
+    try {
+        const { code } = req.body;
+        const promo = await prisma.promotion.findUnique({ where: { code } });
+        if (!promo) return res.status(404).json({ error: 'Invalid promo code' });
+        if (promo.status !== 'Active') return res.status(400).json({ error: `Promo code is ${promo.status}` });
+        if (promo.used >= promo.maxUsage) return res.status(400).json({ error: 'Promo code usage limit reached' });
+
+        const updated = await prisma.promotion.update({
+            where: { code },
+            data: { used: { increment: 1 } }
+        });
+        res.json({ message: 'Promo redeemed', promo: updated });
     } catch (error) { next(error); }
 });
 
@@ -1350,6 +1488,163 @@ app.put('/api/inventory/:id', verifyToken, requireRole('Super Admin', 'admin', '
 // MEDIA UPLOAD API
 // ════════════════════════════════════════════════════════
 app.post('/api/upload', uploadService.uploadMiddleware, uploadService.handleUpload);
+
+// ════════════════════════════════════════════════════════
+// FAVORITES API
+// ════════════════════════════════════════════════════════
+app.get('/api/favorites', verifyToken, async (req, res, next) => {
+    try {
+        const favorites = await prisma.favorite.findMany({
+            where: { userId: req.user.id },
+            orderBy: { createdAt: 'desc' }
+        });
+        res.json(favorites);
+    } catch (error) { next(error); }
+});
+
+app.post('/api/favorites/toggle', verifyToken, async (req, res, next) => {
+    try {
+        const { type, restaurantId, menuItemId } = req.body;
+        const where = { userId_type_restaurantId_menuItemId: { userId: req.user.id, type, restaurantId: restaurantId || null, menuItemId: menuItemId || null } };
+
+        const existing = await prisma.favorite.findUnique({ where });
+        if (existing) {
+            await prisma.favorite.delete({ where });
+            res.json({ message: 'Removed from favorites', favorited: false });
+        } else {
+            const fav = await prisma.favorite.create({ data: { userId: req.user.id, type, restaurantId, menuItemId } });
+            res.json({ message: 'Added to favorites', favorited: true, favorite: fav });
+        }
+    } catch (error) { next(error); }
+});
+
+// ════════════════════════════════════════════════════════
+// ADDRESSES API
+// ════════════════════════════════════════════════════════
+app.get('/api/addresses', verifyToken, async (req, res, next) => {
+    try {
+        const addresses = await prisma.address.findMany({
+            where: { userId: req.user.id },
+            orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }]
+        });
+        res.json(addresses);
+    } catch (error) { next(error); }
+});
+
+app.post('/api/addresses', verifyToken, async (req, res, next) => {
+    try {
+        const { label, address, landmark, lat, lng, isDefault } = req.body;
+
+        // If setting as default, unset all others first
+        if (isDefault) {
+            await prisma.address.updateMany({ where: { userId: req.user.id }, data: { isDefault: false } });
+        }
+
+        const newAddr = await prisma.address.create({
+            data: { userId: req.user.id, label: label || 'Home', address, landmark, lat, lng, isDefault: isDefault || false }
+        });
+        res.status(201).json(newAddr);
+    } catch (error) { next(error); }
+});
+
+app.put('/api/addresses/:id', verifyToken, async (req, res, next) => {
+    try {
+        const addr = await prisma.address.findFirst({ where: { id: parseInt(req.params.id), userId: req.user.id } });
+        if (!addr) return res.status(404).json({ error: 'Address not found' });
+
+        if (req.body.isDefault) {
+            await prisma.address.updateMany({ where: { userId: req.user.id }, data: { isDefault: false } });
+        }
+
+        const updated = await prisma.address.update({ where: { id: addr.id }, data: req.body });
+        res.json(updated);
+    } catch (error) { next(error); }
+});
+
+app.delete('/api/addresses/:id', verifyToken, async (req, res, next) => {
+    try {
+        const addr = await prisma.address.findFirst({ where: { id: parseInt(req.params.id), userId: req.user.id } });
+        if (!addr) return res.status(404).json({ error: 'Address not found' });
+        await prisma.address.delete({ where: { id: addr.id } });
+        res.json({ message: 'Address deleted' });
+    } catch (error) { next(error); }
+});
+
+// ════════════════════════════════════════════════════════
+// NOTIFICATIONS API
+// ════════════════════════════════════════════════════════
+app.get('/api/notifications', verifyToken, async (req, res, next) => {
+    try {
+        const { skip, take, page, limit } = paginate(req.query);
+        const where = { userId: req.user.id };
+        const [notifications, total, unreadCount] = await Promise.all([
+            prisma.notification.findMany({ where, orderBy: { createdAt: 'desc' }, skip, take }),
+            prisma.notification.count({ where }),
+            prisma.notification.count({ where: { userId: req.user.id, isRead: false } })
+        ]);
+        res.json({ data: notifications, unreadCount, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+    } catch (error) { next(error); }
+});
+
+app.patch('/api/notifications/:id/read', verifyToken, async (req, res, next) => {
+    try {
+        const notification = await prisma.notification.findFirst({ where: { id: parseInt(req.params.id), userId: req.user.id } });
+        if (!notification) return res.status(404).json({ error: 'Notification not found' });
+        const updated = await prisma.notification.update({ where: { id: notification.id }, data: { isRead: true } });
+        res.json(updated);
+    } catch (error) { next(error); }
+});
+
+app.post('/api/notifications/read-all', verifyToken, async (req, res, next) => {
+    try {
+        await prisma.notification.updateMany({ where: { userId: req.user.id, isRead: false }, data: { isRead: true } });
+        res.json({ message: 'All notifications marked as read' });
+    } catch (error) { next(error); }
+});
+
+// ════════════════════════════════════════════════════════
+// ORDER RATINGS API
+// ════════════════════════════════════════════════════════
+app.post('/api/order-ratings', verifyToken, async (req, res, next) => {
+    try {
+        const { orderId, foodRating, deliveryRating, comment } = req.body;
+
+        // Verify user owns the order
+        const order = await prisma.order.findUnique({ where: { id: parseInt(orderId) } });
+        if (!order) return res.status(404).json({ error: 'Order not found' });
+        if (order.userId !== req.user.id) return res.status(403).json({ error: 'You can only rate your own orders' });
+        if (order.status !== 'Delivered') return res.status(400).json({ error: 'Only delivered orders can be rated' });
+
+        // Check if already rated
+        const existing = await prisma.orderRating.findUnique({ where: { orderId: parseInt(orderId) } });
+        if (existing) return res.status(409).json({ error: 'Order already rated' });
+
+        const rating = await prisma.orderRating.create({
+            data: { orderId: parseInt(orderId), userId: req.user.id, foodRating, deliveryRating, comment }
+        });
+
+        // Update restaurant average rating
+        if (order.restaurantId) {
+            const avgResult = await prisma.orderRating.aggregate({
+                where: { orderId: { in: (await prisma.order.findMany({ where: { restaurantId: order.restaurantId }, select: { id: true } })).map(o => o.id) } },
+                _avg: { foodRating: true }
+            });
+            if (avgResult._avg.foodRating) {
+                await prisma.restaurant.update({ where: { id: order.restaurantId }, data: { rating: Math.round(avgResult._avg.foodRating * 10) / 10 } });
+            }
+        }
+
+        res.status(201).json({ message: 'Thank you for your rating!', rating });
+    } catch (error) { next(error); }
+});
+
+app.get('/api/order-ratings/:orderId', async (req, res, next) => {
+    try {
+        const rating = await prisma.orderRating.findUnique({ where: { orderId: parseInt(req.params.orderId) } });
+        if (!rating) return res.status(404).json({ error: 'No rating found for this order' });
+        res.json(rating);
+    } catch (error) { next(error); }
+});
 
 // ─── DISPUTE DETAIL ROUTES (by ticketId) ────────────────
 app.get('/api/disputes/:id', verifyToken, requireRole('Super Admin', 'admin', 'dispute manager'), async (req, res, next) => {

@@ -30,6 +30,11 @@ model User {
   supportTickets    SupportTicket[]
   subscriptions     UserSubscription[]
   pushSubscriptions PushSubscription[]
+  favorites         Favorite[]
+  addresses         Address[]
+  notifications     Notification[]
+  orderRatings      OrderRating[]
+  userBadges        UserBadge[]
 
   @@index([role])
   @@index([status])
@@ -388,6 +393,7 @@ model Badge {
   color       String?
   status      String   @default("active") // active, library
   createdAt   DateTime @default(now())
+  userBadges  UserBadge[]
 }
 
 // ─── REFUNDS ────────────────────────────────────────────
@@ -408,4 +414,80 @@ model Refund {
   updatedAt     DateTime @updatedAt
 
   @@index([status])
+}
+
+// ─── FAVORITES ──────────────────────────────────────────
+model Favorite {
+  id           Int        @id @default(autoincrement())
+  userId       Int
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         String     // restaurant, dish
+  restaurantId Int?
+  menuItemId   Int?
+  createdAt    DateTime   @default(now())
+
+  @@unique([userId, type, restaurantId, menuItemId])
+  @@index([userId])
+}
+
+// ─── SAVED ADDRESSES ────────────────────────────────────
+model Address {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label     String   @default("Home") // Home, Work, Other
+  address   String
+  landmark  String?
+  lat       Float?
+  lng       Float?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ─── NOTIFICATIONS ──────────────────────────────────────
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  type      String   @default("info") // info, order, promo, system, achievement
+  url       String?  // deep-link URL
+  isRead    Boolean  @default(false)
+  metadata  Json?    // extra payload {orderId, badgeId, etc.}
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+// ─── ORDER RATINGS ──────────────────────────────────────
+model OrderRating {
+  id             Int      @id @default(autoincrement())
+  orderId        Int      @unique
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id])
+  foodRating     Int      @default(5) // 1-5
+  deliveryRating Int?     // 1-5 (null for dine-in)
+  comment        String?
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ─── USER BADGES (Gamification) ─────────────────────────
+model UserBadge {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId   Int
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  earnedAt  DateTime @default(now())
+  metadata  Json?    // {reason, orderId, points}
+
+  @@unique([userId, badgeId])
+  @@index([userId])
 }

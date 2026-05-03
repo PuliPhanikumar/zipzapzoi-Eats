@@ -443,8 +443,9 @@
         function addToCart(name, price, image) {
             // Check if adding from a different restaurant
             if (cartRest && cartRest.id !== currentRest.id) {
-                if (!confirm(`Start new basket? Your cart contains items from ${cartRest.name}.`)) return;
-                cart = []; // Clear if user agrees
+                // Auto clear and notify to prevent silent blocking by browser native confirms
+                cart = []; 
+                showToast('New Basket Started 🔄', `Cleared previous items. Now ordering from ${currentRest.name}!`);
             }
 
             // Set current restaurant context
