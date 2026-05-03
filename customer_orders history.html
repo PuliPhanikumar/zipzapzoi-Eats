@@ -248,15 +248,27 @@
         <div class="bg-card-dark border border-border-dark rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl transform scale-95 transition-all">
             <div class="size-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4 text-primary text-3xl"><span class="material-symbols-outlined star">star</span></div>
             <h3 class="text-xl font-bold mb-1">Rate your order</h3>
-            <p class="text-text-secondary text-sm mb-6 pb-4 border-b border-border-dark" id="rate-name">Restaurant Name</p>
+            <p class="text-text-secondary text-sm mb-4 pb-2 border-b border-border-dark" id="rate-name">Restaurant Name</p>
             
-            <div class="star-rating mb-8">
+            <p class="text-xs text-text-secondary mb-1">Food Quality</p>
+            <div class="star-rating mb-4">
                 <input type="radio" id="star5" name="rate" value="5"><label for="star5" class="material-symbols-outlined">star</label>
                 <input type="radio" id="star4" name="rate" value="4"><label for="star4" class="material-symbols-outlined">star</label>
                 <input type="radio" id="star3" name="rate" value="3"><label for="star3" class="material-symbols-outlined">star</label>
                 <input type="radio" id="star2" name="rate" value="2"><label for="star2" class="material-symbols-outlined">star</label>
                 <input type="radio" id="star1" name="rate" value="1"><label for="star1" class="material-symbols-outlined">star</label>
             </div>
+
+            <p class="text-xs text-text-secondary mb-1" id="delivery-rating-label">Delivery Experience</p>
+            <div class="star-rating mb-4" id="delivery-stars">
+                <input type="radio" id="dstar5" name="drate" value="5"><label for="dstar5" class="material-symbols-outlined">star</label>
+                <input type="radio" id="dstar4" name="drate" value="4"><label for="dstar4" class="material-symbols-outlined">star</label>
+                <input type="radio" id="dstar3" name="drate" value="3"><label for="dstar3" class="material-symbols-outlined">star</label>
+                <input type="radio" id="dstar2" name="drate" value="2"><label for="dstar2" class="material-symbols-outlined">star</label>
+                <input type="radio" id="dstar1" name="drate" value="1"><label for="dstar1" class="material-symbols-outlined">star</label>
+            </div>
+
+            <textarea id="rate-comment" rows="2" placeholder="Tell us more (optional)" class="w-full bg-white/5 border border-border-dark rounded-lg px-3 py-2 text-sm text-white placeholder-text-secondary focus:border-primary focus:ring-0 mb-4 resize-none"></textarea>
             
             <button onclick="submitRating()" class="w-full py-3 bg-primary text-black font-bold rounded-xl hover:bg-white transition-all">Submit Rating</button>
             <button onclick="closeModal('rate-modal')" class="w-full py-2 mt-2 text-text-secondary hover:text-white text-sm">Cancel</button>
@@ -416,9 +428,14 @@
                         <div class="text-right flex flex-col items-end gap-2">
                             <p class="font-black text-white text-lg">₹${o.total || 0}</p>
                             <div class="flex gap-2 flex-wrap justify-end">
+                                ${['Pending', 'Confirmed'].includes(o.status) ? `
+                                <button onclick="cancelOrder(${o.id || realIdx}, '${safeName}')" class="text-xs text-red-400 border border-red-400/30 px-3 py-1.5 rounded-lg hover:bg-red-500 hover:text-white font-bold flex items-center gap-1 transition-all">
+                                    <span class="material-symbols-outlined text-sm">cancel</span> Cancel
+                                </button>` : ''}
+                                ${statusLabel === 'Delivered' || statusLabel === 'delivered' ? `
                                 <button onclick="openRateModal('${safeName}', ${realIdx})" class="text-xs text-neon-pink border border-neon-pink/30 px-3 py-1.5 rounded-lg hover:bg-neon-pink hover:text-black font-bold flex items-center gap-1 transition-all">
                                     <span class="material-symbols-outlined text-sm">${o.rating > 0 ? 'star' : 'star_border'}</span> ${o.rating > 0 ? 'Rated' : 'Rate'}
-                                </button>
+                                </button>` : ''}
                                 <button onclick="reorder(${realIdx})" class="text-xs text-primary font-bold hover:bg-primary/10 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all">
                                     <span class="material-symbols-outlined text-sm">refresh</span> Reorder
                                 </button>
@@ -474,18 +491,59 @@
             openModal('rate-modal');
         }
 
-        function submitRating() {
+        async function submitRating() {
             const checked = document.querySelector('.star-rating input[name="rate"]:checked');
+            const deliveryChecked = document.querySelector('.star-rating input[name="drate"]:checked');
+            const comment = document.getElementById('rate-comment')?.value || '';
+
             if (checked && currentRateIdx >= 0) {
                 const r = parseInt(checked.value);
+                const dr = deliveryChecked ? parseInt(deliveryChecked.value) : null;
                 completedOrders[currentRateIdx].rating = r;
+
+                // Try API first
+                const order = completedOrders[currentRateIdx];
+                if (typeof ZoiAPI !== 'undefined' && ZoiAPI.orderRatings && order.id) {
+                    try {
+                        await ZoiAPI.orderRatings.submit(order.id, r, dr, comment);
+                    } catch (e) { console.log('Rating API fallback to local:', e.message); }
+                }
+
+                // Also save locally
                 const stored = JSON.parse(localStorage.getItem('zoiCompletedOrders') || '[]');
-                const found = stored.find(o => o.id === completedOrders[currentRateIdx].id);
+                const found = stored.find(o => o.id === order.id);
                 if (found) { found.rating = r; localStorage.setItem('zoiCompletedOrders', JSON.stringify(stored)); }
                 renderOrders();
             }
             showToast('⭐ Thanks for your review!');
             closeModal('rate-modal');
+            // Reset
+            document.querySelectorAll('.star-rating input').forEach(i => i.checked = false);
+            if (document.getElementById('rate-comment')) document.getElementById('rate-comment').value = '';
+        }
+
+        async function cancelOrder(orderId, name) {
+            if (!confirm(`Cancel your order from ${name}? This cannot be undone.`)) return;
+            const reason = prompt('Reason for cancellation (optional):') || 'Cancelled by customer';
+
+            if (typeof ZoiAPI !== 'undefined' && ZoiAPI.orderActions) {
+                try {
+                    const result = await ZoiAPI.orderActions.cancel(orderId, reason);
+                    showToast('Order cancelled. ' + (result.message || ''));
+                    // Update local state
+                    const order = completedOrders.find(o => o.id === orderId);
+                    if (order) order.status = 'Cancelled';
+                    renderOrders();
+                    return;
+                } catch (e) {
+                    showToast('⚠️ ' + (e.message || 'Cancellation failed'));
+                }
+            } else {
+                // Local-only fallback
+                const order = completedOrders.find(o => o.id === orderId);
+                if (order) { order.status = 'Cancelled'; renderOrders(); }
+                showToast('Order cancelled locally');
+            }
         }
 
         function openModal(id) {

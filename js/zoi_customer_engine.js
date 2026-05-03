@@ -1203,22 +1203,256 @@
         });
     }
 
+    // ─── NOTIFICATION BELL WIDGET ───────────────────────────
+    const NOTIFICATION_STYLES = `
+    #zoi-notif-bell {
+        position: fixed; top: 20px; right: 80px; z-index: 9997;
+        width: 44px; height: 44px; border-radius: 50%;
+        background: rgba(10,3,20,0.85); border: 1px solid #3c1e6e;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 20px;
+        backdrop-filter: blur(12px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    #zoi-notif-bell:hover { border-color: #00f0ff; transform: scale(1.1); }
+    #zoi-notif-bell .bell-badge {
+        position: absolute; top: -4px; right: -4px;
+        min-width: 18px; height: 18px; border-radius: 9px;
+        background: #ef4444; color: #fff; font-size: 10px;
+        font-weight: 800; display: flex; align-items: center;
+        justify-content: center; padding: 0 4px;
+        border: 2px solid #0a0314;
+        animation: zoi-bounce 0.5s ease;
+    }
+    @keyframes zoi-bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+    #zoi-notif-panel {
+        position: fixed; top: 72px; right: 24px; z-index: 9998;
+        width: 360px; max-width: calc(100vw - 32px); max-height: 420px;
+        background: #0a0314; border: 1px solid #3c1e6e;
+        border-radius: 16px; box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+        display: none; flex-direction: column; overflow: hidden;
+        font-family: 'Quicksand','Nunito',sans-serif;
+    }
+    #zoi-notif-panel.open { display: flex; animation: zoi-slide-in 0.25s ease; }
+    @keyframes zoi-slide-in { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+    .notif-header {
+        padding: 14px 16px; border-bottom: 1px solid #1a0b36;
+        display: flex; justify-content: space-between; align-items: center;
+        font-weight: 800; color: #00f0ff; font-size: 14px;
+    }
+    .notif-header button {
+        background: none; border: 1px solid #3c1e6e; color: #b4a5d8;
+        font-size: 11px; padding: 4px 10px; border-radius: 8px; cursor: pointer;
+        font-family: inherit;
+    }
+    .notif-header button:hover { border-color: #00f0ff; color: #00f0ff; }
+    .notif-list { overflow-y: auto; flex: 1; max-height: 350px; }
+    .notif-item {
+        padding: 12px 16px; border-bottom: 1px solid #1a0b3620;
+        cursor: pointer; transition: background 0.2s;
+        display: flex; gap: 10px; align-items: flex-start;
+    }
+    .notif-item:hover { background: rgba(0,240,255,0.05); }
+    .notif-item.unread { background: rgba(0,240,255,0.08); border-left: 3px solid #00f0ff; }
+    .notif-item .notif-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+    .notif-item .notif-body { flex: 1; }
+    .notif-item .notif-title { font-weight: 700; color: #e0d4ff; font-size: 13px; }
+    .notif-item .notif-text { color: #8b7faa; font-size: 12px; margin-top: 2px; }
+    .notif-item .notif-time { color: #5a4d7a; font-size: 10px; margin-top: 4px; }
+    .notif-empty { padding: 40px 16px; text-align: center; color: #5a4d7a; font-size: 13px; }
+    `;
+
+    const notifIcons = { order: '📦', promo: '🎉', system: '⚙️', achievement: '🏆', info: 'ℹ️' };
+
+    function timeAgo(dateStr) {
+        const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+        return `${Math.floor(diff / 86400)}d ago`;
+    }
+
+    async function initNotificationBell() {
+        if (typeof ZoiAPI === 'undefined' || !ZoiAPI.inAppNotifications) return;
+        if (!window.ZoiCustomer?.isLoggedIn?.()) return;
+
+        // Inject styles
+        const style = document.createElement('style');
+        style.textContent = NOTIFICATION_STYLES;
+        document.head.appendChild(style);
+
+        // Create bell
+        const bell = document.createElement('div');
+        bell.id = 'zoi-notif-bell';
+        bell.innerHTML = '🔔';
+        document.body.appendChild(bell);
+
+        // Create panel
+        const panel = document.createElement('div');
+        panel.id = 'zoi-notif-panel';
+        panel.innerHTML = `
+            <div class="notif-header">
+                <span>🔔 Notifications</span>
+                <button id="notif-mark-all">Mark all read</button>
+            </div>
+            <div class="notif-list" id="notif-list"></div>
+        `;
+        document.body.appendChild(panel);
+
+        // Toggle panel
+        bell.addEventListener('click', async () => {
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) await loadNotifications();
+        });
+
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (!panel.contains(e.target) && e.target !== bell && !bell.contains(e.target)) {
+                panel.classList.remove('open');
+            }
+        });
+
+        // Mark all read
+        document.getElementById('notif-mark-all').addEventListener('click', async () => {
+            try {
+                await ZoiAPI.inAppNotifications.markAllRead();
+                updateBellBadge(0);
+                document.querySelectorAll('.notif-item.unread').forEach(el => el.classList.remove('unread'));
+                showToast('All notifications marked as read', 'success');
+            } catch (e) { showToast('Failed to mark notifications', 'error'); }
+        });
+
+        // Initial badge count
+        try {
+            const result = await ZoiAPI.inAppNotifications.list(1, 1);
+            updateBellBadge(result.unreadCount || 0);
+        } catch (e) { /* silent */ }
+
+        // Poll every 60 seconds
+        setInterval(async () => {
+            try {
+                const result = await ZoiAPI.inAppNotifications.list(1, 1);
+                updateBellBadge(result.unreadCount || 0);
+            } catch (e) { /* silent */ }
+        }, 60000);
+    }
+
+    function updateBellBadge(count) {
+        const bell = document.getElementById('zoi-notif-bell');
+        if (!bell) return;
+        const existing = bell.querySelector('.bell-badge');
+        if (existing) existing.remove();
+        if (count > 0) {
+            const badge = document.createElement('span');
+            badge.className = 'bell-badge';
+            badge.textContent = count > 9 ? '9+' : count;
+            bell.appendChild(badge);
+        }
+    }
+
+    async function loadNotifications() {
+        const list = document.getElementById('notif-list');
+        if (!list) return;
+        list.innerHTML = '<div class="notif-empty">Loading...</div>';
+
+        try {
+            const result = await ZoiAPI.inAppNotifications.list(1, 20);
+            const notifications = result.data || [];
+            updateBellBadge(result.unreadCount || 0);
+
+            if (notifications.length === 0) {
+                list.innerHTML = '<div class="notif-empty">🔕 No notifications yet</div>';
+                return;
+            }
+
+            list.innerHTML = notifications.map(n => `
+                <div class="notif-item ${n.isRead ? '' : 'unread'}" data-id="${n.id}" onclick="window._zoiMarkNotifRead(${n.id}, this)">
+                    <span class="notif-icon">${notifIcons[n.type] || 'ℹ️'}</span>
+                    <div class="notif-body">
+                        <div class="notif-title">${n.title}</div>
+                        <div class="notif-text">${n.body}</div>
+                        <div class="notif-time">${timeAgo(n.createdAt)}</div>
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) {
+            list.innerHTML = '<div class="notif-empty">Failed to load notifications</div>';
+        }
+    }
+
+    window._zoiMarkNotifRead = async (id, el) => {
+        if (el.classList.contains('unread')) {
+            try {
+                await ZoiAPI.inAppNotifications.markRead(id);
+                el.classList.remove('unread');
+                const bell = document.getElementById('zoi-notif-bell');
+                const badge = bell?.querySelector('.bell-badge');
+                if (badge) {
+                    const c = parseInt(badge.textContent) || 0;
+                    if (c <= 1) badge.remove();
+                    else badge.textContent = c - 1;
+                }
+            } catch (e) { /* silent */ }
+        }
+    };
+
+    // ─── FAVORITES HEART HELPER ─────────────────────────────
+    window.ZoiFavorites = {
+        _cache: null,
+        load: async () => {
+            if (typeof ZoiAPI !== 'undefined' && ZoiAPI.favorites) {
+                try {
+                    ZoiFavorites._cache = await ZoiAPI.favorites.list();
+                } catch (e) { ZoiFavorites._cache = []; }
+            }
+        },
+        isFavorited: (type, id) => {
+            if (!ZoiFavorites._cache) return false;
+            return ZoiFavorites._cache.some(f =>
+                f.type === type && (type === 'restaurant' ? f.restaurantId === id : f.menuItemId === id)
+            );
+        },
+        toggle: async (type, id) => {
+            if (typeof ZoiAPI === 'undefined' || !ZoiAPI.favorites) {
+                showToast('Please log in to save favorites', 'warning');
+                return;
+            }
+            try {
+                const result = await ZoiAPI.favorites.toggle(
+                    type,
+                    type === 'restaurant' ? id : null,
+                    type === 'dish' ? id : null
+                );
+                // Refresh cache
+                await ZoiFavorites.load();
+                showToast(result.favorited ? '❤️ Added to favorites!' : '💔 Removed from favorites', result.favorited ? 'success' : 'info');
+                return result.favorited;
+            } catch (e) {
+                showToast('Login required to save favorites', 'warning');
+                return null;
+            }
+        }
+    };
+
     // ─── GLOBAL INIT ────────────────────────────────────────
     function init() {
-        // Don't init on admin/partner/POS/login pages
-        const path = window.location.pathname.toLowerCase();
-        if (path.includes('admin') || path.includes('partner') || path.includes('pos-') ||
-            path.includes('hostel') || path.includes('rider') || path.includes('restaurant_management') ||
-            path.includes('restaurant_settings') || path.includes('restaurant_staff') ||
-            path.includes('restaurant_financials') || path.includes('restaurant_menu_manager') ||
-            path.includes('restaurant_order') || path.includes('login')) return;
-
-        // Injected Styles
+        // Inject styles globally (including login) for toast support
         const style = document.createElement('style');
         style.textContent = TOAST_STYLES + `
             .zoi-user-active { color: #00f0ff !important; font-weight: 800 !important; }
         `;
         document.head.appendChild(style);
+
+        // Don't wire page logic on admin/partner/POS/login pages
+        const path = window.location.pathname.toLowerCase();
+        if (path.includes('admin') || path.includes('partner') || path.includes('pos-') ||
+            path.includes('hostel') || path.includes('rider') || path.includes('restaurant_management') ||
+            path.includes('restaurant_settings') || path.includes('restaurant_staff') ||
+            path.includes('restaurant_financials') || path.includes('restaurant_menu_manager') ||
+            path.includes('restaurant_order') || path.includes('login')) {
+            return;
+        }
 
         // Global Logout Listener (Interception)
         document.addEventListener('click', (e) => {
@@ -1233,7 +1467,7 @@
                 e.stopPropagation();
                 ZoiCustomer.logout();
             }
-        }, true); // Use capture phase to ensure we intercept even if other listeners are present
+        }, true);
 
         // Update cart badges
         ZoiCart.updateBadges();
@@ -1241,10 +1475,16 @@
         // Update user state
         ZoiCustomer.updateUI();
 
-        // Session guard removed - auth is handled by each page's inline script
-
         // Wire current page
         wireCurrentPage();
+
+        // Init notification bell for logged-in users
+        setTimeout(() => initNotificationBell(), 500);
+
+        // Pre-load favorites cache
+        if (window.ZoiCustomer?.isLoggedIn?.()) {
+            ZoiFavorites.load();
+        }
 
         // Listen for cart changes from other tabs
         window.addEventListener('storage', (e) => {

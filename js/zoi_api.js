@@ -651,6 +651,96 @@
                 } catch (e) {
                     return { balance: 0, transactions: [] };
                 }
+            },
+            withdraw: async (entityId, amount) => {
+                return apiFetch(`/wallet/${entityId}/withdraw`, {
+                    method: 'POST',
+                    body: JSON.stringify({ amount })
+                });
+            }
+        },
+
+        // ─── FAVORITES ─────────────────────────────────────
+        favorites: {
+            list: async () => {
+                try {
+                    return await apiFetch('/favorites');
+                } catch (e) { return []; }
+            },
+            toggle: async (type, restaurantId = null, menuItemId = null) => {
+                return apiFetch('/favorites/toggle', {
+                    method: 'POST',
+                    body: JSON.stringify({ type, restaurantId, menuItemId })
+                });
+            }
+        },
+
+        // ─── ADDRESSES ─────────────────────────────────────
+        addresses: {
+            list: async () => {
+                try {
+                    return await apiFetch('/addresses');
+                } catch (e) { return []; }
+            },
+            create: async (data) => {
+                return apiFetch('/addresses', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+            },
+            update: async (id, data) => {
+                return apiFetch(`/addresses/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+            },
+            delete: async (id) => {
+                return apiFetch(`/addresses/${id}`, { method: 'DELETE' });
+            }
+        },
+
+        // ─── IN-APP NOTIFICATIONS ──────────────────────────
+        inAppNotifications: {
+            list: async (page = 1, limit = 20) => {
+                try {
+                    return await apiFetch(`/notifications?page=${page}&limit=${limit}`);
+                } catch (e) { return { data: [], unreadCount: 0, pagination: {} }; }
+            },
+            markRead: async (id) => {
+                return apiFetch(`/notifications/${id}/read`, { method: 'PATCH' });
+            },
+            markAllRead: async () => {
+                return apiFetch('/notifications/read-all', { method: 'POST' });
+            }
+        },
+
+        // ─── ORDER RATINGS ─────────────────────────────────
+        orderRatings: {
+            submit: async (orderId, foodRating, deliveryRating, comment) => {
+                return apiFetch('/order-ratings', {
+                    method: 'POST',
+                    body: JSON.stringify({ orderId, foodRating, deliveryRating, comment })
+                });
+            },
+            get: async (orderId) => {
+                try {
+                    return await apiFetch(`/order-ratings/${orderId}`);
+                } catch (e) { return null; }
+            }
+        },
+
+        // ─── ORDER ACTIONS ─────────────────────────────────
+        orderActions: {
+            cancel: async (orderId, reason) => {
+                return apiFetch(`/orders/${orderId}/cancel`, {
+                    method: 'POST',
+                    body: JSON.stringify({ reason })
+                });
+            },
+            trackGuest: async (zoiId) => {
+                try {
+                    return await apiFetch(`/orders/track/${zoiId}`);
+                } catch (e) { return null; }
             }
         },
 
