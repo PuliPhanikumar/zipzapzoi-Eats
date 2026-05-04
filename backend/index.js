@@ -1722,8 +1722,216 @@ app.delete('/api/cms/assets/:id', verifyToken, requireRole('Super Admin', 'admin
 });
 
 // ════════════════════════════════════════════════════════
-// BADGE AUTO-AWARD SYSTEM
+// ADMIN ANALYTICS DASHBOARD API
 // ════════════════════════════════════════════════════════
+
+// Helper: get start of today, this week, this month
+function getDateRanges() {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterdayStart = new Date(todayStart); yesterdayStart.setDate(yesterdayStart.getDate() - 1);
+    const weekStart = new Date(todayStart); weekStart.setDate(weekStart.getDate() - 7);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    return { now, todayStart, yesterdayStart, weekStart, monthStart };
+}
+
+// ─── FULL ANALYTICS (page load + 60s refresh) ───────────
+app.get('/api/admin/analytics', verifyToken, async (req, res, next) => {
+    try {
+        // Role check: admin only
+        if (!['admin', 'Super Admin', 'manager'].includes(req.user.role)) {
+            return res.status(403).json({ error: 'Admin access required' });
+        }
+        const { now, todayStart, yesterdayStart, weekStart, monthStart } = getDateRanges();
+
+        // ── Revenue ──
+        const [revToday, revYesterday, revWeek, revMonth, revAll] = await Promise.all([
+            prisma.order.aggregate({ where: { createdAt: { gte: todayStart }, paymentStatus: 'Paid' }, _sum: { total: true } }),
+            prisma.order.aggregate({ where: { createdAt: { gte: yesterdayStart, lt: todayStart }, paymentStatus: 'Paid' }, _sum: { total: true } }),
+            prisma.order.aggregate({ where: { createdAt: { gte: weekStart }, paymentStatus: 'Paid' }, _sum: { total: true } }),
+            prisma.order.aggregate({ where: { createdAt: { gte: monthStart }, paymentStatus: 'Paid' }, _sum: { total: true } }),
+            prisma.order.aggregate({ where: { paymentStatus: 'Paid' }, _sum: { total: true } }),
+        ]);
+
+        // ── Order Volume ──
+        const [ordersTotal, ordersToday, ordersYesterday, ordersByStatus] = await Promise.all([
+            prisma.order.count(),
+            prisma.order.count({ where: { createdAt: { gte: todayStart } } }),
+            prisma.order.count({ where: { createdAt: { gte: yesterdayStart, lt: todayStart } } }),
+            prisma.order.groupBy({ by: ['status'], _count: true }),
+        ]);
+
+        // ── Customer Stats ──
+        const [usersTotal, usersToday, usersByRole] = await Promise.all([
+            prisma.user.count(),
+            prisma.user.count({ where: { createdAt: { gte: todayStart } } }),
+            prisma.user.groupBy({ by: ['role'], _count: true }),
+        ]);
+
+        // ── Restaurant Stats ──
+        const [restTotal, restByStatus] = await Promise.all([
+            prisma.restaurant.count(),
+            prisma.restaurant.groupBy({ by: ['status'], _count: true }),
+        ]);
+
+        // ── Disputes ──
+        const [disputesByStatus, disputesTotal] = await Promise.all([
+            prisma.dispute.groupBy({ by: ['status'], _count: true }),
+            prisma.dispute.count(),
+        ]);
+
+        // ── Rider Fleet ──
+        const riderCount = await prisma.user.count({ where: { role: 'rider' } });
+
+        // ── Top 5 Restaurants by order count ──
+        const topRestaurantsRaw = await prisma.order.groupBy({
+            by: ['restaurantId'],
+            _count: true,
+            _sum: { total: true },
+            orderBy: { _count: { restaurantId: 'desc' } },
+            take: 5,
+        });
+        // Fetch restaurant names
+        const topRestIds = topRestaurantsRaw.map(r => r.restaurantId);
+        const topRestDetails = await prisma.restaurant.findMany({
+            where: { id: { in: topRestIds } },
+            select: { id: true, name: true, image: true, rating: true },
+        });
+        const topRestaurants = topRestaurantsRaw.map(r => {
+            const detail = topRestDetails.find(d => d.id === r.restaurantId) || {};
+            return { id: r.restaurantId, name: detail.name || 'Unknown', image: detail.image, rating: detail.rating, orders: r._count, revenue: r._sum.total || 0 };
+        });
+
+        // ── Recent 10 Orders (Live Feed) ──
+        const recentOrders = await prisma.order.findMany({
+            take: 10,
+            orderBy: { createdAt: 'desc' },
+            select: { id: true, zoiId: true, total: true, status: true, type: true, createdAt: true, user: { select: { name: true } }, restaurant: { select: { name: true } } },
+        });
+
+        // ── Hourly Orders (last 24h for line chart) ──
+        const hours24ago = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const hourlyOrdersRaw = await prisma.order.findMany({
+            where: { createdAt: { gte: hours24ago } },
+            select: { createdAt: true, total: true },
+        });
+        // Group by hour
+        const hourlyMap = {};
+        for (let h = 0; h < 24; h++) hourlyMap[h] = { count: 0, revenue: 0 };
+        hourlyOrdersRaw.forEach(o => {
+            const h = new Date(o.createdAt).getHours();
+            hourlyMap[h].count++;
+            hourlyMap[h].revenue += parseFloat(o.total) || 0;
+        });
+        const hourlyOrders = Object.entries(hourlyMap).map(([h, v]) => ({ hour: parseInt(h), ...v }));
+
+        // ── Daily Revenue (last 7 days for bar chart) ──
+        const dailyRevenueRaw = await prisma.order.findMany({
+            where: { createdAt: { gte: weekStart }, paymentStatus: 'Paid' },
+            select: { createdAt: true, total: true },
+        });
+        const dailyMap = {};
+        for (let d = 6; d >= 0; d--) {
+            const day = new Date(todayStart);
+            day.setDate(day.getDate() - d);
+            const key = day.toISOString().slice(0, 10);
+            dailyMap[key] = { date: key, label: day.toLocaleDateString('en-IN', { weekday: 'short' }), revenue: 0, orders: 0 };
+        }
+        dailyRevenueRaw.forEach(o => {
+            const key = new Date(o.createdAt).toISOString().slice(0, 10);
+            if (dailyMap[key]) { dailyMap[key].revenue += parseFloat(o.total) || 0; dailyMap[key].orders++; }
+        });
+        const dailyRevenue = Object.values(dailyMap);
+
+        // ── Build Status Maps ──
+        const statusMap = (arr) => arr.reduce((acc, item) => { acc[item.status || item.role] = item._count; return acc; }, {});
+
+        res.json({
+            timestamp: now.toISOString(),
+            revenue: {
+                today: revToday._sum.total || 0,
+                yesterday: revYesterday._sum.total || 0,
+                week: revWeek._sum.total || 0,
+                month: revMonth._sum.total || 0,
+                allTime: revAll._sum.total || 0,
+                growthPct: revYesterday._sum.total > 0 ? Math.round(((revToday._sum.total || 0) - revYesterday._sum.total) / revYesterday._sum.total * 100) : 0,
+            },
+            orders: {
+                total: ordersTotal,
+                today: ordersToday,
+                yesterday: ordersYesterday,
+                growthPct: ordersYesterday > 0 ? Math.round((ordersToday - ordersYesterday) / ordersYesterday * 100) : 0,
+                byStatus: statusMap(ordersByStatus),
+            },
+            customers: {
+                total: usersTotal,
+                newToday: usersToday,
+                byRole: statusMap(usersByRole),
+            },
+            restaurants: {
+                total: restTotal,
+                byStatus: statusMap(restByStatus),
+                active: restByStatus.find(r => r.status === 'Active')?._count || 0,
+            },
+            fleet: { total: riderCount },
+            disputes: {
+                total: disputesTotal,
+                byStatus: statusMap(disputesByStatus),
+                open: (disputesByStatus.find(d => d.status === 'Open')?._count || 0) + (disputesByStatus.find(d => d.status === 'Escalated')?._count || 0),
+            },
+            topRestaurants,
+            recentOrders: recentOrders.map(o => ({
+                id: o.zoiId || `ORD-${o.id}`,
+                customer: o.user?.name || 'Guest',
+                restaurant: o.restaurant?.name || 'Unknown',
+                total: o.total,
+                status: o.status,
+                type: o.type,
+                time: o.createdAt,
+            })),
+            charts: { hourlyOrders, dailyRevenue },
+        });
+    } catch (error) { next(error); }
+});
+
+// ─── LIGHTWEIGHT LIVE POLLING (every 5s) ────────────────
+app.get('/api/admin/analytics/live', verifyToken, async (req, res, next) => {
+    try {
+        if (!['admin', 'Super Admin', 'manager'].includes(req.user.role)) {
+            return res.status(403).json({ error: 'Admin access required' });
+        }
+        const { todayStart } = getDateRanges();
+
+        const [revToday, ordersToday, riderCount, openDisputes] = await Promise.all([
+            prisma.order.aggregate({ where: { createdAt: { gte: todayStart }, paymentStatus: 'Paid' }, _sum: { total: true } }),
+            prisma.order.count({ where: { createdAt: { gte: todayStart } } }),
+            prisma.user.count({ where: { role: 'rider' } }),
+            prisma.dispute.count({ where: { status: { in: ['Open', 'Escalated'] } } }),
+        ]);
+
+        res.json({
+            revenue: revToday._sum.total || 0,
+            ordersToday,
+            fleet: riderCount,
+            disputes: openDisputes,
+        });
+    } catch (error) { next(error); }
+});
+
+// ─── ADMIN METRICS (legacy compatibility) ────────────────
+app.get('/admin/metrics', async (req, res, next) => {
+    try {
+        const [users, restaurants, orders, revAgg] = await Promise.all([
+            prisma.user.count(),
+            prisma.restaurant.count(),
+            prisma.order.count(),
+            prisma.order.aggregate({ where: { paymentStatus: 'Paid' }, _sum: { total: true } }),
+        ]);
+        res.json({ users, restaurants, orders, revenue: revAgg._sum.total || 0 });
+    } catch (error) { next(error); }
+});
+
+
 const BADGE_DEFINITIONS = [
     { slug: 'first_bite', name: 'First Bite', icon: '🍕', description: 'Placed your first order', check: (stats) => stats.orderCount >= 1 },
     { slug: 'regular_10', name: 'Regular Foodie', icon: '🔥', description: 'Placed 10 orders', check: (stats) => stats.orderCount >= 10 },

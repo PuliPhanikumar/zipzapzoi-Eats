@@ -191,137 +191,96 @@
         <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div
-                    class="bg-surface border border-border p-5 rounded-xl relative overflow-hidden group hover:border-primary/50 transition-colors">
+                <div class="bg-surface border border-border p-5 rounded-xl relative overflow-hidden group hover:border-primary/50 transition-colors">
                     <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-xs text-gray-400 uppercase font-bold">Revenue (Real-time)</p>
-                            <h3 class="text-2xl font-mono font-bold text-white mt-1">₹<span id="stat-revenue">--</span>
-                            </h3>
-                        </div>
-                        <span
-                            class="bg-success/10 text-success text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1">+12%</span>
+                        <div><p class="text-xs text-gray-400 uppercase font-bold">Revenue (Today)</p>
+                            <h3 class="text-2xl font-mono font-bold text-white mt-1">₹<span id="stat-revenue">--</span></h3></div>
+                        <span id="stat-revenue-badge" class="bg-success/10 text-success text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1">--</span>
                     </div>
-                    <p class="text-[10px] text-gray-500 mt-2">Z.O.I. optimizing pricing (+1.2% boost)</p>
-                    <div
-                        class="absolute bottom-0 left-0 h-0.5 bg-primary w-full transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left">
-                    </div>
+                    <p class="text-[10px] text-gray-500 mt-2">Week: ₹<span id="stat-rev-week">--</span> · Month: ₹<span id="stat-rev-month">--</span></p>
                 </div>
-
-                <div class="bg-surface border border-border p-5 rounded-xl relative overflow-hidden group hover:border-yellow-400/50 transition-colors cursor-pointer"
-                    onclick="window.location.href='admin subscription management.html'">
+                <div class="bg-surface border border-border p-5 rounded-xl relative overflow-hidden group hover:border-yellow-400/50 transition-colors cursor-pointer" onclick="window.location.href='admin_restaurant_onboarding.html'">
                     <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-xs text-gray-400 uppercase font-bold">ZipZap Gold</p>
-                            <h3 class="text-2xl font-mono font-bold text-yellow-400 mt-1" id="stat-subs">--</h3>
-                        </div>
-                        <span
-                            class="bg-yellow-500/10 text-yellow-400 text-[10px] font-bold px-2 py-1 rounded">Active</span>
+                        <div><p class="text-xs text-gray-400 uppercase font-bold">Orders Today</p>
+                            <h3 class="text-2xl font-mono font-bold text-yellow-400 mt-1" id="stat-subs">--</h3></div>
+                        <span id="stat-orders-badge" class="bg-yellow-500/10 text-yellow-400 text-[10px] font-bold px-2 py-1 rounded">--</span>
                     </div>
-                    <p class="text-[10px] text-gray-500 mt-2">Churn Rate: <span class="text-success">1.2% (Low)</span>
-                    </p>
+                    <p class="text-[10px] text-gray-500 mt-2">Total all-time: <span class="text-white" id="stat-orders-total">--</span></p>
                 </div>
-
-                <div class="bg-surface border border-border p-5 rounded-xl relative overflow-hidden group hover:border-blue-400/50 transition-colors cursor-pointer"
-                    onclick="window.location.href='admin deliverypartner Metrics.html'">
+                <div class="bg-surface border border-border p-5 rounded-xl relative overflow-hidden group hover:border-blue-400/50 transition-colors cursor-pointer" onclick="window.location.href='admin deliverypartner Metrics.html'">
                     <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-xs text-gray-400 uppercase font-bold">Active Fleet</p>
-                            <h3 class="text-2xl font-mono font-bold text-white mt-1" id="stat-riders">--</h3>
-                        </div>
-                        <span class="bg-blue-500/10 text-blue-400 text-[10px] font-bold px-2 py-1 rounded">High
-                            Cap</span>
+                        <div><p class="text-xs text-gray-400 uppercase font-bold">Rider Fleet</p>
+                            <h3 class="text-2xl font-mono font-bold text-white mt-1" id="stat-riders">--</h3></div>
+                        <span class="bg-blue-500/10 text-blue-400 text-[10px] font-bold px-2 py-1 rounded">Fleet</span>
                     </div>
-                    <div class="w-full bg-gray-800 h-1 rounded-full mt-3 overflow-hidden">
-                        <div class="bg-blue-500 h-full w-[85%]"></div>
-                    </div>
+                    <p class="text-[10px] text-gray-500 mt-2">Restaurants: <span class="text-white" id="stat-restaurants">--</span> · Users: <span class="text-white" id="stat-users">--</span></p>
                 </div>
-
-                <div class="bg-surface border border-border p-5 rounded-xl relative overflow-hidden group hover:border-red-400/50 transition-colors cursor-pointer"
-                    onclick="window.location.href='admin refund management.html'">
+                <div class="bg-surface border border-border p-5 rounded-xl relative overflow-hidden group hover:border-red-400/50 transition-colors cursor-pointer" onclick="window.location.href='admin dispute resolution.html'">
                     <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-xs text-gray-400 uppercase font-bold">Dispute Risks</p>
-                            <h3 class="text-2xl font-mono font-bold text-white mt-1" id="stat-issues">--</h3>
-                        </div>
-                        <span
-                            class="bg-ai/10 text-ai text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1"><span
-                                class="material-symbols-outlined text-[10px]">auto_fix</span> Auto-Fixing</span>
+                        <div><p class="text-xs text-gray-400 uppercase font-bold">Open Disputes</p>
+                            <h3 class="text-2xl font-mono font-bold text-white mt-1" id="stat-issues">--</h3></div>
+                        <span class="bg-ai/10 text-ai text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1"><span class="material-symbols-outlined text-[10px]">auto_fix</span> Auto-Fixing</span>
                     </div>
-                    <p class="text-[10px] text-gray-500 mt-2" id="ai-last-action">Last action: 2m ago</p>
+                    <p class="text-[10px] text-gray-500 mt-2" id="ai-last-action">Total disputes: <span id="stat-disputes-total">--</span></p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[500px]">
-
-                <div
-                    class="lg:col-span-2 bg-surface border border-border rounded-xl overflow-hidden relative flex flex-col">
+                <div class="lg:col-span-2 bg-surface border border-border rounded-xl overflow-hidden relative flex flex-col">
                     <div class="p-3 border-b border-border bg-[#15171c] flex justify-between items-center">
-                        <h3 class="font-bold text-sm text-white flex items-center gap-2"><span
-                                class="material-symbols-outlined text-primary text-sm">public</span> Live City View</h3>
+                        <h3 class="font-bold text-sm text-white flex items-center gap-2"><span class="material-symbols-outlined text-primary text-sm">public</span> Live City View</h3>
                         <div class="flex gap-2 text-[10px]">
-                            <span
-                                class="bg-black/30 px-2 py-1 rounded text-primary border border-primary/20 cursor-pointer hover:bg-black/50">●
-                                Riders</span>
-                            <span
-                                class="bg-black/30 px-2 py-1 rounded text-blue-400 border border-blue-400/20 cursor-pointer hover:bg-black/50">●
-                                Zones</span>
+                            <span class="bg-black/30 px-2 py-1 rounded text-primary border border-primary/20">● Riders</span>
+                            <span class="bg-black/30 px-2 py-1 rounded text-blue-400 border border-blue-400/20">● Zones</span>
                         </div>
                     </div>
                     <div id="map" class="flex-1 grayscale-[80%] invert-[1] brightness-[0.7]"></div>
                 </div>
-
                 <div class="bg-surface border border-border rounded-xl overflow-hidden flex flex-col">
                     <div class="p-4 border-b border-border bg-[#15171c] flex justify-between items-center">
-                        <h3 class="font-bold text-sm text-white flex items-center gap-2">
-                            <span class="material-symbols-outlined text-ai text-sm animate-pulse">smart_toy</span>
-                            Z.O.I. Actions Log
-                        </h3>
-                        <span class="text-[10px] bg-ai/10 text-ai px-2 py-0.5 rounded font-bold">Self-Healing</span>
+                        <h3 class="font-bold text-sm text-white flex items-center gap-2"><span class="material-symbols-outlined text-primary text-sm animate-pulse">receipt_long</span> Live Order Feed</h3>
+                        <span class="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded font-bold" id="feed-count">0 today</span>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-2 space-y-2" id="zoi-log">
-                        <div class="bg-bg border border-border p-3 rounded-lg opacity-50">
-                            <div class="flex justify-between items-start mb-1">
-                                <span class="text-xs font-bold text-gray-400">System Init</span>
-                                <span class="text-[10px] text-gray-600">Now</span>
-                            </div>
-                            <p class="text-xs text-gray-500">Z.O.I. Monitoring engine started.</p>
-                        </div>
-                    </div>
-                    <div class="p-3 border-t border-border">
-                        <button onclick="simulateIncident()"
-                            class="w-full py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs font-bold text-red-400 rounded transition-colors">Simulate
-                            Random Failure</button>
-                    </div>
+                    <div class="flex-1 overflow-y-auto p-2 space-y-1.5" id="live-feed"></div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-surface border border-border p-6 rounded-xl">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <span class="material-symbols-outlined text-danger text-sm">security</span> Anomaly
-                            Detection
-                        </h3>
-                    </div>
-                    <div class="h-64 w-full flex items-center justify-center">
-                        <canvas id="securityChart"></canvas>
-                    </div>
-                </div>
-
                 <div class="lg:col-span-2 bg-surface border border-border p-6 rounded-xl">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <span class="material-symbols-outlined text-ai text-sm">neurology</span> Z.O.I. Neural
-                            Network Load
-                        </h3>
-                        <div class="flex gap-2">
-                            <span class="text-[10px] text-gray-400 bg-white/5 px-2 py-1 rounded">Prediction Accuracy:
-                                98.4%</span>
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2"><span class="material-symbols-outlined text-success text-sm">bar_chart</span> 7-Day Revenue</h3>
+                        <span class="text-[10px] text-gray-400 bg-white/5 px-2 py-1 rounded" id="rev-chart-total">--</span>
+                    </div>
+                    <div class="h-64 w-full"><canvas id="revenueChart"></canvas></div>
+                </div>
+                <div class="bg-surface border border-border p-6 rounded-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2"><span class="material-symbols-outlined text-primary text-sm">trophy</span> Top Restaurants</h3>
+                    </div>
+                    <div class="space-y-3" id="top-restaurants"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-surface border border-border p-6 rounded-xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2"><span class="material-symbols-outlined text-info text-sm">timeline</span> 24h Order Volume</h3>
+                    </div>
+                    <div class="h-64 w-full"><canvas id="hourlyChart"></canvas></div>
+                </div>
+                <div class="bg-surface border border-border rounded-xl overflow-hidden flex flex-col">
+                    <div class="p-4 border-b border-border bg-[#15171c] flex justify-between items-center">
+                        <h3 class="font-bold text-sm text-white flex items-center gap-2"><span class="material-symbols-outlined text-ai text-sm animate-pulse">smart_toy</span> Z.O.I. Actions Log</h3>
+                        <span class="text-[10px] bg-ai/10 text-ai px-2 py-0.5 rounded font-bold">Self-Healing</span>
+                    </div>
+                    <div class="flex-1 overflow-y-auto p-2 space-y-2" id="zoi-log">
+                        <div class="bg-bg border border-border p-3 rounded-lg opacity-50">
+                            <div class="flex justify-between items-start mb-1"><span class="text-xs font-bold text-gray-400">System Init</span><span class="text-[10px] text-gray-600">Now</span></div>
+                            <p class="text-xs text-gray-500">Z.O.I. Monitoring engine started.</p>
                         </div>
                     </div>
-                    <div class="h-64 w-full">
-                        <canvas id="neuralChart"></canvas>
+                    <div class="p-3 border-t border-border">
+                        <button onclick="simulateIncident()" class="w-full py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs font-bold text-red-400 rounded transition-colors">Simulate Random Failure</button>
                     </div>
                 </div>
             </div>
@@ -615,59 +574,61 @@
             }
         }
 
-        // 3. CHARTS
+        // 3. CHARTS (initialized with empty data, filled by API)
+        let revenueChartInst = null, hourlyChartInst = null;
         function initCharts() {
-            const ctxSec = document.getElementById('securityChart').getContext('2d');
-            new Chart(ctxSec, {
-                type: 'radar',
-                data: {
-                    labels: ['Fraud', 'Fake Accts', 'API Abuse', 'GPS Spoof', 'Chargebacks'],
-                    datasets: [{
-                        label: 'Risk Level',
-                        data: [20, 45, 10, 30, 15],
-                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                        borderColor: '#ef4444',
-                        pointBackgroundColor: '#ef4444'
-                    }]
-                },
-                options: {
-                    scales: { r: { grid: { color: '#2a2d35' }, angleLines: { color: '#2a2d35' }, pointLabels: { color: '#9ca3af', font: { size: 10 } } } },
-                    plugins: { legend: { display: false } }
-                }
+            const chartOpts = { plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#2a2d35' }, ticks: { color: '#9ca3af', font: { size: 10 } } }, x: { grid: { color: '#1a1c22' }, ticks: { color: '#9ca3af', font: { size: 10 } } } } };
+            revenueChartInst = new Chart(document.getElementById('revenueChart').getContext('2d'), {
+                type: 'bar', data: { labels: [], datasets: [{ label: 'Revenue ₹', data: [], backgroundColor: 'rgba(0,240,255,0.3)', borderColor: '#00f0ff', borderWidth: 1, borderRadius: 6 }] }, options: chartOpts
             });
+            hourlyChartInst = new Chart(document.getElementById('hourlyChart').getContext('2d'), {
+                type: 'line', data: { labels: [], datasets: [{ label: 'Orders', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.4, pointRadius: 2 }] }, options: chartOpts
+            });
+        }
 
-            // NEURAL NETWORK VISUALIZER
-            const ctxNeural = document.getElementById('neuralChart').getContext('2d');
-            const dataPoints = Array.from({ length: 20 }, () => Math.floor(Math.random() * 100));
-            new Chart(ctxNeural, {
-                type: 'line',
-                data: {
-                    labels: Array.from({ length: 20 }, (_, i) => i),
-                    datasets: [{
-                        label: 'Neural Load',
-                        data: dataPoints,
-                        borderColor: '#8b5cf6',
-                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    plugins: { legend: { display: false } },
-                    scales: { y: { grid: { color: '#2a2d35' }, min: 0, max: 100 }, x: { display: false } },
-                    animation: { duration: 2000, easing: 'linear' }
-                }
-            });
+        function updateCharts(charts) {
+            if (charts.dailyRevenue && revenueChartInst) {
+                revenueChartInst.data.labels = charts.dailyRevenue.map(d => d.label);
+                revenueChartInst.data.datasets[0].data = charts.dailyRevenue.map(d => d.revenue);
+                revenueChartInst.update();
+                const weekTotal = charts.dailyRevenue.reduce((s, d) => s + d.revenue, 0);
+                const el = document.getElementById('rev-chart-total');
+                if (el) el.innerText = '₹' + weekTotal.toLocaleString('en-IN');
+            }
+            if (charts.hourlyOrders && hourlyChartInst) {
+                hourlyChartInst.data.labels = charts.hourlyOrders.map(h => h.hour + ':00');
+                hourlyChartInst.data.datasets[0].data = charts.hourlyOrders.map(h => h.count);
+                hourlyChartInst.update();
+            }
+        }
+
+        function renderLiveFeed(orders) {
+            const el = document.getElementById('live-feed');
+            if (!el || !orders) return;
+            const statusColors = { Pending: 'text-yellow-400 bg-yellow-500/10', Confirmed: 'text-blue-400 bg-blue-500/10', Preparing: 'text-purple-400 bg-purple-500/10', Delivered: 'text-green-400 bg-green-500/10', Cancelled: 'text-red-400 bg-red-500/10' };
+            el.innerHTML = orders.map(o => {
+                const sc = statusColors[o.status] || 'text-gray-400 bg-gray-500/10';
+                const t = new Date(o.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return `<div class="bg-bg border border-border rounded-lg p-2.5 flex items-center justify-between hover:border-primary/30 transition-colors">
+                    <div class="flex-1 min-w-0"><p class="text-xs font-bold text-white truncate">${o.customer} → ${o.restaurant}</p><p class="text-[10px] text-gray-500">${o.id} · ${t}</p></div>
+                    <div class="flex items-center gap-2 shrink-0"><span class="text-xs font-mono font-bold text-white">₹${o.total}</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${sc}">${o.status}</span></div></div>`;
+            }).join('');
+        }
+
+        function renderTopRestaurants(list) {
+            const el = document.getElementById('top-restaurants');
+            if (!el || !list) return;
+            el.innerHTML = list.length === 0 ? '<p class="text-xs text-gray-500 italic">No order data yet</p>' : list.map((r, i) => `<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                <span class="text-lg font-black ${i === 0 ? 'text-yellow-500' : i === 1 ? 'text-gray-300' : 'text-orange-700'}">${i + 1}</span>
+                <div class="flex-1 min-w-0"><p class="text-sm font-bold text-white truncate">${r.name}</p><p class="text-[10px] text-gray-500">${r.orders} orders · ₹${Math.round(r.revenue).toLocaleString('en-IN')}</p></div>
+                ${r.rating ? '<span class="text-[10px] font-bold text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded">' + r.rating.toFixed(1) + ' ★</span>' : ''}</div>`).join('');
         }
 
         // 4. SIDEBAR SEARCH
         function filterSidebar() {
             const query = document.getElementById('cmd-search').value.toLowerCase();
             const links = document.querySelectorAll('#sidebar-nav a');
-            links.forEach(link => {
-                link.style.display = link.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
-            });
+            links.forEach(link => { link.style.display = link.innerText.toLowerCase().includes(query) ? 'flex' : 'none'; });
         }
 
         // 5. NOTIFICATION LOGIC
@@ -675,70 +636,80 @@
             const panel = document.getElementById('notif-panel');
             panel.classList.toggle('hidden');
             panel.classList.toggle('opacity-0');
-            // Populate with data from other modules
             const list = document.getElementById('notif-list');
             list.innerHTML = "";
-
-            // Check Refunds
             if (localStorage.getItem('zoi_refunds_pending') === 'true') {
                 list.innerHTML += `<div class="p-3 bg-red-500/10 border border-red-500/20 rounded-lg cursor-pointer hover:bg-red-500/20" onclick="window.location.href='admin refund management.html'"><p class="text-xs font-bold text-red-400 mb-1">New Refund Request</p></div>`;
             }
-
-            // Default
             list.innerHTML += `<div class="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg cursor-pointer hover:bg-blue-500/20" onclick="window.location.href='admin system health.html'"><p class="text-xs font-bold text-blue-400 mb-1">System Stable</p><p class="text-[10px] text-gray-400">All nodes operational.</p></div>`;
         }
 
-        // 6. AUTO-SIMULATION
-        // 6. AUTO-SIMULATION & REAL DATA
-        async function refreshDashboard() {
+        function growthBadge(pct) {
+            if (pct > 0) return `<span class="bg-success/10 text-success text-[10px] font-bold px-2 py-1 rounded">+${pct}%</span>`;
+            if (pct < 0) return `<span class="bg-danger/10 text-danger text-[10px] font-bold px-2 py-1 rounded">${pct}%</span>`;
+            return `<span class="bg-white/5 text-gray-400 text-[10px] font-bold px-2 py-1 rounded">0%</span>`;
+        }
+
+        // 6. REFRESH DASHBOARD
+        let fullDataLoaded = false;
+        async function refreshDashboard(full) {
+            const token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+            const base = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
             try {
-                // Fetch Real Backend Metrics
-                const response = await fetch('' + ZOI_CONFIG.API_BASE_URL + '/admin/metrics');
-                if (response.ok) {
-                    const data = await response.json();
-
-                    // Update the UI with actual DB counts
-                    document.getElementById('stat-riders').innerText = (data.users || 0) + 120; // Using users as a proxy for active riders + a baseline
-                    document.getElementById('stat-subs').innerText = data.restaurants || 0; // Using restaurants for subscriptions proxy
-                    document.getElementById('stat-issues').innerText = data.orders || 0; // Tracking total orders on this card
-
-                    // Real Revenue calculation from the DB orders table
-                    const realRevenue = data.revenue || 0;
-
-                    // Add slight random noise to look "Live" using the real DB baseline
-                    const noise = Math.floor(Math.random() * 500);
-                    document.getElementById('stat-revenue').innerText = (realRevenue + noise).toLocaleString();
+                if (full || !fullDataLoaded) {
+                    const r = await fetch(base + '/api/admin/analytics', { headers: { Authorization: 'Bearer ' + token } });
+                    if (r.ok) {
+                        const d = await r.json();
+                        fullDataLoaded = true;
+                        document.getElementById('stat-revenue').innerText = d.revenue.today.toLocaleString('en-IN');
+                        document.getElementById('stat-rev-week').innerText = d.revenue.week.toLocaleString('en-IN');
+                        document.getElementById('stat-rev-month').innerText = d.revenue.month.toLocaleString('en-IN');
+                        document.getElementById('stat-revenue-badge').innerHTML = growthBadge(d.revenue.growthPct);
+                        document.getElementById('stat-subs').innerText = d.orders.today;
+                        document.getElementById('stat-orders-badge').innerHTML = growthBadge(d.orders.growthPct);
+                        document.getElementById('stat-orders-total').innerText = d.orders.total.toLocaleString('en-IN');
+                        document.getElementById('stat-riders').innerText = d.fleet.total;
+                        document.getElementById('stat-restaurants').innerText = d.restaurants.total;
+                        document.getElementById('stat-users').innerText = d.customers.total;
+                        document.getElementById('stat-issues').innerText = d.disputes.open;
+                        document.getElementById('stat-disputes-total').innerText = d.disputes.total;
+                        document.getElementById('feed-count').innerText = d.orders.today + ' today';
+                        updateCharts(d.charts);
+                        renderLiveFeed(d.recentOrders);
+                        renderTopRestaurants(d.topRestaurants);
+                        return;
+                    }
                 } else {
-                    throw new Error("API not reachable");
+                    const r = await fetch(base + '/api/admin/analytics/live', { headers: { Authorization: 'Bearer ' + token } });
+                    if (r.ok) {
+                        const d = await r.json();
+                        document.getElementById('stat-revenue').innerText = d.revenue.toLocaleString('en-IN');
+                        document.getElementById('stat-subs').innerText = d.ordersToday;
+                        document.getElementById('stat-riders').innerText = d.fleet;
+                        document.getElementById('stat-issues').innerText = d.disputes;
+                        document.getElementById('feed-count').innerText = d.ordersToday + ' today';
+                        return;
+                    }
                 }
+                throw new Error('API unavailable');
             } catch (e) {
-                console.warn("Backend unavailable, using simulation fallback", e);
-                // Fallback Simulation
+                console.warn('Backend unavailable, using simulation', e.message);
                 const riders = typeof ZoiFleet !== 'undefined' ? ZoiFleet.getAllRiders() : [];
-                const activeRiders = riders.filter(r => r.status === 'Online' || r.status === 'Busy').length;
-                if (document.getElementById('stat-riders')) document.getElementById('stat-riders').innerText = activeRiders || '--';
-
-                const subs = typeof ZoiSubscriptions !== 'undefined' ? ZoiSubscriptions.getAll() : [];
-                if (document.getElementById('stat-subs')) document.getElementById('stat-subs').innerText = subs.length || '--';
-
-                const refunds = typeof ZoiRefunds !== 'undefined' ? ZoiRefunds.getAll() : [];
-                const risks = refunds.filter(r => r.status === 'Pending').length;
-                if (document.getElementById('stat-issues')) document.getElementById('stat-issues').innerText = risks || '--';
-
-                let baseRev = 124500;
-                const noise = Math.floor(Date.now() / 10000 % 100) * 100;
-                if (document.getElementById('stat-revenue')) document.getElementById('stat-revenue').innerText = (baseRev + noise).toLocaleString();
-            }
-
-            // Map Riders Update (if map exists)
-            if (map && window.riderMarkers) {
-                // Future expansion: move rider pins
+                const active = riders.filter(r => r.status === 'Online' || r.status === 'Busy').length;
+                if (document.getElementById('stat-riders')) document.getElementById('stat-riders').innerText = active || '--';
+                if (document.getElementById('stat-subs')) document.getElementById('stat-subs').innerText = '--';
+                if (document.getElementById('stat-issues')) document.getElementById('stat-issues').innerText = '--';
+                let baseRev = 124500 + Math.floor(Date.now() / 10000 % 100) * 100;
+                if (document.getElementById('stat-revenue')) document.getElementById('stat-revenue').innerText = baseRev.toLocaleString();
             }
         }
 
+        // Polling: light every 5s, full every 60s
+        let pollCount = 0;
         setInterval(() => {
+            pollCount++;
             if (Math.random() > 0.8) simulateIncident();
-            refreshDashboard();
+            refreshDashboard(pollCount % 12 === 0);
         }, 5000);
 
         window.onload = function () {
@@ -762,7 +733,7 @@
             initMap();
             initCharts();
             ZoiDB.init(); // Ensure DB exists
-            refreshDashboard();
+            refreshDashboard(true);
 
             // CMD+K
             document.addEventListener('keydown', (e) => {
