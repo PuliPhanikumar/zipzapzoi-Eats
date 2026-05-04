@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -10,6 +10,8 @@
 
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta name="theme-color" content="#00f0ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json" />
     <title>ZipZapZoi Eats - Smart Checkout</title>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
@@ -247,22 +249,22 @@
                 <h3 class="font-bold text-white mb-4">Bill Details</h3>
                 <div class="space-y-3 text-sm text-text-secondary mb-4 pb-4 border-b border-gray-800">
                     <div class="flex justify-between"><span>Item Total</span><span class="text-white"
-                            id="bill-item-total">₹0</span></div>
+                            id="bill-item-total">?0</span></div>
                     <div class="flex justify-between"><span>Delivery Fee</span><span class="text-primary"
-                            id="bill-delivery">₹40</span></div>
+                            id="bill-delivery">?40</span></div>
                     <div class="flex justify-between"><span>Taxes & Charges</span><span class="text-white"
-                            id="bill-tax">₹0</span></div>
+                            id="bill-tax">?0</span></div>
                     <div class="flex justify-between text-yellow-400 hidden" id="surge-row">
                         <span class="flex items-center gap-1"><span
                                 class="material-symbols-outlined text-[14px]">bolt</span> Peak Hour Surge</span>
-                        <span id="bill-surge">₹0</span>
+                        <span id="bill-surge">?0</span>
                     </div>
                     <div class="flex justify-between text-green-500 hidden" id="discount-row"><span>Discount</span><span
-                            id="bill-discount">-₹0</span></div>
+                            id="bill-discount">-?0</span></div>
                 </div>
                 <div class="flex justify-between items-center">
                     <span class="font-bold text-white text-lg">To Pay</span>
-                    <span class="font-bold text-white text-xl" id="bill-grand-total">₹0</span>
+                    <span class="font-bold text-white text-xl" id="bill-grand-total">?0</span>
                 </div>
             </div>
 
@@ -315,9 +317,9 @@
                 </h3>
                 <div class="flex gap-2" id="tip-buttons">
                     <button onclick="setTip(0)" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">No Tip</button>
-                    <button onclick="setTip(20)" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">₹20</button>
-                    <button onclick="setTip(30)" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">₹30</button>
-                    <button onclick="setTip(50)" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">₹50</button>
+                    <button onclick="setTip(20)" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">?20</button>
+                    <button onclick="setTip(30)" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">?30</button>
+                    <button onclick="setTip(50)" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">?50</button>
                     <button onclick="setCustomTip()" class="tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-gray-800 text-gray-400 border border-gray-700 hover:border-primary transition-all">Other</button>
                 </div>
             </div>
@@ -326,7 +328,7 @@
                 class="w-full bg-primary hover:bg-[#00d4c5] text-[#0a0314] font-bold text-lg py-4 rounded-xl shadow-lg shadow-primary/20 transition-all active:scale-[0.98] flex justify-between px-6 items-center group">
                 <span class="flex flex-col items-start leading-tight">
                     <span class="text-xs font-medium opacity-80 uppercase">Total</span>
-                    <span id="btn-total">₹0</span>
+                    <span id="btn-total">?0</span>
                 </span>
                 <span class="flex items-center gap-2">
                     Place Order <span
@@ -381,9 +383,9 @@
                 <p class="text-xs text-gray-500 font-bold uppercase mb-3">Add New Address</p>
                 <div class="space-y-3">
                     <div class="flex gap-2">
-                        <button onclick="setAddrLabel(this,'Home')" class="addr-label-btn flex-1 py-2 rounded-lg border border-gray-700 text-sm font-bold text-gray-400 hover:border-primary hover:text-primary transition-all" data-label="Home">🏠 Home</button>
-                        <button onclick="setAddrLabel(this,'Office')" class="addr-label-btn flex-1 py-2 rounded-lg border border-gray-700 text-sm font-bold text-gray-400 hover:border-primary hover:text-primary transition-all" data-label="Office">🏢 Office</button>
-                        <button onclick="setAddrLabel(this,'Other')" class="addr-label-btn flex-1 py-2 rounded-lg border border-gray-700 text-sm font-bold text-gray-400 hover:border-primary hover:text-primary transition-all" data-label="Other">📍 Other</button>
+                        <button onclick="setAddrLabel(this,'Home')" class="addr-label-btn flex-1 py-2 rounded-lg border border-gray-700 text-sm font-bold text-gray-400 hover:border-primary hover:text-primary transition-all" data-label="Home">?? Home</button>
+                        <button onclick="setAddrLabel(this,'Office')" class="addr-label-btn flex-1 py-2 rounded-lg border border-gray-700 text-sm font-bold text-gray-400 hover:border-primary hover:text-primary transition-all" data-label="Office">?? Office</button>
+                        <button onclick="setAddrLabel(this,'Other')" class="addr-label-btn flex-1 py-2 rounded-lg border border-gray-700 text-sm font-bold text-gray-400 hover:border-primary hover:text-primary transition-all" data-label="Other">?? Other</button>
                     </div>
                     <input id="new-addr-line" type="text" placeholder="Full address (street, area, landmark)" class="w-full bg-background-dark border border-gray-700 rounded-lg px-4 py-3 text-white text-sm focus:border-primary focus:ring-0 placeholder-gray-500" />
                     <div class="flex gap-2">
@@ -461,11 +463,11 @@
         };
 
         const coupons = [
-            { code: "WELCOME50", discount: 50, min: 200, desc: "Flat ₹50 OFF on orders above ₹200" },
-            { code: "ZAPIT", discount: 100, min: 500, desc: "Flat ₹100 OFF on orders above ₹500" },
-            { code: "STEALDEAL", discount: 30, min: 0, desc: "Flat ₹30 OFF no minimum" },
-            { code: "NEWUSER", discount: 75, min: 300, desc: "₹75 OFF for new users on ₹300+" },
-            { code: "ZIPFREE", discount: 40, min: 150, desc: "Free delivery on orders above ₹150" }
+            { code: "WELCOME50", discount: 50, min: 200, desc: "Flat ?50 OFF on orders above ?200" },
+            { code: "ZAPIT", discount: 100, min: 500, desc: "Flat ?100 OFF on orders above ?500" },
+            { code: "STEALDEAL", discount: 30, min: 0, desc: "Flat ?30 OFF no minimum" },
+            { code: "NEWUSER", discount: 75, min: 300, desc: "?75 OFF for new users on ?300+" },
+            { code: "ZIPFREE", discount: 40, min: 150, desc: "Free delivery on orders above ?150" }
         ];
 
         // --- 2. INITIALIZATION ---
@@ -540,7 +542,7 @@
                         <div class="w-20 h-20 rounded-xl bg-cover bg-center shrink-0 border border-gray-700" style="background-image: url('${item.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuDqVSbBRHF_1gL44bwx-KhGaRwQJREqj4wRTeRu0w3j7A0_-HTddgO5LY3HjujnAMOz0JsWULe-k7xvAa_qJkOgeIecxlKI6_BJAvHH4P758jaKLZ_4x8zVeMPv19f1-RptZ3UahFjKNnFU47mEWsii5BC1dUHyVKOpuaiIHXuXdsokAVzBBqp2DO7zBH7dx4cwM88xFSrf0nyzruxuQGGBcTj_lA7oPrh4Fx1A1fdSi6wgBiZ3TwIEcvzrT2ZEt0JVGHb7CDjQXy_XSammpsHDABzlbNR2j1WYrudBZFRAAcgfDONLhGmumU-GE5xKmo4Y0KNcT5wPl6StcfL4P3ilVXhMJQX8QrOME1YZ4QDOamnI3D0WpPviCXtq6KFXPOEi2NaVYdTIn0NTLNxCl82"}')"></div>
                         <div class="flex-1">
                             <h3 class="font-bold text-white mb-1">${item.name}</h3>
-                            <p class="text-primary font-mono text-sm">₹${item.price}</p>
+                            <p class="text-primary font-mono text-sm">?${item.price}</p>
                         </div>
                         <div class="flex items-center gap-3 bg-background-dark border border-gray-700 rounded-lg p-1">
                             <button onclick="updateQty(${index}, -1)" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white">-</button>
@@ -580,7 +582,7 @@
                         </div>
                         <div>
                             <p class="text-white text-xs font-bold truncate">${s.name}</p>
-                            <p class="text-text-secondary text-[10px]">₹${s.price}</p>
+                            <p class="text-text-secondary text-[10px]">?${s.price}</p>
                         </div>
                     </div>
                 `;
@@ -592,24 +594,24 @@
             const delivery = itemTotal > 0 ? 40 : 0;
             const tax = Math.round(itemTotal * 0.05);
 
-            // Check Surge — safe fallback if ZoiSystem isn't loaded
+            // Check Surge � safe fallback if ZoiSystem isn't loaded
             let surge = 0;
             const config = (typeof ZoiSystem !== 'undefined' && ZoiSystem.getConfig) ? ZoiSystem.getConfig() : { surgeMultiplier: 1.0 };
             if (config.surgeMultiplier > 1.0) {
                 surge = Math.round(itemTotal * (config.surgeMultiplier - 1));
                 document.getElementById('surge-row').classList.remove('hidden');
-                document.getElementById('bill-surge').innerText = `₹${surge}`;
+                document.getElementById('bill-surge').innerText = `?${surge}`;
             } else {
                 document.getElementById('surge-row').classList.add('hidden');
             }
 
             cartTotal = itemTotal + delivery + tax + surge + currentTip - currentDiscount;
 
-            document.getElementById('bill-item-total').innerText = `₹${itemTotal}`;
-            document.getElementById('bill-delivery').innerText = delivery > 0 ? `₹${delivery}` : 'FREE';
-            document.getElementById('bill-tax').innerText = `₹${tax}`;
-            document.getElementById('bill-grand-total').innerText = `₹${cartTotal}`;
-            document.getElementById('btn-total').innerText = `₹${cartTotal}`;
+            document.getElementById('bill-item-total').innerText = `?${itemTotal}`;
+            document.getElementById('bill-delivery').innerText = delivery > 0 ? `?${delivery}` : 'FREE';
+            document.getElementById('bill-tax').innerText = `?${tax}`;
+            document.getElementById('bill-grand-total').innerText = `?${cartTotal}`;
+            document.getElementById('btn-total').innerText = `?${cartTotal}`;
         }
 
         // --- 4. CORE ACTIONS ---
@@ -672,10 +674,10 @@
         function applyCoupon(code, amount) {
             currentDiscount = amount;
             document.getElementById('offer-display-title').innerText = `${code} Applied`;
-            document.getElementById('offer-display-desc').innerText = `You saved ₹${amount}`;
+            document.getElementById('offer-display-desc').innerText = `You saved ?${amount}`;
             document.getElementById('offer-display-desc').classList.add('text-green-500');
             document.getElementById('discount-row').classList.remove('hidden');
-            document.getElementById('bill-discount').innerText = `-₹${amount}`;
+            document.getElementById('bill-discount').innerText = `-?${amount}`;
 
             closeModal('offers-modal');
             renderCart(); // Re-calc bill
@@ -725,7 +727,7 @@
                 if (!date || !time) return showCartToast('Schedule Required', 'Please select date and time for scheduled delivery');
             }
 
-            // All valid — proceed
+            // All valid � proceed
             const btn = document.querySelector('button[onclick="validateAndPay()"]');
             btn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Processing Payment...`;
             btn.disabled = true;
@@ -824,7 +826,7 @@
                     paymentMethod: paymentMethod,
                     zone: 'Default'
                 });
-                console.log('🟢 Order created via API:', apiOrder);
+                console.log('?? Order created via API:', apiOrder);
             } catch (apiErr) {
                 console.warn('API order creation failed, saving locally:', apiErr);
             }
@@ -1013,7 +1015,7 @@
             document.getElementById('new-addr-line').value = '';
             document.getElementById('new-addr-city').value = '';
             document.getElementById('new-addr-pin').value = '';
-            showCartToast('✅ Saved', 'Address added successfully');
+            showCartToast('? Saved', 'Address added successfully');
         }
 
         function copyInviteLink() {
@@ -1113,10 +1115,10 @@
             });
             event.target.className = 'tip-btn flex-1 py-2 rounded-lg text-xs font-bold bg-primary/20 text-primary border border-primary transition-all';
             renderCart();
-            showCartToast('Tip Updated', amount > 0 ? `₹${amount} tip added. Thank you! 💚` : 'Tip removed');
+            showCartToast('Tip Updated', amount > 0 ? `?${amount} tip added. Thank you! ??` : 'Tip removed');
         }
         function setCustomTip() {
-            const amount = parseInt(prompt('Enter tip amount (₹):'));
+            const amount = parseInt(prompt('Enter tip amount (?):'));
             if (!isNaN(amount) && amount >= 0) {
                 setTip(amount);
             }
@@ -1132,7 +1134,7 @@
             }
         }
 
-        // copyInviteLink_old removed — replaced by copyInviteLink() above
+        // copyInviteLink_old removed � replaced by copyInviteLink() above
 
         function togglePaymentFields() {
             const checked = document.querySelector('input[name="payment"]:checked');

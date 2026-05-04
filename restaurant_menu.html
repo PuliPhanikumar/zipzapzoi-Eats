@@ -1,9 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta name="theme-color" content="#00f0ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json" />
     <title>ZipZapZoi Eats - Ultimate AI Culinary Experience</title>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
@@ -176,7 +178,7 @@
                         </div>
                         <div class="flex items-center gap-2 mt-3">
                             <span class="animate-pulse size-2 bg-green-500 rounded-full"></span>
-                            <span class="text-green-400 text-sm font-medium">Open Now • Kitchen Live</span>
+                            <span class="text-green-400 text-sm font-medium">Open Now � Kitchen Live</span>
                         </div>
                     </div>
                 </div>
@@ -250,7 +252,7 @@
             </div>
         </div>
 
-        <!-- 🛒 CART SIDEBAR (lg:col-span-5) -->
+        <!-- ?? CART SIDEBAR (lg:col-span-5) -->
         <div id="cart-section" class="col-span-1 lg:col-span-5 flex flex-col gap-6 sticky top-24">
             <div class="bg-surface-dark border border-white/5 shadow-2xl rounded-3xl p-6 relative overflow-hidden flex flex-col gap-6">
                 <!-- AI Glow Header -->
@@ -290,7 +292,7 @@
                 <div class="flex flex-col gap-3 py-4 border-t border-b border-white/10 relative z-10">
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-400">Subtotal</span>
-                        <span id="cart-subtotal" class="text-white font-mono">₹0</span>
+                        <span id="cart-subtotal" class="text-white font-mono">?0</span>
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-400">Net Delivery Fee</span>
@@ -300,7 +302,7 @@
 
                 <div class="flex items-center justify-between relative z-10 mb-2">
                     <span class="text-white font-bold">Total Request</span>
-                    <span id="cart-total" class="text-white font-bold text-2xl font-mono">₹0</span>
+                    <span id="cart-total" class="text-white font-bold text-2xl font-mono">?0</span>
                 </div>
 
                 <a href="shopping_cart.html" class="w-full py-4 rounded-xl bg-primary text-black font-bold text-center hover:scale-[1.02] transition-transform shadow-[0_0_20px_rgba(0,240,255,0.2)] flex justify-center items-center gap-2 relative z-10">
@@ -414,7 +416,7 @@
                                     <h3 class="text-xl font-bold text-white group-hover:text-primary transition-colors">${item.name}</h3>
                                     ${popularBadge ? '<div class="flex gap-2 mt-0.5">' + popularBadge + '</div>' : ''}
                                 </div>
-                                <span class="text-lg font-mono font-bold text-white">₹${item.price}</span>
+                                <span class="text-lg font-mono font-bold text-white">?${item.price}</span>
                             </div>
                             <p class="text-gray-400 text-sm mt-2">${item.desc}</p>
                             <div class="flex flex-wrap gap-2 mt-3">
@@ -423,7 +425,7 @@
                             </div>
                         </div>
                         <div class="flex items-center justify-between pt-4 border-t border-white/5">
-                            <span class="text-xs text-[#92c9a7] uppercase tracking-wider font-bold">${idx < 2 ? '🔥 Popular' : '✨ Recommended'}</span>
+                            <span class="text-xs text-[#92c9a7] uppercase tracking-wider font-bold">${idx < 2 ? '?? Popular' : '? Recommended'}</span>
                             <button onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price}, '${item.img}')" class="bg-primary hover:bg-[#00d4c5] text-black font-extrabold py-2.5 px-6 rounded-xl flex items-center gap-2 transition-all transform hover:scale-105 active:scale-95 shadow-[0_4px_15px_rgba(0,240,255,0.25)] border border-green-300">
                                 Add <span class="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
                             </button>
@@ -445,7 +447,7 @@
             if (cartRest && cartRest.id !== currentRest.id) {
                 // Auto clear and notify to prevent silent blocking by browser native confirms
                 cart = []; 
-                showToast('New Basket Started 🔄', `Cleared previous items. Now ordering from ${currentRest.name}!`);
+                showToast('New Basket Started ??', `Cleared previous items. Now ordering from ${currentRest.name}!`);
             }
 
             // Set current restaurant context
@@ -466,7 +468,7 @@
             updateCartUI();
             
             // Show Feedback
-            showToast('Added to Request 🛒', `${name} has been added!`);
+            showToast('Added to Request ??', `${name} has been added!`);
         }
 
         function showToast(title, message) {
@@ -521,8 +523,8 @@
                 healthBar.style.width = "5%";
                 healthText.innerText = "Empty";
                 aiTip.innerHTML = `<span class="text-primary font-bold">Tip:</span> Start adding items to unlock AI discounts!`;
-                subtotalEl.innerText = `₹0`;
-                totalEl.innerText = `₹0`;
+                subtotalEl.innerText = `?0`;
+                totalEl.innerText = `?0`;
             } else {
                 container.innerHTML = "";
                 let total = 0;
@@ -534,11 +536,11 @@
                             <div class="w-12 h-12 rounded-lg bg-cover bg-center border border-white/10" style="background-image: url('${item.image}')"></div>
                             <div class="flex flex-col">
                                 <span class="text-white text-sm font-bold truncate max-w-[120px]">${item.name}</span>
-                                <span class="text-gray-400 text-[10px] uppercase font-bold tracking-wider mt-0.5">₹${item.price} each</span>
+                                <span class="text-gray-400 text-[10px] uppercase font-bold tracking-wider mt-0.5">?${item.price} each</span>
                             </div>
                         </div>
                         <div class="flex flex-col items-end gap-2">
-                            <span class="text-primary font-mono font-bold text-sm">₹${item.price * (item.qty || 1)}</span>
+                            <span class="text-primary font-mono font-bold text-sm">?${item.price * (item.qty || 1)}</span>
                             <div class="flex items-center gap-2 bg-background-dark border border-white/10 rounded-lg p-1">
                                 <button onclick="updateQty(${index}, -1)" class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-white rounded bg-white/5 hover:bg-red-500/20 transition-colors">
                                     <span class="material-symbols-outlined text-[14px]">${(item.qty || 1) === 1 ? 'delete' : 'remove'}</span>
@@ -552,8 +554,8 @@
                     </div>
                 `;
                 });
-                subtotalEl.innerText = `₹${total}`;
-                totalEl.innerText = `₹${total + 40}`; // + Delivery
+                subtotalEl.innerText = `?${total}`;
+                totalEl.innerText = `?${total + 40}`; // + Delivery
 
                 // AI Optimizer Logic
                 if (total > 500) {
@@ -564,7 +566,7 @@
                 } else {
                     healthBar.style.width = "60%";
                     healthText.innerText = "Good";
-                    aiTip.innerHTML = `<span class="text-primary font-bold">Tip:</span> Add ₹${500 - total} more for free delivery.`;
+                    aiTip.innerHTML = `<span class="text-primary font-bold">Tip:</span> Add ?${500 - total} more for free delivery.`;
                 }
             }
         }

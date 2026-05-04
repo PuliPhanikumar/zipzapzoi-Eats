@@ -1,9 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta name="theme-color" content="#00f0ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json" />
     <title>ZipZapZoi Eats - Restaurant Listing</title>
     <meta name="description" content="Browse the best restaurants near you on ZipZapZoi Eats. Discover local dhabas, biryani houses, pure veg cafes, and more with AI-powered recommendations.">
@@ -103,7 +105,7 @@
                             <div
                                 class="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent z-10 flex flex-col justify-center px-6">
                                 <p class="text-primary font-bold text-xs uppercase mb-1">Limited Time</p>
-                                <h3 class="text-2xl font-black text-white leading-tight mb-2">50% OFF<br />Up to ₹100
+                                <h3 class="text-2xl font-black text-white leading-tight mb-2">50% OFF<br />Up to ?100
                                 </h3><button
                                     class="bg-white text-black text-xs font-bold px-3 py-1.5 rounded-full w-fit group-hover:scale-105 transition-transform">Claim
                                     Now</button>
@@ -156,11 +158,11 @@
                         </button>
                         <select id="sort-select" onchange="applyFilters()" class="px-3 py-2 rounded-xl bg-[#2d2319] border border-[#493622] text-white text-sm font-medium focus:ring-0 focus:border-primary appearance-none cursor-pointer">
                             <option value="">Sort By</option>
-                            <option value="rating">⭐ Rating (High-Low)</option>
-                            <option value="time">⚡ Delivery Time</option>
-                            <option value="price_low">💰 Price (Low-High)</option>
-                            <option value="price_high">💎 Price (High-Low)</option>
-                            <option value="popular">🔥 Popularity</option>
+                            <option value="rating">? Rating (High-Low)</option>
+                            <option value="time">? Delivery Time</option>
+                            <option value="price_low">?? Price (Low-High)</option>
+                            <option value="price_high">?? Price (High-Low)</option>
+                            <option value="popular">?? Popularity</option>
                         </select>
                     </div>
                 </div>
@@ -171,9 +173,9 @@
                         <div>
                             <p class="text-xs text-text-secondary font-bold uppercase mb-2">Price Range</p>
                             <div class="flex flex-wrap gap-1.5">
-                                <button onclick="toggleFilter('price','under200',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="price" data-value="under200">Under ₹200</button>
-                                <button onclick="toggleFilter('price','200to500',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="price" data-value="200to500">₹200-500</button>
-                                <button onclick="toggleFilter('price','over500',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="price" data-value="over500">₹500+</button>
+                                <button onclick="toggleFilter('price','under200',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="price" data-value="under200">Under ?200</button>
+                                <button onclick="toggleFilter('price','200to500',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="price" data-value="200to500">?200-500</button>
+                                <button onclick="toggleFilter('price','over500',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="price" data-value="over500">?500+</button>
                             </div>
                         </div>
                         <!-- Rating -->
@@ -196,9 +198,9 @@
                         <div>
                             <p class="text-xs text-text-secondary font-bold uppercase mb-2">Dietary</p>
                             <div class="flex flex-wrap gap-1.5">
-                                <button onclick="toggleFilter('diet','veg',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="diet" data-value="veg">🟢 Veg Only</button>
-                                <button onclick="toggleFilter('diet','nonveg',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="diet" data-value="nonveg">🔴 Non-Veg</button>
-                                <button onclick="toggleFilter('diet','vegan',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="diet" data-value="vegan">🌱 Vegan</button>
+                                <button onclick="toggleFilter('diet','veg',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="diet" data-value="veg">?? Veg Only</button>
+                                <button onclick="toggleFilter('diet','nonveg',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="diet" data-value="nonveg">?? Non-Veg</button>
+                                <button onclick="toggleFilter('diet','vegan',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="diet" data-value="vegan">?? Vegan</button>
                             </div>
                         </div>
                     </div>
@@ -279,7 +281,7 @@
 
             <div class="border-t border-border-dark pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-text-secondary">
-                    <span>© 2025 ZoiEats. All rights reserved.</span>
+                    <span>� 2025 ZoiEats. All rights reserved.</span>
                     <span class="hidden sm:inline-block text-border-dark">|</span>
                     <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms & Conditions</a>
                     <a class="hover:text-white transition-colors" href="privacy policy.html">Privacy Policy</a>
@@ -365,7 +367,7 @@
                             data-type="restaurant" data-id="${rest.id}"
                             onclick="event.stopPropagation(); toggleFavHeart(this, 'restaurant', ${rest.id})"
                             title="Save to favorites">
-                            ${(typeof ZoiFavorites !== 'undefined' && ZoiFavorites.isFavorited('restaurant', rest.id)) ? '❤️' : '🤍'}
+                            ${(typeof ZoiFavorites !== 'undefined' && ZoiFavorites.isFavorited('restaurant', rest.id)) ? '??' : '??'}
                         </button>
                         <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur text-black text-[10px] font-bold px-2 py-1 rounded shadow-lg flex items-center gap-1">
                             <span class="material-symbols-outlined text-primary text-xs">schedule</span> ${rest.time}
@@ -398,7 +400,7 @@
             }
             btn.style.transform = 'scale(1.3)';
             const isFav = await ZoiFavorites.toggle(type, id);
-            btn.innerHTML = isFav ? '❤️' : '🤍';
+            btn.innerHTML = isFav ? '??' : '??';
             setTimeout(() => btn.style.transform = '', 200);
         }
 
@@ -429,7 +431,7 @@
         }
 
         function toggleFilter(category, value, btn) {
-            // Toggle same category — deselect if already active
+            // Toggle same category � deselect if already active
             if (activeFilters[category] === value) {
                 activeFilters[category] = null;
                 btn.classList.remove('border-primary', 'text-primary', 'bg-primary/10');
@@ -508,10 +510,10 @@
             // Render pills
             const pillsContainer = document.getElementById('active-pills');
             if (pillsContainer) {
-                const labels = { price: { under200: 'Under ₹200', '200to500': '₹200-500', over500: '₹500+' }, rating: { '4': '4.0+ ⭐', '4.5': '4.5+ ⭐' }, time: { '30': '< 30 min', '45': '< 45 min' }, diet: { veg: '🟢 Veg', nonveg: '🔴 Non-Veg', vegan: '🌱 Vegan' } };
+                const labels = { price: { under200: 'Under ?200', '200to500': '?200-500', over500: '?500+' }, rating: { '4': '4.0+ ?', '4.5': '4.5+ ?' }, time: { '30': '< 30 min', '45': '< 45 min' }, diet: { veg: '?? Veg', nonveg: '?? Non-Veg', vegan: '?? Vegan' } };
                 pillsContainer.innerHTML = Object.entries(activeFilters)
                     .filter(([k, v]) => v !== null)
-                    .map(([cat, val]) => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold">${labels[cat]?.[val] || val}<button onclick="toggleFilter('${cat}','${val}',document.querySelector('.filter-chip[data-filter=${cat}][data-value=${val}]'))" class="ml-1 hover:text-white">✕</button></span>`)
+                    .map(([cat, val]) => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold">${labels[cat]?.[val] || val}<button onclick="toggleFilter('${cat}','${val}',document.querySelector('.filter-chip[data-filter=${cat}][data-value=${val}]'))" class="ml-1 hover:text-white">?</button></span>`)
                     .join('');
             }
         }
