@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -393,34 +393,52 @@
         let categories = ["Starters", "Mains", "Breads", "Rice", "Desserts", "Beverages"];
         let historyLog = [{ time: "10:30 AM", user: "System", item: "Zoi Menu Sync", action: "Connected", value: "Live" }];
 
-        // === INIT ===
-        window.onload = () => {
-            if (typeof ZoiPartnerMenu !== 'undefined') {
-                const zcat = ZoiPartnerMenu.getAllCategories();
-                if (zcat && zcat.length > 0 && zcat[0] !== 'Recommended') {
-                    categories = zcat;
+        // === INIT (API-first with fallback) ===
+        window.onload = async () => {
+            const restId = localStorage.getItem('zoiPartnerRestId') || '1';
+            const token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+            const base = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+            let apiLoaded = false;
+            try {
+                const r = await fetch(base + '/api/partner/menu/' + restId, { headers: { Authorization: 'Bearer ' + token } });
+                if (r.ok) {
+                    const d = await r.json();
+                    if (d.items && d.items.length > 0) {
+                        menuItems = d.items.map(i => ({
+                            id: i.id, name: i.itemName, category: i.category, price: i.price,
+                            cost: 0, stock: i.isAvailable, type: (i.type || 'veg').toLowerCase(),
+                            img: i.image || 'https://via.placeholder.com/300x200?text=' + encodeURIComponent(i.itemName),
+                            time: 15, cals: 0, qty: 100, schedule: 'All Day', description: i.description || ''
+                        }));
+                        categories = Object.keys(d.grouped || {});
+                        if (categories.length === 0) categories = ['Mains'];
+                        apiLoaded = true;
+                    }
                 }
-                const zItems = ZoiPartnerMenu.getMenuItems();
-                if (zItems && zItems.length > 0) {
-                    menuItems = zItems;
-                } else {
-                    // Seed initial if empty
-                    ZoiPartnerMenu.addMenuItem({ id: 101, name: "Butter Chicken", price: 350, cost: 200, type: "nonveg", img: "https://via.placeholder.com/300x200?text=Butter+Chicken", time: 20, cals: 450, qty: 100, schedule: "All Day" }, "Mains");
-                    menuItems = ZoiPartnerMenu.getMenuItems();
-                }
-            } else {
-                menuItems = [
-                    { id: 101, name: "Butter Chicken", category: "Mains", price: 350, cost: 200, stock: true, type: "nonveg", img: "https://via.placeholder.com/300x200?text=Butter+Chicken", time: 20, cals: 450, qty: 100, schedule: "All Day" },
-                    { id: 102, name: "Paneer Tikka", category: "Starters", price: 280, cost: 120, stock: true, type: "veg", img: "https://via.placeholder.com/300x200?text=Paneer+Tikka", time: 15, cals: 320, qty: 50, schedule: "Dinner" }
-                ];
-            }
+            } catch (e) { console.warn('Menu API unavailable, using simulation', e.message); }
 
-            // Unify stock flag
-            menuItems.forEach(i => {
-                if(i.tags && i.tags.includes('Out of Stock')) i.stock = false;
-                else i.stock = true;
-                if(!i.category) i.category = "Mains";
-            });
+            if (!apiLoaded) {
+                if (typeof ZoiPartnerMenu !== 'undefined') {
+                    const zcat = ZoiPartnerMenu.getAllCategories();
+                    if (zcat && zcat.length > 0 && zcat[0] !== 'Recommended') categories = zcat;
+                    const zItems = ZoiPartnerMenu.getMenuItems();
+                    if (zItems && zItems.length > 0) menuItems = zItems;
+                    else {
+                        ZoiPartnerMenu.addMenuItem({ id: 101, name: "Butter Chicken", price: 350, cost: 200, type: "nonveg", img: "https://via.placeholder.com/300x200?text=Butter+Chicken", time: 20, cals: 450, qty: 100, schedule: "All Day" }, "Mains");
+                        menuItems = ZoiPartnerMenu.getMenuItems();
+                    }
+                } else {
+                    menuItems = [
+                        { id: 101, name: "Butter Chicken", category: "Mains", price: 350, cost: 200, stock: true, type: "nonveg", img: "https://via.placeholder.com/300x200?text=Butter+Chicken", time: 20, cals: 450, qty: 100, schedule: "All Day" },
+                        { id: 102, name: "Paneer Tikka", category: "Starters", price: 280, cost: 120, stock: true, type: "veg", img: "https://via.placeholder.com/300x200?text=Paneer+Tikka", time: 15, cals: 320, qty: 50, schedule: "Dinner" }
+                    ];
+                }
+                menuItems.forEach(i => {
+                    if (i.tags && i.tags.includes('Out of Stock')) i.stock = false;
+                    else if (i.stock === undefined) i.stock = true;
+                    if (!i.category) i.category = 'Mains';
+                });
+            }
 
             renderCategories();
             renderMenu();
@@ -675,13 +693,15 @@
         }
 
         // === STOCK & HISTORY ===
-        function toggleStock(id) {
+        async function toggleStock(id) {
             const item = menuItems.find(i => i.id == id);
             if (!item) return;
             item.stock = !item.stock;
-            if (typeof ZoiPartnerMenu !== 'undefined') {
-                ZoiPartnerMenu.toggleItemStock(id);
-            }
+            // API toggle
+            const token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+            const base = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+            try { await fetch(base + '/api/partner/menu/' + id + '/toggle', { method: 'PATCH', headers: { Authorization: 'Bearer ' + token } }); } catch (e) { /* fallback local */ }
+            if (typeof ZoiPartnerMenu !== 'undefined') ZoiPartnerMenu.toggleItemStock(id);
             renderMenu();
             addToHistory(item.name, "Stock Change", item.stock ? "Live" : "Sold Out");
             showToast(item.stock ? "Restocked" : "Sold Out", `${item.name} status updated.`);

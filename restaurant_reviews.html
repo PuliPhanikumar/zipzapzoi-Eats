@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html class="dark" lang="en">
 
@@ -508,6 +508,78 @@
         </div>
     </footer>
 
+    <script>
+    // === API-First Reviews Loading ===
+    document.addEventListener('DOMContentLoaded', async () => {
+        const u = JSON.parse(localStorage.getItem('zoiUser') || '{}');
+        const restId = localStorage.getItem('zoiPartnerRestId') || (u.restaurantId || new URLSearchParams(window.location.search).get('id') || '1');
+        const token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+        const base = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+        try {
+            const r = await fetch(base + '/api/partner/reviews/' + restId, { headers: { Authorization: 'Bearer ' + token } });
+            if (!r.ok) throw new Error('API error');
+            const d = await r.json();
+            if (!d.reviews || d.reviews.length === 0) return;
+
+            // Update rating summary
+            const avgEl = document.querySelector('.text-5xl');
+            if (avgEl) avgEl.innerText = (d.avg || 0).toFixed(1);
+            const countEl = document.querySelector('.text-text-secondary.text-sm');
+            if (countEl) countEl.innerText = d.count + ' verified ratings';
+            const reviewCountHeader = document.querySelector('.lg\\:col-span-8 h3');
+            if (reviewCountHeader) reviewCountHeader.innerText = d.count + ' Reviews';
+
+            // Build star rating distribution
+            const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+            d.reviews.forEach(rv => dist[rv.rating] = (dist[rv.rating] || 0) + 1);
+            const histContainer = document.querySelector('.flex.flex-col.gap-3.w-full');
+            if (histContainer && d.count > 0) {
+                histContainer.innerHTML = [5,4,3,2,1].map(star => {
+                    const pct = Math.round((dist[star] / d.count) * 100);
+                    return `<div class="grid grid-cols-[20px_1fr_40px] items-center gap-3">
+                        <span class="text-white text-sm font-medium">${star}</span>
+                        <div class="h-2 w-full rounded-full bg-surface-border overflow-hidden"><div class="h-full bg-primary rounded-full" style="width:${pct}%"></div></div>
+                        <span class="text-text-secondary text-xs text-right">${pct}%</span></div>`;
+                }).join('');
+            }
+
+            // Render review cards
+            const feedContainer = document.querySelector('.lg\\:col-span-8');
+            if (feedContainer) {
+                const filterBar = feedContainer.querySelector('.flex.flex-wrap.items-center.justify-between');
+                const loadMore = feedContainer.querySelector('.flex.justify-center.pt-4');
+                // Clear existing review cards
+                feedContainer.innerHTML = '';
+                if (filterBar) feedContainer.appendChild(filterBar);
+                d.reviews.forEach(rv => {
+                    const stars = Array(5).fill(0).map((_, i) => `<span class="material-symbols-outlined text-[20px] ${i < rv.rating ? 'text-primary' : 'text-surface-border'}">${i < rv.rating ? 'star' : 'star'}</span>`).join('');
+                    const initials = (rv.authorName || 'A').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                    const ago = Math.floor((Date.now() - new Date(rv.createdAt).getTime()) / 86400000);
+                    const agoText = ago === 0 ? 'Today' : ago === 1 ? 'Yesterday' : ago + ' days ago';
+                    const photosHtml = (rv.photos || []).length > 0 ? `<div class="flex gap-3 overflow-x-auto pb-2">${rv.photos.map(p => `<div class="flex-shrink-0 size-24 rounded-lg bg-cover bg-center border border-surface-border" style="background-image:url('${p}')"></div>`).join('')}</div>` : '';
+                    const card = document.createElement('div');
+                    card.className = 'flex flex-col gap-4 p-6 rounded-xl bg-surface-dark border border-surface-border hover:border-surface-border/80 transition-colors';
+                    card.innerHTML = `
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="size-12 rounded-full bg-primary/20 border-2 border-surface-border flex items-center justify-center text-primary font-bold text-lg">${initials}</div>
+                                <div><h4 class="text-white font-bold text-base">${rv.authorName}</h4>
+                                <div class="flex items-center gap-2 text-text-secondary text-xs mt-0.5"><span>${agoText}</span></div></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2"><div class="flex">${stars}</div>${rv.title ? `<span class="text-white font-bold text-sm">${rv.title}</span>` : ''}</div>
+                        ${rv.text ? `<p class="text-gray-300 text-sm leading-relaxed">${rv.text}</p>` : ''}
+                        ${photosHtml}
+                        <div class="flex items-center gap-6 pt-2 border-t border-surface-border/50">
+                            <button class="flex items-center gap-2 text-text-secondary text-sm hover:text-white transition-colors"><span class="material-symbols-outlined text-[18px]">thumb_up</span> Helpful (${rv.helpful || 0})</button>
+                        </div>`;
+                    feedContainer.appendChild(card);
+                });
+                if (loadMore) feedContainer.appendChild(loadMore);
+            }
+        } catch (e) { console.warn('Reviews API unavailable, using static HTML', e.message); }
+    });
+    </script>
 <script src="js/zoi_config.js"></script>
     <script src="js/db_simulation.js"></script>
 <script src="js/zoi_customer_engine.js"></script>

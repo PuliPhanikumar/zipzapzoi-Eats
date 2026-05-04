@@ -1506,6 +1506,57 @@ app.get('/api/rider/dashboard', verifyToken, async (req, res, next) => {
 });
 
 // ════════════════════════════════════════════════════════
+// PARTNER KDS / REVIEWS / MENU API
+// ════════════════════════════════════════════════════════
+
+// KDS Live Orders
+app.get('/api/partner/orders/:restaurantId', verifyToken, async (req, res, next) => {
+    try {
+        const restId = parseInt(req.params.restaurantId);
+        const orders = await prisma.order.findMany({
+            where: { restaurantId: restId, status: { in: ['Pending', 'Confirmed', 'Preparing', 'Ready'] } },
+            orderBy: { createdAt: 'desc' }, take: 30,
+            select: { id: true, zoiId: true, total: true, status: true, type: true, items: true, createdAt: true, deliveryAddress: true, user: { select: { name: true, phone: true } } }
+        });
+        res.json({ orders: orders.map(o => ({ id: o.zoiId || `ORD-${o.id}`, dbId: o.id, total: o.total, status: o.status, type: o.type || 'Delivery', items: o.items || [], customer: o.user?.name || 'Guest', phone: o.user?.phone || '', address: o.deliveryAddress || '', time: o.createdAt, elapsed: Math.round((Date.now() - new Date(o.createdAt).getTime()) / 60000) })) });
+    } catch (error) { next(error); }
+});
+
+// Partner Reviews
+app.get('/api/partner/reviews/:restaurantId', verifyToken, async (req, res, next) => {
+    try {
+        const restId = parseInt(req.params.restaurantId);
+        const [reviews, agg] = await Promise.all([
+            prisma.review.findMany({ where: { restaurantId: restId }, orderBy: { createdAt: 'desc' }, take: 20 }),
+            prisma.review.aggregate({ where: { restaurantId: restId }, _avg: { rating: true }, _count: true })
+        ]);
+        res.json({ reviews, avg: agg._avg.rating || 0, count: agg._count || 0 });
+    } catch (error) { next(error); }
+});
+
+// Partner Menu Items
+app.get('/api/partner/menu/:restaurantId', verifyToken, async (req, res, next) => {
+    try {
+        const restId = parseInt(req.params.restaurantId);
+        const items = await prisma.menu.findMany({ where: { restaurantId: restId }, orderBy: [{ category: 'asc' }, { itemName: 'asc' }] });
+        // Group by category
+        const grouped = {};
+        items.forEach(i => { if (!grouped[i.category]) grouped[i.category] = []; grouped[i.category].push(i); });
+        res.json({ items, grouped, total: items.length });
+    } catch (error) { next(error); }
+});
+
+// Toggle menu item availability
+app.patch('/api/partner/menu/:itemId/toggle', verifyToken, async (req, res, next) => {
+    try {
+        const item = await prisma.menu.findUnique({ where: { id: parseInt(req.params.itemId) } });
+        if (!item) return res.status(404).json({ error: 'Item not found' });
+        const updated = await prisma.menu.update({ where: { id: item.id }, data: { isAvailable: !item.isAvailable } });
+        res.json(updated);
+    } catch (error) { next(error); }
+});
+
+// ════════════════════════════════════════════════════════
 // BADGES / GAMIFICATION API
 // ════════════════════════════════════════════════════════
 app.get('/api/badges', async (req, res, next) => {

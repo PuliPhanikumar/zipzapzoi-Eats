@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -563,8 +563,29 @@
         // --- REAL DATA INTEGRATION ---
         let _lastSeenOrderId = null;
 
-        function renderBoard() {
-            let liveOrders = typeof ZoiPartnerOrders !== 'undefined' ? ZoiPartnerOrders.getLiveOrders() : [];
+        async function renderBoard() {
+            let liveOrders = [];
+            const REST_ID = localStorage.getItem('zoiPartnerRestId') || "101";
+            const token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+            const base = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+
+            // API-first: try real backend
+            try {
+                const r = await fetch(base + '/api/partner/orders/' + REST_ID, { headers: { Authorization: 'Bearer ' + token } });
+                if (r.ok) {
+                    const d = await r.json();
+                    liveOrders = (d.orders || []).map(o => ({
+                        id: o.id, status: o.status, total: o.total, mode: o.type || 'Online',
+                        timestamp: o.time, items: Array.isArray(o.items) ? o.items.map(i => ({ name: i.name || i.itemName, qty: i.qty || i.quantity || 1 })) : [],
+                        instructions: '', meta: o.customer, dbId: o.dbId, elapsed: o.elapsed || 0
+                    }));
+                }
+            } catch (e) { /* fallback below */ }
+
+            // Fallback to simulation
+            if (liveOrders.length === 0 && typeof ZoiPartnerOrders !== 'undefined') {
+                liveOrders = ZoiPartnerOrders.getLiveOrders() || [];
+            }
 
             ['incoming', 'preparing', 'ready'].forEach(c => document.getElementById('col-' + c).innerHTML = "");
 
@@ -573,19 +594,16 @@
 
             liveOrders.forEach(o => {
                 let displayType = 'incoming';
-                if (['Accepted', 'Preparing', 'Cooking'].includes(o.status)) displayType = 'preparing';
+                if (['Confirmed', 'Accepted', 'Preparing', 'Cooking'].includes(o.status)) displayType = 'preparing';
                 else if (['Ready', 'Out for Delivery'].includes(o.status)) displayType = 'ready';
 
-                // Monitor Unacknowledged Ready orders
                 if (displayType === 'ready') unacknowledgedOrders.add(o.id);
                 else unacknowledgedOrders.delete(o.id);
 
-                let elapsedMins = 0;
-                try {
-                    const ticketDate = new Date(o.timestamp || o.time || o.date || new Date());
-                    elapsedMins = Math.floor((new Date() - ticketDate) / 60000);
-                    if (elapsedMins < 0) elapsedMins += 1440; // overnight fixes
-                } catch (e) { }
+                let elapsedMins = o.elapsed || 0;
+                if (!elapsedMins) {
+                    try { elapsedMins = Math.max(0, Math.floor((new Date() - new Date(o.timestamp || o.time || new Date())) / 60000)); } catch (e) { }
+                }
 
                 const itemCount = o.items ? o.items.length : 1;
                 const estPrepMins = o.estPrepMins || (10 + (itemCount - 1) * 3);
@@ -594,34 +612,24 @@
                 else if (elapsedMins > estPrepMins * 0.7) slaStatus = 'delayed';
 
                 displayOrders.push({
-                    id: o.id,
+                    id: o.id, dbId: o.dbId,
                     type: displayType.charAt(0).toUpperCase() + displayType.slice(1),
-                    time: elapsedMins,
-                    mode: o.mode || "Online",
+                    time: elapsedMins, mode: o.mode || "Online",
                     items: (o.items || []).map(i => ({ qty: i.qty || 1, n: i.name, mods: i.mods || [] })),
-                    price: o.total,
-                    driver: o.riderName || o.meta || "Searching...",
-                    placedAt: o.timestamp || o.time,
-                    estPrepMins: estPrepMins,
-                    sla: slaStatus,
-                    instructions: o.instructions || '',
-                    riderAssigned: !!o.riderAssigned,
-                    riderAtRestaurant: !!o.riderAtRestaurant,
-                    displayType: displayType,
-                    isSync: true // Engine handles all syncing
+                    price: o.total, driver: o.meta || "Searching...",
+                    placedAt: o.timestamp || o.time, estPrepMins, sla: slaStatus,
+                    instructions: o.instructions || '', displayType,
+                    riderAssigned: !!o.riderAssigned, riderAtRestaurant: !!o.riderAtRestaurant, isSync: true
                 });
             });
 
-            // Render all
             perfStats.activeCount = 0;
             displayOrders.forEach(kdsOrder => {
                 if (kdsOrder.displayType === 'incoming') {
                     incomingCount++;
                     if (_lastSeenOrderId !== kdsOrder.id) {
                         _lastSeenOrderId = kdsOrder.id;
-                        playAlert();
-                        announce("new");
-                        startAutoAcceptTimer();
+                        playAlert(); announce("new"); startAutoAcceptTimer();
                     }
                 }
                 if (kdsOrder.displayType === 'preparing') { preparingCount++; perfStats.activeCount++; }
