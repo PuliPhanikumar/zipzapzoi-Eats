@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -370,8 +370,34 @@
         let isAuditMode = false;
         let activeReceiveId = null;
 
+        // === API CONFIG ===
+        const API = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+        const PARTNER_ID = localStorage.getItem('zoiPartnerInternalId') || '1';
+        const authHeaders = () => ({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '')
+        });
+        function fastFetch(url, opts) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+            return fetch(url, Object.assign({}, opts, { signal: controller.signal })).finally(() => clearTimeout(timeout));
+        }
+
         // === INIT ===
-        window.onload = () => {
+        window.onload = async () => {
+            try {
+                const res = await fastFetch(API + '/api/inventory/' + PARTNER_ID, { headers: authHeaders() });
+                if (res.ok) {
+                    const apiItems = await res.json();
+                    if (apiItems.length > 0) {
+                        inventory = apiItems.map(i => ({
+                            id: i.id, name: i.itemName || i.name, supplier: i.supplier || 'Unknown',
+                            cost: i.cost || i.price || 0, unit: i.unit || 'kg',
+                            qty: i.quantity || i.qty || 0, par: i.parLevel || i.par || 10, cat: i.category || 'Grocery'
+                        }));
+                    }
+                }
+            } catch(e) { console.warn('[Inventory] API fallback:', e.message); }
             renderAll();
         };
 

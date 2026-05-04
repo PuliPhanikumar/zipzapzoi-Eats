@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -151,7 +151,7 @@
                             <div class="size-10 bg-white rounded flex items-center justify-center"><span
                                     class="material-symbols-outlined text-black">account_balance</span></div>
                             <div>
-                                <p class="text-sm font-bold text-white" id="bank-display">HDFC Bank •••• 9921</p>
+                                <p class="text-sm font-bold text-white" id="bank-display">HDFC Bank ï¿½ï¿½ï¿½ï¿½ 9921</p>
                                 <p class="text-xs text-gray-500">Primary Payout Account</p>
                             </div>
                             <button onclick="openModal('bank-modal')"
@@ -346,7 +346,7 @@
                             <div class="size-10 bg-white rounded flex items-center justify-center"><span
                                     class="material-symbols-outlined text-black">account_balance</span></div>
                             <div>
-                                <p class="text-sm font-bold text-white" id="bank-display">HDFC Bank •••• 9921</p>
+                                <p class="text-sm font-bold text-white" id="bank-display">HDFC Bank ï¿½ï¿½ï¿½ï¿½ 9921</p>
                                 <p class="text-xs text-gray-500">Primary Payout Account</p>
                             </div>
                             <button onclick="openModal('bank-modal')"
@@ -435,7 +435,31 @@
 
     <script>
         // LOGIC
-        function initSettings() {
+        // === API CONFIG ===
+        const API = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+        const PARTNER_ID = localStorage.getItem('zoiPartnerInternalId') || '1';
+        const authHeaders = () => ({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '')
+        });
+        function fastFetch(url, opts) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+            return fetch(url, Object.assign({}, opts, { signal: controller.signal })).finally(() => clearTimeout(timeout));
+        }
+
+        async function initSettings() {
+            // Try to load restaurant info from API
+            try {
+                const res = await fastFetch(API + '/api/partner/dashboard/' + PARTNER_ID, { headers: authHeaders() });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.name) {
+                        const nameEl = document.getElementById('rest-name-display');
+                        if (nameEl) nameEl.innerText = data.name;
+                    }
+                }
+            } catch(e) { console.warn('[Settings] API fallback:', e.message); }
             try {
                 const settings = JSON.parse(localStorage.getItem('zoi_outlet_settings') || '{"online": true, "bank": "HDFC Bank \\u2022\\u2022\\u2022\\u2022 9921"}');
                 document.getElementById('master-toggle').checked = settings.online;
@@ -489,13 +513,13 @@
             }, 1500);
         }
 
-        function saveAll(silent = false) {
+        async function saveAll(silent = false) {
             const btn = document.querySelector('button[onclick="saveAll()"]');
             if(btn && !silent) btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> Saving...`;
             
             const isOnline = document.getElementById('master-toggle').checked;
             const bankElement = document.getElementById('bank-display');
-            const bankAcct = bankElement ? bankElement.innerText : "HDFC Bank •••• 9921";
+            const bankAcct = bankElement ? bankElement.innerText : "HDFC Bank ï¿½ï¿½ï¿½ï¿½ 9921";
             localStorage.setItem('zoi_outlet_settings', JSON.stringify({
                 online: isOnline,
                 bank: bankAcct
@@ -513,7 +537,7 @@
             const ac = document.getElementById('new-ac-no').value;
             if (!ac) return alert("Enter Account Number");
             const bankName = "Verified Bank";
-            document.getElementById('bank-display').innerText = `${bankName} •••• ${ac.slice(-4)}`;
+            document.getElementById('bank-display').innerText = `${bankName} ï¿½ï¿½ï¿½ï¿½ ${ac.slice(-4)}`;
             saveAll(true);
             closeModal('bank-modal');
             showToast("Verification Pending", "Bank details submitted for review.");

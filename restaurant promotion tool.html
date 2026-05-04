@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -20,6 +20,30 @@
     <script src="js/zoi_api.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
+        // === API CONFIG ===
+        const API = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+        const PARTNER_ID = localStorage.getItem('zoiPartnerInternalId') || '1';
+        const authHeaders = () => ({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '')
+        });
+        function fastFetch(url, opts) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+            return fetch(url, Object.assign({}, opts, { signal: controller.signal })).finally(() => clearTimeout(timeout));
+        }
+
+        // Load promotions from API
+        (async function loadPromotions() {
+            try {
+                const res = await fastFetch(API + '/api/promotions', { headers: authHeaders() });
+                if (res.ok) {
+                    const promos = await res.json();
+                    const countEl = document.getElementById('promo-active-count');
+                    if (countEl) countEl.innerText = promos.filter(p => p.isActive).length;
+                }
+            } catch(e) { console.warn('[Promos] API fallback:', e.message); }
+        })();
         tailwind.config = {
             darkMode: "class",
             theme: {
@@ -339,7 +363,7 @@
                                 <span class="material-symbols-outlined text-black">arrow_back</span>
                                 <div class="flex-1">
                                     <h4 class="font-bold text-black text-sm">Spice Garden</h4>
-                                    <p class="text-[10px] text-gray-500">North Indian • 4.2 ?</p>
+                                    <p class="text-[10px] text-gray-500">North Indian ï¿½ 4.2 ?</p>
                                 </div>
                             </div>
                         </div>
@@ -354,7 +378,7 @@
                                         <p class="text-white font-black text-xl leading-none" id="preview-offer-text">
                                             20% OFF</p>
                                         <p class="text-white/90 text-[10px] font-medium mt-1" id="preview-subtext">Up to
-                                            ?100 • Use code...</p>
+                                            ?100 ï¿½ Use code...</p>
                                     </div>
                                     <div
                                         class="absolute top-2 right-2 bg-primary text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wide">
@@ -444,7 +468,7 @@
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3 class="font-bold text-lg text-white">${title}</h3>
-                                    <p class="text-xs text-gray-400 mt-0.5"><span class="text-${style.colorRaw}-400 font-bold">${p.desc || 'General Promo'}</span> • Code: ${p.code}</p>
+                                    <p class="text-xs text-gray-400 mt-0.5"><span class="text-${style.colorRaw}-400 font-bold">${p.desc || 'General Promo'}</span> ï¿½ Code: ${p.code}</p>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer" title="Toggle Status">
                                     <input type="checkbox" ${isChecked ? 'checked' : ''} class="sr-only peer" onchange="toggleCampaignStatus('${p.id}', this)">
@@ -593,7 +617,7 @@
                 const val = document.getElementById('input-value').value;
                 const cap = document.getElementById('input-cap').value;
                 mainText.innerText = `${val}% OFF`;
-                subText.innerText = `Up to ?${cap} • Min Order ?${mov}`;
+                subText.innerText = `Up to ?${cap} ï¿½ Min Order ?${mov}`;
             } else if (currentStrat === 'flat') {
                 const val = document.getElementById('input-value').value;
                 mainText.innerText = `FLAT ?${val} OFF`;
@@ -603,7 +627,7 @@
                 subText.innerText = "Free item must be of equal or lesser value";
             } else if (currentStrat === 'freedel') {
                 mainText.innerText = "FREE DELIVERY";
-                subText.innerText = `Save on delivery • Min Order ?${mov}`;
+                subText.innerText = `Save on delivery ï¿½ Min Order ?${mov}`;
             }
         }
 

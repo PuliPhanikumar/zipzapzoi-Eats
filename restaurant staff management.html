@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -430,6 +430,32 @@
 
     <script>
         // === DATA MODEL ===
+        // === API CONFIG ===
+        const API = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+        const PARTNER_ID = localStorage.getItem('zoiPartnerInternalId') || '1';
+        const authHeaders = () => ({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '')
+        });
+        function fastFetch(url, opts) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+            return fetch(url, Object.assign({}, opts, { signal: controller.signal })).finally(() => clearTimeout(timeout));
+        }
+
+        // Load staff from API on init
+        (async function loadStaffFromAPI() {
+            try {
+                const res = await fastFetch(API + '/api/partner/dashboard/' + PARTNER_ID, { headers: authHeaders() });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.staffCount) {
+                        document.getElementById('kpi-total-staff') && (document.getElementById('kpi-total-staff').innerText = data.staffCount);
+                    }
+                }
+            } catch(e) { console.warn('[Staff] API fallback:', e.message); }
+        })();
+
         let staff = JSON.parse(localStorage.getItem('zoi_restaurant_staff')) || [
             { id: 101, fname: "Rahul", lname: "S.", role: "Manager", status: "Active", shift: "09:00 - 18:00", phone: "9876543210", rate: 500, hours: 160, ot: 10, tips: 2000, pin: "1234", docs: true, rating: 4.8 },
             { id: 102, fname: "Amit", lname: "V.", role: "Chef", status: "Active", shift: "10:00 - 22:00", phone: "9988776655", rate: 300, hours: 180, ot: 20, tips: 1500, pin: "4421", docs: true, rating: 4.5 },
@@ -567,7 +593,7 @@
                     <div class="bg-surface border border-border rounded-xl p-4 flex justify-between items-center">
                         <div>
                             <h4 class="font-bold text-white text-sm">${l.name}</h4>
-                            <p class="text-xs text-gray-400">${l.type} • ${l.dates}</p>
+                            <p class="text-xs text-gray-400">${l.type} ï¿½ ${l.dates}</p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="approveLeave(${l.id})" class="p-2 bg-green-500/10 text-green-500 rounded hover:bg-green-500 hover:text-white"><span class="material-symbols-outlined text-sm">check</span></button>
@@ -608,7 +634,7 @@
                     <div class="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs uppercase">${s.fname[0]}</div>
                     <div class="flex-1">
                         <p class="text-sm font-bold text-white">${s.fname} ${s.lname}</p>
-                        <p class="text-xs text-gray-500">${s.role} • ?${s.tips} Tips</p>
+                        <p class="text-xs text-gray-500">${s.role} ï¿½ ?${s.tips} Tips</p>
                     </div>
                 </div>
             `).join('');

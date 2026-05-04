@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -117,14 +117,14 @@
                         <div class="flex items-center justify-between border-b border-white/5 pb-2">
                             <div class="flex items-center gap-3">
                                 <div class="size-8 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center font-bold text-xs">RS</div>
-                                <div><p class="text-sm font-bold text-white">Rahul Sharma earned 50 pts</p><p class="text-xs text-gray-500">Order #8821 • 2 mins ago</p></div>
+                                <div><p class="text-sm font-bold text-white">Rahul Sharma earned 50 pts</p><p class="text-xs text-gray-500">Order #8821 ï¿½ 2 mins ago</p></div>
                             </div>
                             <span class="text-green-500 font-mono text-sm font-bold">+50</span>
                         </div>
                         <div class="flex items-center justify-between border-b border-white/5 pb-2">
                             <div class="flex items-center gap-3">
                                 <div class="size-8 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold text-xs">JD</div>
-                                <div><p class="text-sm font-bold text-white">Jane Doe joined via Referral</p><p class="text-xs text-gray-500">Ref by: Rahul Sharma • 5 mins ago</p></div>
+                                <div><p class="text-sm font-bold text-white">Jane Doe joined via Referral</p><p class="text-xs text-gray-500">Ref by: Rahul Sharma ï¿½ 5 mins ago</p></div>
                             </div>
                             <span class="text-blue-500 font-mono text-sm font-bold">New</span>
                         </div>
@@ -167,7 +167,7 @@
                                     <div class="size-8 bg-yellow-500 text-black rounded-full flex items-center justify-center text-xs font-bold">G</div>
                                     <div class="flex-1">
                                         <div class="flex justify-between"><p class="text-sm font-bold text-white">Gold</p><span class="text-xs text-primary font-bold">Spend > ?5,000</span></div>
-                                        <p class="text-xs text-gray-500">1.5x Points • Free Delivery</p>
+                                        <p class="text-xs text-gray-500">1.5x Points ï¿½ Free Delivery</p>
                                     </div>
                                     <button class="text-gray-400 hover:text-white"><span class="material-symbols-outlined text-sm">edit</span></button>
                                 </div>
@@ -314,6 +314,31 @@
 
     <script>
         // === STATE ===
+        // === API CONFIG ===
+        const API = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+        const PARTNER_ID = localStorage.getItem('zoiPartnerInternalId') || '1';
+        const authHeaders = () => ({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '')
+        });
+        function fastFetch(url, opts) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+            return fetch(url, Object.assign({}, opts, { signal: controller.signal })).finally(() => clearTimeout(timeout));
+        }
+
+        // Load loyalty metrics from partner dashboard
+        (async function loadLoyaltyData() {
+            try {
+                const res = await fastFetch(API + '/api/partner/dashboard/' + PARTNER_ID, { headers: authHeaders() });
+                if (res.ok) {
+                    const data = await res.json();
+                    const el = document.getElementById('loyalty-enrolled');
+                    if (el && data.totalCustomers) el.innerText = data.totalCustomers;
+                }
+            } catch(e) { console.warn('[Loyalty] API fallback:', e.message); }
+        })();
+
         function updatePreview() {
             const name = document.getElementById('conf-name').value;
             const currency = document.getElementById('conf-currency').value;
