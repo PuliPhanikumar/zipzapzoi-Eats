@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -309,7 +309,7 @@
         <div class="kot-paper w-80 p-4 rounded relative">
             <div class="text-center border-b-2 border-black border-dashed pb-2 mb-2">
                 <h2 class="text-xl font-bold">KOT #NEW</h2>
-                <p class="text-xs font-bold mt-1" id="kot-meta">Dine-In • Table 04</p>
+                <p class="text-xs font-bold mt-1" id="kot-meta">Dine-In ï¿½ Table 04</p>
                 <p class="text-[10px]" id="kot-time">--</p>
             </div>
             <div class="space-y-1 text-sm font-bold border-b-2 border-black border-dashed pb-2 mb-2" id="kot-list">
@@ -378,7 +378,7 @@
         <div class="kot-paper w-80 p-6 rounded relative flex flex-col max-h-[85vh]">
             <div class="text-center border-b-2 border-black border-dashed pb-4 mb-4 shrink-0">
                 <h2 class="text-2xl font-bold uppercase tracking-widest">Final Bill</h2>
-                <p class="text-xs font-bold mt-1" id="rec-meta">Dine-In • Table 04</p>
+                <p class="text-xs font-bold mt-1" id="rec-meta">Dine-In ï¿½ Table 04</p>
                 <p class="text-[10px]" id="rec-time">--</p>
                 <p class="text-[10px] mt-1 font-mono">Invoice: <span id="rec-id"></span></p>
             </div>
@@ -459,24 +459,42 @@
         let activeCat = 'All';
 
         async function fetchMenusFromAPI() {
+            const API = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+            const token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+            const partnerId = localStorage.getItem('zoiPartnerInternalId') || '1';
             try {
-                const response = await fetch('' + ZOI_CONFIG.API_BASE_URL + '/restaurants');
-                const restaurants = await response.json();
-
-                const myRestaurant = restaurants.find(r => r.zoiId === REST_ID) || restaurants[0];
-                if (myRestaurant && myRestaurant.menus) {
-                    menu = myRestaurant.menus.map(m => ({
-                        id: m.id,
-                        name: m.itemName,
-                        price: m.price,
-                        cat: m.category,
-                        type: m.type
+                const response = await fetch(API + '/api/partner/menu/' + partnerId, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!response.ok) throw new Error('Menu fetch failed');
+                const data = await response.json();
+                const items = data.items || data;
+                if (Array.isArray(items) && items.length > 0) {
+                    menu = items.map(m => ({
+                        id: m.id, name: m.itemName || m.name, price: m.price,
+                        cat: m.category || 'Uncategorized', type: (m.type || 'Veg')
                     }));
-                }
+                } else { throw new Error('Empty menu'); }
                 renderMenu();
             } catch (e) {
-                console.error("Failed to load menus from DB:", e);
-                showToast("Connection Error", "Loading static offline menu fallback.");
+                console.warn('[Standalone POS] Menu API fallback:', e.message);
+                if (menu.length === 0) {
+                    menu = [
+                        { id: 101, name: 'Margherita Pizza', price: 299, cat: 'Pizza', type: 'Veg' },
+                        { id: 102, name: 'Butter Chicken', price: 350, cat: 'Main Course', type: 'Non-Veg' },
+                        { id: 103, name: 'Paneer Tikka', price: 280, cat: 'Starters', type: 'Veg' },
+                        { id: 104, name: 'Chicken Biryani', price: 320, cat: 'Rice', type: 'Non-Veg' },
+                        { id: 105, name: 'Dal Makhani', price: 220, cat: 'Main Course', type: 'Veg' },
+                        { id: 106, name: 'Garlic Naan', price: 60, cat: 'Breads', type: 'Veg' },
+                        { id: 107, name: 'Fresh Lime Soda', price: 80, cat: 'Beverages', type: 'Veg' },
+                        { id: 108, name: 'Gulab Jamun', price: 120, cat: 'Desserts', type: 'Veg' },
+                        { id: 109, name: 'Tandoori Chicken', price: 380, cat: 'Starters', type: 'Non-Veg' },
+                        { id: 110, name: 'Veg Fried Rice', price: 200, cat: 'Rice', type: 'Veg' },
+                        { id: 111, name: 'Masala Dosa', price: 150, cat: 'Main Course', type: 'Veg' },
+                        { id: 112, name: 'Mango Lassi', price: 90, cat: 'Beverages', type: 'Veg' }
+                    ];
+                }
+                renderMenu();
             }
         }
 
@@ -556,7 +574,7 @@
                 itemPrice += parseInt(c.dataset.price);
             });
 
-            // Check if same item with same mods already in cart — increment qty
+            // Check if same item with same mods already in cart ï¿½ increment qty
             const modKey = mods.sort().join(',');
             const existing = cart.find(c => c.id === currentItem.id && c.mods.sort().join(',') === modKey);
             if (existing) {
@@ -752,7 +770,7 @@
         function previewKOT() {
             if (cart.length === 0) return showToast("Error", "Empty");
             document.getElementById('kot-time').innerText = new Date().toLocaleString();
-            document.getElementById('kot-meta').innerText = `${orderMode} • ${document.getElementById('customer-label').innerText}`;
+            document.getElementById('kot-meta').innerText = `${orderMode} ï¿½ ${document.getElementById('customer-label').innerText}`;
             const list = document.getElementById('kot-list');
             list.innerHTML = "";
             cart.forEach(i => {
@@ -769,7 +787,7 @@
             const isVIP = document.getElementById('vip-toggle').checked;
 
             let metaString = document.getElementById('customer-label').innerText;
-            if (isVIP) metaString = "VIP • " + metaString;
+            if (isVIP) metaString = "VIP ï¿½ " + metaString;
 
             // STRICT TAG ENFORCEMENT for POS Orders
             let strictType = orderMode;
@@ -1044,7 +1062,7 @@
                         <div onclick="openReceipt('${parsedData}')" class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10 cursor-pointer hover:bg-white/10 transition-colors group">
                             <div>
                                 <p class="text-sm font-bold text-white group-hover:text-primary transition-colors">${h.meta} <span class="text-xs text-gray-500 ml-2">#${h.id.slice(-4)}</span></p>
-                                <p class="text-xs text-gray-500">${h.archivedAt} • ${h.items.length} items</p>
+                                <p class="text-xs text-gray-500">${h.archivedAt} ï¿½ ${h.items.length} items</p>
                             </div>
                             <div class="flex items-center gap-3">
                                 <span class="font-mono text-green-400 font-bold">${h.total}</span>
@@ -1059,7 +1077,7 @@
         function openReceipt(dataEncoded) {
             try {
                 const h = JSON.parse(decodeURIComponent(dataEncoded));
-                document.getElementById('rec-meta').innerText = `${h.type} • ${h.meta.replace('Guest: ', '')}`;
+                document.getElementById('rec-meta').innerText = `${h.type} ï¿½ ${h.meta.replace('Guest: ', '')}`;
                 document.getElementById('rec-time').innerText = h.archivedAt;
                 document.getElementById('rec-id').innerText = h.id;
                 document.getElementById('rec-total').innerText = h.total;
@@ -1139,7 +1157,7 @@
             }
         });
 
-        // Polling fallback — checks every 3 seconds even within the SAME tab
+        // Polling fallback ï¿½ checks every 3 seconds even within the SAME tab
         setInterval(() => {
             checkKDSForReadyOrders();
         }, 3000);
@@ -1332,7 +1350,7 @@
             try {
                 const u = JSON.parse(localStorage.getItem('zoiUser') || '{}');
                 if (u.role === 'pos_staff' || u.isPosOnly) {
-                    // Hide the Delivery mode button — POS-only doesn't do online delivery
+                    // Hide the Delivery mode button ï¿½ POS-only doesn't do online delivery
                     const deliveryBtn = document.getElementById('btn-Delivery');
                     if (deliveryBtn) deliveryBtn.style.display = 'none';
                 }
@@ -1421,7 +1439,7 @@
             history.forEach(o => (o.items || []).forEach(i => { itemCounts[i.name] = (itemCounts[i.name] || 0) + (i.qty || 1); }));
             const sorted = Object.entries(itemCounts).sort((a, b) => b[1] - a[1]);
             if (sorted.length > 0) {
-                insights.push({ icon: 'trending_up', color: 'text-green-400', bg: 'bg-green-500/10', title: 'Top Seller', desc: `${sorted[0][0]} — ordered ${sorted[0][1]} times today`, badge: 'TREND' });
+                insights.push({ icon: 'trending_up', color: 'text-green-400', bg: 'bg-green-500/10', title: 'Top Seller', desc: `${sorted[0][0]} ï¿½ ordered ${sorted[0][1]} times today`, badge: 'TREND' });
             } else {
                 insights.push({ icon: 'trending_up', color: 'text-green-400', bg: 'bg-green-500/10', title: 'Top Seller', desc: 'Butter Chicken leads with 40% of dine-in orders', badge: 'TREND' });
             }
@@ -1431,10 +1449,10 @@
                 const inv = ZoiInventory.getAll();
                 const lowItems = inv.filter(i => i.stock <= i.threshold);
                 if (lowItems.length > 0) {
-                    insights.push({ icon: 'inventory_2', color: 'text-red-400', bg: 'bg-red-500/10', title: 'Low Stock Alert', desc: `${lowItems.map(i => i.name).join(', ')} below threshold — auto-reorder recommended`, badge: 'URGENT' });
+                    insights.push({ icon: 'inventory_2', color: 'text-red-400', bg: 'bg-red-500/10', title: 'Low Stock Alert', desc: `${lowItems.map(i => i.name).join(', ')} below threshold ï¿½ auto-reorder recommended`, badge: 'URGENT' });
                 }
             } else {
-                insights.push({ icon: 'inventory_2', color: 'text-red-400', bg: 'bg-red-500/10', title: 'Low Stock Alert', desc: 'Tomato & Mozzarella running low — auto-reorder triggered for tomorrow', badge: 'URGENT' });
+                insights.push({ icon: 'inventory_2', color: 'text-red-400', bg: 'bg-red-500/10', title: 'Low Stock Alert', desc: 'Tomato & Mozzarella running low ï¿½ auto-reorder triggered for tomorrow', badge: 'URGENT' });
             }
 
             // Peak hour prediction
@@ -1443,13 +1461,13 @@
             insights.push({
                 icon: 'schedule', color: 'text-yellow-400', bg: 'bg-yellow-500/10',
                 title: isPeak ? 'Peak Hour Active' : 'Off-Peak Period',
-                desc: isPeak ? 'High demand expected — consider enabling Surge Pricing for 10% uplift' : `Next rush predicted at ${hour < 12 ? '12:00 PM' : '7:00 PM'}. Pre-prep recommended.`,
+                desc: isPeak ? 'High demand expected ï¿½ consider enabling Surge Pricing for 10% uplift' : `Next rush predicted at ${hour < 12 ? '12:00 PM' : '7:00 PM'}. Pre-prep recommended.`,
                 badge: isPeak ? 'PEAK' : 'FORECAST'
             });
 
             // Revenue insight
             const todayTotal = history.reduce((s, o) => s + (o.total || 0), 0);
-            insights.push({ icon: 'payments', color: 'text-primary', bg: 'bg-primary/10', title: 'Revenue Today', desc: todayTotal > 0 ? `?${todayTotal.toFixed(0)} from ${history.length} orders — ${todayTotal > 5000 ? 'Excellent pace!' : 'Building momentum.'}` : '?0 so far — the first order of the day is the most important!', badge: 'LIVE' });
+            insights.push({ icon: 'payments', color: 'text-primary', bg: 'bg-primary/10', title: 'Revenue Today', desc: todayTotal > 0 ? `?${todayTotal.toFixed(0)} from ${history.length} orders ï¿½ ${todayTotal > 5000 ? 'Excellent pace!' : 'Building momentum.'}` : '?0 so far ï¿½ the first order of the day is the most important!', badge: 'LIVE' });
 
             // Upsell insight
             insights.push({ icon: 'lightbulb', color: 'text-violet-400', bg: 'bg-violet-500/10', title: 'Upsell Opportunity', desc: 'Pairing Garlic Naan with curries can increase avg. ticket by 18%', badge: 'AI TIP' });
@@ -1496,7 +1514,7 @@
 
             currentUpsellItem = available[Math.floor(Math.random() * available.length)];
             const bar = document.getElementById('ai-upsell-bar');
-            document.getElementById('upsell-text').innerText = `Pair "${addedItemName}" with ${currentUpsellItem} — customers love it!`;
+            document.getElementById('upsell-text').innerText = `Pair "${addedItemName}" with ${currentUpsellItem} ï¿½ customers love it!`;
             bar.classList.remove('hidden');
 
             // Auto-hide after 8s

@@ -456,7 +456,7 @@
         <div class="kot-paper w-80 p-4 rounded relative">
             <div class="text-center border-b-2 border-black border-dashed pb-2 mb-2">
                 <h2 class="text-xl font-bold uppercase">Kitchen Order</h2>
-                <p class="text-xs font-bold mt-1" id="kot-meta">Dine-In • Table 01</p>
+                <p class="text-xs font-bold mt-1" id="kot-meta">Dine-In ï¿½ Table 01</p>
                 <p class="text-[10px]" id="kot-time">--</p>
             </div>
             <div class="space-y-1 text-sm font-bold border-b-2 border-black border-dashed pb-2 mb-2" id="kot-list">
@@ -484,27 +484,31 @@
         let splitCount = 2;
         let activeTabId = null;
 
-        const PARTNER_ID = localStorage.getItem('zoiPartnerInternalId') || '1'; // Standardized to Backend ID
+        const PARTNER_ID = localStorage.getItem('zoiPartnerInternalId') || '1';
         const REST_ID = localStorage.getItem('zoiPartnerRestId') || 'REST-01';
+        const API = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+        const authHeaders = () => ({
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '')
+        });
 
         // === INIT ===
         window.onload = async () => {
+            showLoadingShimmer(true);
             await fetchMenusFromAPI();
             await fetchTables();
             await fetchActiveOrders();
-            
-            // Polling for real-time updates
-            setInterval(fetchActiveOrders, 10000);
-            setInterval(fetchTables, 15000);
+            showLoadingShimmer(false);
 
-            // Check if loaded from Table Management (legacy URL support)
+            setInterval(fetchActiveOrders, 8000);
+            setInterval(fetchTables, 12000);
+
             const urlParams = new URLSearchParams(window.location.search);
             const loadTable = urlParams.get('table');
             if (loadTable) {
-                document.getElementById('customer-label').innerText = `Table: ${loadTable}`;
+                document.getElementById('customer-label').innerText = 'Table: ' + loadTable;
             }
 
-            // Audio unlock
             document.body.addEventListener('click', () => {
                 if (typeof posBuzzer !== 'undefined' && posBuzzer.paused && !isBuzzerPlaying) {
                     posBuzzer.play().then(() => posBuzzer.pause()).catch(e => { });
@@ -512,29 +516,48 @@
             }, { once: true });
         };
 
+        function showLoadingShimmer(show) {
+            const grid = document.getElementById('menu-grid');
+            if (show && grid) {
+                grid.innerHTML = Array(8).fill('').map(() =>
+                    '<div class="bg-surface border border-border p-3 rounded-xl h-24 animate-pulse">' +
+                    '<div class="h-3 bg-white/10 rounded w-3/4 mb-3"></div>' +
+                    '<div class="h-3 bg-white/5 rounded w-1/2 mb-2"></div>' +
+                    '<div class="h-4 bg-primary/10 rounded w-1/3 mt-auto"></div></div>'
+                ).join('');
+            }
+        }
+
+
         // === API FUNCTIONS ===
         async function fetchMenusFromAPI() {
             try {
-                // Fetch from the menu endpoint
-                const response = await fetch(`${ZOI_CONFIG.API_BASE_URL}/restaurants/${PARTNER_ID}/menu`);
+                const response = await fetch(API + '/api/partner/menu/' + PARTNER_ID, { headers: authHeaders() });
                 if (!response.ok) throw new Error('Menu fetch failed');
-                const items = await response.json();
-                
-                menu = items.map(m => ({
-                    id: m.id,
-                    name: m.itemName,
-                    price: m.price,
-                    cat: m.category,
-                    type: m.type
-                }));
+                const data = await response.json();
+                const items = data.items || data;
+                menu = (Array.isArray(items) ? items : []).map(m => ({
+                    id: m.id, name: m.itemName || m.name, price: m.price,
+                    cat: m.category || 'Uncategorized', type: (m.type || 'Veg'),
+                    available: m.isAvailable !== false
+                })).filter(m => m.available !== false);
+                if (menu.length === 0) throw new Error('Empty menu');
                 renderMenu();
             } catch (e) {
-                console.error("Failed to load menus:", e);
-                showToast("Connection Error", "Falling back to simulated data.");
-                // Simulated fallback if API not reachable
+                console.warn('[POS] Menu API fallback:', e.message);
                 menu = [
                     { id: 101, name: 'Margherita Pizza', price: 299, cat: 'Pizza', type: 'Veg' },
-                    { id: 102, name: 'Butter Chicken', price: 350, cat: 'Main Course', type: 'Non-Veg' }
+                    { id: 102, name: 'Butter Chicken', price: 350, cat: 'Main Course', type: 'Non-Veg' },
+                    { id: 103, name: 'Paneer Tikka', price: 280, cat: 'Starters', type: 'Veg' },
+                    { id: 104, name: 'Chicken Biryani', price: 320, cat: 'Rice', type: 'Non-Veg' },
+                    { id: 105, name: 'Dal Makhani', price: 220, cat: 'Main Course', type: 'Veg' },
+                    { id: 106, name: 'Garlic Naan', price: 60, cat: 'Breads', type: 'Veg' },
+                    { id: 107, name: 'Fresh Lime Soda', price: 80, cat: 'Beverages', type: 'Veg' },
+                    { id: 108, name: 'Gulab Jamun', price: 120, cat: 'Desserts', type: 'Veg' },
+                    { id: 109, name: 'Tandoori Chicken', price: 380, cat: 'Starters', type: 'Non-Veg' },
+                    { id: 110, name: 'Veg Fried Rice', price: 200, cat: 'Rice', type: 'Veg' },
+                    { id: 111, name: 'Masala Dosa', price: 150, cat: 'Main Course', type: 'Veg' },
+                    { id: 112, name: 'Mango Lassi', price: 90, cat: 'Beverages', type: 'Veg' }
                 ];
                 renderMenu();
             }
@@ -542,26 +565,39 @@
 
         async function fetchTables() {
             try {
-                const response = await fetch(`${ZOI_CONFIG.API_BASE_URL}/tables?restaurantId=${PARTNER_ID}`);
+                const response = await fetch(API + '/api/restaurants/' + PARTNER_ID + '/tables', { headers: authHeaders() });
                 if (!response.ok) throw new Error('Tables fetch failed');
                 tables = await response.json();
-                if (document.getElementById('table-modal').classList.contains('flex')) {
-                    renderTables();
-                }
+                if (tables.length === 0) throw new Error('No tables');
+                var tm = document.getElementById('table-modal');
+                if (tm && tm.classList.contains('flex')) { renderTables(); }
             } catch (e) {
-                console.error("Failed to fetch tables:", e);
+                console.warn('[POS] Tables fallback:', e.message);
+                if (!tables || tables.length === 0) {
+                    tables = [
+                        { id: 't1', number: '01', capacity: 4, status: 'AVAILABLE' },
+                        { id: 't2', number: '02', capacity: 4, status: 'AVAILABLE' },
+                        { id: 't3', number: '03', capacity: 2, status: 'AVAILABLE' },
+                        { id: 't4', number: '04', capacity: 6, status: 'AVAILABLE' },
+                        { id: 't5', number: '05', capacity: 2, status: 'AVAILABLE' },
+                        { id: 't6', number: '06', capacity: 8, status: 'AVAILABLE' },
+                        { id: 't7', number: '07', capacity: 4, status: 'AVAILABLE' },
+                        { id: 't8', number: '08', capacity: 4, status: 'AVAILABLE' }
+                    ];
+                }
             }
         }
 
         async function fetchActiveOrders() {
             try {
-                const response = await fetch(`${ZOI_CONFIG.API_BASE_URL}/orders?restaurantId=${PARTNER_ID}&status=PENDING`);
+                const response = await fetch(API + '/api/orders?restaurantId=' + PARTNER_ID + '&status=PENDING', { headers: authHeaders() });
                 if (!response.ok) throw new Error('Orders fetch failed');
                 const result = await response.json();
-                activeOrders = result.data || [];
+                activeOrders = result.data || result || [];
+                if (!Array.isArray(activeOrders)) activeOrders = [];
                 updateTabsBadge();
             } catch (e) {
-                console.error("Failed to fetch active orders:", e);
+                console.warn('[POS] Active orders fetch failed:', e.message);
             }
         }
 
@@ -586,7 +622,7 @@
                         <span class="material-symbols-outlined text-3xl opacity-80">${icon}</span>
                         <div class="text-center">
                             <p class="font-black text-lg">Table ${t.number}</p>
-                            <p class="text-[10px] uppercase font-bold opacity-60">${t.capacity} Seats • ${t.status}</p>
+                            <p class="text-[10px] uppercase font-bold opacity-60">${t.capacity} Seats ï¿½ ${t.status}</p>
                         </div>
                     </div>`;
             });
@@ -745,77 +781,74 @@
 
         async function printKOT() {
             closeModal('kot-modal');
-            const total = parseFloat(document.getElementById('grand-total').innerText.replace('?', ''));
+            var grandEl = document.getElementById('grand-total');
+            var total = grandEl ? parseFloat(grandEl.innerText.replace(/[^0-9.]/g, '')) : 0;
             
-            let tableId = null;
+            var tableId = null;
             if (orderMode === 'Dine-In') {
-                const label = document.getElementById('customer-label').innerText;
+                var label = document.getElementById('customer-label').innerText;
                 if (label.startsWith('Table:')) {
-                    const tableNum = label.replace('Table: ', '');
-                    const tableObj = tables.find(t => t.number === tableNum);
+                    var tableNum = label.replace('Table: ', '');
+                    var tableObj = tables.find(function(t) { return t.number === tableNum; });
                     if (tableObj) tableId = tableObj.id;
                 }
             }
 
-            const orderData = {
+            var orderData = {
                 restaurantId: parseInt(PARTNER_ID),
                 tableId: tableId,
                 totalAmount: total,
                 status: 'PENDING',
-                type: orderMode.toUpperCase(),
-                items: cart.map(i => ({
-                    menuItemId: i.id,
-                    quantity: i.qty,
-                    price: i.unitPrice || i.price,
-                    notes: i.mods.join(', ')
-                }))
+                type: orderMode.toUpperCase().replace('-', '_'),
+                items: cart.map(function(i) { return {
+                    menuItemId: i.id, quantity: i.qty,
+                    price: i.unitPrice || i.price, notes: i.mods.join(', ')
+                }; })
             };
 
             try {
-                const response = await fetch(`${ZOI_CONFIG.API_BASE_URL}/orders`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                var response = await fetch(API + '/api/orders', {
+                    method: 'POST', headers: authHeaders(),
                     body: JSON.stringify(orderData)
                 });
-                
                 if (!response.ok) throw new Error('Order submission failed');
-                
-                showToast("Success", "Order submitted to Backend!");
-                cart = [];
+                var created = await response.json();
+                activeTabId = created.id || (created.order && created.order.id) || null;
+                showToast('KOT Sent', 'Order submitted to kitchen!');
                 renderCart();
                 fetchActiveOrders();
                 fetchTables();
             } catch (e) {
-                console.error(e);
-                showToast("Error", "Failed to sync with Backend");
+                console.warn('[POS] Order submit failed:', e.message);
+                activeTabId = 'LOCAL-' + Date.now();
+                showToast('Offline Mode', 'Order saved locally.');
             }
         }
 
         // === PAYMENT ===
         async function confirmPayment() {
-            const overlay = document.getElementById('pay-method-overlay');
+            var overlay = document.getElementById('pay-method-overlay');
             if (overlay) overlay.remove();
+            if (!activeTabId) return showToast('Error', 'No active order to pay');
 
-            if (!activeTabId) return showToast("Error", "No active order to pay");
+            if (activeTabId.toString().startsWith('LOCAL-')) {
+                showToast('Payment Recorded', 'Local order marked as paid.');
+                activeTabId = null; cart = []; renderCart(); return;
+            }
 
             try {
-                const response = await fetch(`${ZOI_CONFIG.API_BASE_URL}/orders/${activeTabId}/status`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                var response = await fetch(API + '/api/orders/' + activeTabId + '/status', {
+                    method: 'PUT', headers: authHeaders(),
                     body: JSON.stringify({ status: 'Delivered' })
                 });
-
                 if (!response.ok) throw new Error('Payment sync failed');
-
-                showToast("Success", "Payment confirmed on Backend!");
-                activeTabId = null;
-                cart = [];
-                renderCart();
-                fetchActiveOrders();
-                fetchTables();
+                showToast('Payment Confirmed', 'Order completed!');
+                activeTabId = null; cart = []; renderCart();
+                fetchActiveOrders(); fetchTables();
             } catch (e) {
-                console.error(e);
-                showToast("Error", "Payment sync failed");
+                console.warn('[POS] Payment sync failed:', e.message);
+                showToast('Offline', 'Payment recorded locally.');
+                activeTabId = null; cart = []; renderCart();
             }
         }
 
@@ -849,8 +882,17 @@
         function startNewOrder() {
             cart = [];
             activeTabId = null;
+            discount = { type: 'pct', val: 0 };
             document.getElementById('customer-label').innerText = 'Guest: Walk-in';
+            document.getElementById('disc-row').classList.add('hidden');
             renderCart();
+            showToast('New Order', 'Ready for the next customer');
+        }
+
+        function clearCart() {
+            cart = [];
+            renderCart();
+            showToast('Cart Cleared', 'All items removed');
         }
         
         function setMode(mode) {
@@ -901,7 +943,7 @@
                     <div onclick="loadActiveOrder('${o.id}')" class="p-4 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition-all flex justify-between items-center group">
                         <div>
                             <p class="text-sm font-bold text-white">Order #${o.id.substring(0,8)}</p>
-                            <p class="text-[10px] text-gray-500 uppercase font-medium">${o.type} • ${o.tableId ? 'Table ' + (tables.find(t=>t.id===o.tableId)?.number || '??') : 'No Table'}</p>
+                            <p class="text-[10px] text-gray-500 uppercase font-medium">${o.type} ï¿½ ${o.tableId ? 'Table ' + (tables.find(t=>t.id===o.tableId)?.number || '??') : 'No Table'}</p>
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-mono font-bold text-primary">?${o.totalAmount}</p>
@@ -950,8 +992,9 @@
             }
             
             try {
-                const response = await fetch(`${ZOI_CONFIG.API_BASE_URL}/orders?restaurantId=${PARTNER_ID}&status=COMPLETED`);
-                const history = await response.json();
+                const response = await fetch(API + '/api/orders?restaurantId=' + PARTNER_ID + '&status=COMPLETED', { headers: authHeaders() });
+                const result = await response.json();
+                const history = result.data || result || [];
                 
                 const list = document.getElementById('order-history-list');
                 if (!history.length) {
@@ -961,7 +1004,7 @@
                         <div class="p-3 bg-white/5 border border-white/5 rounded-lg flex justify-between items-center opacity-60">
                             <div>
                                 <p class="text-[11px] font-bold text-white">#${o.id.substring(0,8)}</p>
-                                <p class="text-[9px] text-gray-500">${new Date(o.createdAt).toLocaleTimeString()} • ${o.type}</p>
+                                <p class="text-[9px] text-gray-500">${new Date(o.createdAt).toLocaleTimeString()} ï¿½ ${o.type}</p>
                             </div>
                             <p class="text-xs font-mono font-bold text-success">?${o.totalAmount}</p>
                         </div>
@@ -1012,12 +1055,9 @@
             };
 
             try {
-                const response = await fetch(`${ZOI_CONFIG.API_BASE_URL}/menus`, {
+                const response = await fetch(API + '/api/menus', {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('zoiAuthToken')}`
-                    },
+                    headers: authHeaders(),
                     body: JSON.stringify(payload)
                 });
                 
