@@ -512,7 +512,7 @@
         let user = { points: 2450, coupons: 3, streakClaimed: false, history: [] };
         let activeUser = null;
 
-        window.onload = function () {
+        window.onload = async function () {
             if (typeof ZoiCustomer === 'undefined' || !ZoiCustomer.isLoggedIn()) {
                 window.location.href = 'login & registration.html';
                 return;
@@ -548,34 +548,92 @@
             
             updateStats();
 
-            // Load badges dynamically
+            // Load badges dynamically — API first, fallback to local
             const badgeGrid = document.getElementById('badge-grid');
-            if (badgeGrid && typeof ZoiGamification !== 'undefined') {
-                const badges = ZoiGamification.getBadges();
-                let badgeHTML = '';
-                badges.forEach((b, i) => {
-                    if (i >= 3) return; // Show only top 3 on dashboard
-                    const isUnlocked = b.status === 'active';
+            if (badgeGrid) {
+                let allBadges = [];
+                let newlyAwarded = [];
 
-                    if (isUnlocked) {
-                        badgeHTML += `<div onclick="showBadge('${b.name}', '${b.desc}', true)" class="flex flex-col items-center gap-2 cursor-pointer group">
-                            <div class="size-14 rounded-full bg-gradient-to-br from-${b.color}-400 to-${b.color}-600 p-0.5 shadow-lg group-hover:scale-110 transition-transform">
-                                <div class="size-full rounded-full bg-surface-light dark:bg-surface-dark flex items-center justify-center">
-                                    <span class="material-symbols-outlined text-2xl text-${b.color}-500">${b.icon}</span>
+                // Try backend API first
+                try {
+                    const token = localStorage.getItem('zoiToken') || localStorage.getItem('zoiAuthToken');
+                    if (token) {
+                        const apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : 'https://zipzapzoi-eats.onrender.com';
+                        const resp = await fetch(apiBase + '/api/users/me/badges', {
+                            headers: { 'Authorization': 'Bearer ' + token }
+                        });
+                        if (resp.ok) {
+                            const data = await resp.json();
+                            allBadges = data.badges || [];
+                            newlyAwarded = data.newlyAwarded || [];
+                        }
+                    }
+                } catch(e) { console.log('Badge API fallback:', e.message); }
+
+                // Fallback to local ZoiGamification
+                if (allBadges.length === 0 && typeof ZoiGamification !== 'undefined') {
+                    const localBadges = ZoiGamification.getBadges();
+                    allBadges = localBadges.map(b => ({
+                        slug: b.name.toLowerCase().replace(/\s+/g, '_'),
+                        name: b.name,
+                        icon: b.icon === 'military_tech' ? '🏆' : (b.icon === 'local_fire_department' ? '🔥' : '⭐'),
+                        description: b.desc,
+                        earned: b.status === 'active'
+                    }));
+                }
+
+                // Fallback to hardcoded defaults
+                if (allBadges.length === 0) {
+                    allBadges = [
+                        { slug: 'first_bite', name: 'First Bite', icon: '🍕', description: 'Placed your first order', earned: false },
+                        { slug: 'regular_10', name: 'Regular Foodie', icon: '🔥', description: 'Placed 10 orders', earned: false },
+                        { slug: 'big_spender', name: 'Big Spender', icon: '💰', description: 'Spent over ₹5,000', earned: false },
+                        { slug: 'weekend_warrior', name: 'Weekend Warrior', icon: '🎉', description: '5 weekend orders', earned: false },
+                        { slug: 'cuisine_explorer', name: 'Cuisine Explorer', icon: '🌍', description: 'Ordered from 5+ cuisines', earned: false },
+                        { slug: 'review_star', name: 'Review Star', icon: '⭐', description: '3+ ratings submitted', earned: false },
+                        { slug: 'zoipass_vip', name: 'ZoiPass VIP', icon: '👑', description: 'Active ZoiPass', earned: false },
+                        { slug: 'loyal_50', name: 'Loyal Legend', icon: '🏆', description: '50 orders placed', earned: false },
+                        { slug: 'referral_hero', name: 'Referral Hero', icon: '🤝', description: 'Referred 3+ friends', earned: false },
+                        { slug: 'night_owl', name: 'Night Owl', icon: '🦉', description: '3 orders after 10 PM', earned: false },
+                    ];
+                }
+
+                // Render all badges
+                let badgeHTML = '';
+                allBadges.forEach(b => {
+                    if (b.earned) {
+                        badgeHTML += `<div onclick="showBadge('${b.name}', '${b.description}', true)" class="flex flex-col items-center gap-2 cursor-pointer group">
+                            <div class="size-14 rounded-full bg-gradient-to-br from-primary/40 to-orange-500/40 p-0.5 shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                                <div class="size-full rounded-full bg-surface-dark flex items-center justify-center text-2xl">
+                                    ${b.icon}
                                 </div>
                             </div>
-                            <span class="text-[10px] font-bold text-center uppercase text-text-secondary-dark">${b.name}</span>
+                            <span class="text-[10px] font-bold text-center uppercase text-white">${b.name}</span>
                         </div>`;
                     } else {
-                        badgeHTML += `<div onclick="showBadge('${b.name}', '${b.desc}', false)" class="flex flex-col items-center gap-2 cursor-pointer group grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all">
-                            <div class="size-14 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700">
-                                <span class="material-symbols-outlined text-2xl text-gray-500">${b.icon}</span>
+                        badgeHTML += `<div onclick="showBadge('${b.name}', '${b.description}', false)" class="flex flex-col items-center gap-2 cursor-pointer group grayscale opacity-50 hover:opacity-80 hover:grayscale-0 transition-all">
+                            <div class="size-14 rounded-full bg-gray-800 flex items-center justify-center border border-gray-700 text-2xl">
+                                ${b.icon}
                             </div>
                             <span class="text-[10px] font-bold text-center uppercase text-gray-500">${b.name}</span>
                         </div>`;
                     }
                 });
                 badgeGrid.innerHTML = badgeHTML;
+                // Expand grid to show all badges
+                badgeGrid.classList.remove('grid-cols-3');
+                badgeGrid.classList.add('grid-cols-5');
+
+                // Celebrate newly awarded badges
+                if (newlyAwarded.length > 0) {
+                    const newBadge = allBadges.find(b => b.slug === newlyAwarded[0]);
+                    if (newBadge) {
+                        setTimeout(() => {
+                            showToast('success', '🎉 New Badge Earned!', `You unlocked "${newBadge.name}"`);
+                            showBadge(newBadge.name, newBadge.description, true);
+                        }, 1500);
+                    }
+                }
             }
 
             // Load history

@@ -885,12 +885,36 @@
         }
         renderAddresses();
 
-        // Favorites Handling
+        // Favorites Handling — API first, localStorage fallback
         const favoritesContainer = document.getElementById('favorites-container');
         if (favoritesContainer) {
-            const favorites = JSON.parse(localStorage.getItem('zoiFavorites') || '[]');
-            let displayFavorites = favorites;
+            let displayFavorites = [];
             
+            // Try API first
+            try {
+                if (typeof ZoiAPI !== 'undefined' && ZoiAPI.favorites) {
+                    const result = await ZoiAPI.favorites.list();
+                    const apiFavs = result.data || result || [];
+                    if (Array.isArray(apiFavs) && apiFavs.length > 0) {
+                        displayFavorites = apiFavs.map(f => ({
+                            id: f.restaurantId || f.id,
+                            name: f.restaurant?.name || f.name || 'Restaurant',
+                            type: f.restaurant?.cuisine || f.type || 'Restaurant',
+                            rating: f.restaurant?.rating || f.rating || 4.5,
+                            time: f.restaurant?.deliveryTime || f.time || '30 min',
+                            img: f.restaurant?.image || f.img || f.image || ''
+                        }));
+                    }
+                }
+            } catch(e) { console.log('Favorites API fallback:', e.message); }
+
+            // Fallback to localStorage
+            if (displayFavorites.length === 0) {
+                const localFavs = JSON.parse(localStorage.getItem('zoiFavorites') || '[]');
+                if (localFavs.length > 0) displayFavorites = localFavs;
+            }
+
+            // Fallback to demo data
             if (displayFavorites.length === 0 && typeof ZoiRestaurants !== 'undefined') {
                 const allRest = ZoiRestaurants.getAll();
                 displayFavorites = allRest.slice(0, 3).map(r => ({
@@ -900,45 +924,43 @@
             }
             
             if (displayFavorites.length === 0) {
-                const defaultFavorites = [
-                    { id: 'f1', name: 'Zoi Burgers & Fries', type: 'American • Burgers', rating: 4.5, time: '15-25 min', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDffN-PybVi6BBZbHOXQfI3X9xq_glheVnaFBZRGYgq4OXxapQmutiq-Mr2YIzqcF2qefHkuQrs1ssjGtUILaNMeUTcTiNhuClguebyfIEAhSlbiWA_eskiHEH2ErJkgyX6-CBmDxlMcxN6Q8lBkV8ORwS7LFE3D61UkDHNIQQjEU8w7susq6PzMlppl8zbRKqNlqfOIhVCQ3qCZto1nq7Rim7DOEAeOdak5gQ7FuPni_AmULNriuYD24PvzAQqTogCBugkEnbz5Y4' },
-                    { id: 'f2', name: 'The Noodle Bowl', type: 'Asian • Noodles', rating: 4.9, time: '30-45 min', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB1eYVn-8WMfTr9z9J8dh-t1yf3zWU4Tgbf5Diu7G0yLp25jsflNbWdSxEc1eNoNKGPcw9QIwrYJRYr9CkpKNEAOVfSoljq3Dj23wKwwe1ctKBmxUqLgerC1WWvwYencvOTskYV-YTiR7tDoZqKxJDOM33xOYTwxzYoj3Rxrd8pv9QvSu2J8ShMHegNGPmgIycSNauykqitz2xz0vy5ftOrByk6tjFndo5y_BKKo28HGkgk15rnqhWQ7bBjs1BcotEBWUvi-zTzmA0' },
-                    { id: 'f3', name: 'The Pizza Oven', type: 'Italian • Pizza', rating: 4.7, time: '20-35 min', img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDfWt5DmOEZDplgZH01kqevF4ykm32V-tVeuAK74eubVCfyOZa4UI57nOk06NeicF4Zc9J1NAHFdJJP_iRkDZXKOEOgRSGnZZ2k5_t5__PT27vZRwo99jLiIUX1LrFoeftCgSdm58cSAqmSF4fbEE6axMXut3ZJhuU4JmVCIWCbkMM-e_XPdP0hWWZzuW5Sr3DWAzVVHdECEnmofwUdlh-AgI5AN4jpsee5SIQb_dukAjujowciIo-SJza7e-MOHDL0W3cBL7FIGgM' }
-                ];
-                displayFavorites = defaultFavorites;
-            }
-            
-            favoritesContainer.innerHTML = '';
-            
-            displayFavorites.forEach((fav, index) => {
-                const hiddenClass = index > 2 ? 'hidden md:block' : '';
-                favoritesContainer.innerHTML += `
-                <div class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden hover:border-primary/50 transition-all group relative ${hiddenClass}">
-                    <div class="h-36 bg-cover bg-center" style="background-image: url('${fav.img || fav.image}');">
-                        <div class="absolute top-2 right-2">
-                            <button class="bg-background-dark/80 backdrop-blur-sm p-1.5 rounded-full text-primary hover:bg-primary hover:text-white transition-colors">
-                                <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">favorite</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="p-4 flex flex-col gap-2">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="text-white font-bold text-base truncate max-w-[140px]">${fav.name}</h4>
-                                <p class="text-text-muted text-xs">${fav.type || 'Restaurant'}</p>
-                            </div>
-                            <div class="flex items-center gap-1 bg-green-500/10 px-1.5 py-0.5 rounded">
-                                <span class="text-green-500 text-xs font-bold">${fav.rating || '4.5'}</span>
-                                <span class="material-symbols-outlined text-green-500 text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span>
-                            </div>
-                        </div>
-                        <div class="flex gap-2 mt-2">
-                            <button class="flex-1 py-2 bg-primary text-background-dark text-xs font-bold rounded-lg hover:bg-orange-600 transition-colors" onclick="window.location.href='restaurant_menu.html?id=${fav.id}'">​Order Now</button>
-                            <button class="px-3 py-2 bg-border-dark text-white text-xs font-bold rounded-lg hover:bg-white/10 transition-colors" onclick="window.location.href='restaurant_menu.html?id=${fav.id}'">​View Menu</button>
-                        </div>
-                    </div>
+                favoritesContainer.innerHTML = `<div class="col-span-full text-center py-8">
+                    <span class="material-symbols-outlined text-5xl text-border-dark mb-3 block">favorite</span>
+                    <p class="text-text-muted text-sm">No favorites yet! Browse restaurants and tap ❤️ to save them here.</p>
+                    <a href="customer_restaurant_listing.html" class="inline-block mt-3 text-primary font-bold text-sm hover:underline">Browse Restaurants →</a>
                 </div>`;
-            });
+            } else {
+                favoritesContainer.innerHTML = '';
+                displayFavorites.forEach((fav, index) => {
+                    const hiddenClass = index > 2 ? 'hidden md:block' : '';
+                    favoritesContainer.innerHTML += `
+                    <div class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden hover:border-primary/50 transition-all group relative ${hiddenClass}">
+                        <div class="h-36 bg-cover bg-center relative" style="background-image: url('${fav.img || fav.image}');">
+                            <div class="absolute top-2 right-2">
+                                <button onclick="removeFavorite('${fav.id}', this)" class="bg-background-dark/80 backdrop-blur-sm p-1.5 rounded-full text-red-500 hover:bg-red-500 hover:text-white transition-colors" title="Remove from favorites">
+                                    <span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4 flex flex-col gap-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="text-white font-bold text-base truncate max-w-[140px]">${fav.name}</h4>
+                                    <p class="text-text-muted text-xs">${fav.type || 'Restaurant'}</p>
+                                </div>
+                                <div class="flex items-center gap-1 bg-green-500/10 px-1.5 py-0.5 rounded">
+                                    <span class="text-green-500 text-xs font-bold">${fav.rating || '4.5'}</span>
+                                    <span class="material-symbols-outlined text-green-500 text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 mt-2">
+                                <button class="flex-1 py-2 bg-primary text-background-dark text-xs font-bold rounded-lg hover:bg-orange-600 transition-colors" onclick="window.location.href='restaurant_menu.html?id=${fav.id}'">​Order Now</button>
+                                <button class="px-3 py-2 bg-border-dark text-white text-xs font-bold rounded-lg hover:bg-white/10 transition-colors" onclick="window.location.href='restaurant_menu.html?id=${fav.id}'">​View Menu</button>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            }
         }
 
         // Recent Orders Handling
@@ -1537,6 +1559,48 @@
     }
     // Initialize on DOMContentLoaded
     document.addEventListener('DOMContentLoaded', () => { initDietPreferences(); });
+
+    // ─── FAVORITES REMOVE ────────────────────────────────
+    window.removeFavorite = async function(restaurantId, btnEl) {
+        if (!confirm('Remove this restaurant from favorites?')) return;
+        // Animate card out
+        const card = btnEl.closest('.group');
+        if (card) { card.style.transition = 'opacity 0.3s, transform 0.3s'; card.style.opacity = '0'; card.style.transform = 'scale(0.9)'; }
+        // Remove from API
+        try {
+            if (typeof ZoiAPI !== 'undefined' && ZoiAPI.favorites) {
+                await ZoiAPI.favorites.toggle(restaurantId);
+            }
+        } catch(e) { console.log('Favorites remove API fallback:', e.message); }
+        // Remove from localStorage
+        const localFavs = JSON.parse(localStorage.getItem('zoiFavorites') || '[]');
+        const updated = localFavs.filter(f => String(f.id) !== String(restaurantId));
+        localStorage.setItem('zoiFavorites', JSON.stringify(updated));
+        // Remove card from DOM after animation
+        setTimeout(() => { if (card) card.remove(); if (typeof showToast !== 'undefined') showToast('Removed from favorites', 'success'); }, 300);
+    };
+
+    // ─── ADDRESS API SYNC (addNewAddress enhancement) ────
+    const origAddNewAddress = window.addNewAddress;
+    window.addNewAddress = async function() {
+        const label = prompt('Address label (e.g. Home, Work, Other):');
+        if (!label) return;
+        const address = prompt('Enter full address:');
+        if (!address) return;
+        const profile = getProfileData();
+        if (!profile.addresses) profile.addresses = [];
+        const isFirst = profile.addresses.length === 0;
+        profile.addresses.push({ id: Date.now(), label: label, address: address, default: isFirst });
+        saveProfileData(profile);
+        // Also sync to API
+        try {
+            if (typeof ZoiAPI !== 'undefined' && ZoiAPI.addresses) {
+                await ZoiAPI.addresses.create({ label, line1: address, isDefault: isFirst });
+            }
+        } catch(e) {}
+        renderAddresses();
+        showToast('Address "' + label + '" added successfully!', 'success');
+    };
 </script>
 <script src="js/zoi_ai_assistant.js?v=4"></script>
 <script src="js/zoi_theme.js"></script>

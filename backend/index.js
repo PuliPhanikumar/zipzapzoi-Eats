@@ -1722,6 +1722,70 @@ app.delete('/api/cms/assets/:id', verifyToken, requireRole('Super Admin', 'admin
 });
 
 // ════════════════════════════════════════════════════════
+// BADGE AUTO-AWARD SYSTEM
+// ════════════════════════════════════════════════════════
+const BADGE_DEFINITIONS = [
+    { slug: 'first_bite', name: 'First Bite', icon: '🍕', description: 'Placed your first order', check: (stats) => stats.orderCount >= 1 },
+    { slug: 'regular_10', name: 'Regular Foodie', icon: '🔥', description: 'Placed 10 orders', check: (stats) => stats.orderCount >= 10 },
+    { slug: 'big_spender', name: 'Big Spender', icon: '💰', description: 'Spent over ₹5,000 total', check: (stats) => stats.totalSpent >= 5000 },
+    { slug: 'weekend_warrior', name: 'Weekend Warrior', icon: '🎉', description: '5 weekend orders', check: (stats) => stats.weekendOrders >= 5 },
+    { slug: 'cuisine_explorer', name: 'Cuisine Explorer', icon: '🌍', description: 'Ordered from 5+ cuisine types', check: (stats) => stats.cuisineCount >= 5 },
+    { slug: 'review_star', name: 'Review Star', icon: '⭐', description: 'Submitted 3+ ratings', check: (stats) => stats.ratingCount >= 3 },
+    { slug: 'zoipass_vip', name: 'ZoiPass VIP', icon: '👑', description: 'Active ZoiPass subscription', check: (stats) => stats.hasZoiPass },
+    { slug: 'loyal_50', name: 'Loyal Legend', icon: '🏆', description: 'Placed 50 orders', check: (stats) => stats.orderCount >= 50 },
+    { slug: 'referral_hero', name: 'Referral Hero', icon: '🤝', description: 'Referred 3+ friends', check: (stats) => stats.referralCount >= 3 },
+    { slug: 'night_owl', name: 'Night Owl', icon: '🦉', description: '3 orders after 10 PM', check: (stats) => stats.lateNightOrders >= 3 },
+];
+
+app.get('/api/users/me/badges', verifyToken, async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+
+        // Gather user stats
+        const orders = await prisma.order.findMany({ where: { userId }, select: { id: true, total: true, createdAt: true, restaurantId: true } });
+        const ratings = await prisma.orderRating.count({ where: { userId } });
+        const referrals = await prisma.user.count({ where: { referredById: userId } });
+
+        const stats = {
+            orderCount: orders.length,
+            totalSpent: orders.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0),
+            weekendOrders: orders.filter(o => { const d = new Date(o.createdAt).getDay(); return d === 0 || d === 6; }).length,
+            cuisineCount: new Set(orders.map(o => o.restaurantId)).size,
+            ratingCount: ratings,
+            hasZoiPass: false, // TODO: check subscription
+            referralCount: referrals,
+            lateNightOrders: orders.filter(o => new Date(o.createdAt).getHours() >= 22).length,
+        };
+
+        // Fetch existing badges
+        const existingBadges = await prisma.userBadge.findMany({ where: { userId } });
+        const earnedSlugs = new Set(existingBadges.map(b => b.badgeSlug));
+
+        // Auto-award new badges
+        const newlyAwarded = [];
+        for (const badge of BADGE_DEFINITIONS) {
+            if (!earnedSlugs.has(badge.slug) && badge.check(stats)) {
+                await prisma.userBadge.create({ data: { userId, badgeSlug: badge.slug, badgeName: badge.name } });
+                earnedSlugs.add(badge.slug);
+                newlyAwarded.push(badge.slug);
+            }
+        }
+
+        // Build response
+        const allBadges = BADGE_DEFINITIONS.map(b => ({
+            slug: b.slug,
+            name: b.name,
+            icon: b.icon,
+            description: b.description,
+            earned: earnedSlugs.has(b.slug),
+            earnedAt: existingBadges.find(eb => eb.badgeSlug === b.slug)?.earnedAt || null
+        }));
+
+        res.json({ badges: allBadges, newlyAwarded, stats });
+    } catch (error) { next(error); }
+});
+
+// ════════════════════════════════════════════════════════
 // ZOI AI AGENT — INDEPENDENT ENTITY
 // ════════════════════════════════════════════════════════
 const aiLimiter = rateLimit({

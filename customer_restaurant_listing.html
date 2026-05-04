@@ -148,21 +148,64 @@
             <div>
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
                     <h2 class="text-2xl font-bold" id="rest-count">Loading Restaurants...</h2>
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1"><button
-                            class="flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2319] border border-[#493622] hover:border-primary transition-colors"><span
-                                class="material-symbols-outlined text-green-500 text-lg">spa</span><span
-                                class="text-sm font-medium">Vegan</span></button><button
-                            class="flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2319] border border-[#493622] hover:border-primary transition-colors"><span
-                                class="material-symbols-outlined text-yellow-500 text-lg">grain</span><span
-                                class="text-sm font-medium">Gluten-Free</span></button><button
-                            class="flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2319] border border-[#493622] hover:border-primary transition-colors"><span
-                                class="material-symbols-outlined text-primary text-lg">bolt</span><span
-                                class="text-sm font-medium">Fast Delivery</span></button><button
-                            class="flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2319] border border-[#493622] hover:border-primary transition-colors"><span
-                                class="material-symbols-outlined text-yellow-500 text-lg">star</span><span
-                                class="text-sm font-medium">Ratings 4.0+</span></button><button
-                            class="flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2d2319] border border-[#493622] hover:border-primary transition-colors"><span
-                                class="text-sm font-medium">Under ₹300</span></button></div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleFilterPanel()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2d2319] border border-[#493622] hover:border-primary transition-colors relative" id="filter-toggle-btn">
+                            <span class="material-symbols-outlined text-primary text-lg">tune</span>
+                            <span class="text-sm font-bold">Filters</span>
+                            <span id="filter-count-badge" class="hidden absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-primary text-black text-[10px] font-bold rounded-full flex items-center justify-center px-1">0</span>
+                        </button>
+                        <select id="sort-select" onchange="applyFilters()" class="px-3 py-2 rounded-xl bg-[#2d2319] border border-[#493622] text-white text-sm font-medium focus:ring-0 focus:border-primary appearance-none cursor-pointer">
+                            <option value="">Sort By</option>
+                            <option value="rating">⭐ Rating (High-Low)</option>
+                            <option value="time">⚡ Delivery Time</option>
+                            <option value="price_low">💰 Price (Low-High)</option>
+                            <option value="price_high">💎 Price (High-Low)</option>
+                            <option value="popular">🔥 Popularity</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Advanced Filter Panel -->
+                <div id="filter-panel" class="hidden mb-4 p-4 rounded-xl bg-[#1a0b26] border border-[#493622] transition-all">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Price Range -->
+                        <div>
+                            <p class="text-xs text-text-secondary font-bold uppercase mb-2">Price Range</p>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="toggleFilter('price','under200',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="price" data-value="under200">Under ₹200</button>
+                                <button onclick="toggleFilter('price','200to500',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="price" data-value="200to500">₹200-500</button>
+                                <button onclick="toggleFilter('price','over500',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="price" data-value="over500">₹500+</button>
+                            </div>
+                        </div>
+                        <!-- Rating -->
+                        <div>
+                            <p class="text-xs text-text-secondary font-bold uppercase mb-2">Rating</p>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="toggleFilter('rating','4',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="rating" data-value="4">4.0+</button>
+                                <button onclick="toggleFilter('rating','4.5',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="rating" data-value="4.5">4.5+</button>
+                            </div>
+                        </div>
+                        <!-- Delivery Time -->
+                        <div>
+                            <p class="text-xs text-text-secondary font-bold uppercase mb-2">Delivery Time</p>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="toggleFilter('time','30',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="time" data-value="30">Under 30 min</button>
+                                <button onclick="toggleFilter('time','45',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="time" data-value="45">Under 45 min</button>
+                            </div>
+                        </div>
+                        <!-- Dietary -->
+                        <div>
+                            <p class="text-xs text-text-secondary font-bold uppercase mb-2">Dietary</p>
+                            <div class="flex flex-wrap gap-1.5">
+                                <button onclick="toggleFilter('diet','veg',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="diet" data-value="veg">🟢 Veg Only</button>
+                                <button onclick="toggleFilter('diet','nonveg',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="diet" data-value="nonveg">🔴 Non-Veg</button>
+                                <button onclick="toggleFilter('diet','vegan',this)" class="filter-chip px-2.5 py-1.5 rounded-lg border border-[#493622] text-xs font-medium text-gray-400 hover:border-primary hover:text-primary transition-all" data-filter="diet" data-value="vegan">🌱 Vegan</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-4 pt-3 border-t border-[#493622]">
+                        <div id="active-pills" class="flex flex-wrap gap-2"></div>
+                        <button onclick="clearAllFilters()" class="text-xs text-red-400 hover:text-red-300 font-bold">Clear All</button>
+                    </div>
                 </div>
                 <!-- DYNAMIC GRID -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6" id="restaurants-grid">
@@ -377,50 +420,111 @@
             document.getElementById('rest-count').innerText = `${filtered.length} Restaurant${filtered.length !== 1 ? 's' : ''} found`;
         }
 
-        // 3. FILTER BUTTONS
-        let activeFilter = null;
-        const filterButtons = document.querySelectorAll('.flex.gap-2.overflow-x-auto button');
-        filterButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const label = this.innerText.trim();
+        // 3. ADVANCED MULTI-FILTER SYSTEM
+        const activeFilters = { price: null, rating: null, time: null, diet: null };
 
-                // Toggle off if same filter clicked again
-                if (activeFilter === label) {
-                    activeFilter = null;
-                    filterButtons.forEach(b => b.classList.remove('border-primary', 'bg-primary/10'));
-                    renderRestaurants(dbRestaurants.slice(0, displayedCount));
-                    document.getElementById('rest-count').innerText = `${dbRestaurants.length} Restaurants near you`;
-                    return;
-                }
+        function toggleFilterPanel() {
+            const panel = document.getElementById('filter-panel');
+            panel.classList.toggle('hidden');
+        }
 
-                activeFilter = label;
-                filterButtons.forEach(b => b.classList.remove('border-primary', 'bg-primary/10'));
-                this.classList.add('border-primary', 'bg-primary/10');
+        function toggleFilter(category, value, btn) {
+            // Toggle same category — deselect if already active
+            if (activeFilters[category] === value) {
+                activeFilters[category] = null;
+                btn.classList.remove('border-primary', 'text-primary', 'bg-primary/10');
+                btn.classList.add('border-[#493622]', 'text-gray-400');
+            } else {
+                // Deselect other chips in same category
+                document.querySelectorAll(`.filter-chip[data-filter="${category}"]`).forEach(b => {
+                    b.classList.remove('border-primary', 'text-primary', 'bg-primary/10');
+                    b.classList.add('border-[#493622]', 'text-gray-400');
+                });
+                activeFilters[category] = value;
+                btn.classList.add('border-primary', 'text-primary', 'bg-primary/10');
+                btn.classList.remove('border-[#493622]', 'text-gray-400');
+            }
+            applyFilters();
+        }
 
-                let filtered = dbRestaurants;
-                if (label === 'Vegan') {
-                    filtered = dbRestaurants.filter(r => r.tags.some(t => t.toLowerCase().includes('healthy') || t.toLowerCase().includes('salad') || t.toLowerCase().includes('vegan')));
-                } else if (label === 'Gluten-Free') {
-                    filtered = dbRestaurants.filter(r => r.tags.some(t => t.toLowerCase().includes('healthy') || t.toLowerCase().includes('salad') || t.toLowerCase().includes('bowl')));
-                } else if (label === 'Fast Delivery') {
-                    filtered = dbRestaurants.filter(r => {
-                        const timeStr = r.time.replace(/[^0-9-]/g, '');
-                        const minTime = parseInt(timeStr.split('-')[0]) || 99;
-                        return minTime <= 25;
-                    });
-                } else if (label === 'Ratings 4.0+') {
-                    filtered = dbRestaurants.filter(r => parseFloat(r.rating) >= 4.0);
-                } else if (label === 'Under ₹300') {
-                    filtered = dbRestaurants.filter(r => {
-                        const costNum = parseInt(r.cost.replace(/[^0-9]/g, '')) || 999;
-                        return costNum <= 300;
-                    });
-                }
+        function applyFilters() {
+            let filtered = [...dbRestaurants];
 
-                renderRestaurants(filtered);
-                document.getElementById('rest-count').innerText = `${filtered.length} Restaurant${filtered.length !== 1 ? 's' : ''} found`;
+            // Price filter
+            if (activeFilters.price) {
+                filtered = filtered.filter(r => {
+                    const costNum = parseInt(r.cost.replace(/[^0-9]/g, '')) || 300;
+                    if (activeFilters.price === 'under200') return costNum <= 200;
+                    if (activeFilters.price === '200to500') return costNum > 200 && costNum <= 500;
+                    if (activeFilters.price === 'over500') return costNum > 500;
+                    return true;
+                });
+            }
+            // Rating filter
+            if (activeFilters.rating) {
+                const minRating = parseFloat(activeFilters.rating);
+                filtered = filtered.filter(r => parseFloat(r.rating) >= minRating);
+            }
+            // Time filter
+            if (activeFilters.time) {
+                const maxTime = parseInt(activeFilters.time);
+                filtered = filtered.filter(r => {
+                    const timeStr = r.time.replace(/[^0-9-]/g, '');
+                    const minTime = parseInt(timeStr.split('-')[0]) || 99;
+                    return minTime <= maxTime;
+                });
+            }
+            // Dietary filter
+            if (activeFilters.diet) {
+                filtered = filtered.filter(r => {
+                    const tags = r.tags.map(t => t.toLowerCase()).join(' ');
+                    if (activeFilters.diet === 'veg') return tags.includes('veg') || tags.includes('indian') || tags.includes('south indian');
+                    if (activeFilters.diet === 'nonveg') return tags.includes('chicken') || tags.includes('biryani') || tags.includes('kebab') || tags.includes('burger') || tags.includes('chinese');
+                    if (activeFilters.diet === 'vegan') return tags.includes('healthy') || tags.includes('salad') || tags.includes('vegan');
+                    return true;
+                });
+            }
+
+            // Sort
+            const sortVal = document.getElementById('sort-select')?.value;
+            if (sortVal === 'rating') filtered.sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating));
+            else if (sortVal === 'time') filtered.sort((a, b) => parseInt(a.time) - parseInt(b.time));
+            else if (sortVal === 'price_low') filtered.sort((a, b) => parseInt(a.cost.replace(/[^0-9]/g, '')) - parseInt(b.cost.replace(/[^0-9]/g, '')));
+            else if (sortVal === 'price_high') filtered.sort((a, b) => parseInt(b.cost.replace(/[^0-9]/g, '')) - parseInt(a.cost.replace(/[^0-9]/g, '')));
+
+            // Update UI
+            renderRestaurants(filtered);
+            document.getElementById('rest-count').innerText = `${filtered.length} Restaurant${filtered.length !== 1 ? 's' : ''} found`;
+            updateFilterUI();
+        }
+
+        function updateFilterUI() {
+            const activeCount = Object.values(activeFilters).filter(v => v !== null).length;
+            const badge = document.getElementById('filter-count-badge');
+            if (badge) {
+                if (activeCount > 0) { badge.textContent = activeCount; badge.classList.remove('hidden'); badge.classList.add('flex'); }
+                else { badge.classList.add('hidden'); badge.classList.remove('flex'); }
+            }
+            // Render pills
+            const pillsContainer = document.getElementById('active-pills');
+            if (pillsContainer) {
+                const labels = { price: { under200: 'Under ₹200', '200to500': '₹200-500', over500: '₹500+' }, rating: { '4': '4.0+ ⭐', '4.5': '4.5+ ⭐' }, time: { '30': '< 30 min', '45': '< 45 min' }, diet: { veg: '🟢 Veg', nonveg: '🔴 Non-Veg', vegan: '🌱 Vegan' } };
+                pillsContainer.innerHTML = Object.entries(activeFilters)
+                    .filter(([k, v]) => v !== null)
+                    .map(([cat, val]) => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold">${labels[cat]?.[val] || val}<button onclick="toggleFilter('${cat}','${val}',document.querySelector('.filter-chip[data-filter=${cat}][data-value=${val}]'))" class="ml-1 hover:text-white">✕</button></span>`)
+                    .join('');
+            }
+        }
+
+        function clearAllFilters() {
+            Object.keys(activeFilters).forEach(k => activeFilters[k] = null);
+            document.querySelectorAll('.filter-chip').forEach(b => {
+                b.classList.remove('border-primary', 'text-primary', 'bg-primary/10');
+                b.classList.add('border-[#493622]', 'text-gray-400');
             });
-        });
+            document.getElementById('sort-select').value = '';
+            applyFilters();
+        }
 
         // 4. SHOW MORE BUTTON
         const showMoreBtn = document.querySelector('.flex.justify-center.mt-12 button');

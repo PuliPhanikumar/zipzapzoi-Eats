@@ -373,18 +373,31 @@
                 </div>
             </button>
             <p class="text-xs text-gray-500 font-bold uppercase mb-3">Saved Addresses</p>
-            <div class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                <div onclick="selectAddress('Home', '123, Cyber Hub, Bengaluru')"
-                    class="p-4 rounded-xl bg-background-dark border border-gray-800 hover:border-primary cursor-pointer transition-colors flex items-start gap-3">
-                    <span class="material-symbols-outlined text-gray-400 mt-0.5">home</span>
-                    <div>
-                        <p class="font-bold text-white text-sm">Home</p>
-                        <p class="text-text-secondary text-xs">123, Cyber Hub, Bengaluru</p>
+            <div id="address-list-container" class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                <p class="text-gray-500 text-sm italic py-2">Loading addresses...</p>
+            </div>
+            <!-- Add New Address Form -->
+            <div id="add-address-form" class="hidden mt-4 pt-4 border-t border-gray-800">
+                <p class="text-xs text-gray-500 font-bold uppercase mb-3">Add New Address</p>
+                <div class="space-y-3">
+                    <div class="flex gap-2">
+                        <button onclick="setAddrLabel(this,'Home')" class="addr-label-btn flex-1 py-2 rounded-lg border border-gray-700 text-sm font-bold text-gray-400 hover:border-primary hover:text-primary transition-all" data-label="Home">🏠 Home</button>
+                        <button onclick="setAddrLabel(this,'Office')" class="addr-label-btn flex-1 py-2 rounded-lg border border-gray-700 text-sm font-bold text-gray-400 hover:border-primary hover:text-primary transition-all" data-label="Office">🏢 Office</button>
+                        <button onclick="setAddrLabel(this,'Other')" class="addr-label-btn flex-1 py-2 rounded-lg border border-gray-700 text-sm font-bold text-gray-400 hover:border-primary hover:text-primary transition-all" data-label="Other">📍 Other</button>
+                    </div>
+                    <input id="new-addr-line" type="text" placeholder="Full address (street, area, landmark)" class="w-full bg-background-dark border border-gray-700 rounded-lg px-4 py-3 text-white text-sm focus:border-primary focus:ring-0 placeholder-gray-500" />
+                    <div class="flex gap-2">
+                        <input id="new-addr-city" type="text" placeholder="City" class="flex-1 bg-background-dark border border-gray-700 rounded-lg px-4 py-3 text-white text-sm focus:border-primary focus:ring-0 placeholder-gray-500" />
+                        <input id="new-addr-pin" type="text" placeholder="Pincode" class="w-28 bg-background-dark border border-gray-700 rounded-lg px-4 py-3 text-white text-sm focus:border-primary focus:ring-0 placeholder-gray-500" />
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="saveNewAddress()" class="flex-1 py-3 bg-primary text-background-dark font-bold rounded-lg hover:bg-white transition-all text-sm">Save & Select</button>
+                        <button onclick="toggleAddForm(false)" class="py-3 px-4 border border-gray-700 text-gray-400 rounded-lg hover:text-white transition-all text-sm">Cancel</button>
                     </div>
                 </div>
             </div>
-            <div class="mt-4 pt-4 border-t border-gray-800">
-                <button onclick="addNewAddress()"
+            <div id="add-address-btn-wrap" class="mt-4 pt-4 border-t border-gray-800">
+                <button onclick="toggleAddForm(true)"
                     class="flex items-center gap-2 text-primary font-bold text-sm hover:underline"><span
                         class="material-symbols-outlined text-[18px]">add</span> Add New Address</button>
             </div>
@@ -854,11 +867,33 @@
         }
 
         // --- 6. UTILS & MODALS ---
-        function loadAddress() {
+        let _addrLabel = 'Home';
+        let _savedAddresses = [];
+
+        async function loadAddress() {
             try {
+                // Try API first
+                if (typeof ZoiAPI !== 'undefined' && ZoiAPI.addresses) {
+                    try {
+                        const result = await ZoiAPI.addresses.list();
+                        const addrs = result.data || result || [];
+                        if (Array.isArray(addrs) && addrs.length > 0) {
+                            _savedAddresses = addrs;
+                            const defaultAddr = addrs.find(a => a.isDefault) || addrs[0];
+                            const addrText = defaultAddr.line1 || defaultAddr.text || defaultAddr.address || '';
+                            const label = defaultAddr.label || defaultAddr.type || 'Saved';
+                            document.getElementById('addr-text').innerText = addrText;
+                            document.getElementById('addr-label').innerText = label;
+                            localStorage.setItem('zoiAddress', addrText);
+                            localStorage.setItem('zoiType', label);
+                            return;
+                        }
+                    } catch(e) { console.log('Address API fallback:', e.message); }
+                }
+                // Fallback to localStorage
                 const addresses = JSON.parse(localStorage.getItem('zoiSavedAddresses') || '[]');
                 if (addresses.length > 0) {
-                    // Find default or use first
+                    _savedAddresses = addresses;
                     const defaultAddr = addresses.find(a => a.isDefault) || addresses[0];
                     if (defaultAddr) {
                         document.getElementById('addr-text').innerText = defaultAddr.text || defaultAddr.address;
@@ -870,15 +905,42 @@
                     const saved = localStorage.getItem('zoiAddress');
                     if (saved) {
                         document.getElementById('addr-text').innerText = saved;
-                        document.getElementById('addr-label').innerText = localStorage.getItem('zoiType') || "Saved";
+                        document.getElementById('addr-label').innerText = localStorage.getItem('zoiType') || 'Saved';
                     }
                 }
             } catch(e) {}
         }
 
+        function renderAddressList() {
+            const container = document.getElementById('address-list-container');
+            if (!container) return;
+            if (_savedAddresses.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm italic py-2">No saved addresses. Add one below!</p>';
+                return;
+            }
+            const icons = { Home: 'home', Office: 'work', Other: 'location_on' };
+            container.innerHTML = _savedAddresses.map((a, i) => {
+                const label = a.label || a.type || 'Address';
+                const text = a.line1 || a.text || a.address || '';
+                const city = a.city ? `, ${a.city}` : '';
+                const pin = a.pincode ? ` - ${a.pincode}` : '';
+                const icon = icons[label] || 'location_on';
+                const isDefault = a.isDefault ? '<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded font-bold ml-2">Default</span>' : '';
+                return `<div onclick="selectAddress('${label}', '${(text + city + pin).replace(/'/g, "\\'")}')"
+                    class="p-4 rounded-xl bg-background-dark border border-gray-800 hover:border-primary cursor-pointer transition-colors flex items-start gap-3">
+                    <span class="material-symbols-outlined text-gray-400 mt-0.5">${icon}</span>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-white text-sm">${label}${isDefault}</p>
+                        <p class="text-text-secondary text-xs truncate">${text}${city}${pin}</p>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
         function openAddressModal() {
             document.getElementById('address-modal').classList.remove('hidden');
             document.getElementById('address-modal').classList.add('flex');
+            renderAddressList();
         }
         function openInviteModal() {
             document.getElementById('invite-modal').classList.remove('hidden');
@@ -919,10 +981,39 @@
             );
         }
 
-        function addNewAddress() {
-            const name = prompt('Address label (e.g. Home, Office):') || 'Custom';
-            const addr = prompt('Enter full address:');
-            if (addr) selectAddress(name, addr);
+        function toggleAddForm(show) {
+            document.getElementById('add-address-form').classList.toggle('hidden', !show);
+            document.getElementById('add-address-btn-wrap').classList.toggle('hidden', show);
+            if (show) document.getElementById('new-addr-line')?.focus();
+        }
+        function setAddrLabel(btn, label) {
+            _addrLabel = label;
+            document.querySelectorAll('.addr-label-btn').forEach(b => { b.classList.remove('border-primary', 'text-primary'); b.classList.add('border-gray-700', 'text-gray-400'); });
+            btn.classList.add('border-primary', 'text-primary');
+            btn.classList.remove('border-gray-700', 'text-gray-400');
+        }
+        async function saveNewAddress() {
+            const line1 = document.getElementById('new-addr-line')?.value.trim();
+            const city = document.getElementById('new-addr-city')?.value.trim();
+            const pincode = document.getElementById('new-addr-pin')?.value.trim();
+            if (!line1) return showCartToast('Error', 'Please enter an address');
+            const fullAddr = `${line1}${city ? ', ' + city : ''}${pincode ? ' - ' + pincode : ''}`;
+            // Try API
+            if (typeof ZoiAPI !== 'undefined' && ZoiAPI.addresses) {
+                try {
+                    await ZoiAPI.addresses.create({ label: _addrLabel, line1, city, pincode, isDefault: _savedAddresses.length === 0 });
+                } catch(e) { console.log('Address create API fallback:', e.message); }
+            }
+            // Also save locally
+            _savedAddresses.push({ label: _addrLabel, line1, city, pincode, text: fullAddr, isDefault: _savedAddresses.length === 0 });
+            localStorage.setItem('zoiSavedAddresses', JSON.stringify(_savedAddresses));
+            selectAddress(_addrLabel, fullAddr);
+            toggleAddForm(false);
+            // Reset form
+            document.getElementById('new-addr-line').value = '';
+            document.getElementById('new-addr-city').value = '';
+            document.getElementById('new-addr-pin').value = '';
+            showCartToast('✅ Saved', 'Address added successfully');
         }
 
         function copyInviteLink() {
