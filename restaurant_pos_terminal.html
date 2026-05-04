@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -492,12 +492,23 @@
             'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '')
         });
 
+        // Fast fetch with 3-second timeout — never buffers
+        function fastFetch(url, opts) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+            return fetch(url, Object.assign({}, opts, { signal: controller.signal }))
+                .finally(() => clearTimeout(timeout));
+        }
+
         // === INIT ===
         window.onload = async () => {
             showLoadingShimmer(true);
-            await fetchMenusFromAPI();
-            await fetchTables();
-            await fetchActiveOrders();
+            // Run all 3 fetches in PARALLEL — no sequential waiting
+            await Promise.allSettled([
+                fetchMenusFromAPI(),
+                fetchTables(),
+                fetchActiveOrders()
+            ]);
             showLoadingShimmer(false);
 
             setInterval(fetchActiveOrders, 8000);
@@ -532,7 +543,7 @@
         // === API FUNCTIONS ===
         async function fetchMenusFromAPI() {
             try {
-                const response = await fetch(API + '/api/partner/menu/' + PARTNER_ID, { headers: authHeaders() });
+                const response = await fastFetch(API + '/api/partner/menu/' + PARTNER_ID, { headers: authHeaders() });
                 if (!response.ok) throw new Error('Menu fetch failed');
                 const data = await response.json();
                 const items = data.items || data;
@@ -565,7 +576,7 @@
 
         async function fetchTables() {
             try {
-                const response = await fetch(API + '/api/restaurants/' + PARTNER_ID + '/tables', { headers: authHeaders() });
+                const response = await fastFetch(API + '/api/restaurants/' + PARTNER_ID + '/tables', { headers: authHeaders() });
                 if (!response.ok) throw new Error('Tables fetch failed');
                 tables = await response.json();
                 if (tables.length === 0) throw new Error('No tables');
@@ -590,7 +601,7 @@
 
         async function fetchActiveOrders() {
             try {
-                const response = await fetch(API + '/api/orders?restaurantId=' + PARTNER_ID + '&status=PENDING', { headers: authHeaders() });
+                const response = await fastFetch(API + '/api/orders?restaurantId=' + PARTNER_ID + '&status=PENDING', { headers: authHeaders() });
                 if (!response.ok) throw new Error('Orders fetch failed');
                 const result = await response.json();
                 activeOrders = result.data || result || [];
@@ -807,7 +818,7 @@
             };
 
             try {
-                var response = await fetch(API + '/api/orders', {
+                var response = await fastFetch(API + '/api/orders', {
                     method: 'POST', headers: authHeaders(),
                     body: JSON.stringify(orderData)
                 });
@@ -837,7 +848,7 @@
             }
 
             try {
-                var response = await fetch(API + '/api/orders/' + activeTabId + '/status', {
+                var response = await fastFetch(API + '/api/orders/' + activeTabId + '/status', {
                     method: 'PUT', headers: authHeaders(),
                     body: JSON.stringify({ status: 'Delivered' })
                 });
@@ -992,7 +1003,7 @@
             }
             
             try {
-                const response = await fetch(API + '/api/orders?restaurantId=' + PARTNER_ID + '&status=COMPLETED', { headers: authHeaders() });
+                const response = await fastFetch(API + '/api/orders?restaurantId=' + PARTNER_ID + '&status=COMPLETED', { headers: authHeaders() });
                 const result = await response.json();
                 const history = result.data || result || [];
                 
@@ -1055,7 +1066,7 @@
             };
 
             try {
-                const response = await fetch(API + '/api/menus', {
+                const response = await fastFetch(API + '/api/menus', {
                     method: 'POST',
                     headers: authHeaders(),
                     body: JSON.stringify(payload)

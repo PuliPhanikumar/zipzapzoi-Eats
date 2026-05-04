@@ -458,12 +458,20 @@
         // === RENDER MENU ===
         let activeCat = 'All';
 
+        // Fast fetch with 3-second timeout
+        function fastFetch(url, opts) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 3000);
+            return fetch(url, Object.assign({}, opts, { signal: controller.signal }))
+                .finally(() => clearTimeout(timeout));
+        }
+
         async function fetchMenusFromAPI() {
             const API = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
             const token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
             const partnerId = localStorage.getItem('zoiPartnerInternalId') || '1';
             try {
-                const response = await fetch(API + '/api/partner/menu/' + partnerId, {
+                const response = await fastFetch(API + '/api/partner/menu/' + partnerId, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 if (!response.ok) throw new Error('Menu fetch failed');
