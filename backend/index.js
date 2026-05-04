@@ -1442,6 +1442,70 @@ app.post('/api/cms', verifyToken, requireRole('Super Admin', 'admin'), async (re
 });
 
 // ════════════════════════════════════════════════════════
+// PARTNER DASHBOARD API
+// ════════════════════════════════════════════════════════
+app.get('/api/partner/dashboard/:restaurantId', verifyToken, async (req, res, next) => {
+    try {
+        const restId = parseInt(req.params.restaurantId);
+        const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+
+        const [restaurant, todayRevAgg, todayOrderCount, activeOrders, recentOrders, lowStock, reviewAgg] = await Promise.all([
+            prisma.restaurant.findUnique({ where: { id: restId }, select: { id: true, name: true, rating: true, status: true, image: true } }),
+            prisma.order.aggregate({ where: { restaurantId: restId, createdAt: { gte: todayStart }, paymentStatus: 'Paid' }, _sum: { total: true } }),
+            prisma.order.count({ where: { restaurantId: restId, createdAt: { gte: todayStart } } }),
+            prisma.order.findMany({ where: { restaurantId: restId, status: { in: ['Pending', 'Confirmed', 'Preparing'] } }, orderBy: { createdAt: 'desc' }, take: 20,
+                select: { id: true, zoiId: true, total: true, status: true, type: true, items: true, createdAt: true, user: { select: { name: true } } } }),
+            prisma.order.findMany({ where: { restaurantId: restId }, orderBy: { createdAt: 'desc' }, take: 10,
+                select: { id: true, zoiId: true, total: true, status: true, type: true, createdAt: true, user: { select: { name: true } } } }),
+            prisma.inventoryItem.count({ where: { restaurantId: restId, currentStock: { lte: 5 } } }).catch(() => 0),
+            prisma.review.aggregate({ where: { restaurantId: restId }, _avg: { rating: true }, _count: true }).catch(() => ({ _avg: { rating: null }, _count: 0 })),
+        ]);
+
+        if (!restaurant) return res.status(404).json({ error: 'Restaurant not found' });
+
+        res.json({
+            restaurant,
+            sales: { today: todayRevAgg._sum.total || 0 },
+            orders: { today: todayOrderCount, active: activeOrders.length,
+                activeList: activeOrders.map(o => ({ id: o.zoiId || `ORD-${o.id}`, total: o.total, status: o.status, type: o.type, items: o.items, customer: o.user?.name || 'Guest', time: o.createdAt })),
+                recentList: recentOrders.map(o => ({ id: o.zoiId || `ORD-${o.id}`, total: o.total, status: o.status, customer: o.user?.name || 'Guest', time: o.createdAt }))
+            },
+            rating: { avg: reviewAgg._avg.rating || restaurant.rating || 0, count: reviewAgg._count || 0 },
+            lowStock,
+        });
+    } catch (error) { next(error); }
+});
+
+// ════════════════════════════════════════════════════════
+// RIDER DASHBOARD API
+// ════════════════════════════════════════════════════════
+app.get('/api/rider/dashboard', verifyToken, async (req, res, next) => {
+    try {
+        const riderId = req.user.id;
+        const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+
+        const [todayTrips, todayEarnings, wallet] = await Promise.all([
+            prisma.order.findMany({ where: { riderId, createdAt: { gte: todayStart }, status: 'Delivered' }, orderBy: { createdAt: 'desc' },
+                select: { id: true, zoiId: true, total: true, createdAt: true, restaurant: { select: { name: true } }, deliveryAddress: true } }),
+            prisma.order.aggregate({ where: { riderId, createdAt: { gte: todayStart }, status: 'Delivered' }, _sum: { total: true } }),
+            prisma.wallet.findUnique({ where: { entityId: req.user.zoiId || `RIDE-${riderId}` } }).catch(() => null),
+        ]);
+
+        // Estimate rider earnings as 15% of order total
+        const earningsRate = 0.15;
+        const totalEarnings = todayTrips.reduce((s, o) => s + (parseFloat(o.total) || 0) * earningsRate, 0);
+
+        res.json({
+            earnings: { today: Math.round(totalEarnings) },
+            trips: { today: todayTrips.length,
+                history: todayTrips.map(t => ({ id: t.zoiId || `ORD-${t.id}`, restaurant: t.restaurant?.name || 'Unknown', amount: Math.round((parseFloat(t.total) || 0) * earningsRate), time: t.createdAt, address: t.deliveryAddress }))
+            },
+            wallet: { balance: wallet?.balance || 0 },
+        });
+    } catch (error) { next(error); }
+});
+
+// ════════════════════════════════════════════════════════
 // BADGES / GAMIFICATION API
 // ════════════════════════════════════════════════════════
 app.get('/api/badges', async (req, res, next) => {

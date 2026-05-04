@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -1150,28 +1150,43 @@
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
-        function updateEarningsUI() {
+        async function updateEarningsUI() {
+            const token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+            const base = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+            try {
+                const r = await fetch(base + '/api/rider/dashboard', { headers: { Authorization: 'Bearer ' + token } });
+                if (r.ok) {
+                    const d = await r.json();
+                    totalEarnings = d.earnings.today;
+                    totalTrips = d.trips.today;
+                    document.getElementById('wallet-balance').innerText = '₹' + (d.wallet.balance || totalEarnings).toFixed(2);
+                    document.getElementById('stats-trips').innerText = totalTrips;
+                    document.getElementById('mini-earnings').innerText = '₹' + totalEarnings;
+                    document.getElementById('mini-trips').innerText = totalTrips;
+                    const list = document.getElementById('trip-history');
+                    if (d.trips.history.length > 0) {
+                        list.innerHTML = d.trips.history.map(t => {
+                            const time = new Date(t.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            return `<div class="flex justify-between items-center bg-surface p-3 rounded-lg border border-border">
+                                <div class="flex items-center gap-3">
+                                    <div class="size-8 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center"><span class="material-symbols-outlined text-sm">check</span></div>
+                                    <div><p class="text-sm font-bold text-white">${t.id}</p><p class="text-[10px] text-gray-500">${time} · ${t.restaurant}</p></div>
+                                </div>
+                                <p class="font-mono font-bold text-primary">+₹${t.amount}</p></div>`;
+                        }).join('');
+                    }
+                    return;
+                }
+            } catch (e) { console.warn('Rider API unavailable, using local data', e.message); }
+            // Fallback to local data
             document.getElementById('wallet-balance').innerText = `₹${totalEarnings.toFixed(2)}`;
             document.getElementById('stats-trips').innerText = totalTrips;
-
             const list = document.getElementById('trip-history');
             if (tripHistory.length === 0) return;
-
-            list.innerHTML = "";
-            tripHistory.forEach(t => {
-                list.innerHTML += `
-                    <div class="flex justify-between items-center bg-surface p-3 rounded-lg border border-border">
-                        <div class="flex items-center gap-3">
-                            <div class="size-8 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center"><span class="material-symbols-outlined text-sm">check</span></div>
-                            <div>
-                                <p class="text-sm font-bold text-white">${t.id}</p>
-                                <p class="text-[10px] text-gray-500">${t.time} • Completed</p>
-                            </div>
-                        </div>
-                        <p class="font-mono font-bold text-primary">+₹${t.amount}</p>
-                    </div>
-                `;
-            });
+            list.innerHTML = tripHistory.map(t => `<div class="flex justify-between items-center bg-surface p-3 rounded-lg border border-border">
+                <div class="flex items-center gap-3"><div class="size-8 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center"><span class="material-symbols-outlined text-sm">check</span></div>
+                <div><p class="text-sm font-bold text-white">${t.id}</p><p class="text-[10px] text-gray-500">${t.time} • Completed</p></div></div>
+                <p class="font-mono font-bold text-primary">+₹${t.amount}</p></div>`).join('');
         }
 
         // --- PROFILE ---

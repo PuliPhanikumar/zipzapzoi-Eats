@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -329,70 +329,61 @@
             }
         }
 
-        // === 2. REALTIME DASHBOARD METRICS ===
-        function updateDashboardMetrics() {
-            if (typeof ZoiOrders === 'undefined') return;
+        // === 2. REALTIME DASHBOARD METRICS (API-first with fallback) ===
+        async function updateDashboardMetrics() {
+            const token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+            const base = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+            try {
+                const r = await fetch(base + '/api/partner/dashboard/' + CURRENT_RESTAURANT_ID, { headers: { Authorization: 'Bearer ' + token } });
+                if (!r.ok) throw new Error('API error');
+                const d = await r.json();
 
-            const completed = (ZoiOrders.getCompletedOrders() || []).filter(o => o.restaurantId == CURRENT_RESTAURANT_ID);
-            const active = ZoiOrders.getActiveOrder();
-            let hasActive = active && active.restaurantId == CURRENT_RESTAURANT_ID;
+                // Update stat cards
+                const salesEl = document.getElementById('stat-sales');
+                const newSales = '₹' + (d.sales.today || 0).toLocaleString('en-IN');
+                if (salesEl.innerText !== newSales) { salesEl.innerText = newSales; salesEl.classList.add('text-success'); setTimeout(() => salesEl.classList.remove('text-success'), 1000); }
+                document.getElementById('stat-orders').innerText = d.orders.active + d.orders.today;
+                document.getElementById('stat-active-orders-text').innerText = d.orders.active + ' Preparing';
 
-            let totalSales = 0;
-            completed.forEach(o => totalSales += (o.total || 0));
-
-            let totalOrders = completed.length;
-            if (hasActive) {
-                totalOrders += 1;
-            }
-
-            const salesEl = document.getElementById('stat-sales');
-            const prevSales = salesEl.innerText;
-            const newSales = "₹" + totalSales.toLocaleString();
-
-            if (prevSales !== newSales) {
-                salesEl.innerText = newSales;
-                salesEl.classList.add('text-success');
-                setTimeout(() => salesEl.classList.remove('text-success'), 1000);
-            }
-
-            document.getElementById('stat-orders').innerText = totalOrders;
-            document.getElementById('stat-active-orders-text').innerText = hasActive ? "1 Preparing" : "0 Preparing";
-
-            const liveContainer = document.getElementById('live-orders-container');
-            if (liveContainer) {
-                if (hasActive) {
-                    let statusText = "Preparing";
-                    let statusColor = "blue-400";
-                    let iconColor = "primary";
-                    let bgIconColor = "primary/20";
-                    if (active.status === 'ready_for_pickup') {
-                        statusText = "Ready for Pickup";
-                        statusColor = "green-500";
-                        iconColor = "green-500";
-                        bgIconColor = "green-500/20";
-                    } else if (active.status === 'placed') {
-                        statusText = "New Order";
-                        statusColor = "orange-500";
-                    }
-
-                    const itemsStr = active.items.map(i => `${i.qty}x ${i.name}`).join(', ');
-
-                    liveContainer.innerHTML = `
-                        <div class="flex items-center justify-between p-4 bg-surface border border-border rounded-xl hover:border-primary/50 transition-colors cursor-pointer group"
-                            onclick="window.location.href='restaurant_live_orders_kds.html'">
+                // Live orders
+                const liveContainer = document.getElementById('live-orders-container');
+                if (liveContainer && d.orders.activeList.length > 0) {
+                    liveContainer.innerHTML = d.orders.activeList.map(o => {
+                        const sc = { Pending: 'orange-500', Confirmed: 'blue-400', Preparing: 'yellow-500' }[o.status] || 'gray-400';
+                        return `<div class="flex items-center justify-between p-4 bg-surface border border-border rounded-xl hover:border-primary/50 transition-colors cursor-pointer group" onclick="window.location.href='restaurant_live_orders_kds.html'">
                             <div class="flex items-center gap-4">
-                                <div class="size-10 rounded-lg bg-${bgIconColor} text-${iconColor} flex items-center justify-center font-bold">
-                                    #${active.id.split('-')[1] || active.id}</div>
-                                <div>
-                                    <h4 class="text-sm font-bold text-white truncate max-w-[200px] sm:max-w-[400px]">${itemsStr}</h4>
-                                    <p class="text-xs text-gray-500">Customer • <span class="text-${statusColor}">${statusText}</span></p>
-                                </div>
+                                <div class="size-10 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">${o.id.slice(-4)}</div>
+                                <div><h4 class="text-sm font-bold text-white truncate max-w-[200px]">${o.customer}</h4>
+                                <p class="text-xs text-gray-500">₹${o.total} · <span class="text-${sc}">${o.status}</span></p></div>
                             </div>
-                            <span class="material-symbols-outlined text-gray-600 group-hover:text-white">chevron_right</span>
-                        </div>
-                    `;
-                } else {
-                    liveContainer.innerHTML = `<div class="text-gray-500 text-sm italic py-4 text-center border border-dashed border-gray-700 rounded-xl">No live orders at the moment.</div>`;
+                            <span class="material-symbols-outlined text-gray-600 group-hover:text-white">chevron_right</span></div>`;
+                    }).join('');
+                } else if (liveContainer) {
+                    liveContainer.innerHTML = '<div class="text-gray-500 text-sm italic py-4 text-center border border-dashed border-gray-700 rounded-xl">No live orders at the moment.</div>';
+                }
+                return;
+            } catch (e) {
+                console.warn('Partner API unavailable, using simulation', e.message);
+                // Fallback to simulation
+                if (typeof ZoiOrders === 'undefined') return;
+                const completed = (ZoiOrders.getCompletedOrders() || []).filter(o => o.restaurantId == CURRENT_RESTAURANT_ID);
+                const active = ZoiOrders.getActiveOrder();
+                let hasActive = active && active.restaurantId == CURRENT_RESTAURANT_ID;
+                let totalSales = 0; completed.forEach(o => totalSales += (o.total || 0));
+                document.getElementById('stat-sales').innerText = '₹' + totalSales.toLocaleString();
+                document.getElementById('stat-orders').innerText = completed.length + (hasActive ? 1 : 0);
+                document.getElementById('stat-active-orders-text').innerText = hasActive ? '1 Preparing' : '0 Preparing';
+                const liveContainer = document.getElementById('live-orders-container');
+                if (liveContainer) {
+                    if (hasActive) {
+                        const itemsStr = active.items.map(i => `${i.qty}x ${i.name}`).join(', ');
+                        liveContainer.innerHTML = `<div class="flex items-center justify-between p-4 bg-surface border border-border rounded-xl hover:border-primary/50 transition-colors cursor-pointer group" onclick="window.location.href='restaurant_live_orders_kds.html'">
+                            <div class="flex items-center gap-4"><div class="size-10 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold">#${active.id.split('-')[1] || active.id}</div>
+                            <div><h4 class="text-sm font-bold text-white truncate max-w-[200px]">${itemsStr}</h4><p class="text-xs text-gray-500">Customer · <span class="text-blue-400">Preparing</span></p></div></div>
+                            <span class="material-symbols-outlined text-gray-600 group-hover:text-white">chevron_right</span></div>`;
+                    } else {
+                        liveContainer.innerHTML = '<div class="text-gray-500 text-sm italic py-4 text-center border border-dashed border-gray-700 rounded-xl">No live orders at the moment.</div>';
+                    }
                 }
             }
         }
