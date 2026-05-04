@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -111,7 +111,7 @@
             <div class="bg-surface border border-border rounded-xl p-4 flex flex-col justify-between">
                 <p class="text-xs text-gray-500 uppercase font-bold">Total Stock Value</p>
                 <div class="flex justify-between items-end mt-2">
-                    <h3 class="text-2xl font-black text-white" id="kpi-value">₹0</h3>
+                    <h3 class="text-2xl font-black text-white" id="kpi-value">?0</h3>
                     <span class="material-symbols-outlined text-gray-600">monetization_on</span>
                 </div>
             </div>
@@ -274,7 +274,7 @@
                     <div class="p-4 border-t border-border bg-surface">
                         <div class="flex justify-between items-center mb-4">
                             <span class="text-gray-400 text-xs">Estimated Total</span>
-                            <span class="text-xl font-bold text-white" id="cart-total">₹0</span>
+                            <span class="text-xl font-bold text-white" id="cart-total">?0</span>
                         </div>
                         <button onclick="generatePOs()"
                             class="w-full py-3 bg-primary hover:bg-orange-600 text-black font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
@@ -389,7 +389,7 @@
                 val += i.qty * i.cost;
                 if (i.qty <= i.par * 0.25) low++;
             });
-            document.getElementById('kpi-value').innerText = "₹" + val.toLocaleString();
+            document.getElementById('kpi-value').innerText = "?" + val.toLocaleString();
             document.getElementById('kpi-low').innerText = low;
             document.getElementById('kpi-po').innerText = purchaseOrders.filter(p => p.status === 'Pending').length;
         }
@@ -424,7 +424,7 @@
                                 <div class="h-full ${color} rounded-full" style="width: ${pct}%"></div>
                             </div>
                         </td>
-                        <td class="p-4 font-mono text-white">₹${(item.qty * item.cost).toLocaleString()}</td>
+                        <td class="p-4 font-mono text-white">?${(item.qty * item.cost).toLocaleString()}</td>
                         <td class="p-4">${status}</td>
                         <td class="p-4 text-right">
                             <button onclick="quickAddCart(${item.id})" class="p-2 bg-primary/20 text-primary rounded border border-primary/30 hover:bg-primary/30" title="Add to Order"><span class="material-symbols-outlined text-lg">add_shopping_cart</span></button>
@@ -491,7 +491,7 @@
                     <div class="grid grid-cols-12 items-center px-4 py-2 hover:bg-white/5 border-b border-border/50 text-sm">
                         <div class="col-span-5 font-bold text-white">${item.name}</div>
                         <div class="col-span-3 text-gray-400 text-xs">${item.supplier}</div>
-                        <div class="col-span-2 text-right font-mono text-gray-300">₹${item.cost}</div>
+                        <div class="col-span-2 text-right font-mono text-gray-300">?${item.cost}</div>
                         <div class="col-span-2 flex items-center justify-end gap-2">
                             <button onclick="modCart(${item.id}, -1)" class="text-gray-500 hover:text-white">-</button>
                             <span class="w-4 text-center font-bold text-primary">${qty}</span>
@@ -526,18 +526,18 @@
 
             for (const [sup, items] of Object.entries(grouped)) {
                 let subTotal = items.reduce((s, i) => s + (i.cost * i.qty), 0);
-                let itemsHtml = items.map(i => `<div class="flex justify-between text-xs text-gray-400"><span>${i.name} x${i.qty}</span><span>₹${i.cost * i.qty}</span></div>`).join('');
+                let itemsHtml = items.map(i => `<div class="flex justify-between text-xs text-gray-400"><span>${i.name} x${i.qty}</span><span>?${i.cost * i.qty}</span></div>`).join('');
 
                 div.innerHTML += `
                     <div class="bg-surface border border-border rounded-lg p-3">
                         <div class="flex justify-between items-center mb-2 pb-1 border-b border-border">
                             <span class="text-xs font-bold text-primary">${sup}</span>
-                            <span class="text-xs font-mono text-white">₹${subTotal}</span>
+                            <span class="text-xs font-mono text-white">?${subTotal}</span>
                         </div>
                         <div class="space-y-1">${itemsHtml}</div>
                     </div>`;
             }
-            totalEl.innerText = "₹" + total.toLocaleString();
+            totalEl.innerText = "?" + total.toLocaleString();
             document.getElementById('draft-count').innerText = Object.keys(grouped).length;
         }
 
@@ -597,7 +597,7 @@
                         <td class="p-4 text-white font-bold">${po.supplier}</td>
                         <td class="p-4 text-gray-400 text-xs">${po.date}</td>
                         <td class="p-4 text-gray-300 text-xs">${po.items.length} items</td>
-                        <td class="p-4 text-primary font-mono font-bold">₹${po.total.toLocaleString()}</td>
+                        <td class="p-4 text-primary font-mono font-bold">?${po.total.toLocaleString()}</td>
                         <td class="p-4">${statusBadge}</td>
                         <td class="p-4 text-right">${action}</td>
                     </tr>`;
@@ -652,7 +652,7 @@
                     <div class="bg-surface border border-border rounded-xl p-5 hover:border-primary/50 transition-all group">
                         <div class="flex justify-between items-start mb-3">
                             <h4 class="text-lg font-bold text-white">${s.name}</h4>
-                            <span class="text-xs bg-white/10 px-2 py-1 rounded text-white">${s.rating} ★</span>
+                            <span class="text-xs bg-white/10 px-2 py-1 rounded text-white">${s.rating} ?</span>
                         </div>
                         <div class="space-y-1 text-sm text-gray-400 mb-4">
                             <p><span class="material-symbols-outlined text-xs align-middle">person</span> ${s.contact}</p>
@@ -733,6 +733,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

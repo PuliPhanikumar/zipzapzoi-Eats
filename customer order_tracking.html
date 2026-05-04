@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -332,15 +332,15 @@
                     id="live-counter-section">
                     <div class="size-2.5 rounded-full bg-red-500 live-counter-dot shrink-0"></div>
                     <p class="text-gray-400 text-xs">You're one of <span class="text-white font-bold"
-                            id="live-order-count">14,832</span> orders happening right now across India ⚡</p>
+                            id="live-order-count">14,832</span> orders happening right now across India ?</p>
                 </div>
 
                 <!-- Safety Badge (Swiggy style) -->
                 <div class="flex items-center gap-3 bg-green-900/10 rounded-xl px-4 py-2.5 border border-green-500/10">
                     <span class="material-symbols-outlined text-green-500 text-[20px] icon-filled">verified_user</span>
                     <div class="flex-1">
-                        <p class="text-green-400 text-xs font-bold">Rider Verified ✓</p>
-                        <p class="text-gray-500 text-[10px]">Background checked • OTP protected delivery</p>
+                        <p class="text-green-400 text-xs font-bold">Rider Verified ?</p>
+                        <p class="text-gray-500 text-[10px]">Background checked � OTP protected delivery</p>
                     </div>
                     <span
                         class="text-[10px] bg-green-500/10 text-green-500 px-2 py-0.5 rounded-full font-bold border border-green-500/20">SAFE</span>
@@ -385,11 +385,11 @@
                         <p class="text-xs text-gray-400 mb-2" id="tip-label">Tip your rider for good service</p>
                         <div class="flex gap-2">
                             <button onclick="addTip(20)"
-                                class="flex-1 py-1.5 rounded-lg border border-border hover:bg-primary hover:text-black hover:border-primary text-xs font-bold text-white transition">₹20</button>
+                                class="flex-1 py-1.5 rounded-lg border border-border hover:bg-primary hover:text-black hover:border-primary text-xs font-bold text-white transition">?20</button>
                             <button onclick="addTip(50)"
-                                class="flex-1 py-1.5 rounded-lg border border-border hover:bg-primary hover:text-black hover:border-primary text-xs font-bold text-white transition">₹50</button>
+                                class="flex-1 py-1.5 rounded-lg border border-border hover:bg-primary hover:text-black hover:border-primary text-xs font-bold text-white transition">?50</button>
                             <button onclick="addTip(100)"
-                                class="flex-1 py-1.5 rounded-lg border border-border hover:bg-primary hover:text-black hover:border-primary text-xs font-bold text-white transition">₹100</button>
+                                class="flex-1 py-1.5 rounded-lg border border-border hover:bg-primary hover:text-black hover:border-primary text-xs font-bold text-white transition">?100</button>
                         </div>
                     </div>
                 </div>
@@ -463,7 +463,7 @@
                     </div>
                     <div class="flex justify-between items-center pt-2 mt-2 border-t border-border/50">
                         <span class="text-gray-400 text-sm">Total Paid</span>
-                        <span class="text-white font-bold" id="summary-total">₹0</span>
+                        <span class="text-white font-bold" id="summary-total">?0</span>
                     </div>
                 </div>
             </div>
@@ -514,7 +514,7 @@
                         </div>
                         <div class="flex items-end gap-2 max-w-[85%] self-start">
                             <div class="bg-[#3a2d20] p-3 rounded-2xl rounded-bl-none border border-border">
-                                <p class="text-gray-200 text-sm">Hello! I'm waiting at the restaurant. 🛵</p>
+                                <p class="text-gray-200 text-sm">Hello! I'm waiting at the restaurant. ??</p>
                             </div>
                         </div>
                     </div>
@@ -663,17 +663,17 @@
                 <p class="text-gray-500 text-xs font-bold uppercase tracking-wider mb-2">Quick Feedback</p>
                 <div class="flex flex-wrap justify-center gap-2 mb-6">
                     <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
-                        onclick="this.classList.toggle('selected')">🔥 Hot Food</button>
+                        onclick="this.classList.toggle('selected')">?? Hot Food</button>
                     <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
-                        onclick="this.classList.toggle('selected')">⚡ Fast Delivery</button>
+                        onclick="this.classList.toggle('selected')">? Fast Delivery</button>
                     <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
-                        onclick="this.classList.toggle('selected')">📦 Good Packaging</button>
+                        onclick="this.classList.toggle('selected')">?? Good Packaging</button>
                     <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
-                        onclick="this.classList.toggle('selected')">😊 Polite Rider</button>
+                        onclick="this.classList.toggle('selected')">?? Polite Rider</button>
                     <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
-                        onclick="this.classList.toggle('selected')">👍 Great Taste</button>
+                        onclick="this.classList.toggle('selected')">?? Great Taste</button>
                     <button class="feedback-tag text-xs text-gray-400 border border-border px-3 py-1.5 rounded-full"
-                        onclick="this.classList.toggle('selected')">🥗 Fresh Ingredients</button>
+                        onclick="this.classList.toggle('selected')">?? Fresh Ingredients</button>
                 </div>
 
                 <button onclick="submitRating()"
@@ -761,7 +761,7 @@
         // 3. FEATURES LOGIC
         function openShareModal() {
             const trackLink = `https://zipzapzoi.in/track/${_currentOrder ? _currentOrder.id : '123'}`;
-            const msg = encodeURIComponent(`Track my food live! 🍕 ${trackLink}`);
+            const msg = encodeURIComponent(`Track my food live! ?? ${trackLink}`);
             document.getElementById('share-wa').href = `https://wa.me/?text=${msg}`;
             document.getElementById('share-sms').href = `sms:?body=${msg}`;
             document.getElementById('share-modal').classList.remove('hidden');
@@ -797,50 +797,50 @@
 
             // Location / ETA
             if (msg.includes('where') || msg.includes('location') || msg.includes('kahan')) {
-                if (order && order.status === 'out_for_delivery') return `I'm about 5-10 mins away from your location. Almost there! 🏍️`;
-                if (order && order.status === 'preparing') return `I'm at the restaurant waiting for your food to be packed. Will update you once I pick it up! 🍳`;
-                if (order && order.status === 'ready_for_pickup') return `Just picked up your order! Starting my ride now. 🛵`;
-                return `I'll be on my way soon! Waiting for the restaurant. 😊`;
+                if (order && order.status === 'out_for_delivery') return `I'm about 5-10 mins away from your location. Almost there! ???`;
+                if (order && order.status === 'preparing') return `I'm at the restaurant waiting for your food to be packed. Will update you once I pick it up! ??`;
+                if (order && order.status === 'ready_for_pickup') return `Just picked up your order! Starting my ride now. ??`;
+                return `I'll be on my way soon! Waiting for the restaurant. ??`;
             }
             if (msg.includes('eta') || msg.includes('time') || msg.includes('how long') || msg.includes('kitna time')) {
-                if (order && order.status === 'out_for_delivery') return `About 5-10 minutes! Riding as fast as I can 🏎️`;
-                if (order && order.status === 'preparing') return `Your food is still being prepared. Estimated 15-20 mins total. 🕐`;
-                return `Should be there in about 20-25 minutes. Hang tight! ⏰`;
+                if (order && order.status === 'out_for_delivery') return `About 5-10 minutes! Riding as fast as I can ???`;
+                if (order && order.status === 'preparing') return `Your food is still being prepared. Estimated 15-20 mins total. ??`;
+                return `Should be there in about 20-25 minutes. Hang tight! ?`;
             }
             // Delivery instructions
             if (msg.includes('gate') || msg.includes('door') || msg.includes('entrance') || msg.includes('floor')) {
-                return `Got it! I'll follow your instructions when I arrive. Thanks for the heads up! 👍`;
+                return `Got it! I'll follow your instructions when I arrive. Thanks for the heads up! ??`;
             }
             // Spice / Extra
             if (msg.includes('extra') || msg.includes('add') || msg.includes('spice') || msg.includes('sauce')) {
-                return `I'll request the restaurant if possible, but I'm already at pickup. You can call the restaurant directly for changes. 📞`;
+                return `I'll request the restaurant if possible, but I'm already at pickup. You can call the restaurant directly for changes. ??`;
             }
             // Delay
             if (msg.includes('late') || msg.includes('delay') || msg.includes('slow')) {
-                return `Sorry for the wait! There's a bit of traffic. I'm doing my best to reach you quickly. 🙏`;
+                return `Sorry for the wait! There's a bit of traffic. I'm doing my best to reach you quickly. ??`;
             }
             // Thanks / Greeting
             if (msg.includes('thank') || msg.includes('thanks') || msg.includes('thx')) {
-                return `You're welcome! Happy to deliver to you. 😊🙏`;
+                return `You're welcome! Happy to deliver to you. ????`;
             }
             if (msg.includes('hi') || msg.includes('hello') || msg.includes('hey')) {
-                return `Hey there! I'm ${riderName}, your delivery partner. How can I help? 😊`;
+                return `Hey there! I'm ${riderName}, your delivery partner. How can I help? ??`;
             }
             // Cancel
             if (msg.includes('cancel')) {
-                return `I can't cancel from my side. Please contact ZipZapZoi Support via the Help button above. 📲`;
+                return `I can't cancel from my side. Please contact ZipZapZoi Support via the Help button above. ??`;
             }
             // Call
             if (msg.includes('call')) {
-                return `Sure, you can tap the green call button to reach me directly. I'm available! 📱`;
+                return `Sure, you can tap the green call button to reach me directly. I'm available! ??`;
             }
             // Default
             const defaults = [
-                `Got it! I'll keep that in mind. 📝`,
-                `Understood! On my way to you. 🛵`,
-                `Thanks for letting me know! Will take care of it. 👍`,
-                `Noted! Anything else you need? 😊`,
-                `Sure thing! Almost there. 🚀`
+                `Got it! I'll keep that in mind. ??`,
+                `Understood! On my way to you. ??`,
+                `Thanks for letting me know! Will take care of it. ??`,
+                `Noted! Anything else you need? ??`,
+                `Sure thing! Almost there. ??`
             ];
             return defaults[Math.floor(Math.random() * defaults.length)];
         }
@@ -890,7 +890,7 @@
         // 4. CORE TRACKING
         function initTracking(order) {
             document.getElementById('order-id').innerText = `Order #${order.id}`;
-            document.getElementById('summary-total').innerText = `₹${order.total}`;
+            document.getElementById('summary-total').innerText = `?${order.total}`;
 
             // Determine effective status for UI
             // Determine effective status for UI
@@ -935,7 +935,7 @@
                             <div class="bg-border-dark text-white text-[10px] font-bold px-1.5 py-0.5 rounded h-fit mt-0.5">${item.qty}x</div>
                             <span class="text-gray-300">${item.name}</span>
                         </div>
-                        <span class="text-white font-medium">₹${item.price * item.qty}</span>
+                        <span class="text-white font-medium">?${item.price * item.qty}</span>
                     </div>
                 `;
             });
@@ -971,12 +971,12 @@
             switch (status) {
                 case 'placed': return "Order Placed";
                 case 'confirmed': return "Order Confirmed";
-                case 'preparing': return "Chef is Cooking... 🍳";
-                case 'heading_to_restaurant': return "Rider Heading to Restaurant 🛵";
-                case 'rider_at_restaurant': return "Rider at Restaurant 🥡";
-                case 'ready_for_pickup': return "Food is Ready! 📦";
-                case 'out_for_delivery': return "On the Way! 🛵";
-                case 'delivered': return "Delivered! Enjoy 🎉";
+                case 'preparing': return "Chef is Cooking... ??";
+                case 'heading_to_restaurant': return "Rider Heading to Restaurant ??";
+                case 'rider_at_restaurant': return "Rider at Restaurant ??";
+                case 'ready_for_pickup': return "Food is Ready! ??";
+                case 'out_for_delivery': return "On the Way! ??";
+                case 'delivered': return "Delivered! Enjoy ??";
                 default: return "Processing...";
             }
         }
@@ -1010,24 +1010,24 @@
                 // Keep step 2 active
             }
             if (status === 'ready_for_pickup') {
-                document.getElementById('time-2').innerText = "✅ Food Ready";
+                document.getElementById('time-2').innerText = "? Food Ready";
                 document.getElementById('time-3').innerText = "Rider picking up...";
             }
             if (status === 'out_for_delivery') {
-                document.getElementById('time-2').innerText = "✅ Done!";
+                document.getElementById('time-2').innerText = "? Done!";
                 const rName = _currentOrder ? (_currentOrder.riderName || "Rider").split(' ')[0] : "Rider";
                 document.getElementById('time-3').innerText = `${rName} is on the way`;
                 document.getElementById('status-alert').classList.remove('hidden');
             }
             if (status === 'delivered') {
-                document.getElementById('time-2').innerText = "✅ Done!";
-                document.getElementById('time-3').innerText = "✅ Picked up";
+                document.getElementById('time-2').innerText = "? Done!";
+                document.getElementById('time-3').innerText = "? Picked up";
                 document.getElementById('time-4').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 document.getElementById('status-alert').classList.add('hidden');
 
                 // Swap main status to a celebration
-                document.getElementById('main-status-text').innerHTML = `<span class="text-primary">Delivered!</span> Enjoy your meal 🎉`;
-                document.getElementById('eta-display').innerText = "✅ Done";
+                document.getElementById('main-status-text').innerHTML = `<span class="text-primary">Delivered!</span> Enjoy your meal ??`;
+                document.getElementById('eta-display').innerText = "? Done";
 
                 // Fire confetti!
                 launchConfetti();
@@ -1076,7 +1076,7 @@
             if (!etaEl) return;
 
             if (status === 'delivered') {
-                etaEl.innerText = "✅ Done";
+                etaEl.innerText = "? Done";
                 return;
             }
 
@@ -1103,7 +1103,7 @@
         function addTip(amount) {
             currentTip += amount;
             const rName = _currentOrder && _currentOrder.riderName ? _currentOrder.riderName.split(' ')[0] : "Rider";
-            showTrackingToast(`Added ₹${amount} tip for ${rName}! Total tip: ₹${currentTip}`);
+            showTrackingToast(`Added ?${amount} tip for ${rName}! Total tip: ?${currentTip}`);
         }
 
         // --- TOAST NOTIFICATION ---
@@ -1177,7 +1177,7 @@
                 'rider_at_restaurant': { pct: 70, time: '~15 min', label: 'Rider waiting at restaurant' },
                 'ready_for_pickup': { pct: 60, time: '~12 min', label: 'Ready for pickup' },
                 'out_for_delivery': { pct: 80, time: '~5 min', label: 'Rider on the way' },
-                'delivered': { pct: 100, time: 'Arrived!', label: '✅ Delivered' }
+                'delivered': { pct: 100, time: 'Arrived!', label: '? Delivered' }
             };
             const data = map[status] || map['placed'];
             fill.style.width = data.pct + '%';
@@ -1268,7 +1268,7 @@
             // Success toast
             const toast = document.createElement('div');
             toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-primary text-[#0a0314] px-6 py-3 rounded-xl font-bold text-sm shadow-2xl z-50 animate-bounce';
-            toast.innerText = 'Thanks for your feedback! 🙏';
+            toast.innerText = 'Thanks for your feedback! ??';
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
@@ -1298,7 +1298,7 @@
                             <span class="material-symbols-outlined text-green-500 text-2xl icon-filled">check_circle</span>
                         </div>
                         <div>
-                            <p class="text-white font-black text-lg">Order Delivered! 🎉</p>
+                            <p class="text-white font-black text-lg">Order Delivered! ??</p>
                             <p class="text-gray-400 text-xs">Enjoy your meal from ${restName}</p>
                         </div>
                     </div>
@@ -1355,6 +1355,8 @@
 <script src="js/zoi_ai_assistant.js?v=4"></script>
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

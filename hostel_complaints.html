@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -265,7 +265,7 @@
             document.getElementById('tickets-container').innerHTML = items.map((t, i) => {
                 const cc = CAT_COLORS[t.category] || 'gray'; const ci = CAT_ICONS[t.category] || 'report';
                 const pc = PRIORITY_COLORS[t.priority] || 'gray';
-                const statusBadge = t.status === 'Resolved' ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">✓ Resolved</span>' : t.status === 'Closed' ? '<span class="bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">Closed</span>' : t.status === 'In Progress' ? '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">🔄 In Prog</span>' : '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">! Open</span>';
+                const statusBadge = t.status === 'Resolved' ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">? Resolved</span>' : t.status === 'Closed' ? '<span class="bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">Closed</span>' : t.status === 'In Progress' ? '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">?? In Prog</span>' : '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">! Open</span>';
 
                 // Determine actions based on status
                 let actions = '';
@@ -323,7 +323,7 @@
 
         function viewTicket(id) {
             const t = TICKETS.find(x => x.id === id);
-            document.getElementById('detail-title').innerText = t.id + ' — ' + t.category;
+            document.getElementById('detail-title').innerText = t.id + ' � ' + t.category;
             document.getElementById('detail-body').innerHTML = `
                 <div class="flex items-center gap-2 mb-3">${PRIORITY_BADGE[t.priority]}${STATUS_BADGE[t.status]}</div>
                 <h4 class="font-bold text-white text-lg mb-2">${t.subject}</h4>
@@ -363,7 +363,7 @@
             const hosteler = document.getElementById('c-hosteler').value.trim();
             const room = document.getElementById('c-room').value.trim();
             if (!subject || !hosteler || !room) { showToast('Hosteler Name, Room and Subject are required.', 'error'); return; }
-            TICKETS.unshift({ id: 'TKT-' + String(TICKETS.length + 1).padStart(3, '0'), hosteler: hosteler + ' (' + room + ')', category: document.getElementById('c-category').value || 'Other', priority: document.getElementById('c-priority').value || 'Medium', subject, desc: document.getElementById('c-desc').value || '—', status: 'Open', date: new Date().toISOString().split('T')[0], source: document.getElementById('c-source').value || 'Ext App', assignee: null });
+            TICKETS.unshift({ id: 'TKT-' + String(TICKETS.length + 1).padStart(3, '0'), hosteler: hosteler + ' (' + room + ')', category: document.getElementById('c-category').value || 'Other', priority: document.getElementById('c-priority').value || 'Medium', subject, desc: document.getElementById('c-desc').value || '�', status: 'Open', date: new Date().toISOString().split('T')[0], source: document.getElementById('c-source').value || 'Ext App', assignee: null });
             ZoiDB.set('complaint_tickets', TICKETS);
             closeComplaintModal();
             renderTickets();
@@ -377,6 +377,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

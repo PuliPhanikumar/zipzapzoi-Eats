@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
@@ -95,7 +95,7 @@
                         <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">savings</span>
                         <p class="text-sm font-bold uppercase tracking-wider text-text-secondary">Total Savings</p>
                     </div>
-                    <p class="text-3xl font-black text-white">₹10,250</p>
+                    <p class="text-3xl font-black text-white">?10,250</p>
                 </div>
                 <div class="flex flex-col gap-1 p-6 rounded-2xl bg-card-dark shadow-lg border border-border-dark group hover:border-primary/50 transition-all duration-300">
                     <div class="flex items-center gap-2 mb-2">
@@ -223,13 +223,13 @@
                     </div>
                     <div class="mb-6">
                         <div class="flex justify-between items-end mb-3">
-                            <p class="text-sm font-medium text-white">Earn 10 pts per ₹100</p>
+                            <p class="text-sm font-medium text-white">Earn 10 pts per ?100</p>
                             <p class="text-sm font-bold text-primary">350 <span class="text-text-secondary font-normal opacity-60">/ 500 pts</span></p>
                         </div>
                         <div class="w-full bg-background-dark rounded-full h-3 border border-border-dark shadow-inner overflow-hidden">
                             <div class="bg-gradient-to-r from-primary to-primary-hover h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(0,240,255,0.4)]" style="width: 70%"></div>
                         </div>
-                        <p class="text-[10px] text-primary font-bold mt-2 uppercase tracking-widest text-right">₹500 off coupon next!</p>
+                        <p class="text-[10px] text-primary font-bold mt-2 uppercase tracking-widest text-right">?500 off coupon next!</p>
                     </div>
                     <button onclick="window.location.href='restaurant_menu.html?id=spice-route'" class="w-full py-3 rounded-xl bg-primary/10 border border-primary/30 text-primary text-sm font-bold hover:bg-primary hover:text-black transition-all active:scale-[0.98]">
                         Order Again
@@ -275,8 +275,8 @@
 <p class="text-sm font-medium mb-2">Buy 8 Tacos, Get Chips Free</p>
 <div class="grid grid-cols-8 gap-1 mt-3">
 <!-- 2 filled -->
-<div class="aspect-square bg-primary rounded-sm flex items-center justify-center text-white"><span class="text-[8px] font-bold">✓</span></div>
-<div class="aspect-square bg-primary rounded-sm flex items-center justify-center text-white"><span class="text-[8px] font-bold">✓</span></div>
+<div class="aspect-square bg-primary rounded-sm flex items-center justify-center text-white"><span class="text-[8px] font-bold">?</span></div>
+<div class="aspect-square bg-primary rounded-sm flex items-center justify-center text-white"><span class="text-[8px] font-bold">?</span></div>
 <!-- 6 empty -->
 <div class="aspect-square bg-gray-200 dark:bg-[#3c1e6e] rounded-sm"></div>
 <div class="aspect-square bg-gray-200 dark:bg-[#3c1e6e] rounded-sm"></div>
@@ -335,10 +335,10 @@
                         </div>
                         <div>
                             <p class="text-sm font-black text-white">Free Side Salad</p>
-                            <p class="text-xs text-text-secondary opacity-60">Green Garden • 2 days ago</p>
+                            <p class="text-xs text-text-secondary opacity-60">Green Garden � 2 days ago</p>
                         </div>
                     </div>
-                    <span class="text-sm font-bold text-text-secondary line-through opacity-40">-₹120</span>
+                    <span class="text-sm font-bold text-text-secondary line-through opacity-40">-?120</span>
                 </div>
                 <div class="flex items-center justify-between p-4 rounded-2xl bg-card-dark border border-border-dark group hover:border-primary/30 transition-all duration-300">
                     <div class="flex items-center gap-4">
@@ -346,11 +346,11 @@
                             <span class="material-symbols-outlined text-xl">check_circle</span>
                         </div>
                         <div>
-                            <p class="text-sm font-black text-white">₹500 Off Order</p>
-                            <p class="text-xs text-text-secondary opacity-60">Sushi Central • 2 weeks ago</p>
+                            <p class="text-sm font-black text-white">?500 Off Order</p>
+                            <p class="text-xs text-text-secondary opacity-60">Sushi Central � 2 weeks ago</p>
                         </div>
                     </div>
-                    <span class="text-sm font-bold text-text-secondary line-through opacity-40">-₹500</span>
+                    <span class="text-sm font-bold text-text-secondary line-through opacity-40">-?500</span>
                 </div>
             </div>
         </section>
@@ -372,15 +372,15 @@
     // === ZoiLoyalty Object ===
     const ZoiLoyalty = {
         redeem(restaurantName, rewardName) {
-            this.showToast(`🎉 Redeeming: ${rewardName} from ${restaurantName}...`);
+            this.showToast(`?? Redeeming: ${rewardName} from ${restaurantName}...`);
             // Persist redemption to localStorage
             const history = JSON.parse(localStorage.getItem('zoiLoyaltyHistory') || '[]');
             history.unshift({ restaurant: restaurantName, reward: rewardName, date: new Date().toISOString() });
             localStorage.setItem('zoiLoyaltyHistory', JSON.stringify(history));
-            setTimeout(() => this.showToast(`✅ ${rewardName} applied to your next order!`), 1500);
+            setTimeout(() => this.showToast(`? ${rewardName} applied to your next order!`), 1500);
         },
         join(programName) {
-            this.showToast(`✅ You've joined ${programName}! 100 bonus points added.`);
+            this.showToast(`? You've joined ${programName}! 100 bonus points added.`);
             const joined = JSON.parse(localStorage.getItem('zoiJoinedPrograms') || '[]');
             if (!joined.includes(programName)) { joined.push(programName); localStorage.setItem('zoiJoinedPrograms', JSON.stringify(joined)); }
         },
@@ -416,4 +416,6 @@
 <script src="js/zoi_ai_assistant.js?v=4"></script>
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body></html>

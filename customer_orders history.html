@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -238,10 +238,10 @@
             </div>
             <div id="inv-items" class="flex flex-col gap-3 mb-6"></div>
             <div class="flex flex-col gap-2 pt-4 border-t border-border-dark text-sm">
-                <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="inv-sub">₹0</span></div>
-                <div class="flex justify-between text-gray-400"><span>Tax</span><span id="inv-tax">₹0</span></div>
-                <div class="flex justify-between text-gray-400"><span>Delivery</span><span id="inv-del">₹0</span></div>
-                <div class="flex justify-between font-bold text-white text-lg mt-2 pt-2 border-t border-border-dark"><span>Total Paid</span><span id="inv-total" class="text-primary">₹0</span></div>
+                <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="inv-sub">?0</span></div>
+                <div class="flex justify-between text-gray-400"><span>Tax</span><span id="inv-tax">?0</span></div>
+                <div class="flex justify-between text-gray-400"><span>Delivery</span><span id="inv-del">?0</span></div>
+                <div class="flex justify-between font-bold text-white text-lg mt-2 pt-2 border-t border-border-dark"><span>Total Paid</span><span id="inv-total" class="text-primary">?0</span></div>
             </div>
             <button onclick="window.print()" class="w-full mt-8 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-all">Download PDF</button>
         </div>
@@ -365,7 +365,7 @@
                             <h3 class="text-xl font-bold text-white">${o.restaurantName || "Restaurant"}</h3>
                             <span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded animate-pulse">${statusText}</span>
                         </div>
-                        <p class="text-text-secondary text-sm mb-1">${itemCount} Items • ₹${o.total || 0}</p>
+                        <p class="text-text-secondary text-sm mb-1">${itemCount} Items � ?${o.total || 0}</p>
                         <p class="text-xs text-primary font-bold">Est. Delivery: ${o.estimatedTime || "30 Mins"}</p>
                         <div class="flex gap-2 mt-4">
                             <button onclick="window.location.href='customer order_tracking.html'" class="px-4 py-2 bg-primary text-black text-xs font-bold rounded-lg hover:bg-white transition-colors flex items-center gap-2">
@@ -407,7 +407,7 @@
                 const itemSummary = (o.items || []).map(i => i.name || i.n).filter(Boolean).join(", ") || "View items";
                 const lifetimeSpend = spendMap[o.restaurantName] || 0;
                 const spendBadge = lifetimeSpend > 1000
-                    ? `<span class="text-[10px] bg-neon-yellow/20 text-neon-yellow px-2 py-0.5 rounded font-bold border border-neon-yellow/30">₹${lifetimeSpend} spent</span>`
+                    ? `<span class="text-[10px] bg-neon-yellow/20 text-neon-yellow px-2 py-0.5 rounded font-bold border border-neon-yellow/30">?${lifetimeSpend} spent</span>`
                     : '';
                 const statusColor = o.status === 'Cancelled' ? 'text-red-400 bg-red-400/10' : 'text-green-400 bg-green-400/10';
                 const statusLabel = o.status || 'Delivered';
@@ -417,7 +417,7 @@
                 <div class="bg-card-dark border border-border-dark rounded-xl p-5 hover:border-primary/30 transition-all group relative overflow-hidden">
                     <div class="flex flex-col sm:flex-row justify-between gap-4">
                         <div class="flex gap-4">
-                            <div class="size-12 rounded-lg bg-white/5 flex items-center justify-center text-xl shadow-inner shrink-0">🍽️</div>
+                            <div class="size-12 rounded-lg bg-white/5 flex items-center justify-center text-xl shadow-inner shrink-0">???</div>
                             <div>
                                 <div class="flex items-center gap-2 mb-1">
                                     <h3 class="font-bold text-white group-hover:text-primary transition-colors text-lg">${o.restaurantName || 'Restaurant'}</h3>
@@ -429,7 +429,7 @@
                             </div>
                         </div>
                         <div class="text-right flex flex-col items-end gap-2">
-                            <p class="font-black text-white text-lg">₹${o.total || 0}</p>
+                            <p class="font-black text-white text-lg">?${o.total || 0}</p>
                             <div class="flex gap-2 flex-wrap justify-end">
                                 ${['Pending', 'Confirmed'].includes(o.status) ? `
                                 <button onclick="cancelOrder(${o.id || realIdx}, '${safeName}')" class="text-xs text-red-400 border border-red-400/30 px-3 py-1.5 rounded-lg hover:bg-red-500 hover:text-white font-bold flex items-center gap-1 transition-all">
@@ -466,14 +466,14 @@
                 const qty = i.qty || i.quantity || 1;
                 const lineTotal = price * qty;
                 itemTotal += lineTotal;
-                itemList.innerHTML += `<div class="flex justify-between text-sm text-gray-300"><span>${qty}x ${name}</span><span>₹${lineTotal.toFixed(2)}</span></div>`;
+                itemList.innerHTML += `<div class="flex justify-between text-sm text-gray-300"><span>${qty}x ${name}</span><span>?${lineTotal.toFixed(2)}</span></div>`;
             });
             const tax = o.tax || Math.round(itemTotal * 0.05);
             const del = o.deliveryFee || 40;
-            document.getElementById('inv-sub').innerText = "₹" + itemTotal.toFixed(2);
-            document.getElementById('inv-tax').innerText = "₹" + tax;
-            document.getElementById('inv-del').innerText = "₹" + del;
-            document.getElementById('inv-total').innerText = "₹" + (o.total || 0).toFixed(2);
+            document.getElementById('inv-sub').innerText = "?" + itemTotal.toFixed(2);
+            document.getElementById('inv-tax').innerText = "?" + tax;
+            document.getElementById('inv-del').innerText = "?" + del;
+            document.getElementById('inv-total').innerText = "?" + (o.total || 0).toFixed(2);
             openModal('invoice-modal');
         }
 
@@ -485,7 +485,7 @@
                 cart.push({ name: i.name || i.n, price: i.price || i.p || 0, qty: i.qty || 1, restaurant: o.restaurantName });
             });
             localStorage.setItem('zoiCart', JSON.stringify(cart));
-            showToast('✅ Items from ' + o.restaurantName + ' added to cart!');
+            showToast('? Items from ' + o.restaurantName + ' added to cart!');
         }
 
         function openRateModal(name, idx) {
@@ -518,7 +518,7 @@
                 if (found) { found.rating = r; localStorage.setItem('zoiCompletedOrders', JSON.stringify(stored)); }
                 renderOrders();
             }
-            showToast('⭐ Thanks for your review!');
+            showToast('? Thanks for your review!');
             closeModal('rate-modal');
             // Reset
             document.querySelectorAll('.star-rating input').forEach(i => i.checked = false);
@@ -539,7 +539,7 @@
                     renderOrders();
                     return;
                 } catch (e) {
-                    showToast('⚠️ ' + (e.message || 'Cancellation failed'));
+                    showToast('?? ' + (e.message || 'Cancellation failed'));
                 }
             } else {
                 // Local-only fallback
@@ -588,5 +588,7 @@
     </script>
     <script src="js/zoi_ai_assistant.js?v=4"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 </html>

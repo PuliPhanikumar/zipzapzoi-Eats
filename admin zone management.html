@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -125,8 +125,8 @@
                     <div class="flex items-center gap-3">
                         <select id="city-selector" onchange="changeCity(this.value)"
                             class="bg-black/50 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:border-primary focus:ring-0 backdrop-blur-md transition-all font-bold">
-                            <option value="delhi">📍 New Delhi</option>
-                            <option value="hyderabad">📍 Hyderabad</option>
+                            <option value="delhi">?? New Delhi</option>
+                            <option value="hyderabad">?? Hyderabad</option>
                         </select>
                         <div class="relative group">
                             <input type="text" id="map-search" onkeydown="handleSearch(event)"
@@ -240,7 +240,7 @@
                     </div>
                     <div class="px-5 py-2 border-r border-white/10">
                         <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Total Area</p>
-                        <p class="text-sm font-bold text-white">142 km²</p>
+                        <p class="text-sm font-bold text-white">142 km�</p>
                     </div>
                     <div class="px-5 py-2 border-r border-white/10">
                         <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Active Orders</p>
@@ -444,7 +444,7 @@
                             <div class="size-2 rounded-full ${activeDot} shrink-0"></div>
                             <div class="overflow-hidden">
                                 <h4 class="text-xs font-bold text-white truncate group-hover:text-primary transition-colors">${zone.name}</h4>
-                                <p class="text-[9px] text-gray-500 truncate">${zone.orders} Orders • ${zone.riders} Riders</p>
+                                <p class="text-[9px] text-gray-500 truncate">${zone.orders} Orders � ${zone.riders} Riders</p>
                             </div>
                         </div>
                         ${surgeBadge}
@@ -655,6 +655,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

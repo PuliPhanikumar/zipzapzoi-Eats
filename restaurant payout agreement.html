@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
@@ -104,7 +104,7 @@
 </div>
 <div class="flex justify-between items-center border-b border-surface-dark-lighter py-4">
 <p class="text-text-secondary text-sm">Onboarding Fee</p>
-<p class="text-primary text-base font-bold">₹0 <span class="text-text-secondary text-sm font-normal">(Waived for launch)</span></p>
+<p class="text-primary text-base font-bold">?0 <span class="text-text-secondary text-sm font-normal">(Waived for launch)</span></p>
 </div>
 <div class="flex justify-between items-center py-4">
 <p class="text-text-secondary text-sm">Cancellation Policy</p>
@@ -152,7 +152,7 @@
 </div>
 <div>
 <label class="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Account Number</label>
-<input class="w-full bg-background-dark border border-surface-dark-lighter text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 placeholder-gray-600" placeholder="•••• •••• •••• 1234" type="password"/>
+<input class="w-full bg-background-dark border border-surface-dark-lighter text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-3 placeholder-gray-600" placeholder="���� ���� ���� 1234" type="password"/>
 </div>
 <div>
 <label class="block text-xs font-medium text-text-secondary mb-1.5 uppercase tracking-wide">Confirm Account Number</label>
@@ -234,7 +234,7 @@
         }
     </style>
     <script>
-    // ── TOAST ──
+    // -- TOAST --
     function showToast(msg, type='info') {
         const t = document.createElement('div');
         const bg = {success:'#00f0ff',error:'#ef4444',info:'#8b5cf6',warning:'#f59e0b'};
@@ -244,7 +244,7 @@
         setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(),300); },3000);
     }
 
-    // ── SAVE DRAFT ──
+    // -- SAVE DRAFT --
     function saveDraft() {
         const inputs = document.querySelectorAll('input:not([disabled])');
         const draft = {};
@@ -254,7 +254,7 @@
         showToast('Draft saved!', 'success');
     }
 
-    // ── DOWNLOAD PDF ──
+    // -- DOWNLOAD PDF --
     document.addEventListener('DOMContentLoaded', () => {
         // Wire Download PDF button
         document.querySelectorAll('button').forEach(btn => {
@@ -305,7 +305,7 @@
         } catch(e) {}
     });
 
-    // ── FINALIZE AGREEMENT ──
+    // -- FINALIZE AGREEMENT --
     function finalizeAgreement() {
         const checkbox = document.getElementById('comments');
         if (!checkbox || !checkbox.checked) {
@@ -348,6 +348,8 @@
     <script src="js/zoi_partner_engine.js"></script>
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body></html>
 
 

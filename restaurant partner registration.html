@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html class="dark" lang="en">
 
@@ -307,7 +307,7 @@
         </div>
     </div>
     <script>
-        // ─── TOAST NOTIFICATION ────────────────────────
+        // --- TOAST NOTIFICATION ------------------------
         function showToast(msg, type = 'info') {
             const toast = document.createElement('div');
             const bgMap = { success: '#00f0ff', error: '#ef4444', info: '#8b5cf6', warning: '#f59e0b' };
@@ -317,7 +317,7 @@
             setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
         }
 
-        // ─── LOCATE ME ────────────────────────
+        // --- LOCATE ME ------------------------
         document.querySelector('button[type="button"]')?.addEventListener('click', function() {
             // Find the Locate Me button specifically
         });
@@ -425,7 +425,7 @@
             reader.readAsDataURL(file);
         }
 
-        // ─── SUBMIT REGISTRATION ────────────────────────
+        // --- SUBMIT REGISTRATION ------------------------
         function submitRegistration(event) {
             event.preventDefault();
             const btn = event.currentTarget;
@@ -516,7 +516,7 @@
                     // 5. Clear draft
                     localStorage.removeItem('zoiPartnerDraft');
 
-                    showToast('Application submitted successfully! 🎉', 'success');
+                    showToast('Application submitted successfully! ??', 'success');
 
                     // 6. Route to payout agreement
                     setTimeout(() => {
@@ -537,6 +537,8 @@
     <script src="js/zoi_partner_engine.js"></script>
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

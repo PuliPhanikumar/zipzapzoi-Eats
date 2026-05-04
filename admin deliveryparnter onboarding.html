@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -147,7 +147,7 @@
                                         AM</div>
                                     <div>
                                         <h4 class="font-bold text-sm text-white">Amit Mishra</h4>
-                                        <p class="text-[10px] text-gray-400">Bike • Delhi</p>
+                                        <p class="text-[10px] text-gray-400">Bike � Delhi</p>
                                     </div>
                                 </div>
                                 <span class="text-[10px] bg-yellow-500/10 text-yellow-500 px-1.5 py-0.5 rounded">Docs
@@ -196,7 +196,7 @@
                             <span class="flex items-center gap-1"><span
                                     class="material-symbols-outlined text-sm">two_wheeler</span> <span
                                     id="modal-vehicle">--</span></span>
-                            <span>•</span>
+                            <span>�</span>
                             <span>Ref: #R-2024-X9</span>
                         </div>
                     </div>
@@ -276,7 +276,7 @@
                                             src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Driving_License_of_India_Smart_Card.png"
                                             class="h-10 rounded border border-border doc-preview cursor-pointer"
                                             onclick="viewFullImage(this.src)"></td>
-                                    <td class="p-4" id="status-dl-front"><span class="text-warning text-xs">●
+                                    <td class="p-4" id="status-dl-front"><span class="text-warning text-xs">?
                                             Pending</span></td>
                                     <td class="p-4 text-right" id="action-dl-front">
                                         <button onclick="verifyItem('dl-front')"
@@ -291,7 +291,7 @@
                                             src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Driving_License_of_India_Smart_Card.png"
                                             class="h-10 rounded border border-border doc-preview cursor-pointer"
                                             onclick="viewFullImage(this.src)"></td>
-                                    <td class="p-4" id="status-dl-back"><span class="text-warning text-xs">●
+                                    <td class="p-4" id="status-dl-back"><span class="text-warning text-xs">?
                                             Pending</span></td>
                                     <td class="p-4 text-right" id="action-dl-back">
                                         <button onclick="verifyItem('dl-back')"
@@ -306,7 +306,7 @@
                                             src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Driving_License_of_India_Smart_Card.png"
                                             class="h-10 rounded border border-border doc-preview cursor-pointer"
                                             onclick="viewFullImage(this.src)"></td>
-                                    <td class="p-4" id="status-rc"><span class="text-warning text-xs">● Pending</span>
+                                    <td class="p-4" id="status-rc"><span class="text-warning text-xs">? Pending</span>
                                     </td>
                                     <td class="p-4 text-right" id="action-rc">
                                         <button onclick="verifyItem('rc')"
@@ -321,7 +321,7 @@
                                             src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Driving_License_of_India_Smart_Card.png"
                                             class="h-10 rounded border border-border doc-preview cursor-pointer"
                                             onclick="viewFullImage(this.src)"></td>
-                                    <td class="p-4" id="status-aadhar"><span class="text-warning text-xs">●
+                                    <td class="p-4" id="status-aadhar"><span class="text-warning text-xs">?
                                             Pending</span></td>
                                     <td class="p-4 text-right" id="action-aadhar">
                                         <button onclick="verifyItem('aadhar')"
@@ -513,7 +513,7 @@
                         <div class="flex justify-between items-start mb-2">
                             <div>
                                 <h4 class="font-bold text-sm text-white">${app.name}</h4>
-                                <p class="text-[10px] text-gray-400">${app.vehicle} • ${app.id}</p>
+                                <p class="text-[10px] text-gray-400">${app.vehicle} � ${app.id}</p>
                             </div>
                             <span class="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-gray-400">${app.status}</span>
                         </div>
@@ -600,7 +600,7 @@
                 container.innerHTML = `<span class="px-4 py-2 bg-success/10 text-success border border-success/20 rounded-lg text-xs font-bold flex items-center justify-end gap-1 cursor-default"><span class="material-symbols-outlined text-sm">check_circle</span> Verified</span>`;
             }
             const statusEl = document.getElementById(`status-${key}`);
-            if (statusEl) statusEl.innerHTML = `<span class="text-success text-xs font-bold">● Approved</span>`;
+            if (statusEl) statusEl.innerHTML = `<span class="text-success text-xs font-bold">? Approved</span>`;
 
             updateProgressBar();
             checkCompletion();
@@ -622,7 +622,7 @@
                 container.innerHTML = `<button onclick="verifyItem('${rejectTarget}')" class="px-3 py-1.5 bg-gray-800 hover:bg-green-900/30 hover:text-green-400 border border-border rounded text-xs font-bold transition-colors">Re-Approve</button>`;
             }
             const statusEl = document.getElementById(`status-${rejectTarget}`);
-            if (statusEl) statusEl.innerHTML = `<span class="text-danger text-xs font-bold">● Re-upload Req.</span>`;
+            if (statusEl) statusEl.innerHTML = `<span class="text-danger text-xs font-bold">? Re-upload Req.</span>`;
 
             closeModal('reject-modal');
             updateProgressBar();
@@ -710,7 +710,7 @@
                     }
                 }
                 const status = document.getElementById(`status-${k}`);
-                if (status) status.innerHTML = `<span class="text-warning text-xs">● Pending</span>`;
+                if (status) status.innerHTML = `<span class="text-warning text-xs">? Pending</span>`;
             });
         }
 
@@ -747,6 +747,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

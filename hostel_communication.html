@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -201,19 +201,19 @@
 
     <script>
         const TEMPLATES_DATA = [
-            { id: 'rent', icon: 'payments', color: 'amber', title: 'Rent Reminder', body: 'Dear {name}, this is a reminder that your hostel rent of ₹{amount} for {month} is due by {date}. Please pay via UPI or at the admin office. Late payment will attract ₹200 fine. — Zoi Hostel' },
-            { id: 'event', icon: 'celebration', color: 'violet', title: 'Event Invite', body: '🎉 Dear {name}, you are invited to {event_name} on {date} at {time} in the hostel {venue}. All hostelers welcome! — Zoi Hostel' },
-            { id: 'emergency', icon: 'emergency', color: 'red', title: 'Emergency Alert', body: '⚠️ URGENT: {message}. Please follow all safety instructions and proceed to the assembly point immediately. — Zoi Hostel Management' },
-            { id: 'guest', icon: 'badge', color: 'blue', title: 'Visitor Notice', body: 'Dear {name}, you have a visitor ({visitor_name}) waiting at the reception. Please come to the reception area. — Zoi Hostel' },
-            { id: 'meeting', icon: 'groups', color: 'teal', title: 'Meeting Call', body: 'Dear all, there will be a hostel meeting on {date} at {time} in the {venue}. Attendance is mandatory. Agenda: {agenda}. — Zoi Hostel Management' },
+            { id: 'rent', icon: 'payments', color: 'amber', title: 'Rent Reminder', body: 'Dear {name}, this is a reminder that your hostel rent of ?{amount} for {month} is due by {date}. Please pay via UPI or at the admin office. Late payment will attract ?200 fine. � Zoi Hostel' },
+            { id: 'event', icon: 'celebration', color: 'violet', title: 'Event Invite', body: '?? Dear {name}, you are invited to {event_name} on {date} at {time} in the hostel {venue}. All hostelers welcome! � Zoi Hostel' },
+            { id: 'emergency', icon: 'emergency', color: 'red', title: 'Emergency Alert', body: '?? URGENT: {message}. Please follow all safety instructions and proceed to the assembly point immediately. � Zoi Hostel Management' },
+            { id: 'guest', icon: 'badge', color: 'blue', title: 'Visitor Notice', body: 'Dear {name}, you have a visitor ({visitor_name}) waiting at the reception. Please come to the reception area. � Zoi Hostel' },
+            { id: 'meeting', icon: 'groups', color: 'teal', title: 'Meeting Call', body: 'Dear all, there will be a hostel meeting on {date} at {time} in the {venue}. Attendance is mandatory. Agenda: {agenda}. � Zoi Hostel Management' },
         ];
 
         const MESSAGES = ZoiDB.get('messages', [
-            { id: 1, channel: 'WhatsApp', audience: 'All Hostelers', to: null, body: '🎉 Holi celebration on March 14th in the courtyard! Organic colors only. Lunch provided. All hostelers welcome!', time: '2026-03-04 10:30 AM', status: 'sent', sent: 42 },
-            { id: 2, channel: 'SMS', audience: 'All Hostelers', to: null, body: 'Rent for March 2026 is due by March 5th. Pay via UPI or at admin office. Late payment = ₹200 fine.', time: '2026-03-01 09:00 AM', status: 'sent', sent: 42 },
+            { id: 1, channel: 'WhatsApp', audience: 'All Hostelers', to: null, body: '?? Holi celebration on March 14th in the courtyard! Organic colors only. Lunch provided. All hostelers welcome!', time: '2026-03-04 10:30 AM', status: 'sent', sent: 42 },
+            { id: 2, channel: 'SMS', audience: 'All Hostelers', to: null, body: 'Rent for March 2026 is due by March 5th. Pay via UPI or at admin office. Late payment = ?200 fine.', time: '2026-03-01 09:00 AM', status: 'sent', sent: 42 },
             { id: 3, channel: 'WhatsApp', audience: 'Floor 2', to: null, body: 'Floor 2 bathroom renovation starts March 8. Use Floor 1 & Floor 3 bathrooms until March 15. Sorry for inconvenience.', time: '2026-03-01 11:00 AM', status: 'sent', sent: 14 },
             { id: 4, channel: 'SMS', audience: 'Individual', to: 'Priya S. (Room 301)', body: 'Priya, your visitor (Ramesh P.) is waiting at the reception. Please come down.', time: '2026-02-28 02:30 PM', status: 'sent', sent: 1 },
-            { id: 5, channel: 'Both', audience: 'All Hostelers', to: null, body: '⚠️ Fire safety drill on March 7 at 6 PM. ALL hostelers must participate. Assembly point: Main parking area.', time: '2026-02-28 09:00 AM', status: 'sent', sent: 42 },
+            { id: 5, channel: 'Both', audience: 'All Hostelers', to: null, body: '?? Fire safety drill on March 7 at 6 PM. ALL hostelers must participate. Assembly point: Main parking area.', time: '2026-02-28 09:00 AM', status: 'sent', sent: 42 },
         ]);
 
         const SCHEDULED = ZoiDB.get('scheduled_messages', [
@@ -234,7 +234,7 @@
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
                                 <span class="bg-${cc}-500/20 text-${cc}-400 px-2 py-0.5 rounded text-[10px] font-bold">${m.channel}</span>
                                 <span class="bg-white/10 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">${m.to || m.audience}</span>
-                                <span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">✓ Sent to ${m.sent}</span>
+                                <span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">? Sent to ${m.sent}</span>
                                 <span class="ml-auto text-[10px] text-gray-500">${m.time}</span>
                             </div>
                             <p class="text-xs text-gray-300 leading-relaxed">${m.body}</p>
@@ -249,7 +249,7 @@
             document.getElementById('template-grid').innerHTML = TEMPLATES_DATA.map((t, i) => `<div class="glass-panel p-5 bouncy-card fade-row cursor-pointer" style="animation-delay:${i * 40}ms" onclick="useTemplate('${t.id}')">
                 <div class="flex items-center gap-3 mb-3"><div class="h-10 w-10 rounded-xl bg-${t.color}-500/15 flex items-center justify-center"><span class="material-symbols-outlined text-${t.color}-400">${t.icon}</span></div><h4 class="font-bold text-white text-sm">${t.title}</h4></div>
                 <p class="text-xs text-gray-400 leading-relaxed">${t.body.substring(0, 100)}...</p>
-                <button class="mt-3 text-[10px] text-pink-400 bg-pink-500/10 px-3 py-1 rounded font-bold">Use Template →</button>
+                <button class="mt-3 text-[10px] text-pink-400 bg-pink-500/10 px-3 py-1 rounded font-bold">Use Template ?</button>
             </div>`).join('');
         }
 
@@ -259,7 +259,7 @@
                 <div class="flex items-start gap-3">
                     <div class="h-10 w-10 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined text-amber-400">schedule</span></div>
                     <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-1"><span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">⏰ ${s.scheduledFor}</span><span class="bg-white/10 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">${s.channel} → ${s.audience}</span></div>
+                        <div class="flex items-center gap-2 mb-1"><span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">? ${s.scheduledFor}</span><span class="bg-white/10 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">${s.channel} ? ${s.audience}</span></div>
                         <p class="text-xs text-gray-300">${s.body}</p>
                     </div>
                     <button onclick="cancelScheduled(${s.id})" class="p-1.5 bg-red-500/10 rounded-lg text-red-400 hover:bg-red-500/20"><span class="material-symbols-outlined text-sm">close</span></button>
@@ -293,11 +293,11 @@
             if (sched) {
                 SCHEDULED.unshift({ id: Date.now(), channel: ch, audience: aud, body, scheduledFor: sched.replace('T', ' ') });
                 ZoiDB.set('scheduled_messages', SCHEDULED);
-                showToast('📅 Message scheduled!', 'success');
+                showToast('?? Message scheduled!', 'success');
             } else {
                 MESSAGES.unshift({ id: Date.now(), channel: ch, audience: aud, to, body, time: new Date().toLocaleString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }), status: 'sent', sent: aud === 'Individual' ? 1 : 42 });
                 ZoiDB.set('messages', MESSAGES);
-                showToast('✅ Message sent!', 'success');
+                showToast('? Message sent!', 'success');
             }
             closeMsgModal();
             // Reset modal data
@@ -317,6 +317,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

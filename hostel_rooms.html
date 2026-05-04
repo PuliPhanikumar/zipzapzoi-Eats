@@ -1,4 +1,4 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -204,7 +204,7 @@
                 <div class="grid grid-cols-2 gap-4">
                     <input type="number" id="new-room-beds" placeholder="No. of Beds" value="2" min="1" max="12"
                         class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
-                    <input type="number" id="new-room-rent" placeholder="Rent â‚¹/month" value="8000"
+                    <input type="number" id="new-room-rent" placeholder="Rent ?/month" value="8000"
                         class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
                 </div>
                 <div class="flex items-center gap-3">
@@ -362,7 +362,7 @@
                                 <div class="flex items-center gap-3 mt-1 text-[10px] text-gray-500">
                                     ${room.ac ? '<span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs text-blue-400">ac_unit</span>AC</span>' : ''}
                                     ${room.attached ? '<span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs text-teal">bathtub</span>Attached</span>' : ''}
-                                    <span>â‚¹${room.rent.toLocaleString()}/mo</span>
+                                    <span>?${room.rent.toLocaleString()}/mo</span>
                                 </div>
                             </div>
                             <div class="text-right">
@@ -423,8 +423,8 @@
         function showBedDetail(roomId, bedLabel) {
             const room = ROOMS.find(r => r.id === roomId);
             const bed = room.beds.find(b => b.label === bedLabel);
-            document.getElementById('bed-modal-title').innerText = `Room ${room.number} â€” Bed ${bed.label}`;
-            document.getElementById('bed-modal-title').innerHTML = `Room ${room.number} â€” Bed ${bed.label} <span class="text-xs font-mono text-gray-500 ml-2 bg-white/5 px-2 py-0.5 rounded">${getBedUID(room, bed)}</span>`;
+            document.getElementById('bed-modal-title').innerText = `Room ${room.number} — Bed ${bed.label}`;
+            document.getElementById('bed-modal-title').innerHTML = `Room ${room.number} — Bed ${bed.label} <span class="text-xs font-mono text-gray-500 ml-2 bg-white/5 px-2 py-0.5 rounded">${getBedUID(room, bed)}</span>`;
             const body = document.getElementById('bed-modal-body');
             const actions = document.getElementById('bed-modal-actions');
             const sc = STATUS_COLORS[bed.status];
@@ -433,11 +433,11 @@
                 body.innerHTML = `
                     <div class="flex items-center gap-3 mb-4">
                         <div class="h-12 w-12 rounded-full bg-${sc}-500/20 border border-${sc}-500/30 flex items-center justify-center text-${sc}-400 font-bold">${bed.tenant.split(' ').map(w => w[0]).join('')}</div>
-                        <div><p class="font-bold text-white">${bed.tenant}</p><p class="text-xs text-gray-400">Since ${bed.since} â€¢ ${bed.mobile}</p></div>
+                        <div><p class="font-bold text-white">${bed.tenant}</p><p class="text-xs text-gray-400">Since ${bed.since} • ${bed.mobile}</p></div>
                     </div>
                     <div class="grid grid-cols-2 gap-3 text-xs">
                         <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Room Type</span><p class="font-bold text-white mt-0.5">${TYPE_LABELS[room.type]}</p></div>
-                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Monthly Rent</span><p class="font-bold text-white mt-0.5">â‚¹${room.rent.toLocaleString()}</p></div>
+                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Monthly Rent</span><p class="font-bold text-white mt-0.5">?${room.rent.toLocaleString()}</p></div>
                         <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Status</span><p class="font-bold text-${sc}-400 mt-0.5 uppercase">${bed.status}</p></div>
                         <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Amenities</span><p class="font-bold text-white mt-0.5">${room.ac ? 'AC, ' : ''}${room.attached ? 'Bath' : 'Shared'}</p></div>
                     </div>`;
@@ -448,7 +448,7 @@
                         `<button onclick="wardenUpdateStatus('${roomId}','${bedLabel}')" class="flex-1 py-2.5 text-xs font-bold text-teal bg-teal/10 border border-teal/30 rounded-xl hover:bg-teal/20 transition-colors">Update Status</button>
                     <button class="flex-1 py-2.5 text-xs font-bold text-violet-400 bg-violet-500/10 border border-violet-500/30 rounded-xl hover:bg-violet-500/20 transition-colors">Upload ID Proof</button>`}`;
             } else if (bed.status === 'vacant') {
-                body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-green-400 text-5xl mb-2">check_circle</span><p class="font-bold text-white text-lg">Bed Available</p><p class="text-sm text-gray-400 mt-1">Room ${room.number} (${TYPE_LABELS[room.type]}) â€” â‚¹${room.rent.toLocaleString()}/mo</p></div>`;
+                body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-green-400 text-5xl mb-2">check_circle</span><p class="font-bold text-white text-lg">Bed Available</p><p class="text-sm text-gray-400 mt-1">Room ${room.number} (${TYPE_LABELS[room.type]}) — ?${room.rent.toLocaleString()}/mo</p></div>`;
                 actions.innerHTML = `<button onclick="window.location.href='hostel_allocation.html'" class="flex-1 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_10px_rgba(236,72,153,0.3)]">Assign Hosteler</button>`;
             } else if (bed.status === 'maintenance') {
                 body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-gray-400 text-5xl mb-2">build</span><p class="font-bold text-white text-lg">Under Maintenance</p><p class="text-sm text-gray-400 mt-1">This bed is currently not available.</p></div>`;
@@ -619,8 +619,8 @@
         function showBedDetail(roomId, bedLabel) {
             const room = ROOMS.find(r => r.id === roomId);
             const bed = room.beds.find(b => b.label === bedLabel);
-            document.getElementById('bed-modal-title').innerText = `Room ${room.number} â€” Bed ${bed.label}`;
-            document.getElementById('bed-modal-title').innerHTML = `Room ${room.number} â€” Bed ${bed.label} <span class="text-xs font-mono text-gray-500 ml-2 bg-white/5 px-2 py-0.5 rounded">${getBedUID(room, bed)}</span>`;
+            document.getElementById('bed-modal-title').innerText = `Room ${room.number} — Bed ${bed.label}`;
+            document.getElementById('bed-modal-title').innerHTML = `Room ${room.number} — Bed ${bed.label} <span class="text-xs font-mono text-gray-500 ml-2 bg-white/5 px-2 py-0.5 rounded">${getBedUID(room, bed)}</span>`;
             const body = document.getElementById('bed-modal-body');
             const actions = document.getElementById('bed-modal-actions');
             const sc = STATUS_COLORS[bed.status];
@@ -629,11 +629,11 @@
                 body.innerHTML = `
                     <div class="flex items-center gap-3 mb-4">
                         <div class="h-12 w-12 rounded-full bg-${sc}-500/20 border border-${sc}-500/30 flex items-center justify-center text-${sc}-400 font-bold">${bed.tenant.split(' ').map(w => w[0]).join('')}</div>
-                        <div><p class="font-bold text-white">${bed.tenant}</p><p class="text-xs text-gray-400">Since ${bed.since} â€¢ ${bed.mobile}</p></div>
+                        <div><p class="font-bold text-white">${bed.tenant}</p><p class="text-xs text-gray-400">Since ${bed.since} • ${bed.mobile}</p></div>
                     </div>
                     <div class="grid grid-cols-2 gap-3 text-xs">
                         <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Room Type</span><p class="font-bold text-white mt-0.5">${TYPE_LABELS[room.type]}</p></div>
-                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Monthly Rent</span><p class="font-bold text-white mt-0.5">â‚¹${room.rent.toLocaleString()}</p></div>
+                        <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Monthly Rent</span><p class="font-bold text-white mt-0.5">?${room.rent.toLocaleString()}</p></div>
                         <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Status</span><p class="font-bold text-${sc}-400 mt-0.5 uppercase">${bed.status}</p></div>
                         <div class="p-3 bg-white/5 rounded-lg"><span class="text-gray-400">Amenities</span><p class="font-bold text-white mt-0.5">${room.ac ? 'AC, ' : ''}${room.attached ? 'Bath' : 'Shared'}</p></div>
                     </div>`;
@@ -644,7 +644,7 @@
                         `<button onclick="wardenUpdateStatus('${roomId}','${bedLabel}')" class="flex-1 py-2.5 text-xs font-bold text-teal bg-teal/10 border border-teal/30 rounded-xl hover:bg-teal/20 transition-colors">Update Status</button>
                     <button class="flex-1 py-2.5 text-xs font-bold text-violet-400 bg-violet-500/10 border border-violet-500/30 rounded-xl hover:bg-violet-500/20 transition-colors">Upload ID Proof</button>`}`;
             } else if (bed.status === 'vacant') {
-                body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-green-400 text-5xl mb-2">check_circle</span><p class="font-bold text-white text-lg">Bed Available</p><p class="text-sm text-gray-400 mt-1">Room ${room.number} (${TYPE_LABELS[room.type]}) â€” â‚¹${room.rent.toLocaleString()}/mo</p></div>`;
+                body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-green-400 text-5xl mb-2">check_circle</span><p class="font-bold text-white text-lg">Bed Available</p><p class="text-sm text-gray-400 mt-1">Room ${room.number} (${TYPE_LABELS[room.type]}) — ?${room.rent.toLocaleString()}/mo</p></div>`;
                 actions.innerHTML = `<button onclick="window.location.href='hostel_allocation.html'" class="flex-1 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 rounded-xl shadow-[0_0_10px_rgba(236,72,153,0.3)]">Assign Hosteler</button>`;
             } else if (bed.status === 'maintenance') {
                 body.innerHTML = `<div class="text-center py-6"><span class="material-symbols-outlined text-gray-400 text-5xl mb-2">build</span><p class="font-bold text-white text-lg">Under Maintenance</p><p class="text-sm text-gray-400 mt-1">This bed is currently not available.</p></div>`;
@@ -808,6 +808,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

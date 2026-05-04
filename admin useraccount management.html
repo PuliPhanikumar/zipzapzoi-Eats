@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -179,7 +179,7 @@
                     <h2 class="text-2xl font-bold text-white" id="modal-name">--</h2>
                     <div class="flex items-center gap-2 mt-1">
                         <p class="text-sm text-gray-400 font-mono" id="modal-id">ID: --</p>
-                        <span class="text-gray-600">•</span>
+                        <span class="text-gray-600">�</span>
                         <p class="text-sm text-gray-400" id="modal-email">--</p>
                     </div>
                     <div class="mt-2" id="modal-role-badge"></div>
@@ -189,7 +189,7 @@
             <div class="grid grid-cols-3 gap-4 mb-8">
                 <div class="bg-bg p-4 rounded-xl border border-border">
                     <p class="text-[10px] text-gray-500 uppercase font-bold mb-1" id="stat-1-label">Total Spend</p>
-                    <h3 class="text-xl font-mono font-bold text-white" id="stat-1-val">₹0</h3>
+                    <h3 class="text-xl font-mono font-bold text-white" id="stat-1-val">?0</h3>
                 </div>
                 <div class="bg-bg p-4 rounded-xl border border-border">
                     <p class="text-[10px] text-gray-500 uppercase font-bold mb-1" id="stat-2-label">Total Orders</p>
@@ -415,7 +415,7 @@
                         status: u.status || 'Active',
                         score: u.role === 'customer' ? 98 : (u.role === 'rider' ? 88 : 95), // Simulation fallback for UI
                         lastActive: 'Today',
-                        spend: u.role === 'customer' ? '₹' + Math.floor(Math.random() * 5000) : 'N/A',
+                        spend: u.role === 'customer' ? '?' + Math.floor(Math.random() * 5000) : 'N/A',
                         orders: Math.floor(Math.random() * 50)
                     }));
                 } else {
@@ -474,7 +474,7 @@
                                     </div>
                                     <div>
                                         <p class="font-bold text-white text-sm">${emp.name}</p>
-                                        <p class="text-xs text-gray-500 font-mono">${emp.id} • ${emp.email}</p>
+                                        <p class="text-xs text-gray-500 font-mono">${emp.id} � ${emp.email}</p>
                                     </div>
                                 </div>
                             </td>
@@ -832,6 +832,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -153,7 +153,7 @@
 <input class="w-full h-12 rounded-lg bg-background-dark border border-surface-border text-white px-4 focus:border-primary focus:ring-primary focus:ring-1 transition-colors" id="daily-orders" type="number" value="50"/>
 </div>
 <div class="flex flex-col gap-2 w-full md:w-1/3">
-<label class="text-white text-sm font-medium" for="order-value">Average Order Value (₹)</label>
+<label class="text-white text-sm font-medium" for="order-value">Average Order Value (?)</label>
 <input class="w-full h-12 rounded-lg bg-background-dark border border-surface-border text-white px-4 focus:border-primary focus:ring-primary focus:ring-1 transition-colors" id="order-value" type="number" value="300"/>
 </div>
 </div>
@@ -166,14 +166,14 @@
 </div>
 <p class="text-text-secondary text-sm h-10">Perfect for cloud kitchens and new startups testing the market.</p>
 <div class="flex items-baseline gap-1 text-white mt-2">
-<span class="text-4xl font-black tracking-tight">₹49</span>
+<span class="text-4xl font-black tracking-tight">?49</span>
 <span class="text-text-secondary font-medium">/ order</span>
 </div>
 <div class="text-sm text-primary font-bold">Zero Listing Fee</div>
 </div>
 <div class="flex flex-col gap-1 pt-4 border-t border-surface-border">
 <span class="text-xs font-bold uppercase tracking-wide text-text-secondary">Est. Monthly Earnings</span>
-<span class="text-2xl font-black text-primary" id="silver-earnings">₹0</span>
+<span class="text-2xl font-black text-primary" id="silver-earnings">?0</span>
 </div>
 <button onclick="selectPlan('Silver')" class="w-full h-12 rounded-lg bg-surface-border hover:bg-[#3d2570] text-white font-bold transition-colors mt-auto">
                                 Start Free
@@ -212,7 +212,7 @@
 </div>
 <div class="flex flex-col gap-1 pt-4 border-t border-surface-border">
 <span class="text-xs font-bold uppercase tracking-wide text-text-secondary">Est. Monthly Earnings</span>
-<span class="text-2xl font-black text-primary" id="gold-earnings">₹0</span>
+<span class="text-2xl font-black text-primary" id="gold-earnings">?0</span>
 </div>
 <button onclick="selectPlan('Gold')" class="w-full h-12 rounded-lg bg-white hover:bg-gray-100 text-background-dark font-bold transition-colors mt-auto">
                                 Choose Gold
@@ -253,7 +253,7 @@
 </div>
 <div class="flex flex-col gap-1 pt-4 border-t border-surface-border/50">
 <span class="text-xs font-bold uppercase tracking-wide text-text-secondary">Est. Monthly Earnings</span>
-<span class="text-2xl font-black text-primary" id="platinum-earnings">₹0</span>
+<span class="text-2xl font-black text-primary" id="platinum-earnings">?0</span>
 </div>
 <button onclick="selectPlan('Platinum')" class="w-full h-12 rounded-lg bg-primary hover:bg-[#00d4c5] text-background-dark font-bold transition-colors shadow-lg shadow-primary/20 mt-auto">
                                 Go Platinum
@@ -396,7 +396,7 @@
 <a class="hover:text-primary transition-colors" href="terms&conditions.html">Terms of Service</a>
 <a class="hover:text-primary transition-colors" href="customer support help.html">Partner Support</a>
 </div>
-<p class="text-sm text-surface-border">© 2025 ZipZapZoi Eats. All rights reserved.</p>
+<p class="text-sm text-surface-border">� 2025 ZipZapZoi Eats. All rights reserved.</p>
 </div>
 </div>
 </footer>
@@ -406,8 +406,8 @@
         const dailyOrders = parseFloat(document.getElementById('daily-orders').value) || 0;
         const orderValue = parseFloat(document.getElementById('order-value').value) || 0;
         const monthlyOrders = dailyOrders * 30; // Assuming 30 days in a month
-        // Silver Plan: ₹49 / order fee
-        // Revenue = (Monthly Orders * Order Value) - (Monthly Orders * ₹49)
+        // Silver Plan: ?49 / order fee
+        // Revenue = (Monthly Orders * Order Value) - (Monthly Orders * ?49)
         const silverEarnings = (monthlyOrders * orderValue) - (monthlyOrders * 49);
         // Gold Plan: 8-10% commission. Use average 9% for calculation.
         // Earnings = (Monthly Orders * Order Value) * (1 - Commission Rate)
@@ -415,15 +415,15 @@
         // Platinum Plan: 12-15% commission. Use average 13.5% for calculation.
         // Earnings = (Monthly Orders * Order Value) * (1 - Commission Rate)
         const platinumEarnings = (monthlyOrders * orderValue) * (1 - 0.135);
-        document.getElementById('silver-earnings').textContent = '₹' + Math.max(0, silverEarnings).toLocaleString('en-IN', {
+        document.getElementById('silver-earnings').textContent = '?' + Math.max(0, silverEarnings).toLocaleString('en-IN', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         });
-        document.getElementById('gold-earnings').textContent = '₹' + Math.max(0, goldEarnings).toLocaleString('en-IN', {
+        document.getElementById('gold-earnings').textContent = '?' + Math.max(0, goldEarnings).toLocaleString('en-IN', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         });
-        document.getElementById('platinum-earnings').textContent = '₹' + Math.max(0, platinumEarnings).toLocaleString('en-IN', {
+        document.getElementById('platinum-earnings').textContent = '?' + Math.max(0, platinumEarnings).toLocaleString('en-IN', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         });
@@ -460,6 +460,8 @@
     <script src="js/zoi_partner_engine.js"></script>
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body></html>
 
 

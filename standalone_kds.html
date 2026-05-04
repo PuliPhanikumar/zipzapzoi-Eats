@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -167,7 +167,7 @@
 
     <div id="offline-banner"
         class="hidden absolute top-0 left-0 w-full bg-red-600 text-white text-center font-bold py-2 z-[60] animate-pulse">
-        ⚠️ KITCHEN OFFLINE - STOPPING ORDERS
+        ?? KITCHEN OFFLINE - STOPPING ORDERS
     </div>
 
     <div id="global-sidebar-container" class="shrink-0 z-30"></div>
@@ -219,7 +219,7 @@
             </div>
             <div class="stat-card">
                 <p class="text-[10px] text-gray-500 font-bold uppercase">Revenue</p>
-                <p class="text-lg font-black text-green-400 font-mono" id="stat-revenue">₹0</p>
+                <p class="text-lg font-black text-green-400 font-mono" id="stat-revenue">?0</p>
             </div>
             <div class="stat-card">
                 <p class="text-[10px] text-gray-500 font-bold uppercase">Avg Prep Time</p>
@@ -301,7 +301,7 @@
                     <div
                         class="bg-surface px-4 py-2 rounded-lg border border-border text-xs text-gray-400 flex flex-col items-end">
                         <span class="text-[9px] uppercase tracking-widest font-bold">Revenue</span>
-                        <span class="text-green-400 font-black text-sm font-mono" id="history-total">₹0</span>
+                        <span class="text-green-400 font-black text-sm font-mono" id="history-total">?0</span>
                     </div>
                 </div>
             </div>
@@ -334,13 +334,13 @@
 
             <div class="flex-1 overflow-y-auto custom-scrollbar">
                 <div class="p-4">
-                    <h4 class="text-xs font-bold text-blue-400 uppercase mb-3 border-b border-blue-500/20 pb-1">🔥
+                    <h4 class="text-xs font-bold text-blue-400 uppercase mb-3 border-b border-blue-500/20 pb-1">??
                         Currently Cooking</h4>
                     <div id="summary-list-active" class="space-y-2"></div>
                 </div>
 
                 <div class="p-4 border-t border-border bg-black/10">
-                    <h4 class="text-xs font-bold text-green-400 uppercase mb-3 border-b border-green-500/20 pb-1">📈
+                    <h4 class="text-xs font-bold text-green-400 uppercase mb-3 border-b border-green-500/20 pb-1">??
                         Sold Today (Total)</h4>
                     <div id="summary-list-total" class="space-y-2"></div>
                 </div>
@@ -358,26 +358,26 @@
                     <div class="grid grid-cols-3 gap-2">
                         <button onclick="setSound('bell')"
                             class="p-3 bg-white/5 border border-border rounded-lg text-white text-xs font-bold hover:border-primary focus:border-primary sound-opt"
-                            id="snd-bell">🔔 Bell</button>
+                            id="snd-bell">?? Bell</button>
                         <button onclick="setSound('chime')"
                             class="p-3 bg-white/5 border border-border rounded-lg text-white text-xs font-bold hover:border-primary focus:border-primary sound-opt"
-                            id="snd-chime">✨ Chime</button>
+                            id="snd-chime">? Chime</button>
                         <button onclick="setSound('buzzer')"
                             class="p-3 bg-white/5 border border-border rounded-lg text-white text-xs font-bold hover:border-primary focus:border-primary sound-opt"
-                            id="snd-buzzer">🚨 Buzzer</button>
+                            id="snd-buzzer">?? Buzzer</button>
                     </div>
                     <!-- CUSTOM UPLOAD -->
                     <button onclick="document.getElementById('kds-custom-input').click()"
                         class="w-full mt-2 p-3 bg-white/5 border border-dashed border-gray-600 rounded-lg text-white text-xs font-bold hover:border-primary transition-all sound-opt flex items-center justify-center gap-2"
                         id="snd-custom">
-                        🎵 Upload Custom Ringtone
+                        ?? Upload Custom Ringtone
                     </button>
                     <input type="file" id="kds-custom-input" accept=".mp3,.wav,.ogg,audio/*" class="hidden"
                         onchange="handleKdsCustomSound(this)">
                     <div id="kds-custom-info" class="hidden flex items-center gap-2 mt-1">
                         <span class="text-[10px] text-purple-400 font-bold truncate flex-1" id="kds-custom-name"></span>
                         <button onclick="removeKdsCustomSound()"
-                            class="text-[10px] text-red-400 font-bold hover:text-red-300">✕ Remove</button>
+                            class="text-[10px] text-red-400 font-bold hover:text-red-300">? Remove</button>
                     </div>
                 </div>
                 <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">Audio Volume</label>
@@ -393,11 +393,11 @@
                     Tones</label>
                 <div class="grid grid-cols-2 gap-2 mb-4">
                     <div class="text-[10px] text-gray-400">Dine-In:</div>
-                    <div class="text-[10px] text-white font-bold text-right" id="tone-dinein">🔔 Bell</div>
+                    <div class="text-[10px] text-white font-bold text-right" id="tone-dinein">?? Bell</div>
                     <div class="text-[10px] text-gray-400">Online:</div>
-                    <div class="text-[10px] text-white font-bold text-right" id="tone-online">🚨 Buzzer</div>
+                    <div class="text-[10px] text-white font-bold text-right" id="tone-online">?? Buzzer</div>
                     <div class="text-[10px] text-gray-400">Takeaway:</div>
-                    <div class="text-[10px] text-white font-bold text-right" id="tone-takeaway">✨ Chime</div>
+                    <div class="text-[10px] text-white font-bold text-right" id="tone-takeaway">? Chime</div>
                 </div>
 
                 <label
@@ -405,13 +405,13 @@
                     Audio</label>
                 <div class="grid grid-cols-3 gap-2">
                     <button onclick="playAlert('bell')"
-                        class="py-2 bg-white/5 border border-white/10 rounded text-xs font-bold hover:bg-white/10">🔔
+                        class="py-2 bg-white/5 border border-white/10 rounded text-xs font-bold hover:bg-white/10">??
                         Test</button>
                     <button onclick="playAlert('chime')"
-                        class="py-2 bg-white/5 border border-white/10 rounded text-xs font-bold hover:bg-white/10">✨
+                        class="py-2 bg-white/5 border border-white/10 rounded text-xs font-bold hover:bg-white/10">?
                         Test</button>
                     <button onclick="playAlert('buzzer')"
-                        class="py-2 bg-white/5 border border-white/10 rounded text-xs font-bold hover:bg-white/10">🚨
+                        class="py-2 bg-white/5 border border-white/10 rounded text-xs font-bold hover:bg-white/10">??
                         Test</button>
                 </div>
             </div>
@@ -425,14 +425,14 @@
         <div class="ticket-paper w-80 p-6 rounded relative transform scale-100 transition-transform">
             <div class="text-center border-b-2 border-black border-dashed pb-4 mb-4">
                 <h2 class="text-2xl font-bold">Zoi Eats</h2>
-                <p class="text-xs font-bold mt-1" id="tick-meta">Dine-In • Table 04</p>
+                <p class="text-xs font-bold mt-1" id="tick-meta">Dine-In � Table 04</p>
                 <p class="text-[10px]" id="tick-time">--</p>
             </div>
             <div class="space-y-2 text-sm font-bold border-b-2 border-black border-dashed pb-4 mb-4" id="tick-items">
             </div>
             <div class="flex justify-between font-black text-lg">
                 <span>TOTAL</span>
-                <span id="tick-total">₹0.00</span>
+                <span id="tick-total">?0.00</span>
             </div>
             <div class="text-center mt-6">
                 <button onclick="document.getElementById('ticket-modal').classList.add('hidden')"
@@ -727,7 +727,7 @@ function startAutoAcceptTimer() {
         // --- STATS ---
         function updateStatsUI() {
             document.getElementById('stat-orders').innerText = perfStats.totalOrders;
-            document.getElementById('stat-revenue').innerText = '₹' + perfStats.totalRevenue.toLocaleString('en-IN');
+            document.getElementById('stat-revenue').innerText = '?' + perfStats.totalRevenue.toLocaleString('en-IN');
             document.getElementById('stat-active').innerText = perfStats.activeCount;
 
             if (perfStats.prepTimes.length > 0) {
@@ -747,7 +747,7 @@ function startAutoAcceptTimer() {
             listActive.innerHTML = "";
             listTotal.innerHTML = "";
 
-            // Active Prep — use real DB
+            // Active Prep � use real DB
             const activeOrder = ZoiOrders.getActiveOrder();
             const currentRestId = localStorage.getItem('zoiPartnerRestId') || "101";
             let activeCounts = {};
@@ -831,27 +831,27 @@ function startAutoAcceptTimer() {
                         <td class="p-4">${summary}</td>
                         <td class="p-4 font-mono text-blue-400 text-center">${prepTimeStr}</td>
                         <td class="p-4 font-mono ${waitTimeClass} text-center">${waitTimeStr}</td>
-                        <td class="p-4 font-mono text-right text-primary font-bold">₹${h.price}</td>
+                        <td class="p-4 font-mono text-right text-primary font-bold">?${h.price}</td>
                         <td class="p-4 text-right"><button onclick="openTicket(${globalIdx})" class="text-xs bg-white/10 px-3 py-1.5 rounded hover:bg-white/20 border border-white/10 font-bold transition-colors">View Ticket</button></td>
                     </tr>`;
             });
             document.getElementById('history-count').innerText = filteredHistory.length;
-            document.getElementById('history-total').innerText = "₹" + totalSales.toLocaleString();
+            document.getElementById('history-total').innerText = "?" + totalSales.toLocaleString();
 
             // Performance summary logic filtered to mode
             if (filteredHistory.length > 0) {
-                let statText = "📉 No performance data";
+                let statText = "?? No performance data";
                 if (prepTimesForFilter.length > 0) {
                     const avg = Math.round(prepTimesForFilter.reduce((a, b) => a + b, 0) / prepTimesForFilter.length);
                     const onTimeCount = prepTimesForFilter.filter(t => t <= 15).length;
                     const onTimePct = Math.round((onTimeCount / prepTimesForFilter.length) * 100);
-                    statText = `📊 Performance (${historyFilter}): Avg ${avg}min • On-Time: ${onTimePct}% • ${filteredHistory.length} orders`;
+                    statText = `?? Performance (${historyFilter}): Avg ${avg}min � On-Time: ${onTimePct}% � ${filteredHistory.length} orders`;
                 }
 
                 const summaryRow = `
                     <tr class="bg-primary/5 border-t-2 border-primary/20">
                         <td class="p-4 text-primary font-bold" colspan="3">${statText}</td>
-                        <td class="p-4 text-right text-green-400 font-bold font-mono" colspan="3">Total: ₹${totalSales.toLocaleString('en-IN')}</td>
+                        <td class="p-4 text-right text-green-400 font-bold font-mono" colspan="3">Total: ?${totalSales.toLocaleString('en-IN')}</td>
                     </tr>`;
                 tbody.innerHTML += summaryRow;
             } else {
@@ -861,9 +861,9 @@ function startAutoAcceptTimer() {
 
         function openTicket(idx) {
             const order = history[idx];
-            document.getElementById('tick-meta').innerText = `${order.mode} • #${order.id}`;
+            document.getElementById('tick-meta').innerText = `${order.mode} � #${order.id}`;
             document.getElementById('tick-time').innerText = order.endTime;
-            document.getElementById('tick-total').innerText = "₹" + order.price;
+            document.getElementById('tick-total').innerText = "?" + order.price;
 
             const list = document.getElementById('tick-items');
             list.innerHTML = "";
@@ -1019,6 +1019,8 @@ function startAutoAcceptTimer() {
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

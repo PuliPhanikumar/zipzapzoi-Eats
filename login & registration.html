@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -226,7 +226,7 @@
                                         class="material-symbols-outlined text-gray-500">lock</span></div>
                                 <input id="password-input" type="password"
                                     class="block w-full rounded-xl border-0 bg-input py-4 pl-12 pr-12 text-white ring-1 ring-white/10 focus:ring-teal sm:text-sm"
-                                    placeholder="••••••••">
+                                    placeholder="��������">
                             </div>
 
                             <div id="field-otp" class="relative hidden">
@@ -389,7 +389,7 @@
         </div>
     </div>
 
-    <!-- ═══ SECRET ADMIN LOGIN MODAL ═══ -->
+    <!-- --- SECRET ADMIN LOGIN MODAL --- -->
     <div id="admin-login-modal" class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl hidden items-center justify-center p-4">
         <div class="relative w-full max-w-sm">
             <!-- Animated glow ring -->
@@ -402,7 +402,7 @@
                         <span class="material-symbols-outlined text-red-400 text-3xl">shield_lock</span>
                     </div>
                     <h2 class="text-xl font-bold text-white">Admin Access</h2>
-                    <p class="text-xs text-gray-500 mt-1 font-mono">RESTRICTED · AUTHORIZED PERSONNEL ONLY</p>
+                    <p class="text-xs text-gray-500 mt-1 font-mono">RESTRICTED � AUTHORIZED PERSONNEL ONLY</p>
                 </div>
 
                 <!-- Form -->
@@ -426,7 +426,7 @@
                             </div>
                             <input id="admin-pass-input" type="password" required autocomplete="off"
                                 class="block w-full rounded-xl border-0 bg-black/50 py-3.5 pl-12 text-white ring-1 ring-red-900/30 focus:ring-2 focus:ring-red-500 sm:text-sm placeholder:text-gray-600"
-                                placeholder="••••••••">
+                                placeholder="��������">
                         </div>
                     </div>
                     <button type="submit" id="btn-admin-login"
@@ -436,7 +436,7 @@
                     </button>
                 </form>
 
-                <p class="text-center text-[10px] text-gray-600 mt-6 font-mono">Session expires in 24h • All activity is logged</p>
+                <p class="text-center text-[10px] text-gray-600 mt-6 font-mono">Session expires in 24h � All activity is logged</p>
 
                 <!-- Close button -->
                 <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-600 hover:text-red-400 transition-colors">
@@ -490,7 +490,7 @@
             localStorage.setItem(USERS_KEY, JSON.stringify(users));
         }
 
-        // Helper: Client-side password hash (SHA-256, NOT for server use — localStorage only)
+        // Helper: Client-side password hash (SHA-256, NOT for server use � localStorage only)
         async function hashPassword(password) {
             const encoder = new TextEncoder();
             const data = encoder.encode(password + '_zoiSalt_2026');
@@ -640,7 +640,7 @@
                             <span class="material-symbols-outlined text-3xl">two_wheeler</span>
                         </div>
                         <h3 class="text-xl font-bold text-white">Ride & Earn</h3>
-                        <p class="text-sm text-gray-400">Flexible hours, instant payouts, and insurance coverage up to ₹5L.</p>
+                        <p class="text-sm text-gray-400">Flexible hours, instant payouts, and insurance coverage up to ?5L.</p>
                         <button onclick="window.location.href='delivery partner application.html'" class="w-full py-4 text-sm font-bold text-white bg-blue-600 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2">
                             Start Rider Application <span class="material-symbols-outlined text-lg">arrow_forward</span>
                         </button>
@@ -768,7 +768,7 @@
             if (isOtpMode) {
                 if (!otp || otp.length < 4) { resetBtn(); return showToast('Error', 'Enter a valid 4-digit OTP.'); }
                 if (otp !== '1234') { resetBtn(); return showToast('OTP Invalid', 'Incorrect OTP. Use 1234 for demo.'); }
-                // OTP verified — find or create user by phone
+                // OTP verified � find or create user by phone
                 let user = findRegisteredUser(input, currentRole);
                 if (!user) {
                     // Auto-create user from phone (like real OTP flow)
@@ -787,7 +787,7 @@
                 }
                 saveToken(generateMockToken(user));
                 createSession(user);
-                showToast('OTP Verified ✅', `Welcome, ${user.name}!`);
+                showToast('OTP Verified ?', `Welcome, ${user.name}!`);
                 setTimeout(() => routeToDashboard(currentRole), 1200);
                 return;
             }
@@ -802,7 +802,7 @@
                     resetBtn();
                     return showToast('Login Failed', 'Incorrect password. Please try again.');
                 }
-                // Password match — login success
+                // Password match � login success
                 saveToken(generateMockToken(registeredUser));
                 const sessionUser = {
                     id: registeredUser.id,
@@ -814,7 +814,7 @@
                     role: currentRole
                 };
                 createSession(sessionUser);
-                showToast('Login Successful ✅', `Welcome back, ${registeredUser.name}!`);
+                showToast('Login Successful ?', `Welcome back, ${registeredUser.name}!`);
                 setTimeout(() => routeToDashboard(currentRole), 1200);
                 return;
             }
@@ -834,7 +834,7 @@
                         type: currentRole
                     };
                     createSession(sessionUser);
-                    showToast('Login Successful ✅', `Welcome back, ${sessionUser.name}!`);
+                    showToast('Login Successful ?', `Welcome back, ${sessionUser.name}!`);
                     setTimeout(() => routeToDashboard(currentRole), 1200);
                     return;
                 }
@@ -896,7 +896,7 @@
             // Also add to the admin-visible users DB (for admin console)
             if (typeof ZoiUsers !== 'undefined') {
                 const allUsers = ZoiUsers.getAll();
-                allUsers.push({ ...newUser, score: 100, orders: 0, spend: "₹0", lastActive: "Just now" });
+                allUsers.push({ ...newUser, score: 100, orders: 0, spend: "?0", lastActive: "Just now" });
                 localStorage.setItem('zoiUsers', JSON.stringify(allUsers));
             }
 
@@ -904,11 +904,11 @@
             saveToken(generateMockToken(newUser));
             createSession(newUser);
 
-            showToast('Account Created! 🎉', `Welcome to ZipZapZoi, ${fname}!`);
+            showToast('Account Created! ??', `Welcome to ZipZapZoi, ${fname}!`);
             setTimeout(() => routeToDashboard(currentRole), 1500);
         }
 
-        // ═══ GOOGLE IDENTITY SERVICES INTEGRATION ═══
+        // --- GOOGLE IDENTITY SERVICES INTEGRATION ---
         // In production (with GOOGLE_CLIENT_ID configured), uses real Google Sign-In.
         // In development/demo mode, falls back to mock JWT for testing.
         let googleClientId = null;
@@ -918,7 +918,7 @@
                 // Fetch services config to check if Google OAuth is configured
                 const config = await zoiApi('/config/services');
                 if (config.oauth && config.oauth.google) {
-                    // Server has GOOGLE_CLIENT_ID — fetch it for client-side init
+                    // Server has GOOGLE_CLIENT_ID � fetch it for client-side init
                     // Note: Client ID is public and safe to expose
                     const healthRes = await fetch((typeof ZOI_CONFIG !== 'undefined' ? ZOI_CONFIG.API_BASE_URL : 'http://localhost:5000/api') + '/auth/google-client-id');
                     if (healthRes.ok) {
@@ -938,7 +938,7 @@
                     auto_select: false,
                     cancel_on_tap_outside: true
                 });
-                console.log('✅ Google Sign-In initialized with real credentials');
+                console.log('? Google Sign-In initialized with real credentials');
             }
         }
 
@@ -950,7 +950,7 @@
                 saveToken(data.token);
                 const zoiUser = data.user || data;
                 createSession({ id: zoiUser.zoiId || zoiUser.id, name: zoiUser.name, email: zoiUser.email, type: 'customer' });
-                showToast('Google Login Success! 🎉', `Welcome, ${zoiUser.name}`);
+                showToast('Google Login Success! ??', `Welcome, ${zoiUser.name}`);
                 setTimeout(() => window.location.href = 'index.html', 1200);
             } catch (error) {
                 showToast('OAuth Failed', error.message || 'Google authentication failed.');
@@ -979,7 +979,7 @@
                 return;
             }
 
-            // ═══ DEMO FALLBACK: Create a demo Google user locally ═══
+            // --- DEMO FALLBACK: Create a demo Google user locally ---
             showToast("Connecting...", "Initiating Google OAuth flow...");
             setTimeout(() => {
                 const googleUser = {
@@ -992,7 +992,7 @@
                 };
                 saveToken(generateMockToken(googleUser));
                 createSession(googleUser);
-                showToast('Google Login ✅', `Welcome, ${googleUser.name}!`);
+                showToast('Google Login ?', `Welcome, ${googleUser.name}!`);
                 setTimeout(() => window.location.href = 'index.html', 1200);
             }, 800);
         }
@@ -1014,7 +1014,7 @@
                 };
                 saveToken(generateMockToken(user));
                 createSession(user);
-                showToast(`${provider} Login ✅`, `Welcome, ${user.name}!`);
+                showToast(`${provider} Login ?`, `Welcome, ${user.name}!`);
                 setTimeout(() => window.location.href = 'index.html', 1200);
             }, 800);
         }
@@ -1047,7 +1047,7 @@
             setTimeout(() => toast.classList.add('translate-x-full'), 3000);
         }
 
-        // ═══ SECRET ADMIN LOGIN LOGIC ═══
+        // --- SECRET ADMIN LOGIN LOGIC ---
         let adminClickCount = 0;
         let adminClickTimer = null;
 
@@ -1131,6 +1131,8 @@
 <script src="js/zoi_ai_assistant.js?v=4"></script>
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

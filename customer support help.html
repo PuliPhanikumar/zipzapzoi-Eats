@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html class="dark" lang="en">
 
@@ -583,7 +583,7 @@
                 <div
                     class="border-t border-[#3c1e6e] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm">
-                        <span>© 2025 ZoiEats. All rights reserved.</span>
+                        <span>� 2025 ZoiEats. All rights reserved.</span>
                         <span class="hidden sm:inline-block text-[#3c1e6e]">|</span>
                         <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms &
                             Conditions</a>
@@ -688,7 +688,7 @@
                                         <p class="text-white text-base font-bold leading-normal line-clamp-1">${order.restaurantName || order.restaurant || 'Local Restaurant'}</p>
                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${statusColor} uppercase">${order.status || 'Completed'}</span>
                                     </div>
-                                    <p class="text-text-beige text-sm font-normal leading-normal mt-1">Order #${order.id} • ₹${orderTotal}</p>
+                                    <p class="text-text-beige text-sm font-normal leading-normal mt-1">Order #${order.id} � ?${orderTotal}</p>
                                     <p class="text-text-beige/60 text-xs font-normal leading-normal mt-0.5">${dateFormatted}</p>
                                 </div>
                             </div>
@@ -850,7 +850,7 @@
             </div>
             <div class="self-start bg-gray-100 dark:bg-surface-dark text-gray-900 dark:text-white border border-gray-300 dark:border-border-brown px-4 py-3 rounded-2xl rounded-tl-sm max-w-[85%] text-sm shadow-md mt-4 animate-[fade-in-up_0.3s_ease-out]">
                 <span class="text-[10px] font-black block mb-1.5 opacity-80 uppercase tracking-widest text-primary flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">smart_toy</span> Zoi AI</span>
-                Hi ${userName}! 👋 I'm Zoi, your dedicated support assistant. To help me resolve this quickly, please describe your issue, or tap an order context above if this is regarding a specific meal!
+                Hi ${userName}! ?? I'm Zoi, your dedicated support assistant. To help me resolve this quickly, please describe your issue, or tap an order context above if this is regarding a specific meal!
             </div>
         `;
 
@@ -891,7 +891,7 @@
                         <span class="material-symbols-outlined text-text-beige/60 group-hover:text-primary text-[20px] transition-colors">receipt_long</span>
                         <div class="flex flex-col">
                             <span class="text-white text-xs font-bold leading-none mb-1">${o.restaurantName || o.restaurant || 'Local Restaurant'}</span>
-                            <span class="text-text-beige/70 text-[9px] uppercase tracking-wider font-mono leading-none">#${o.id} • ₹${total}</span>
+                            <span class="text-text-beige/70 text-[9px] uppercase tracking-wider font-mono leading-none">#${o.id} � ?${total}</span>
                         </div>
                      </button>
                  `;
@@ -900,7 +900,7 @@
     }
 
     function attachOrderContext(orderId, restaurant, total) {
-        document.getElementById('inbox-chat-input').value = `I have an issue with Order #${orderId} from ${restaurant} (₹${total}). \n`;
+        document.getElementById('inbox-chat-input').value = `I have an issue with Order #${orderId} from ${restaurant} (?${total}). \n`;
         document.getElementById('inbox-chat-input').focus();
     }
 
@@ -921,7 +921,7 @@
                 date: new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'}),
                 status: 'open',
                 messages: [
-                    { sender: 'Zoi AI', text: `Hi ${userName}! 👋 I'm Zoi, your dedicated support assistant. To help me resolve this quickly, please describe your issue, or tap an order context above if this is regarding a specific meal!`, time: now },
+                    { sender: 'Zoi AI', text: `Hi ${userName}! ?? I'm Zoi, your dedicated support assistant. To help me resolve this quickly, please describe your issue, or tap an order context above if this is regarding a specific meal!`, time: now },
                     { sender: userName, text: text, time: now }
                 ]
             };
@@ -980,7 +980,7 @@
                 <div class="bg-primary text-black px-4 py-3 rounded-2xl rounded-tr-sm text-sm shadow-[0_4px_15px_rgba(0,240,255,0.15)] font-medium leading-relaxed">
                     ${formattedText}
                 </div>
-                <span class="text-[9px] text-text-beige/50 mt-1 font-bold tracking-widest uppercase">${timeStr} • You</span>
+                <span class="text-[9px] text-text-beige/50 mt-1 font-bold tracking-widest uppercase">${timeStr} � You</span>
             `;
         } else {
             bubble.className = 'self-start flex flex-col items-start max-w-[85%] animate-[fade-in-up_0.3s_ease-out]';
@@ -991,7 +991,7 @@
                     </span>
                     ${formattedText}
                 </div>
-                <span class="text-[9px] text-text-beige/50 mt-1 font-bold tracking-widest uppercase">${timeStr} • Automated</span>
+                <span class="text-[9px] text-text-beige/50 mt-1 font-bold tracking-widest uppercase">${timeStr} � Automated</span>
             `;
         }
         
@@ -1055,6 +1055,8 @@
 </script>
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

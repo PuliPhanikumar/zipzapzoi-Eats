@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -195,12 +195,12 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="text-xs font-bold text-gray-500 uppercase">Selling Price (₹)</label>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Selling Price (?)</label>
                                     <input type="number" id="editor-price" oninput="calculateMargin()"
                                         class="w-full bg-black/30 border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary">
                                 </div>
                                 <div>
-                                    <label class="text-xs font-bold text-gray-500 uppercase">Cost Price (₹)</label>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Cost Price (?)</label>
                                     <input type="number" id="editor-cost" oninput="calculateMargin()"
                                         class="w-full bg-black/30 border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary"
                                         placeholder="Optional">
@@ -232,7 +232,7 @@
 
                         <div class="col-span-2 bg-black/20 p-4 rounded-xl border border-border space-y-4">
                             <div class="flex justify-between items-center">
-                                <h4 class="text-sm font-bold text-white">⚙️ Variants & Portions</h4>
+                                <h4 class="text-sm font-bold text-white">?? Variants & Portions</h4>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
@@ -255,7 +255,7 @@
                                     <label class="text-xs font-bold text-gray-500 uppercase">Daily Quantity</label>
                                     <input type="number" id="editor-qty"
                                         class="w-full bg-black/30 border border-border rounded-lg p-2 text-white text-sm"
-                                        placeholder="∞">
+                                        placeholder="8">
                                 </div>
                                 <div>
                                     <label class="text-xs font-bold text-gray-500 uppercase">Prep Time (m)</label>
@@ -494,8 +494,8 @@
                                     <h4 class="font-bold text-white text-base truncate">${item.name}</h4>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <p class="text-primary font-black text-lg">₹${item.price}</p>
-                                    <span class="text-xs text-gray-500 font-mono">${item.qty === '∞' ? 'Unlimited' : item.qty + ' Left'}</span>
+                                    <p class="text-primary font-black text-lg">?${item.price}</p>
+                                    <span class="text-xs text-gray-500 font-mono">${item.qty === '8' ? 'Unlimited' : item.qty + ' Left'}</span>
                                 </div>
                             </div>
                             
@@ -602,7 +602,7 @@
                 }
                 const localIndex = menuItems.findIndex(i => i.id == id);
                 if (localIndex > -1) menuItems[localIndex] = newItem;
-                addToHistory(name, "Update", `Price: ₹${price}`);
+                addToHistory(name, "Update", `Price: ?${price}`);
             } else {
                 if (typeof ZoiPartnerMenu !== 'undefined') {
                     ZoiPartnerMenu.addMenuItem(newItem, cat);
@@ -793,6 +793,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

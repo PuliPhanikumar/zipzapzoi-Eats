@@ -1,4 +1,4 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -181,7 +181,7 @@
             document.getElementById('floor-grid').innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">${rooms.map((r, ri) => {
                 return `<div class="glass-panel p-0 overflow-hidden bouncy-card fade-row" style="animation-delay:${ri * 60}ms">
                     <div class="p-4 border-b border-border flex items-center justify-between">
-                        <div><h4 class="font-bold text-white text-sm">Room ${r.room}</h4><p class="text-[10px] text-gray-500">${r.type} â€¢ ${r.beds.length} Beds</p></div>
+                        <div><h4 class="font-bold text-white text-sm">Room ${r.room}</h4><p class="text-[10px] text-gray-500">${r.type} • ${r.beds.length} Beds</p></div>
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-white/10 text-gray-400">${r.beds.filter(b => b.status === 'occupied').length}/${r.beds.length} Full</span>
                     </div>
                     <div class="p-4 grid grid-cols-${Math.min(r.beds.length, 3)} gap-2">
@@ -190,7 +190,7 @@
                     return `<div class="bed-cell bg-${c}-500/15 border border-${c}-500/30 rounded-xl p-3 text-center" onclick="showBed('${b.id}',${currentFloor})">
                                 <span class="material-symbols-outlined text-${c}-400 text-lg block">${ic}</span>
                                 <p class="text-[10px] font-bold text-${c}-400 mt-0.5">${b.id.split('-')[1]}</p>
-                                <p class="text-[9px] text-gray-400 truncate">${b.hosteler || 'â€”'}</p>
+                                <p class="text-[9px] text-gray-400 truncate">${b.hosteler || '—'}</p>
                             </div>`;
                 }).join('')}
                     </div>
@@ -204,7 +204,7 @@
             rooms.forEach(r => r.beds.forEach(b => { if (b.id === bedId) { bed = b; room = r; } }));
             if (!bed) return;
             const c = STATUS_COLORS[bed.status];
-            document.getElementById('bm-title').innerText = `Bed ${bedId} â€” Room ${room.room}`;
+            document.getElementById('bm-title').innerText = `Bed ${bedId} — Room ${room.room}`;
             document.getElementById('bm-body').innerHTML = `
                 <div class="text-center mb-4"><span class="inline-block px-3 py-1 bg-${c}-500/20 text-${c}-400 rounded-lg text-xs font-bold capitalize">${bed.status}</span></div>
                 <div class="grid grid-cols-2 gap-2 text-xs">
@@ -255,6 +255,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

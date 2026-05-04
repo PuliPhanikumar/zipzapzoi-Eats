@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
     <meta charset="utf-8" />
@@ -76,7 +76,7 @@
         </div>
     </header>
 
-    <!-- Main Content Area — Single centered content that changes based on state -->
+    <!-- Main Content Area � Single centered content that changes based on state -->
     <main class="flex-1 flex items-center justify-center p-6">
         <div class="w-full max-w-lg text-center" id="contentArea">
             <!-- Content is injected by JavaScript based on state -->
@@ -85,7 +85,7 @@
 
     <!-- Minimal Footer -->
     <footer class="px-6 py-4 border-t border-border-dark flex items-center justify-between text-xs text-text-muted">
-        <span>© 2025 ZipZapZoi Technologies</span>
+        <span>� 2025 ZipZapZoi Technologies</span>
         <div class="flex gap-4">
             <a href="privacy policy.html" class="hover:text-primary transition-colors">Privacy</a>
             <a href="terms&conditions.html" class="hover:text-primary transition-colors">Terms</a>
@@ -94,12 +94,12 @@
     </footer>
 
     <script>
-        // ═══════════════════════════════════════════
-        // STATE MACHINE — 3 states:
-        // 1. 'ready'    → Show blinking "Go Live Now" button
-        // 2. 'pending'  → Show "Under Verification" message
-        // 3. 'approved' → Show Congratulations + link to dashboard
-        // ═══════════════════════════════════════════
+        // -------------------------------------------
+        // STATE MACHINE � 3 states:
+        // 1. 'ready'    ? Show blinking "Go Live Now" button
+        // 2. 'pending'  ? Show "Under Verification" message
+        // 3. 'approved' ? Show Congratulations + link to dashboard
+        // -------------------------------------------
 
         const contentArea = document.getElementById('contentArea');
 
@@ -120,7 +120,7 @@
             return localStorage.getItem('zoiGoLiveStatus') || 'ready';
         }
 
-        // ─── STATE 1: READY (Blinking Go Live button) ───
+        // --- STATE 1: READY (Blinking Go Live button) ---
         function renderReady() {
             contentArea.innerHTML = `
                 <div class="fade-in flex flex-col items-center gap-8">
@@ -159,7 +159,7 @@
                         </div>
                     </div>
 
-                    <!-- THE BUTTON — Large, centered, blinking -->
+                    <!-- THE BUTTON � Large, centered, blinking -->
                     <button onclick="goLive()" id="goLiveBtn"
                         class="blink-glow w-full max-w-sm py-5 bg-gradient-to-r from-primary to-[#00d4c5] hover:from-[#00d4c5] hover:to-primary text-[#0a0314] font-black text-2xl rounded-2xl transition-all flex items-center justify-center gap-3 cursor-pointer">
                         <span class="material-symbols-outlined" style="font-size:32px">power_settings_new</span>
@@ -171,7 +171,7 @@
             `;
         }
 
-        // ─── STATE 2: PENDING VERIFICATION ───
+        // --- STATE 2: PENDING VERIFICATION ---
         function renderPending() {
             const submittedAt = localStorage.getItem('zoiGoLiveSubmittedAt');
             let timeAgo = '';
@@ -258,7 +258,7 @@
             `;
         }
 
-        // ─── STATE 3: APPROVED — CONGRATULATIONS ───
+        // --- STATE 3: APPROVED � CONGRATULATIONS ---
         function renderApproved() {
             // Fire confetti
             launchConfetti();
@@ -274,7 +274,7 @@
 
                     <!-- Congratulations message -->
                     <div>
-                        <h1 class="text-3xl md:text-4xl font-black text-white mb-3">🎉 Congratulations!</h1>
+                        <h1 class="text-3xl md:text-4xl font-black text-white mb-3">?? Congratulations!</h1>
                         <p class="text-text-muted text-lg max-w-md mx-auto">
                             <span class="text-white font-semibold">${restaurantName}</span> has been verified 
                             and is now live on ZipZapZoi Eats!
@@ -292,7 +292,7 @@
                         </p>
                     </div>
 
-                    <!-- CTA — Go to Dashboard -->
+                    <!-- CTA � Go to Dashboard -->
                     <a href="restaurant_partner_dashboard.html" 
                         class="blink-glow w-full max-w-sm py-5 bg-gradient-to-r from-primary to-[#00d4c5] text-[#0a0314] font-black text-xl rounded-2xl transition-all flex items-center justify-center gap-3 no-underline">
                         <span class="material-symbols-outlined" style="font-size:28px">dashboard</span>
@@ -303,7 +303,7 @@
                     <div class="text-center">
                         <p class="text-text-muted text-sm mb-1">Or login with your credentials:</p>
                         <a href="login & registration.html" class="text-primary hover:underline text-sm font-bold">
-                            Login to ZipZapZoi Eats →
+                            Login to ZipZapZoi Eats ?
                         </a>
                         ${partnerEmail ? `<p class="text-text-muted text-xs mt-2">Registered email: <span class="text-white">${partnerEmail}</span></p>` : ''}
                     </div>
@@ -311,7 +311,7 @@
             `;
         }
 
-        // ─── GO LIVE ACTION ───
+        // --- GO LIVE ACTION ---
         function goLive() {
             const btn = document.getElementById('goLiveBtn');
             btn.classList.remove('blink-glow');
@@ -338,7 +338,7 @@
             }, 2000);
         }
 
-        // ─── CONFETTI ───
+        // --- CONFETTI ---
         function launchConfetti() {
             const colors = ['#00f0ff', '#8b5cf6', '#f59e0b', '#ef4444', '#22c55e', '#ec4899'];
             for (let i = 0; i < 50; i++) {
@@ -353,7 +353,7 @@
             }
         }
 
-        // ─── INIT ───
+        // --- INIT ---
         function render() {
             const state = getGoLiveState();
             if (state === 'approved') renderApproved();
@@ -390,5 +390,7 @@
     <script src="js/zoi_partner_engine.js"></script>
     <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 </html>

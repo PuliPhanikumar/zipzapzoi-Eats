@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -291,7 +291,7 @@
                 <td class="py-3 px-4 text-gray-400 text-xs">${l.pickup}</td>
                 <td class="py-3 px-4 text-gray-400 text-xs">${l.delivery}</td>
                 <td class="py-3 px-4">${LAUNDRY_STATUS[l.status]}</td>
-                <td class="py-3 px-4">${l.status !== 'delivered' ? `<button onclick="advanceLaundry('${l.id}')" class="text-xs text-teal bg-teal/10 px-3 py-1.5 rounded-lg font-bold hover:bg-teal/20 transition-colors">Next →</button>` : '<span class="text-xs text-gray-500">✓</span>'}</td>
+                <td class="py-3 px-4">${l.status !== 'delivered' ? `<button onclick="advanceLaundry('${l.id}')" class="text-xs text-teal bg-teal/10 px-3 py-1.5 rounded-lg font-bold hover:bg-teal/20 transition-colors">Next ?</button>` : '<span class="text-xs text-gray-500">?</span>'}</td>
             </tr>`).join('');
             updateStats();
         }
@@ -304,7 +304,7 @@
                 <td class="py-3 px-4 font-mono text-[10px] text-gray-400">${p.tracking}</td>
                 <td class="py-3 px-4 text-gray-400 text-xs">${p.received}</td>
                 <td class="py-3 px-4">${PARCEL_STATUS[p.status]}</td>
-                <td class="py-3 px-4">${p.status === 'pending' ? `<button onclick="collectParcel('${p.id}')" class="text-xs text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg font-bold hover:bg-green-500/20 transition-colors">Mark Collected</button>` : '<span class="text-xs text-gray-500">✓</span>'}</td>
+                <td class="py-3 px-4">${p.status === 'pending' ? `<button onclick="collectParcel('${p.id}')" class="text-xs text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg font-bold hover:bg-green-500/20 transition-colors">Mark Collected</button>` : '<span class="text-xs text-gray-500">?</span>'}</td>
             </tr>`).join('');
         }
 
@@ -343,7 +343,7 @@
             if (!h) { showToast('Select hosteler.', 'error'); return; }
             const shirts = parseInt(document.getElementById('l-shirts').value) || 0; const pants = parseInt(document.getElementById('l-pants').value) || 0; const others = parseInt(document.getElementById('l-others').value) || 0;
             const items = []; if (shirts) items.push(shirts + ' Shirts'); if (pants) items.push(pants + ' Pants'); if (others) items.push(others + ' Others');
-            LAUNDRY.unshift({ id: 'LDR-' + String(LAUNDRY.length + 1).padStart(3, '0'), hosteler: h, items: items.join(', ') || 'Mixed', service: document.getElementById('l-service').value.split('(')[0].trim(), pickup: new Date().toISOString().split('T')[0], delivery: '—', status: 'picked-up' });
+            LAUNDRY.unshift({ id: 'LDR-' + String(LAUNDRY.length + 1).padStart(3, '0'), hosteler: h, items: items.join(', ') || 'Mixed', service: document.getElementById('l-service').value.split('(')[0].trim(), pickup: new Date().toISOString().split('T')[0], delivery: '�', status: 'picked-up' });
             ZoiDB.set('laundry', LAUNDRY);
             closeLaundryModal(); renderLaundry();
             showToast('Laundry request submitted', 'success');
@@ -352,7 +352,7 @@
         function logParcel() {
             const h = document.getElementById('p-hosteler').value;
             if (!h) { showToast('Select hosteler.', 'error'); return; }
-            PARCELS.unshift({ id: 'PKL-' + String(PARCELS.length + 1).padStart(3, '0'), hosteler: h, courier: document.getElementById('p-courier').value || 'Other', tracking: document.getElementById('p-tracking').value || '—', received: new Date().toLocaleString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }), desc: document.getElementById('p-desc').value || 'Package', status: 'pending' });
+            PARCELS.unshift({ id: 'PKL-' + String(PARCELS.length + 1).padStart(3, '0'), hosteler: h, courier: document.getElementById('p-courier').value || 'Other', tracking: document.getElementById('p-tracking').value || '�', received: new Date().toLocaleString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }), desc: document.getElementById('p-desc').value || 'Package', status: 'pending' });
             ZoiDB.set('parcels', PARCELS);
             closeParcelModal(); renderParcels(); updateStats();
             showToast('New parcel logged', 'success');
@@ -365,6 +365,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -200,7 +200,7 @@
     <script>
         // 1. DATA SYNC (From Zone Manager)
         let zones = [];
-        const BASE_DELIVERY_FEE = 40; // ₹40 base fee
+        const BASE_DELIVERY_FEE = 40; // ?40 base fee
 
         function loadZones() {
             // Fetch from ZoiDB (Real World Persistence)
@@ -253,7 +253,7 @@
                                 <span class="font-mono font-bold text-primary w-10 text-right">${z.surge}x</span>
                             </div>
                         </td>
-                        <td class="p-4 text-right font-mono text-white">₹${finalPrice}</td>
+                        <td class="p-4 text-right font-mono text-white">?${finalPrice}</td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
@@ -268,7 +268,7 @@
             // Dynamic updates without full re-render for performance
             event.target.nextElementSibling.innerText = val + 'x';
             const row = event.target.closest('tr');
-            row.lastElementChild.innerText = '₹' + Math.round(BASE_DELIVERY_FEE * val);
+            row.lastElementChild.innerText = '?' + Math.round(BASE_DELIVERY_FEE * val);
 
             saveData();
             updateStats();
@@ -367,6 +367,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -140,7 +140,7 @@
                         class="material-symbols-outlined text-pink-400">currency_rupee</span></div>
                 <div>
                     <p class="text-[10px] text-gray-500 uppercase font-bold">Total Cost</p>
-                    <p class="text-xl font-extrabold text-pink-400" id="st-cost">₹0</p>
+                    <p class="text-xl font-extrabold text-pink-400" id="st-cost">?0</p>
                 </div>
             </div>
         </div>
@@ -252,7 +252,7 @@
                 <div class="grid grid-cols-2 gap-3">
                     <input id="nw-vendor" type="text" placeholder="Vendor / Technician"
                         class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
-                    <input id="nw-cost" type="number" placeholder="Est. Cost ₹"
+                    <input id="nw-cost" type="number" placeholder="Est. Cost ?"
                         class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
@@ -280,15 +280,15 @@
         const PRIORITY_COLORS = { Low: 'green', Medium: 'blue', High: 'amber', Urgent: 'red' };
 
         const ORDERS = ZoiDB.get('maintenance_orders', [
-            { id: 1, title: 'AC Servicing — Room 204 & 205', category: 'AC/HVAC', priority: 'High', location: 'Room 204, 205', vendor: 'Blue Star Service', cost: 5600, scheduledDate: '2026-03-05', dueDate: '2026-03-06', status: 'Scheduled' },
+            { id: 1, title: 'AC Servicing � Room 204 & 205', category: 'AC/HVAC', priority: 'High', location: 'Room 204, 205', vendor: 'Blue Star Service', cost: 5600, scheduledDate: '2026-03-05', dueDate: '2026-03-06', status: 'Scheduled' },
             { id: 2, title: 'Bathroom Pipe Leak Fix', category: 'Plumbing', priority: 'Urgent', location: 'Floor 1 Bathroom', vendor: 'Sri Ganesh Plumbing', cost: 3500, scheduledDate: '2026-03-03', dueDate: '2026-03-03', status: 'Overdue' },
             { id: 3, title: 'Floor 2 Bathroom Renovation', category: 'Plumbing', priority: 'High', location: 'Floor 2 Bathrooms', vendor: 'Krishna Constructions', cost: 45000, scheduledDate: '2026-03-08', dueDate: '2026-03-15', status: 'Scheduled' },
-            { id: 4, title: 'Electrical Wiring Check — Floor 3', category: 'Electrical', priority: 'Medium', location: 'Floor 3 Common Area', vendor: 'Local Electrician', cost: 2000, scheduledDate: '2026-03-04', dueDate: '2026-03-05', status: 'In Progress' },
+            { id: 4, title: 'Electrical Wiring Check � Floor 3', category: 'Electrical', priority: 'Medium', location: 'Floor 3 Common Area', vendor: 'Local Electrician', cost: 2000, scheduledDate: '2026-03-04', dueDate: '2026-03-05', status: 'In Progress' },
             { id: 5, title: 'Monthly Pest Control', category: 'Pest Control', priority: 'Medium', location: 'All Floors', vendor: 'Godrej Pest Control', cost: 3000, scheduledDate: '2026-03-01', dueDate: '2026-03-01', status: 'Completed' },
-            { id: 6, title: 'Deep Cleaning — Common Hall', category: 'Deep Cleaning', priority: 'Low', location: 'Common Hall', vendor: 'Housekeeping Team', cost: 1500, scheduledDate: '2026-03-02', dueDate: '2026-03-02', status: 'Completed' },
+            { id: 6, title: 'Deep Cleaning � Common Hall', category: 'Deep Cleaning', priority: 'Low', location: 'Common Hall', vendor: 'Housekeeping Team', cost: 1500, scheduledDate: '2026-03-02', dueDate: '2026-03-02', status: 'Completed' },
             { id: 7, title: 'Broken Bed Frame Replacement', category: 'Furniture', priority: 'Medium', location: 'Room 105 Bed B', vendor: 'Local Furniture Shop', cost: 4500, scheduledDate: '2026-03-06', dueDate: '2026-03-08', status: 'Scheduled' },
-            { id: 8, title: 'Wall Repainting — Room 303', category: 'Painting', priority: 'Low', location: 'Room 303', vendor: 'SRK Painters', cost: 6000, scheduledDate: '2026-03-10', dueDate: '2026-03-12', status: 'Scheduled' },
-            { id: 9, title: 'Geyser Replacement — Floor 2', category: 'Electrical', priority: 'High', location: 'Floor 2 Bathroom', vendor: 'Racold Service Center', cost: 8500, scheduledDate: '2026-03-07', dueDate: '2026-03-07', status: 'Scheduled' },
+            { id: 8, title: 'Wall Repainting � Room 303', category: 'Painting', priority: 'Low', location: 'Room 303', vendor: 'SRK Painters', cost: 6000, scheduledDate: '2026-03-10', dueDate: '2026-03-12', status: 'Scheduled' },
+            { id: 9, title: 'Geyser Replacement � Floor 2', category: 'Electrical', priority: 'High', location: 'Floor 2 Bathroom', vendor: 'Racold Service Center', cost: 8500, scheduledDate: '2026-03-07', dueDate: '2026-03-07', status: 'Scheduled' },
             { id: 10, title: 'Garden Maintenance & Landscaping', category: 'Other', priority: 'Low', location: 'Hostel Garden', vendor: 'Green Thumb Services', cost: 2500, scheduledDate: '2026-03-09', dueDate: '2026-03-09', status: 'Scheduled' },
         ]);
 
@@ -302,7 +302,7 @@
                 const cc = CAT_COLORS[o.category] || 'gray'; const ci = CAT_ICONS[o.category] || 'build';
                 const pc = PRIORITY_COLORS[o.priority] || 'gray';
                 const isOverdue = o.status === 'Overdue';
-                const statusBadge = o.status === 'Completed' ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">✓ Completed</span>' : o.status === 'In Progress' ? '<span class="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[10px] font-bold">🔄 In Progress</span>' : o.status === 'Overdue' ? '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">⚠ Overdue</span>' : '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">⏳ Scheduled</span>';
+                const statusBadge = o.status === 'Completed' ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">? Completed</span>' : o.status === 'In Progress' ? '<span class="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[10px] font-bold">?? In Progress</span>' : o.status === 'Overdue' ? '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">? Overdue</span>' : '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">? Scheduled</span>';
                 return `<div class="glass-panel p-4 bouncy-card fade-row ${isOverdue ? 'overdue-pulse border-red-500/30' : ''}" style="animation-delay:${i * 40}ms">
                     <div class="flex items-start gap-3">
                         <div class="h-10 w-10 rounded-xl bg-${cc}-500/15 flex items-center justify-center flex-shrink-0">
@@ -318,8 +318,8 @@
                             <div class="flex flex-wrap gap-3 mt-1.5 text-[10px] text-gray-500">
                                 <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">location_on</span>${o.location}</span>
                                 <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">person</span>${o.vendor}</span>
-                                <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">currency_rupee</span>₹${o.cost.toLocaleString()}</span>
-                                <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">calendar_today</span>${o.scheduledDate} → ${o.dueDate}</span>
+                                <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">currency_rupee</span>?${o.cost.toLocaleString()}</span>
+                                <span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-xs">calendar_today</span>${o.scheduledDate} ? ${o.dueDate}</span>
                             </div>
                         </div>
                         <div class="flex flex-col gap-1 flex-shrink-0">
@@ -348,7 +348,7 @@
             document.getElementById('st-total').innerText = ORDERS.length;
             document.getElementById('st-prog').innerText = ORDERS.filter(o => o.status === 'In Progress').length;
             document.getElementById('st-over').innerText = ORDERS.filter(o => o.status === 'Overdue').length;
-            document.getElementById('st-cost').innerText = '₹' + ORDERS.reduce((s, o) => s + o.cost, 0).toLocaleString();
+            document.getElementById('st-cost').innerText = '?' + ORDERS.reduce((s, o) => s + o.cost, 0).toLocaleString();
         }
 
         function renderCalendar() {
@@ -364,7 +364,7 @@
                     <p class="text-[10px] font-bold ${today ? 'text-pink-400' : 'text-gray-400'} mb-0.5">${d}</p>
                     ${events.map(e => {
                     const tc = CAT_COLORS[e.category] || 'gray';
-                    return `<div class="bg-${tc}-500/20 rounded px-1 py-0.5 text-[7px] text-${tc}-400 font-bold truncate mb-0.5">${e.title.substring(0, 15)}…</div>`;
+                    return `<div class="bg-${tc}-500/20 rounded px-1 py-0.5 text-[7px] text-${tc}-400 font-bold truncate mb-0.5">${e.title.substring(0, 15)}�</div>`;
                 }).join('')}
                 </div>`;
             }).join('');
@@ -420,7 +420,7 @@
                     maintainAspectRatio: false,
                     scales: {
                         x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 9 } } },
-                        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 9 }, callback: v => '₹' + (v / 1000) + 'K' } }
+                        y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 9 }, callback: v => '?' + (v / 1000) + 'K' } }
                     },
                     plugins: { legend: { display: false } }
                 }
@@ -438,8 +438,8 @@
                 title: t,
                 category: document.getElementById('nw-cat').value,
                 priority: document.getElementById('nw-priority').value,
-                location: document.getElementById('nw-loc').value || '—',
-                vendor: document.getElementById('nw-vendor').value || '—',
+                location: document.getElementById('nw-loc').value || '�',
+                vendor: document.getElementById('nw-vendor').value || '�',
                 cost: parseInt(document.getElementById('nw-cost').value) || 0,
                 scheduledDate: document.getElementById('nw-date').value,
                 dueDate: document.getElementById('nw-due').value || document.getElementById('nw-date').value,
@@ -461,6 +461,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

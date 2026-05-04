@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -147,7 +147,7 @@
                         class="material-symbols-outlined text-green-400">payments</span></div>
                 <div>
                     <p class="text-[10px] text-gray-500 uppercase font-bold">Monthly Spend</p>
-                    <p class="text-xl font-extrabold text-green-400" id="stat-spend">₹0</p>
+                    <p class="text-xl font-extrabold text-green-400" id="stat-spend">?0</p>
                 </div>
             </div>
         </div>
@@ -249,7 +249,7 @@
                             Category</h3><canvas id="cat-chart" height="240"></canvas>
                     </div>
                     <div class="glass-panel p-6 lg:col-span-2">
-                        <h3 class="font-bold text-white text-sm mb-4">Top 5 Highest Spend Items — March 2026</h3>
+                        <h3 class="font-bold text-white text-sm mb-4">Top 5 Highest Spend Items � March 2026</h3>
                         <div class="space-y-3" id="top-spend-list"></div>
                     </div>
                 </div>
@@ -289,7 +289,7 @@
                     <input id="new-min" type="number" placeholder="Min Level *"
                         class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
                 </div>
-                <input id="new-price" type="number" placeholder="Price per Unit ₹"
+                <input id="new-price" type="number" placeholder="Price per Unit ?"
                     class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
             </div>
             <div class="p-5 border-t border-border flex gap-3">
@@ -324,7 +324,7 @@
                 <input id="po-items" type="text" placeholder="Items (comma separated) *"
                     class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
                 <div class="grid grid-cols-2 gap-3">
-                    <input id="po-amount" type="number" placeholder="Total Amount ₹"
+                    <input id="po-amount" type="number" placeholder="Total Amount ?"
                         class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
                     <input id="po-date" type="date"
                         class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
@@ -351,7 +351,7 @@
                         class="material-symbols-outlined">close</span></button>
             </div>
             <div class="p-5 space-y-3.5">
-                <p class="text-sm text-gray-400" id="restock-info">—</p>
+                <p class="text-sm text-gray-400" id="restock-info">�</p>
                 <input id="restock-qty" type="number" placeholder="Quantity to add"
                     class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
             </div>
@@ -401,7 +401,7 @@
         const SUPPLIERS = ZoiDB.get('suppliers', [
             { name: 'Reliance Fresh', contact: '080-40001234', email: 'b2b@reliancefresh.in', items: 'Groceries, FMCG', rating: 4.5, orders: 12, totalSpend: 45000 },
             { name: 'Metro Cash & Carry', contact: '080-40005678', email: 'wholesale@metro.in', items: 'Bulk Groceries, Cleaning', rating: 4.2, orders: 8, totalSpend: 32000 },
-            { name: 'Local Kirana - Ramesh', contact: '9876512345', email: '—', items: 'Vegetables, Dairy', rating: 4.8, orders: 22, totalSpend: 28000 },
+            { name: 'Local Kirana - Ramesh', contact: '9876512345', email: '�', items: 'Vegetables, Dairy', rating: 4.8, orders: 22, totalSpend: 28000 },
             { name: 'BigBasket B2B', contact: '1800-200-1000', email: 'business@bigbasket.com', items: 'Pantry, Spices, Beverages', rating: 4.0, orders: 5, totalSpend: 15000 },
         ]);
 
@@ -429,7 +429,7 @@
                     <td class="py-3 px-4">
                         <div class="flex items-center gap-2.5">
                             <div class="h-8 w-8 rounded-lg bg-pink-500/15 flex items-center justify-center"><span class="material-symbols-outlined text-pink-400 text-sm">${it.cat === 'grocery' ? 'grocery' : it.cat === 'cleaning' ? 'cleaning_services' : it.cat === 'kitchen' ? 'skillet' : it.cat === 'maintenance' ? 'build' : 'edit_note'}</span></div>
-                            <div><span class="font-bold text-white text-sm">${it.name}</span><p class="text-[10px] text-gray-500">₹${it.price}/${it.unit}</p></div>
+                            <div><span class="font-bold text-white text-sm">${it.name}</span><p class="text-[10px] text-gray-500">?${it.price}/${it.unit}</p></div>
                         </div>
                     </td>
                     <td class="py-3 px-4"><span class="bg-white/10 px-2 py-0.5 rounded text-[10px] font-bold text-gray-300 capitalize">${it.cat}</span></td>
@@ -448,10 +448,10 @@
                 <td class="py-3 px-4 font-mono text-xs text-gray-400">${o.po}</td>
                 <td class="py-3 px-4 font-bold text-white text-sm">${o.supplier}</td>
                 <td class="py-3 px-4 text-gray-300 text-xs">${o.items}</td>
-                <td class="py-3 px-4 font-bold text-white">₹${o.total.toLocaleString()}</td>
+                <td class="py-3 px-4 font-bold text-white">?${o.total.toLocaleString()}</td>
                 <td class="py-3 px-4 text-gray-400 text-xs">${o.date}</td>
                 <td class="py-3 px-4">${STATUS_MAP[o.status]}</td>
-                <td class="py-3 px-4">${o.status === 'ordered' ? `<button onclick="markDelivered('${o.po}')" class="text-xs text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg font-bold hover:bg-green-500/20 transition-colors">Mark Delivered</button>` : '<span class="text-xs text-gray-500">—</span>'}</td>
+                <td class="py-3 px-4">${o.status === 'ordered' ? `<button onclick="markDelivered('${o.po}')" class="text-xs text-green-400 bg-green-500/10 px-3 py-1.5 rounded-lg font-bold hover:bg-green-500/20 transition-colors">Mark Delivered</button>` : '<span class="text-xs text-gray-500">�</span>'}</td>
             </tr>`).join('');
         }
 
@@ -463,15 +463,15 @@
                         <h4 class="font-bold text-white text-sm truncate">${s.name}</h4>
                         <p class="text-xs text-gray-400">${s.items}</p>
                     </div>
-                    <div class="flex items-center gap-0.5">${'★'.repeat(Math.floor(s.rating))}<span class="text-xs text-amber-400 font-bold ml-1">${s.rating}</span></div>
+                    <div class="flex items-center gap-0.5">${'?'.repeat(Math.floor(s.rating))}<span class="text-xs text-amber-400 font-bold ml-1">${s.rating}</span></div>
                 </div>
                 <div class="grid grid-cols-2 gap-2 text-[10px] mb-3">
                     <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Contact</span><span class="text-gray-300 font-bold">${s.contact}</span></div>
                     <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Orders</span><span class="text-gray-300 font-bold">${s.orders} orders</span></div>
                     <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Email</span><span class="text-gray-300 font-bold truncate block">${s.email}</span></div>
-                    <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Total Spend</span><span class="text-green-400 font-bold">₹${(s.totalSpend / 1000).toFixed(0)}K</span></div>
+                    <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Total Spend</span><span class="text-green-400 font-bold">?${(s.totalSpend / 1000).toFixed(0)}K</span></div>
                 </div>
-                <button class="w-full py-2 text-xs font-bold text-pink-400 bg-pink-500/10 rounded-lg hover:bg-pink-500/20 transition-colors">View Orders →</button>
+                <button class="w-full py-2 text-xs font-bold text-pink-400 bg-pink-500/10 rounded-lg hover:bg-pink-500/20 transition-colors">View Orders ?</button>
             </div>`).join('');
         }
 
@@ -481,7 +481,7 @@
             document.getElementById('stat-orders').innerText = PURCHASE_ORDERS.filter(o => o.status === 'ordered').length;
             const currentMonth = new Date().toISOString().substring(0, 7);
             const spend = PURCHASE_ORDERS.filter(o => o.status === 'delivered' && o.date.startsWith(currentMonth)).reduce((s, o) => s + o.total, 0);
-            document.getElementById('stat-spend').innerText = '₹' + spend.toLocaleString();
+            document.getElementById('stat-spend').innerText = '?' + spend.toLocaleString();
 
             if (document.getElementById('tab-spend').classList.contains('hidden') === false) {
                 initCharts();
@@ -496,7 +496,7 @@
         function closePOModal() { document.getElementById('po-modal').classList.add('hidden'); document.getElementById('po-modal').classList.remove('flex'); }
 
         let restockId = null;
-        function openRestockModal(id) { restockId = id; const it = INVENTORY.find(x => x.id === id); document.getElementById('restock-title').innerText = 'Restock: ' + it.name; document.getElementById('restock-info').innerText = `Current: ${it.qty} ${it.unit} • Min: ${it.min} ${it.unit}`; document.getElementById('restock-qty').value = ''; document.getElementById('restock-modal').classList.remove('hidden'); document.getElementById('restock-modal').classList.add('flex'); }
+        function openRestockModal(id) { restockId = id; const it = INVENTORY.find(x => x.id === id); document.getElementById('restock-title').innerText = 'Restock: ' + it.name; document.getElementById('restock-info').innerText = `Current: ${it.qty} ${it.unit} � Min: ${it.min} ${it.unit}`; document.getElementById('restock-qty').value = ''; document.getElementById('restock-modal').classList.remove('hidden'); document.getElementById('restock-modal').classList.add('flex'); }
         function closeRestockModal() { document.getElementById('restock-modal').classList.add('hidden'); document.getElementById('restock-modal').classList.remove('flex'); }
 
         function addItem() {
@@ -521,7 +521,7 @@
         function createPO() {
             const supplier = document.getElementById('po-supplier').value;
             if (!supplier) { showToast('Select a supplier.', 'error'); return; }
-            PURCHASE_ORDERS.unshift({ po: 'PO-' + Date.now().toString().slice(-8), supplier, items: document.getElementById('po-items').value || '—', total: parseInt(document.getElementById('po-amount').value) || 0, date: document.getElementById('po-date').value, status: 'ordered' });
+            PURCHASE_ORDERS.unshift({ po: 'PO-' + Date.now().toString().slice(-8), supplier, items: document.getElementById('po-items').value || '�', total: parseInt(document.getElementById('po-amount').value) || 0, date: document.getElementById('po-date').value, status: 'ordered' });
             ZoiDB.set('purchase_orders', PURCHASE_ORDERS);
             closePOModal(); renderOrders(); updateStats();
             showToast('Purchase order created', 'success');
@@ -554,7 +554,7 @@
             const data = sortedMonths.map(m => spendByMonth[m]);
             if (labels.length === 0) { labels.push('No Data'); data.push(0); }
 
-            spendChartInstance = new Chart(document.getElementById('spend-chart'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Monthly Spend (₹)', data: data, backgroundColor: 'rgba(0,212,197,0.3)', borderColor: 'rgba(0,212,197,0.7)', borderWidth: 1, borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 10 }, callback: v => '₹' + (v / 1000) + 'K' } } }, plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } } } });
+            spendChartInstance = new Chart(document.getElementById('spend-chart'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Monthly Spend (?)', data: data, backgroundColor: 'rgba(0,212,197,0.3)', borderColor: 'rgba(0,212,197,0.7)', borderWidth: 1, borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 10 }, callback: v => '?' + (v / 1000) + 'K' } } }, plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } } } });
 
             // Calculate Category Distribution
             const catData = {};
@@ -573,7 +573,7 @@
                 return `<div class="flex items-center gap-4 p-3 bg-white/[0.03] rounded-xl fade-row" style="animation-delay:${i * 60}ms">
                     <span class="text-xs font-bold text-gray-500 w-5">#${i + 1}</span>
                     <div class="flex-1"><p class="text-sm font-bold text-white">${it.name}</p><div class="mt-1 h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full" style="width:${(val / maxVal) * 100}%"></div></div></div>
-                    <span class="text-sm font-bold text-pink-400">₹${val.toLocaleString()}</span>
+                    <span class="text-sm font-bold text-pink-400">?${val.toLocaleString()}</span>
                 </div>`;
             }).join('');
         }
@@ -603,6 +603,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -137,7 +137,7 @@
             <div class="flex items-center gap-3">
                 <div class="glass-panel px-4 py-2 flex items-center gap-2 text-sm">
                     <span class="material-symbols-outlined text-pink-400 text-lg">calendar_today</span>
-                    <span class="font-bold text-white" id="header-date">—</span>
+                    <span class="font-bold text-white" id="header-date">�</span>
                 </div>
                 <button onclick="markAllPresent()"
                     class="flex items-center gap-2 px-4 py-2 bg-teal/15 border border-teal/30 rounded-full font-bold text-sm text-teal hover:bg-teal/25 transition-colors">
@@ -185,7 +185,7 @@
                         class="material-symbols-outlined text-green-400">savings</span></div>
                 <div>
                     <p class="text-[10px] text-gray-500 uppercase font-bold">Today's Cost</p>
-                    <p class="text-xl font-extrabold text-green-400" id="stat-cost">₹0</p>
+                    <p class="text-xl font-extrabold text-green-400" id="stat-cost">?0</p>
                 </div>
             </div>
         </div>
@@ -213,26 +213,26 @@
                         class="meal-selector active px-5 py-2.5 rounded-xl text-sm font-bold border border-amber-500/30 bg-amber-500/15 text-amber-400 transition-all"
                         data-meal="breakfast" onclick="selectMeal('breakfast')">
                         <span class="material-symbols-outlined text-sm align-middle mr-1">wb_sunny</span>Breakfast <span
-                            class="text-[10px] font-normal">(7:30 – 9:00)</span>
+                            class="text-[10px] font-normal">(7:30 � 9:00)</span>
                     </button>
                     <button
                         class="meal-selector px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-gray-400 transition-all"
                         data-meal="lunch" onclick="selectMeal('lunch')">
                         <span class="material-symbols-outlined text-sm align-middle mr-1">lunch_dining</span>Lunch <span
-                            class="text-[10px] font-normal">(12:30 – 2:00)</span>
+                            class="text-[10px] font-normal">(12:30 � 2:00)</span>
                     </button>
                     <button
                         class="meal-selector px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-gray-400 transition-all"
                         data-meal="dinner" onclick="selectMeal('dinner')">
                         <span class="material-symbols-outlined text-sm align-middle mr-1">dinner_dining</span>Dinner
-                        <span class="text-[10px] font-normal">(7:30 – 9:00)</span>
+                        <span class="text-[10px] font-normal">(7:30 � 9:00)</span>
                     </button>
                 </div>
 
                 <!-- Attendance Grid -->
                 <div class="glass-panel p-0 overflow-hidden">
                     <div class="p-4 border-b border-border flex items-center justify-between">
-                        <h3 class="font-bold text-white text-sm" id="grid-title">Breakfast Attendance — Today</h3>
+                        <h3 class="font-bold text-white text-sm" id="grid-title">Breakfast Attendance � Today</h3>
                         <div class="flex items-center gap-4 text-[10px] font-bold">
                             <span class="flex items-center gap-1.5"><span
                                     class="h-2.5 w-2.5 rounded-full bg-teal inline-block"></span> Present</span>
@@ -264,7 +264,7 @@
             <div id="tab-menu" class="tab-content hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-7 gap-4 mb-6">
                     <div class="glass-panel p-4 lg:col-span-7 mb-2">
-                        <h3 class="font-bold text-sm text-white mb-1">Weekly Menu — <span id="week-label"
+                        <h3 class="font-bold text-sm text-white mb-1">Weekly Menu � <span id="week-label"
                                 class="text-pink-400">This Week</span></h3>
                         <p class="text-xs text-gray-400">Plan & display the weekly mess menu. Click any item to edit.
                         </p>
@@ -290,28 +290,28 @@
                     </div>
                     <!-- Cost Summary Cards -->
                     <div class="glass-panel p-6 lg:col-span-2">
-                        <h3 class="font-bold text-white text-sm mb-4">Monthly Cost Summary — March 2026</h3>
+                        <h3 class="font-bold text-white text-sm mb-4">Monthly Cost Summary � March 2026</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             <div class="p-4 bg-white/[0.03] rounded-xl text-center border border-white/5">
                                 <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Groceries</p>
-                                <p class="text-xl font-extrabold text-white">₹28,500</p>
-                                <p class="text-[10px] text-green-400 mt-1">↓ 5% from Feb</p>
+                                <p class="text-xl font-extrabold text-white">?28,500</p>
+                                <p class="text-[10px] text-green-400 mt-1">? 5% from Feb</p>
                             </div>
                             <div class="p-4 bg-white/[0.03] rounded-xl text-center border border-white/5">
                                 <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Cooking Gas</p>
-                                <p class="text-xl font-extrabold text-white">₹4,200</p>
-                                <p class="text-[10px] text-red-400 mt-1">↑ 3% from Feb</p>
+                                <p class="text-xl font-extrabold text-white">?4,200</p>
+                                <p class="text-[10px] text-red-400 mt-1">? 3% from Feb</p>
                             </div>
                             <div class="p-4 bg-white/[0.03] rounded-xl text-center border border-white/5">
                                 <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Staff Wages</p>
-                                <p class="text-xl font-extrabold text-white">₹18,000</p>
-                                <p class="text-[10px] text-gray-400 mt-1">— No change</p>
+                                <p class="text-xl font-extrabold text-white">?18,000</p>
+                                <p class="text-[10px] text-gray-400 mt-1">� No change</p>
                             </div>
                             <div
                                 class="p-4 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-xl text-center border border-pink-500/20">
                                 <p class="text-[10px] text-pink-400 uppercase font-bold mb-1">Total Mess Cost</p>
-                                <p class="text-xl font-extrabold text-pink-400">₹50,700</p>
-                                <p class="text-[10px] text-gray-400 mt-1">Cost/plate: ₹62</p>
+                                <p class="text-xl font-extrabold text-pink-400">?50,700</p>
+                                <p class="text-[10px] text-gray-400 mt-1">Cost/plate: ?62</p>
                             </div>
                         </div>
                     </div>
@@ -322,7 +322,7 @@
             <div id="tab-history" class="tab-content hidden">
                 <div class="glass-panel p-0 overflow-hidden">
                     <div class="p-4 border-b border-border flex items-center justify-between">
-                        <h3 class="font-bold text-white text-sm">Hosteler Attendance Summary — March 2026</h3>
+                        <h3 class="font-bold text-white text-sm">Hosteler Attendance Summary � March 2026</h3>
                         <div class="flex gap-2">
                             <select
                                 class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-1.5 text-gray-300">
@@ -428,9 +428,9 @@
                         </div>
                     </td>
                     <td class="py-3 px-4 text-gray-300">${h.room}</td>
-                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'breakfast')" class="meal-btn ${att.breakfast} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Breakfast">${att.breakfast === 'present' ? '✓' : att.breakfast === 'absent' ? '✕' : '—'}</button></td>
-                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'lunch')" class="meal-btn ${att.lunch} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Lunch">${att.lunch === 'present' ? '✓' : att.lunch === 'absent' ? '✕' : '—'}</button></td>
-                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'dinner')" class="meal-btn ${att.dinner} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Dinner">${att.dinner === 'present' ? '✓' : att.dinner === 'absent' ? '✕' : '—'}</button></td>
+                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'breakfast')" class="meal-btn ${att.breakfast} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Breakfast">${att.breakfast === 'present' ? '?' : att.breakfast === 'absent' ? '?' : '�'}</button></td>
+                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'lunch')" class="meal-btn ${att.lunch} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Lunch">${att.lunch === 'present' ? '?' : att.lunch === 'absent' ? '?' : '�'}</button></td>
+                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'dinner')" class="meal-btn ${att.dinner} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Dinner">${att.dinner === 'present' ? '?' : att.dinner === 'absent' ? '?' : '�'}</button></td>
                     <td class="py-3 px-4"><div class="flex items-center gap-2"><div class="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-teal rounded-full" style="width:${(mealCount / 3) * 100}%"></div></div><span class="text-xs text-gray-400 font-bold">${mealCount}/3</span></div></td>
                 </tr>`;
             }).join('');
@@ -494,7 +494,7 @@
                 if (m === meal) { b.className = `meal-selector active px-5 py-2.5 rounded-xl text-sm font-bold border border-${MEAL_COLORS[m]}-500/30 bg-${MEAL_COLORS[m]}-500/15 text-${MEAL_COLORS[m]}-400 transition-all`; }
                 else { b.className = 'meal-selector px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-gray-400 transition-all'; }
             });
-            document.getElementById('grid-title').innerText = MEAL_LABELS[meal] + ' Attendance — Today';
+            document.getElementById('grid-title').innerText = MEAL_LABELS[meal] + ' Attendance � Today';
         }
 
         function updateStats() {
@@ -509,7 +509,7 @@
                 if (!TODAY[h.id]) return s;
                 return s + ['breakfast', 'lunch', 'dinner'].filter(m => TODAY[h.id][m] === 'present').length;
             }, 0);
-            document.getElementById('stat-cost').innerText = '₹' + (totalMeals * 62).toLocaleString();
+            document.getElementById('stat-cost').innerText = '?' + (totalMeals * 62).toLocaleString();
 
             if (!document.getElementById('tab-analytics').classList.contains('hidden')) {
                 initCharts(); // update pie chart dynamically
@@ -580,13 +580,13 @@
                 data: {
                     labels: ['1 Mar', '5 Mar', '10 Mar', '15 Mar', '20 Mar', '25 Mar', 'Today'],
                     datasets: [{
-                        label: 'Cost per Plate (₹)',
+                        label: 'Cost per Plate (?)',
                         data: [58, 65, 60, 62, 68, 55, 62],
                         borderColor: '#00D4C5', backgroundColor: 'rgba(0,212,197,0.1)',
                         fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: '#00D4C5'
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 10 }, callback: v => '₹' + v }, min: 40 } }, plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } } }
+                options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#6b7280', font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#6b7280', font: { size: 10 }, callback: v => '?' + v }, min: 40 } }, plugins: { legend: { labels: { color: '#9ca3af', font: { size: 10 } } } } }
             });
 
             // Meal distribution dynamically calculated from MONTHLY report
@@ -695,6 +695,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

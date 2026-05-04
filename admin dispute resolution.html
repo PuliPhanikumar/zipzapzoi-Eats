@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -247,7 +247,7 @@
                             <div class="bg-surface rounded-lg border border-border p-3 space-y-2">
                                 <div class="flex justify-between text-xs">
                                     <span class="text-gray-400">Customer LTV</span>
-                                    <span class="text-white font-bold">₹12,450 (High)</span>
+                                    <span class="text-white font-bold">?12,450 (High)</span>
                                 </div>
                                 <div class="flex justify-between text-xs">
                                     <span class="text-gray-400">Driver Rating</span>
@@ -469,7 +469,7 @@
                         </div>
                         <h3 class="text-white font-bold text-sm mb-1">${d.title}</h3>
                         <div class="flex items-center justify-between text-xs text-gray-500">
-                            <span>${d.user} • ${d.time}</span>
+                            <span>${d.user} � ${d.time}</span>
                         </div>
                     </div>`;
                 container.innerHTML += html;
@@ -491,7 +491,7 @@
             const d = disputes.find(x => x.id === id);
             renderList();
             document.getElementById('detail-title').innerText = `#${d.id}: ${d.title.split(':')[0]}`;
-            document.getElementById('detail-sub').innerText = `${d.title.split(':')[1]} • ${d.user}`;
+            document.getElementById('detail-sub').innerText = `${d.title.split(':')[1]} � ${d.user}`;
             document.getElementById('detail-tag').classList.toggle('hidden', d.type !== 'Critical');
             document.getElementById('ai-card').classList.remove('hidden');
             document.getElementById('ai-text').innerText = d.ai;
@@ -512,9 +512,9 @@
             let total = 0;
             d.items.forEach(i => {
                 orderList.innerHTML += `<div class="flex justify-between text-sm text-gray-300"><span>${i.n}</span><span>${i.p}</span></div>`;
-                total += parseInt(i.p.replace('₹', ''));
+                total += parseInt(i.p.replace('?', ''));
             });
-            document.getElementById('order-total').innerText = '₹' + total;
+            document.getElementById('order-total').innerText = '?' + total;
 
             document.getElementById('action-footer').classList.remove('hidden');
             document.getElementById('btn-evidence').classList.remove('hidden');
@@ -703,6 +703,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

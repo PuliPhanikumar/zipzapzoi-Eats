@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -109,7 +109,7 @@
                         <span class="material-symbols-outlined animate-pulse-slow text-2xl">auto_awesome</span>
                     </div>
                     <div>
-                        <h3 class="font-bold text-xl text-white">Opportunity: "Monsoon Rush" 🌧️</h3>
+                        <h3 class="font-bold text-xl text-white">Opportunity: "Monsoon Rush" ???</h3>
                         <p class="text-sm text-gray-400 max-w-xl mt-1">Local demand for <strong>Hot Snacks</strong> is
                             up 40% due to weather. Launch a targeted offer to capture this traffic.</p>
                     </div>
@@ -126,12 +126,12 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="bg-surface border border-border p-4 rounded-xl">
                     <p class="text-xs text-gray-400 uppercase font-bold">Active Spend</p>
-                    <h3 class="text-2xl font-mono font-black text-white mt-1">₹1,200<span
+                    <h3 class="text-2xl font-mono font-black text-white mt-1">?1,200<span
                             class="text-xs font-sans text-gray-500 font-normal">/day</span></h3>
                 </div>
                 <div class="bg-surface border border-border p-4 rounded-xl">
                     <p class="text-xs text-gray-400 uppercase font-bold">Sales Generated</p>
-                    <h3 class="text-2xl font-mono font-black text-success mt-1">₹45,200</h3>
+                    <h3 class="text-2xl font-mono font-black text-success mt-1">?45,200</h3>
                 </div>
                 <div class="bg-surface border border-border p-4 rounded-xl">
                     <p class="text-xs text-gray-400 uppercase font-bold">Claim Rate</p>
@@ -339,7 +339,7 @@
                                 <span class="material-symbols-outlined text-black">arrow_back</span>
                                 <div class="flex-1">
                                     <h4 class="font-bold text-black text-sm">Spice Garden</h4>
-                                    <p class="text-[10px] text-gray-500">North Indian • 4.2 ★</p>
+                                    <p class="text-[10px] text-gray-500">North Indian � 4.2 ?</p>
                                 </div>
                             </div>
                         </div>
@@ -354,7 +354,7 @@
                                         <p class="text-white font-black text-xl leading-none" id="preview-offer-text">
                                             20% OFF</p>
                                         <p class="text-white/90 text-[10px] font-medium mt-1" id="preview-subtext">Up to
-                                            ₹100 • Use code...</p>
+                                            ?100 � Use code...</p>
                                     </div>
                                     <div
                                         class="absolute top-2 right-2 bg-primary text-white px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wide">
@@ -428,7 +428,7 @@
                 const style = stratStyles[sType] || stratStyles['%'];
 
                 let title = `${p.val}% Off`;
-                if (sType === 'flat') title = `Flat ₹${p.val} Off`;
+                if (sType === 'flat') title = `Flat ?${p.val} Off`;
                 if (sType === 'bogo') title = 'BOGO Offer';
                 if (sType === 'freedel') title = 'Free Delivery';
 
@@ -444,7 +444,7 @@
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3 class="font-bold text-lg text-white">${title}</h3>
-                                    <p class="text-xs text-gray-400 mt-0.5"><span class="text-${style.colorRaw}-400 font-bold">${p.desc || 'General Promo'}</span> • Code: ${p.code}</p>
+                                    <p class="text-xs text-gray-400 mt-0.5"><span class="text-${style.colorRaw}-400 font-bold">${p.desc || 'General Promo'}</span> � Code: ${p.code}</p>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer" title="Toggle Status">
                                     <input type="checkbox" ${isChecked ? 'checked' : ''} class="sr-only peer" onchange="toggleCampaignStatus('${p.id}', this)">
@@ -454,15 +454,15 @@
                             <div class="mt-4 flex gap-6 text-xs border-t border-white/5 pt-3">
                                 <div>
                                     <p class="text-gray-500 uppercase font-bold text-[10px]">Spend</p>
-                                    <p class="font-mono font-bold text-white text-sm">₹${(p.used || 0) * 5}</p>
+                                    <p class="font-mono font-bold text-white text-sm">?${(p.used || 0) * 5}</p>
                                 </div>
                                 <div>
                                     <p class="text-gray-500 uppercase font-bold text-[10px]">Sales</p>
-                                    <p class="font-mono font-bold text-success text-sm">₹${(p.used || 0) * 25}</p>
+                                    <p class="font-mono font-bold text-success text-sm">?${(p.used || 0) * 25}</p>
                                 </div>
                                 <div>
                                     <p class="text-gray-500 uppercase font-bold text-[10px]">Claims</p>
-                                    <p class="font-mono font-bold text-white text-sm">${p.used || 0}/${p.limit || '∞'}</p>
+                                    <p class="font-mono font-bold text-white text-sm">${p.used || 0}/${p.limit || '8'}</p>
                                 </div>
                             </div>
                         </div>
@@ -538,11 +538,11 @@
                             <input type="number" id="input-value" value="20" class="w-full bg-bg border border-border rounded-lg p-2 text-white focus:border-primary text-sm" oninput="updatePreview()">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Max Cap (₹)</label>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Max Cap (?)</label>
                             <input type="number" id="input-cap" value="100" class="w-full bg-bg border border-border rounded-lg p-2 text-white focus:border-primary text-sm" oninput="updatePreview()">
                         </div>
                         <div class="col-span-2">
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Min Order Value (MOV) ₹</label>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Min Order Value (MOV) ?</label>
                             <input type="number" id="input-mov" value="200" class="w-full bg-bg border border-border rounded-lg p-2 text-white focus:border-primary text-sm" oninput="updatePreview()">
                         </div>
                     </div>`;
@@ -550,11 +550,11 @@
                 container.innerHTML = `
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Flat Amount Off (₹)</label>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Flat Amount Off (?)</label>
                             <input type="number" id="input-value" value="100" class="w-full bg-bg border border-border rounded-lg p-2 text-white focus:border-primary text-sm" oninput="updatePreview()">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Min Order Value (MOV) ₹</label>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Min Order Value (MOV) ?</label>
                             <input type="number" id="input-mov" value="300" class="w-full bg-bg border border-border rounded-lg p-2 text-white focus:border-primary text-sm" oninput="updatePreview()">
                         </div>
                     </div>`;
@@ -562,13 +562,13 @@
                 container.innerHTML = `
                     <div class="p-3 text-xs text-pink-300 bg-pink-500/10 rounded-lg border border-pink-500/20 flex items-center gap-2">
                         <span class="material-symbols-outlined text-sm">info</span>
-                        Buy 1 Get 1 Free. Cheapest item is free. Requires MOV ₹150.
+                        Buy 1 Get 1 Free. Cheapest item is free. Requires MOV ?150.
                     </div>`;
             } else if (strat === 'freedel') {
                 container.innerHTML = `
                     <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Min Order Value (MOV) ₹</label>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Min Order Value (MOV) ?</label>
                             <input type="number" id="input-mov" value="200" class="w-full bg-bg border border-border rounded-lg p-2 text-white focus:border-primary text-sm" oninput="updatePreview()">
                         </div>
                     </div>`;
@@ -593,17 +593,17 @@
                 const val = document.getElementById('input-value').value;
                 const cap = document.getElementById('input-cap').value;
                 mainText.innerText = `${val}% OFF`;
-                subText.innerText = `Up to ₹${cap} • Min Order ₹${mov}`;
+                subText.innerText = `Up to ?${cap} � Min Order ?${mov}`;
             } else if (currentStrat === 'flat') {
                 const val = document.getElementById('input-value').value;
-                mainText.innerText = `FLAT ₹${val} OFF`;
-                subText.innerText = `Min Order ₹${mov}`;
+                mainText.innerText = `FLAT ?${val} OFF`;
+                subText.innerText = `Min Order ?${mov}`;
             } else if (currentStrat === 'bogo') {
                 mainText.innerText = "BUY 1 GET 1";
                 subText.innerText = "Free item must be of equal or lesser value";
             } else if (currentStrat === 'freedel') {
                 mainText.innerText = "FREE DELIVERY";
-                subText.innerText = `Save on delivery • Min Order ₹${mov}`;
+                subText.innerText = `Save on delivery � Min Order ?${mov}`;
             }
         }
 
@@ -704,6 +704,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

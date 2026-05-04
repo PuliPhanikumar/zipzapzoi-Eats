@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -161,14 +161,14 @@
 
         <div class="p-4 border-t border-border bg-surface shadow-[0_-5px_15px_rgba(0,0,0,0.3)]">
             <div class="space-y-1 mb-4 text-sm">
-                <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="sub-total">₹0.00</span>
+                <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="sub-total">?0.00</span>
                 </div>
-                <div class="flex justify-between text-gray-400"><span>Tax (5%)</span><span id="tax-total">₹0.00</span>
+                <div class="flex justify-between text-gray-400"><span>Tax (5%)</span><span id="tax-total">?0.00</span>
                 </div>
                 <div class="flex justify-between text-red-400 hidden" id="disc-row"><span>Discount</span><span
-                        id="disc-total">-₹0.00</span></div>
+                        id="disc-total">-?0.00</span></div>
                 <div class="flex justify-between text-white text-xl font-black mt-2 pt-2 border-t border-white/10">
-                    <span>Total</span><span id="grand-total">₹0.00</span>
+                    <span>Total</span><span id="grand-total">?0.00</span>
                 </div>
             </div>
 
@@ -207,7 +207,7 @@
 
             <button onclick="processPayment()"
                 class="w-full py-4 bg-success hover:bg-green-500 text-white font-bold text-lg rounded-xl shadow-lg shadow-green-900/20 flex items-center justify-center gap-2 transition-all">
-                <span>Charge</span> <span id="pay-btn">₹0</span>
+                <span>Charge</span> <span id="pay-btn">?0</span>
             </button>
         </div>
     </div>
@@ -243,7 +243,7 @@
                     <label
                         class="flex items-center gap-2 p-2 border border-border rounded hover:bg-white/5 cursor-pointer">
                         <input type="checkbox" class="accent-primary mod-check" value="Extra Cheese" data-price="30">
-                        <span class="text-sm text-white">Extra Cheese (+₹30)</span>
+                        <span class="text-sm text-white">Extra Cheese (+?30)</span>
                     </label>
                     <label
                         class="flex items-center gap-2 p-2 border border-border rounded hover:bg-white/5 cursor-pointer">
@@ -290,7 +290,7 @@
                     class="flex-1 py-2 bg-primary text-black font-bold rounded text-xs">% Percent</button>
                 <button onclick="setDiscType('flat')" id="btn-disc-flat"
                     class="flex-1 py-2 bg-white/10 text-gray-400 font-bold rounded text-xs border border-white/10">Flat
-                    ₹</button>
+                    ?</button>
             </div>
             <input type="number" id="disc-input" placeholder="Value (e.g. 10)"
                 class="w-full bg-black/30 border border-border rounded-lg p-3 text-white mb-2">
@@ -307,7 +307,7 @@
         <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl text-center">
             <h3 class="text-lg font-bold text-white mb-4">Split Bill</h3>
             <p class="text-gray-400 text-xs mb-4">Total Amount: <span id="split-total-display"
-                    class="text-white font-bold">₹0</span></p>
+                    class="text-white font-bold">?0</span></p>
             <div class="flex items-center justify-center gap-4 mb-6">
                 <button onclick="adjSplit(-1)" class="size-8 bg-white/10 rounded-full text-white">-</button>
                 <span id="split-count" class="text-xl font-bold text-primary">2</span> <span
@@ -316,7 +316,7 @@
             </div>
             <div class="p-3 bg-black/30 rounded-lg border border-border mb-4">
                 <p class="text-xs text-gray-500">Each Pays</p>
-                <p class="text-2xl font-bold text-white" id="split-amount">₹0</p>
+                <p class="text-2xl font-bold text-white" id="split-amount">?0</p>
             </div>
             <button onclick="closeModal('split-modal')"
                 class="w-full py-2 border border-border text-gray-400 rounded-lg text-xs">Done</button>
@@ -410,7 +410,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1.5">
-                        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Price (₹)</label>
+                        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Price (?)</label>
                         <input type="number" id="prod-price" placeholder="199" class="w-full bg-black/40 border border-border rounded-xl px-4 py-3 text-white focus:border-purple-500 text-sm outline-none font-mono">
                     </div>
                     <div class="space-y-1.5">
@@ -456,7 +456,7 @@
         <div class="kot-paper w-80 p-4 rounded relative">
             <div class="text-center border-b-2 border-black border-dashed pb-2 mb-2">
                 <h2 class="text-xl font-bold uppercase">Kitchen Order</h2>
-                <p class="text-xs font-bold mt-1" id="kot-meta">Dine-In • Table 01</p>
+                <p class="text-xs font-bold mt-1" id="kot-meta">Dine-In � Table 01</p>
                 <p class="text-[10px]" id="kot-time">--</p>
             </div>
             <div class="space-y-1 text-sm font-bold border-b-2 border-black border-dashed pb-2 mb-2" id="kot-list">
@@ -586,7 +586,7 @@
                         <span class="material-symbols-outlined text-3xl opacity-80">${icon}</span>
                         <div class="text-center">
                             <p class="font-black text-lg">Table ${t.number}</p>
-                            <p class="text-[10px] uppercase font-bold opacity-60">${t.capacity} Seats • ${t.status}</p>
+                            <p class="text-[10px] uppercase font-bold opacity-60">${t.capacity} Seats � ${t.status}</p>
                         </div>
                     </div>`;
             });
@@ -659,7 +659,7 @@
                     <div onclick="initAdd('${item.id}')" class="item-card bg-surface border border-border p-3 rounded-xl cursor-pointer hover:bg-white/5 h-24 flex flex-col justify-between shadow-lg relative group select-none">
                         <span class="font-bold text-sm text-white leading-tight line-clamp-2">${item.name} ${typeIcon}</span>
                         <div class="flex justify-between items-end">
-                            <span class="font-mono font-bold text-primary">₹${item.price}</span>
+                            <span class="font-mono font-bold text-primary">?${item.price}</span>
                         </div>
                     </div>`;
             });
@@ -710,11 +710,11 @@
                             ${item.mods.length ? `<p class="text-[9px] text-yellow-500 italic">+ ${item.mods.join(',')}</p>` : ''}
                         </div>
                         <div class="flex items-center gap-1">
-                            <button onclick="changeQty(${idx},-1)" class="size-6 bg-white/10 rounded text-white text-xs font-bold">−</button>
+                            <button onclick="changeQty(${idx},-1)" class="size-6 bg-white/10 rounded text-white text-xs font-bold">-</button>
                             <span class="text-xs text-white font-mono w-6 text-center">${qty}</span>
                             <button onclick="changeQty(${idx},1)" class="size-6 bg-white/10 rounded text-white text-xs font-bold">+</button>
                         </div>
-                        <span class="text-xs font-mono w-14 text-right">₹${(price * qty).toFixed(0)}</span>
+                        <span class="text-xs font-mono w-14 text-right">?${(price * qty).toFixed(0)}</span>
                     </div>`;
             });
 
@@ -722,10 +722,10 @@
             const tax = (subtotal - discAmt) * 0.05;
             const total = (subtotal - discAmt) + tax;
 
-            document.getElementById('sub-total').innerText = "₹" + subtotal.toFixed(2);
-            document.getElementById('tax-total').innerText = "₹" + tax.toFixed(2);
-            document.getElementById('grand-total').innerText = "₹" + total.toFixed(2);
-            document.getElementById('pay-btn').innerText = "₹" + total.toFixed(0);
+            document.getElementById('sub-total').innerText = "?" + subtotal.toFixed(2);
+            document.getElementById('tax-total').innerText = "?" + tax.toFixed(2);
+            document.getElementById('grand-total').innerText = "?" + total.toFixed(2);
+            document.getElementById('pay-btn').innerText = "?" + total.toFixed(0);
         }
 
         function changeQty(idx, delta) {
@@ -745,7 +745,7 @@
 
         async function printKOT() {
             closeModal('kot-modal');
-            const total = parseFloat(document.getElementById('grand-total').innerText.replace('₹', ''));
+            const total = parseFloat(document.getElementById('grand-total').innerText.replace('?', ''));
             
             let tableId = null;
             if (orderMode === 'Dine-In') {
@@ -901,10 +901,10 @@
                     <div onclick="loadActiveOrder('${o.id}')" class="p-4 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition-all flex justify-between items-center group">
                         <div>
                             <p class="text-sm font-bold text-white">Order #${o.id.substring(0,8)}</p>
-                            <p class="text-[10px] text-gray-500 uppercase font-medium">${o.type} • ${o.tableId ? 'Table ' + (tables.find(t=>t.id===o.tableId)?.number || '??') : 'No Table'}</p>
+                            <p class="text-[10px] text-gray-500 uppercase font-medium">${o.type} � ${o.tableId ? 'Table ' + (tables.find(t=>t.id===o.tableId)?.number || '??') : 'No Table'}</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-sm font-mono font-bold text-primary">₹${o.totalAmount}</p>
+                            <p class="text-sm font-mono font-bold text-primary">?${o.totalAmount}</p>
                             <p class="text-[9px] text-blue-400">SELECT TO VIEW</p>
                         </div>
                     </div>
@@ -961,9 +961,9 @@
                         <div class="p-3 bg-white/5 border border-white/5 rounded-lg flex justify-between items-center opacity-60">
                             <div>
                                 <p class="text-[11px] font-bold text-white">#${o.id.substring(0,8)}</p>
-                                <p class="text-[9px] text-gray-500">${new Date(o.createdAt).toLocaleTimeString()} • ${o.type}</p>
+                                <p class="text-[9px] text-gray-500">${new Date(o.createdAt).toLocaleTimeString()} � ${o.type}</p>
                             </div>
-                            <p class="text-xs font-mono font-bold text-success">₹${o.totalAmount}</p>
+                            <p class="text-xs font-mono font-bold text-success">?${o.totalAmount}</p>
                         </div>
                     `).join('');
                 }
@@ -1058,8 +1058,8 @@
         function adjSplit(delta) {
             splitCount = Math.max(1, splitCount + delta);
             document.getElementById('split-count').innerText = splitCount;
-            const total = parseFloat(document.getElementById('grand-total').innerText.replace('₹', ''));
-            document.getElementById('split-amount').innerText = "₹" + (total / splitCount).toFixed(2);
+            const total = parseFloat(document.getElementById('grand-total').innerText.replace('?', ''));
+            document.getElementById('split-amount').innerText = "?" + (total / splitCount).toFixed(2);
         }
 
         function applyDiscount() {
@@ -1071,7 +1071,7 @@
             
             renderCart();
             closeModal('discount-modal');
-            showToast("Discount Applied", `${val}${discount.type === 'pct' ? '%' : '₹'} off items`);
+            showToast("Discount Applied", `${val}${discount.type === 'pct' ? '%' : '?'} off items`);
         }
 
         function setDiscType(type) {
@@ -1108,6 +1108,8 @@
     </script>
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

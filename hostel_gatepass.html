@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -278,17 +278,17 @@
     ]);
 
     const STATUS_MAP = {
-    pending: { badge: '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">⏳
+    pending: { badge: '<span class="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-[10px] font-bold">?
         Pending</span>', border: 'border-amber-500/20' },
-    approved: { badge: '<span class="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[10px] font-bold">✓
+    approved: { badge: '<span class="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-[10px] font-bold">?
         Approved</span>', border: 'border-blue-500/20' },
-    active: { badge: '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">●
+    active: { badge: '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">?
         Active</span>', border: 'border-green-500/20' },
-    used: { badge: '<span class="bg-teal/20 text-teal px-2 py-0.5 rounded text-[10px] font-bold">✓ Used</span>', border:
+    used: { badge: '<span class="bg-teal/20 text-teal px-2 py-0.5 rounded text-[10px] font-bold">? Used</span>', border:
     'border-teal/20' },
-    expired: { badge: '<span class="bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">⏰
+    expired: { badge: '<span class="bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">?
         Expired</span>', border: 'border-gray-500/20' },
-    rejected: { badge: '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">✕
+    rejected: { badge: '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">?
         Rejected</span>', border: 'border-red-500/20' }
     };
 
@@ -355,7 +355,7 @@
                     function viewPass(id) {
                     const p = PASSES.find(x => x.id === id); const sm = STATUS_MAP[p.status]; const tc =
                     TYPE_COLORS[p.type] || 'gray';
-                    document.getElementById('det-title').innerText = p.id + ' — ' + p.hosteler;
+                    document.getElementById('det-title').innerText = p.id + ' � ' + p.hosteler;
                     document.getElementById('det-body').innerHTML = `
                     <div class="flex justify-center mb-4">${generateQR(p.id)}</div>
                     <div class="text-center mb-4"><span
@@ -373,7 +373,7 @@
                                 class="text-gray-500 block mb-0.5">Return</span><span
                                 class="text-white font-bold">${p.returnDate}</span></div>
                         <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Approved
-                                By</span><span class="text-white font-bold">${p.approvedBy || '—'}</span></div>
+                                By</span><span class="text-white font-bold">${p.approvedBy || '�'}</span></div>
                     </div>
                     <div class="mt-3 p-2.5 bg-white/[0.03] rounded-lg text-xs"><span
                             class="text-gray-500 block mb-0.5">Reason</span><span
@@ -516,13 +516,13 @@
                     function generatePass() {
                     const h = document.getElementById('gp-hosteler').value;
                     if (!h) { showToast('Select hosteler.', 'error'); return; }
-                    const name = h.split('(')[0].trim(); const room = h.match(/\((\d+)\)/)?.[1] || '—';
+                    const name = h.split('(')[0].trim(); const room = h.match(/\((\d+)\)/)?.[1] || '�';
                     const type = document.getElementById('gp-type').value || 'Day Out (Same Day Return)';
                     PASSES.unshift({ id: 'GP-' + String(PASSES.length + 1).padStart(3, '0'), hosteler: name, room, type,
                     exit: document.getElementById('gp-exit').value, returnDate:
                     document.getElementById('gp-return').value || document.getElementById('gp-exit').value, reason:
-                    document.getElementById('gp-reason').value || '—', emergency:
-                    document.getElementById('gp-emergency').value || '—', status: type === 'Medical Emergency' ?
+                    document.getElementById('gp-reason').value || '�', emergency:
+                    document.getElementById('gp-emergency').value || '�', status: type === 'Medical Emergency' ?
                     'approved' : 'pending', approvedBy: type === 'Medical Emergency' ? 'Auto-Approved' : null });
                     ZoiDB.set('gate_passes', PASSES);
                     closePassModal(); renderPasses();
@@ -536,6 +536,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

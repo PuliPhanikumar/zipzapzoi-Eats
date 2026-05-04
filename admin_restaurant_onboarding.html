@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -72,10 +72,10 @@
                 <h1 class="text-xl font-bold text-white" id="page-title">Verification Queue</h1>
                 <div class="flex gap-1 bg-black/30 rounded-lg p-1 border border-border">
                     <button onclick="switchQueue('restaurant')" id="tab-restaurant"
-                        class="px-4 py-1.5 rounded-md text-xs font-bold transition-all bg-primary text-black">🏪
+                        class="px-4 py-1.5 rounded-md text-xs font-bold transition-all bg-primary text-black">??
                         Restaurants</button>
                     <button onclick="switchQueue('pos')" id="tab-pos"
-                        class="px-4 py-1.5 rounded-md text-xs font-bold transition-all text-gray-400 hover:text-white">💻
+                        class="px-4 py-1.5 rounded-md text-xs font-bold transition-all text-gray-400 hover:text-white">??
                         POS Signups</button>
                 </div>
             </div>
@@ -234,7 +234,7 @@
         let currentAppId = null;
         let currentView = 'restaurant'; // 'restaurant' or 'pos'
 
-        const PLAN_LABELS = { yearly: '₹8,888/yr', half: '₹4,888/6mo', quarterly: '₹2,888/3mo' };
+        const PLAN_LABELS = { yearly: '?8,888/yr', half: '?4,888/6mo', quarterly: '?2,888/3mo' };
 
         // === INIT ===
         window.onload = async () => {
@@ -421,7 +421,7 @@
                         <p class="text-[10px] text-gray-500">Payout verification</p>
                     </button>
                     <div class="mt-6 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-                        <p class="text-xs font-bold text-green-400 mb-1">✅ No FSSAI/GST required</p>
+                        <p class="text-xs font-bold text-green-400 mb-1">? No FSSAI/GST required</p>
                         <p class="text-[10px] text-gray-400">POS-only outlets don't need food aggregator compliance docs.</p>
                     </div>`;
 
@@ -436,7 +436,7 @@
                             <span class="text-sm font-bold text-white">FSSAI License</span>
                             <span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>
                         </div>
-                        <p class="text-[10px] text-gray-500">Exp: 2028 • Valid</p>
+                        <p class="text-[10px] text-gray-500">Exp: 2028 � Valid</p>
                     </button>
                     <button id="btn-gst" class="w-full text-left p-3 bg-white/5 border border-border rounded-lg cursor-pointer hover:border-primary transition-all mt-3" onclick="viewDoc('gst')">
                         <div class="flex justify-between items-center mb-1">
@@ -490,7 +490,7 @@
                 fssai: { t: 'FSSAI License', i: 'verified_user', d: 'License #2134556 Valid till 2028' },
                 gst: { t: 'GST Certificate', i: 'receipt_long', d: 'GSTIN Verified via API' },
                 bank: { t: 'Bank Details', i: 'account_balance', d: 'IFSC: HDFC000123' },
-                business: { t: 'Business Proof', i: 'storefront', d: 'Awaiting upload — Trade License / Udyam / PAN' }
+                business: { t: 'Business Proof', i: 'storefront', d: 'Awaiting upload � Trade License / Udyam / PAN' }
             };
             const lbl = labels[type] || labels.business;
             document.getElementById('doc-label').innerText = lbl.t;
@@ -558,6 +558,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

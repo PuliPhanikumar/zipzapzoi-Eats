@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -201,7 +201,7 @@
                             </div>
                             <div class="p-3 bg-blue-500/5 rounded-xl border border-blue-500/10">
                                 <p class="text-xs text-gray-300"><span class="text-blue-400 font-bold">Trend:</span>
-                                    "Overall satisfaction up 8% from Jan → Feb. Cleanliness score improved the most
+                                    "Overall satisfaction up 8% from Jan ? Feb. Cleanliness score improved the most
                                     (+15%)."</p>
                             </div>
                         </div>
@@ -215,9 +215,9 @@
                     <select id="fb-filter" onchange="renderFeedback()"
                         class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-2 text-gray-300">
                         <option value="all">All Sentiment</option>
-                        <option value="positive">😊 Positive</option>
-                        <option value="neutral">😐 Neutral</option>
-                        <option value="negative">😞 Negative</option>
+                        <option value="positive">?? Positive</option>
+                        <option value="neutral">?? Neutral</option>
+                        <option value="negative">?? Negative</option>
                     </select>
                     <input type="text" id="fb-search" oninput="renderFeedback()" placeholder="Search feedback..."
                         class="bg-surface/50 border border-white/10 rounded-full py-2 pl-4 pr-4 text-xs text-white focus:outline-none focus:border-pink-500 w-48">
@@ -259,22 +259,22 @@
         const FEEDBACKS = [
             { name: 'Ravi Kumar', room: '101', date: '2026-03-04', rating: 5, sentiment: 'positive', comment: 'Excellent food quality this month! The new breakfast menu with idli-vada is amazing. Staff is very helpful, especially the housekeeping team.', anonymous: false, responded: true, response: 'Thank you Ravi! We\'re glad you enjoy the new menu.' },
             { name: 'Deepak S.', room: '102', date: '2026-03-03', rating: 4, sentiment: 'positive', comment: 'Rooms are clean and well maintained. Only issue is Wi-Fi on Floor 1 is a bit slow during peak hours (9-11 PM).', anonymous: false, responded: false, response: null },
-            { name: 'Anonymous', room: '—', date: '2026-03-03', rating: 2, sentiment: 'negative', comment: 'Hot water supply is inconsistent in the morning. Sometimes no hot water at all even at 6 AM. This needs urgent fixing.', anonymous: true, responded: true, response: 'We\'ve scheduled a geyser inspection for March 5. Sorry for the inconvenience.' },
+            { name: 'Anonymous', room: '�', date: '2026-03-03', rating: 2, sentiment: 'negative', comment: 'Hot water supply is inconsistent in the morning. Sometimes no hot water at all even at 6 AM. This needs urgent fixing.', anonymous: true, responded: true, response: 'We\'ve scheduled a geyser inspection for March 5. Sorry for the inconvenience.' },
             { name: 'Priya S.', room: '301', date: '2026-03-02', rating: 4, sentiment: 'positive', comment: 'Love the Holi celebration initiative! Also, the new laundry service is very convenient. Would love a gaming room too!', anonymous: false, responded: false, response: null },
-            { name: 'Sanjay V.', room: '201', date: '2026-03-01', rating: 3, sentiment: 'neutral', comment: 'Everything is average. Dinner variety could be better — too much rice-based. Would appreciate more roti/chapati options.', anonymous: false, responded: true, response: 'Noted! We\'ll add more roti options starting next week.' },
-            { name: 'Anonymous', room: '—', date: '2026-02-28', rating: 1, sentiment: 'negative', comment: 'Night security guard sleeping on duty multiple times. Very concerning for safety. Please address this immediately.', anonymous: true, responded: true, response: 'This has been reported to the owner. Strict action will be taken. Thank you for reporting.' },
+            { name: 'Sanjay V.', room: '201', date: '2026-03-01', rating: 3, sentiment: 'neutral', comment: 'Everything is average. Dinner variety could be better � too much rice-based. Would appreciate more roti/chapati options.', anonymous: false, responded: true, response: 'Noted! We\'ll add more roti options starting next week.' },
+            { name: 'Anonymous', room: '�', date: '2026-02-28', rating: 1, sentiment: 'negative', comment: 'Night security guard sleeping on duty multiple times. Very concerning for safety. Please address this immediately.', anonymous: true, responded: true, response: 'This has been reported to the owner. Strict action will be taken. Thank you for reporting.' },
             { name: 'Kiran R.', room: '103', date: '2026-02-27', rating: 5, sentiment: 'positive', comment: 'Best hostel I\'ve stayed in! The management is very responsive to complaints. Rent is fair for the facilities provided.', anonymous: false, responded: false, response: null },
             { name: 'Sneha Sharma', room: '301', date: '2026-02-25', rating: 4, sentiment: 'positive', comment: 'Good facilities overall. Parking area could be better organized. Also, please add a water purifier on Floor 3.', anonymous: false, responded: true, response: 'Water purifier for Floor 3 has been ordered. Should be installed by March 10.' },
         ];
 
-        const SENTIMENT_MAP = { positive: { icon: '😊', color: 'green', label: 'Positive' }, neutral: { icon: '😐', color: 'amber', label: 'Neutral' }, negative: { icon: '😞', color: 'red', label: 'Negative' } };
+        const SENTIMENT_MAP = { positive: { icon: '??', color: 'green', label: 'Positive' }, neutral: { icon: '??', color: 'amber', label: 'Neutral' }, negative: { icon: '??', color: 'red', label: 'Negative' } };
 
         function renderCategoryRatings() {
             document.getElementById('cat-ratings').innerHTML = CATEGORIES.map((cat, i) => {
                 const r = CAT_RATINGS_DATA[i];
                 const w = (r / 5) * 100;
                 const clr = r >= 4 ? 'green' : r >= 3 ? 'amber' : 'red';
-                return `<div><div class="flex justify-between text-xs mb-1"><span class="text-gray-300">${cat}</span><span class="text-${clr}-400 font-bold">${r.toFixed(1)} ★</span></div><div class="h-2 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-${clr}-500 to-${clr}-400 rounded-full transition-all" style="width:${w}%"></div></div></div>`;
+                return `<div><div class="flex justify-between text-xs mb-1"><span class="text-gray-300">${cat}</span><span class="text-${clr}-400 font-bold">${r.toFixed(1)} ?</span></div><div class="h-2 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-${clr}-500 to-${clr}-400 rounded-full transition-all" style="width:${w}%"></div></div></div>`;
             }).join('');
         }
 
@@ -292,20 +292,20 @@
 
             document.getElementById('feedback-list').innerHTML = items.map((f, i) => {
                 const s = SENTIMENT_MAP[f.sentiment];
-                const stars = '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating);
+                const stars = '?'.repeat(f.rating) + '?'.repeat(5 - f.rating);
                 return `<div class="glass-panel p-0 overflow-hidden bouncy-card fade-row" style="animation-delay:${i * 50}ms">
                     <div class="p-5 flex items-start gap-4">
                         <div class="h-10 w-10 rounded-full ${f.anonymous ? 'bg-gray-500/20' : 'bg-pink-500/20'} flex items-center justify-center flex-shrink-0"><span class="material-symbols-outlined ${f.anonymous ? 'text-gray-400' : 'text-pink-400'}">${f.anonymous ? 'visibility_off' : 'person'}</span></div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
                                 <span class="font-bold text-white text-sm">${f.name}</span>
-                                ${f.room !== '—' ? `<span class="text-[10px] text-gray-500">Room ${f.room}</span>` : ''}
+                                ${f.room !== '�' ? `<span class="text-[10px] text-gray-500">Room ${f.room}</span>` : ''}
                                 <span class="bg-${s.color}-500/20 text-${s.color}-400 px-2 py-0.5 rounded text-[10px] font-bold">${s.icon} ${s.label}</span>
                                 <span class="text-amber-400 text-xs font-bold ml-auto">${stars}</span>
                             </div>
                             <p class="text-xs text-gray-300 leading-relaxed">${f.comment}</p>
                             <p class="text-[10px] text-gray-500 mt-2">${f.date}</p>
-                            ${f.responded ? `<div class="mt-3 p-3 bg-teal/5 border border-teal/15 rounded-lg"><p class="text-[10px] text-teal font-bold mb-0.5">↪ Management Response:</p><p class="text-xs text-gray-300">${f.response}</p></div>` : `<button onclick="this.parentElement.innerHTML+='<div class=\\'mt-3 p-3 bg-white/5 border border-white/10 rounded-lg\\'><textarea class=\\'w-full bg-transparent text-xs text-white resize-none\\' rows=\\'2\\' placeholder=\\'Write a response...\\'></textarea><button class=\\'mt-1 text-[10px] text-pink-400 font-bold\\'>Send Response</button></div>';this.remove()" class="mt-2 text-[10px] text-pink-400 bg-pink-500/10 px-3 py-1 rounded font-bold hover:bg-pink-500/20">Reply</button>`}
+                            ${f.responded ? `<div class="mt-3 p-3 bg-teal/5 border border-teal/15 rounded-lg"><p class="text-[10px] text-teal font-bold mb-0.5">? Management Response:</p><p class="text-xs text-gray-300">${f.response}</p></div>` : `<button onclick="this.parentElement.innerHTML+='<div class=\\'mt-3 p-3 bg-white/5 border border-white/10 rounded-lg\\'><textarea class=\\'w-full bg-transparent text-xs text-white resize-none\\' rows=\\'2\\' placeholder=\\'Write a response...\\'></textarea><button class=\\'mt-1 text-[10px] text-pink-400 font-bold\\'>Send Response</button></div>';this.remove()" class="mt-2 text-[10px] text-pink-400 bg-pink-500/10 px-3 py-1 rounded font-bold hover:bg-pink-500/20">Reply</button>`}
                         </div>
                     </div>
                 </div>`;
@@ -327,17 +327,17 @@
         function submitSurvey() {
             const avg = surveyRatings.reduce((a, b) => a + b, 0) / surveyRatings.length;
             if (avg === 0) { alert('Please rate at least one category.'); return; }
-            const comment = document.getElementById('survey-comment').value || '—';
+            const comment = document.getElementById('survey-comment').value || '�';
             const anon = document.getElementById('survey-anon').checked;
             const sentiment = avg >= 4 ? 'positive' : avg >= 3 ? 'neutral' : 'negative';
-            FEEDBACKS.unshift({ name: anon ? 'Anonymous' : 'Hostel Admin', room: anon ? '—' : '—', date: new Date().toISOString().split('T')[0], rating: Math.round(avg), sentiment, comment, anonymous: anon, responded: false, response: null });
-            alert('✅ Thank you! Feedback submitted successfully.');
+            FEEDBACKS.unshift({ name: anon ? 'Anonymous' : 'Hostel Admin', room: anon ? '�' : '�', date: new Date().toISOString().split('T')[0], rating: Math.round(avg), sentiment, comment, anonymous: anon, responded: false, response: null });
+            alert('? Thank you! Feedback submitted successfully.');
             switchTab('feedbacks'); renderFeedback(); updateStats();
         }
 
         function updateStats() {
             const avg = FEEDBACKS.reduce((s, f) => s + f.rating, 0) / FEEDBACKS.length;
-            document.getElementById('avg-rating').innerText = avg.toFixed(1) + ' ★';
+            document.getElementById('avg-rating').innerText = avg.toFixed(1) + ' ?';
             document.getElementById('total-fb').innerText = FEEDBACKS.length;
             const pos = Math.round(FEEDBACKS.filter(f => f.sentiment === 'positive').length / FEEDBACKS.length * 100);
             document.getElementById('positive-pct').innerText = pos + '%';
@@ -352,6 +352,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

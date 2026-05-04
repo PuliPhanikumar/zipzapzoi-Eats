@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -156,7 +156,7 @@
     <!-- Simple Footer -->
     <footer class="bg-surface border-t border-white/10 py-8 mt-auto">
         <div class="max-w-7xl mx-auto px-6 text-center text-sm text-gray-500">
-            <p>© 2026 ZipZapZoi Eats Ecosystem. All rights reserved.</p>
+            <p>� 2026 ZipZapZoi Eats Ecosystem. All rights reserved.</p>
         </div>
     </footer>
 
@@ -300,7 +300,7 @@
                             <p class="text-[10px] text-gray-400 hover:text-primary cursor-pointer transition-colors truncate" onclick="goToRestaurant('${restId}', '${restName}')">By ${restName}</p>
                         </div>
                         <div class="flex items-center justify-between mt-2">
-                            <span class="font-bold text-primary">₹${d.price}</span>
+                            <span class="font-bold text-primary">?${d.price}</span>
                             <button onclick="addDishToCart(${d.id}, '${d.itemName}', ${d.price}, '${restId}', '${restName}')" class="bg-white/10 hover:bg-white text-white hover:text-black w-7 h-7 flex items-center justify-center rounded-lg transition-all shadow-sm">
                                 <span class="material-symbols-outlined text-sm">add</span>
                             </button>
@@ -396,5 +396,7 @@
     <script src="js/zoi_ai_assistant.js?v=4"></script>
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 </html>

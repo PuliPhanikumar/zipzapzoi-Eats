@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -56,7 +56,7 @@
                     <span class="material-symbols-outlined text-primary">admin_panel_settings</span>
                     Manager Dashboard
                 </h2>
-                <p class="text-xs text-gray-500 mt-0.5">Logged in as: <span class="text-primary font-bold" id="current-manager-name">--</span> · <span class="text-gray-400" id="current-manager-role">--</span></p>
+                <p class="text-xs text-gray-500 mt-0.5">Logged in as: <span class="text-primary font-bold" id="current-manager-name">--</span> � <span class="text-gray-400" id="current-manager-role">--</span></p>
             </div>
             <div class="flex items-center gap-3">
                 <div class="relative">
@@ -99,12 +99,12 @@
                         <span class="material-symbols-outlined text-primary">assignment</span>
                         Assigned Escalations
                     </h3>
-                    <a href="admin dispute resolution.html" class="text-xs text-primary hover:underline font-bold">View All Disputes →</a>
+                    <a href="admin dispute resolution.html" class="text-xs text-primary hover:underline font-bold">View All Disputes ?</a>
                 </div>
                 <div class="space-y-3" id="task-list"></div>
                 <div class="hidden text-center py-12 text-gray-500" id="empty-tasks">
                     <span class="material-symbols-outlined text-4xl mb-2 opacity-30">inbox</span>
-                    <p class="text-sm">No escalated tickets assigned to you. You're all caught up! 🎉</p>
+                    <p class="text-sm">No escalated tickets assigned to you. You're all caught up! ??</p>
                 </div>
             </div>
 
@@ -217,7 +217,7 @@
                                             ${typeBadge}
                                         </div>
                                         <h4 class="text-white font-bold">${ticket.title}</h4>
-                                        <p class="text-xs text-gray-500 mt-0.5">${ticket.user} · ${ticket.time}</p>
+                                        <p class="text-xs text-gray-500 mt-0.5">${ticket.user} � ${ticket.time}</p>
                                     </div>
                                     <button class="p-2 bg-primary/10 text-primary rounded-lg hover:bg-primary hover:text-black transition-all"><span class="material-symbols-outlined text-lg">task_alt</span></button>
                                 </div>
@@ -302,5 +302,7 @@
     <script src="js/zoi_ai_assistant.js?v=4"></script>
     <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 </html>

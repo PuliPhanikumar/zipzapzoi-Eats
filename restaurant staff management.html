@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -121,7 +121,7 @@
                 class="bg-surface border border-border rounded-xl p-4 flex flex-col group hover:border-red-500/50 transition-colors">
                 <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Labor Cost (Month)</p>
                 <div class="flex justify-between items-end mt-2">
-                    <h3 class="text-2xl font-black text-white" id="stat-labor-cost">₹0</h3>
+                    <h3 class="text-2xl font-black text-white" id="stat-labor-cost">?0</h3>
                     <span class="text-[10px] text-gray-400">Includes OT & Tips</span>
                 </div>
             </div>
@@ -137,7 +137,7 @@
                 class="bg-surface border border-border rounded-xl p-4 flex flex-col group hover:border-green-500/50 transition-colors">
                 <p class="text-xs text-gray-500 uppercase font-bold tracking-wider">Total Tips (Pool)</p>
                 <div class="flex justify-between items-end mt-2">
-                    <h3 class="text-2xl font-black text-white" id="stat-tips">₹0</h3>
+                    <h3 class="text-2xl font-black text-white" id="stat-tips">?0</h3>
                     <span class="material-symbols-outlined text-green-500">savings</span>
                 </div>
             </div>
@@ -341,7 +341,7 @@
                         <option value="Waiter">Waiter</option>
                         <option value="Rider">Rider</option>
                     </select>
-                    <input type="number" id="new-rate" placeholder="Rate/Hr (₹)"
+                    <input type="number" id="new-rate" placeholder="Rate/Hr (?)"
                         class="w-full bg-black/30 border border-border rounded-lg p-2.5 text-white text-sm focus:border-primary">
                 </div>
                 <input type="text" id="new-phone" placeholder="Phone (WhatsApp)"
@@ -408,7 +408,7 @@
             <p class="text-xs text-gray-400 mb-4">Tips are pooled and distributed based on hours worked.</p>
             <input type="number" id="tip-amount"
                 class="w-full bg-black/30 border border-border rounded-lg p-2.5 text-white text-lg font-mono mb-4"
-                placeholder="₹0.00">
+                placeholder="?0.00">
             <div class="flex justify-end gap-3">
                 <button onclick="closeModal('tip-modal')"
                     class="px-4 py-2 border border-border text-gray-400 rounded-lg text-xs font-bold">Cancel</button>
@@ -522,8 +522,8 @@
                         <td class="p-3 text-white font-bold">${s.fname}</td>
                         <td class="p-3 text-gray-400">${s.hours}</td>
                         <td class="p-3 text-gray-400">${s.ot}</td>
-                        <td class="p-3 text-green-400">₹${s.tips}</td>
-                        <td class="p-3 text-right font-mono font-bold">₹${total.toLocaleString()}</td>
+                        <td class="p-3 text-green-400">?${s.tips}</td>
+                        <td class="p-3 text-right font-mono font-bold">?${total.toLocaleString()}</td>
                     </tr>`;
             });
         }
@@ -536,11 +536,11 @@
                 staff.forEach(s => s.tips += share);
                 saveStaffData();
                 renderPayroll();
-                document.getElementById('stat-tips').innerText = "₹" + (staff.reduce((a, b) => a + b.tips, 0)).toLocaleString();
+                document.getElementById('stat-tips').innerText = "?" + (staff.reduce((a, b) => a + b.tips, 0)).toLocaleString();
                 renderPerfCards();
                 renderStats();
                 closeModal('tip-modal');
-                showToast("Added", `₹${amount} distributed to pool.`);
+                showToast("Added", `?${amount} distributed to pool.`);
             }
         }
         function exportPayrollCSV() {
@@ -567,7 +567,7 @@
                     <div class="bg-surface border border-border rounded-xl p-4 flex justify-between items-center">
                         <div>
                             <h4 class="font-bold text-white text-sm">${l.name}</h4>
-                            <p class="text-xs text-gray-400">${l.type} • ${l.dates}</p>
+                            <p class="text-xs text-gray-400">${l.type} � ${l.dates}</p>
                         </div>
                         <div class="flex gap-2">
                             <button onclick="approveLeave(${l.id})" class="p-2 bg-green-500/10 text-green-500 rounded hover:bg-green-500 hover:text-white"><span class="material-symbols-outlined text-sm">check</span></button>
@@ -608,7 +608,7 @@
                     <div class="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs uppercase">${s.fname[0]}</div>
                     <div class="flex-1">
                         <p class="text-sm font-bold text-white">${s.fname} ${s.lname}</p>
-                        <p class="text-xs text-gray-500">${s.role} • ₹${s.tips} Tips</p>
+                        <p class="text-xs text-gray-500">${s.role} � ?${s.tips} Tips</p>
                     </div>
                 </div>
             `).join('');
@@ -619,8 +619,8 @@
             const totalTips = staff.reduce((sum, s) => sum + s.tips, 0);
             
             document.getElementById('stat-active').innerText = activeCount;
-            document.getElementById('stat-labor-cost').innerText = '₹' + laborCost.toLocaleString();
-            document.getElementById('stat-tips').innerText = '₹' + totalTips.toLocaleString();
+            document.getElementById('stat-labor-cost').innerText = '?' + laborCost.toLocaleString();
+            document.getElementById('stat-tips').innerText = '?' + totalTips.toLocaleString();
             
             const avatarsHtml = staff.filter(s => s.status === 'Active').slice(0, 3).map(s => 
                 `<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-black text-xs font-bold border-2 border-surface uppercase">${s.fname[0]}</div>`
@@ -685,6 +685,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>

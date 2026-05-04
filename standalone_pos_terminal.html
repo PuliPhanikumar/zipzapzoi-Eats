@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -149,14 +149,14 @@
 
         <div class="p-4 border-t border-border bg-surface shadow-[0_-5px_15px_rgba(0,0,0,0.3)]">
             <div class="space-y-1 mb-4 text-sm">
-                <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="sub-total">₹0.00</span>
+                <div class="flex justify-between text-gray-400"><span>Subtotal</span><span id="sub-total">?0.00</span>
                 </div>
-                <div class="flex justify-between text-gray-400"><span>Tax (5%)</span><span id="tax-total">₹0.00</span>
+                <div class="flex justify-between text-gray-400"><span>Tax (5%)</span><span id="tax-total">?0.00</span>
                 </div>
                 <div class="flex justify-between text-red-400 hidden" id="disc-row"><span>Discount</span><span
-                        id="disc-total">-₹0.00</span></div>
+                        id="disc-total">-?0.00</span></div>
                 <div class="flex justify-between text-white text-xl font-black mt-2 pt-2 border-t border-white/10">
-                    <span>Total</span><span id="grand-total">₹0.00</span>
+                    <span>Total</span><span id="grand-total">?0.00</span>
                 </div>
             </div>
 
@@ -195,7 +195,7 @@
 
             <button onclick="processPayment()"
                 class="w-full py-4 bg-success hover:bg-green-500 text-white font-bold text-lg rounded-xl shadow-lg shadow-green-900/20 flex items-center justify-center gap-2 transition-all">
-                <span>Charge</span> <span id="pay-btn">₹0</span>
+                <span>Charge</span> <span id="pay-btn">?0</span>
             </button>
         </div>
     </div>
@@ -209,7 +209,7 @@
                     <label
                         class="flex items-center gap-2 p-2 border border-border rounded hover:bg-white/5 cursor-pointer">
                         <input type="checkbox" class="accent-primary mod-check" value="Extra Cheese" data-price="30">
-                        <span class="text-sm text-white">Extra Cheese (+₹30)</span>
+                        <span class="text-sm text-white">Extra Cheese (+?30)</span>
                     </label>
                     <label
                         class="flex items-center gap-2 p-2 border border-border rounded hover:bg-white/5 cursor-pointer">
@@ -256,7 +256,7 @@
                     class="flex-1 py-2 bg-primary text-black font-bold rounded text-xs">% Percent</button>
                 <button onclick="setDiscType('flat')" id="btn-disc-flat"
                     class="flex-1 py-2 bg-white/10 text-gray-400 font-bold rounded text-xs border border-white/10">Flat
-                    ₹</button>
+                    ?</button>
             </div>
             <input type="number" id="disc-input" placeholder="Value (e.g. 10)"
                 class="w-full bg-black/30 border border-border rounded-lg p-3 text-white mb-2">
@@ -273,7 +273,7 @@
         <div class="bg-surface border border-border rounded-xl w-full max-w-sm p-6 shadow-2xl text-center">
             <h3 class="text-lg font-bold text-white mb-4">Split Bill</h3>
             <p class="text-gray-400 text-xs mb-4">Total Amount: <span id="split-total-display"
-                    class="text-white font-bold">₹0</span></p>
+                    class="text-white font-bold">?0</span></p>
             <div class="flex items-center justify-center gap-4 mb-6">
                 <button onclick="adjSplit(-1)" class="size-8 bg-white/10 rounded-full text-white">-</button>
                 <span id="split-count" class="text-xl font-bold text-primary">2</span> <span
@@ -282,7 +282,7 @@
             </div>
             <div class="p-3 bg-black/30 rounded-lg border border-border mb-4">
                 <p class="text-xs text-gray-500">Each Pays</p>
-                <p class="text-2xl font-bold text-white" id="split-amount">₹0</p>
+                <p class="text-2xl font-bold text-white" id="split-amount">?0</p>
             </div>
             <button onclick="closeModal('split-modal')"
                 class="w-full py-2 border border-border text-gray-400 rounded-lg text-xs">Done</button>
@@ -309,7 +309,7 @@
         <div class="kot-paper w-80 p-4 rounded relative">
             <div class="text-center border-b-2 border-black border-dashed pb-2 mb-2">
                 <h2 class="text-xl font-bold">KOT #NEW</h2>
-                <p class="text-xs font-bold mt-1" id="kot-meta">Dine-In • Table 04</p>
+                <p class="text-xs font-bold mt-1" id="kot-meta">Dine-In � Table 04</p>
                 <p class="text-[10px]" id="kot-time">--</p>
             </div>
             <div class="space-y-1 text-sm font-bold border-b-2 border-black border-dashed pb-2 mb-2" id="kot-list">
@@ -378,7 +378,7 @@
         <div class="kot-paper w-80 p-6 rounded relative flex flex-col max-h-[85vh]">
             <div class="text-center border-b-2 border-black border-dashed pb-4 mb-4 shrink-0">
                 <h2 class="text-2xl font-bold uppercase tracking-widest">Final Bill</h2>
-                <p class="text-xs font-bold mt-1" id="rec-meta">Dine-In • Table 04</p>
+                <p class="text-xs font-bold mt-1" id="rec-meta">Dine-In � Table 04</p>
                 <p class="text-[10px]" id="rec-time">--</p>
                 <p class="text-[10px] mt-1 font-mono">Invoice: <span id="rec-id"></span></p>
             </div>
@@ -392,7 +392,7 @@
             <div class="shrink-0">
                 <div class="flex justify-between font-black text-lg">
                     <span>TOTAL</span>
-                    <span id="rec-total">₹0.00</span>
+                    <span id="rec-total">?0.00</span>
                 </div>
                 <div class="text-center mt-6">
                     <button onclick="closeModal('receipt-modal')"
@@ -531,7 +531,7 @@
                         ${warningBadge}
                         <span class="font-bold text-sm text-white leading-tight line-clamp-2">${item.name} ${typeIcon}</span>
                         <div class="flex justify-between items-end">
-                            <span class="font-mono font-bold text-primary">₹${item.price}</span>
+                            <span class="font-mono font-bold text-primary">?${item.price}</span>
                             <span class="text-[9px] text-gray-500 bg-black/30 px-1.5 py-0.5 rounded">${item.cat}</span>
                         </div>
                         <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 rounded-xl"></div>
@@ -556,7 +556,7 @@
                 itemPrice += parseInt(c.dataset.price);
             });
 
-            // Check if same item with same mods already in cart — increment qty
+            // Check if same item with same mods already in cart � increment qty
             const modKey = mods.sort().join(',');
             const existing = cart.find(c => c.id === currentItem.id && c.mods.sort().join(',') === modKey);
             if (existing) {
@@ -587,12 +587,12 @@
                             ${modHtml}
                         </div>
                         <div class="flex items-center gap-1">
-                            <button onclick="changeQty(${idx},-1)" class="size-6 bg-white/10 rounded text-white text-xs font-bold hover:bg-white/20">−</button>
+                            <button onclick="changeQty(${idx},-1)" class="size-6 bg-white/10 rounded text-white text-xs font-bold hover:bg-white/20">-</button>
                             <span class="text-xs text-white font-mono w-6 text-center">${qty}</span>
                             <button onclick="changeQty(${idx},1)" class="size-6 bg-white/10 rounded text-white text-xs font-bold hover:bg-white/20">+</button>
                             <button onclick="removeFromCart(${idx})" class="text-red-400 hover:text-red-300 ml-1"><span class="material-symbols-outlined text-sm">delete</span></button>
                         </div>
-                        <span class="text-xs font-mono w-14 text-right">₹${(unitP * qty).toFixed(0)}</span>
+                        <span class="text-xs font-mono w-14 text-right">?${(unitP * qty).toFixed(0)}</span>
                     </div>`;
             });
 
@@ -603,15 +603,15 @@
             const tax = (subtotal - discAmt) * 0.05;
             const total = (subtotal - discAmt) + tax;
 
-            document.getElementById('sub-total').innerText = "₹" + subtotal.toFixed(2);
-            document.getElementById('tax-total').innerText = "₹" + tax.toFixed(2);
-            document.getElementById('grand-total').innerText = "₹" + total.toFixed(2);
-            document.getElementById('pay-btn').innerText = "₹" + total.toFixed(0);
+            document.getElementById('sub-total').innerText = "?" + subtotal.toFixed(2);
+            document.getElementById('tax-total').innerText = "?" + tax.toFixed(2);
+            document.getElementById('grand-total').innerText = "?" + total.toFixed(2);
+            document.getElementById('pay-btn').innerText = "?" + total.toFixed(0);
 
             // Show Discount Row
             if (discAmt > 0) {
                 document.getElementById('disc-row').classList.remove('hidden');
-                document.getElementById('disc-total').innerText = "-₹" + discAmt.toFixed(2);
+                document.getElementById('disc-total').innerText = "-?" + discAmt.toFixed(2);
             } else {
                 document.getElementById('disc-row').classList.add('hidden');
             }
@@ -731,7 +731,7 @@
 
         // === SPLIT BILL ===
         function openSplitModal() {
-            const total = document.getElementById('grand-total').innerText.replace('₹', '');
+            const total = document.getElementById('grand-total').innerText.replace('?', '');
             if (parseFloat(total) === 0) return showToast("Error", "No Bill");
             openModal('split-modal');
             calcSplit();
@@ -742,17 +742,17 @@
             calcSplit();
         }
         function calcSplit() {
-            const total = parseFloat(document.getElementById('grand-total').innerText.replace('₹', ''));
-            document.getElementById('split-total-display').innerText = "₹" + total;
+            const total = parseFloat(document.getElementById('grand-total').innerText.replace('?', ''));
+            document.getElementById('split-total-display').innerText = "?" + total;
             document.getElementById('split-count').innerText = splitCount;
-            document.getElementById('split-amount').innerText = "₹" + (total / splitCount).toFixed(2);
+            document.getElementById('split-amount').innerText = "?" + (total / splitCount).toFixed(2);
         }
 
         // === KOT ===
         function previewKOT() {
             if (cart.length === 0) return showToast("Error", "Empty");
             document.getElementById('kot-time').innerText = new Date().toLocaleString();
-            document.getElementById('kot-meta').innerText = `${orderMode} • ${document.getElementById('customer-label').innerText}`;
+            document.getElementById('kot-meta').innerText = `${orderMode} � ${document.getElementById('customer-label').innerText}`;
             const list = document.getElementById('kot-list');
             list.innerHTML = "";
             cart.forEach(i => {
@@ -769,7 +769,7 @@
             const isVIP = document.getElementById('vip-toggle').checked;
 
             let metaString = document.getElementById('customer-label').innerText;
-            if (isVIP) metaString = "VIP • " + metaString;
+            if (isVIP) metaString = "VIP � " + metaString;
 
             // STRICT TAG ENFORCEMENT for POS Orders
             let strictType = orderMode;
@@ -1044,7 +1044,7 @@
                         <div onclick="openReceipt('${parsedData}')" class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/10 cursor-pointer hover:bg-white/10 transition-colors group">
                             <div>
                                 <p class="text-sm font-bold text-white group-hover:text-primary transition-colors">${h.meta} <span class="text-xs text-gray-500 ml-2">#${h.id.slice(-4)}</span></p>
-                                <p class="text-xs text-gray-500">${h.archivedAt} • ${h.items.length} items</p>
+                                <p class="text-xs text-gray-500">${h.archivedAt} � ${h.items.length} items</p>
                             </div>
                             <div class="flex items-center gap-3">
                                 <span class="font-mono text-green-400 font-bold">${h.total}</span>
@@ -1059,7 +1059,7 @@
         function openReceipt(dataEncoded) {
             try {
                 const h = JSON.parse(decodeURIComponent(dataEncoded));
-                document.getElementById('rec-meta').innerText = `${h.type} • ${h.meta.replace('Guest: ', '')}`;
+                document.getElementById('rec-meta').innerText = `${h.type} � ${h.meta.replace('Guest: ', '')}`;
                 document.getElementById('rec-time').innerText = h.archivedAt;
                 document.getElementById('rec-id').innerText = h.id;
                 document.getElementById('rec-total').innerText = h.total;
@@ -1079,13 +1079,13 @@
                 const mathDiv = document.getElementById('rec-math');
                 mathDiv.innerHTML = "";
                 if (h.subtotal) {
-                    mathDiv.innerHTML += `<div class="flex justify-between"><span>Subtotal</span><span>₹${h.subtotal}</span></div>`;
+                    mathDiv.innerHTML += `<div class="flex justify-between"><span>Subtotal</span><span>?${h.subtotal}</span></div>`;
                 }
                 if (h.discount && parseFloat(h.discount) > 0) {
-                    mathDiv.innerHTML += `<div class="flex justify-between text-yellow-600 italic"><span>Discount (${h.discountReason || 'Manual'})</span><span>-₹${h.discount}</span></div>`;
+                    mathDiv.innerHTML += `<div class="flex justify-between text-yellow-600 italic"><span>Discount (${h.discountReason || 'Manual'})</span><span>-?${h.discount}</span></div>`;
                 }
                 if (h.tax) {
-                    mathDiv.innerHTML += `<div class="flex justify-between"><span>Tax (5%)</span><span>₹${h.tax}</span></div>`;
+                    mathDiv.innerHTML += `<div class="flex justify-between"><span>Tax (5%)</span><span>?${h.tax}</span></div>`;
                 }
                 if (h.staff) {
                     mathDiv.innerHTML += `<div class="mt-2 text-[10px] uppercase font-bold text-center">Served by: ${h.staff}</div>`;
@@ -1139,7 +1139,7 @@
             }
         });
 
-        // Polling fallback — checks every 3 seconds even within the SAME tab
+        // Polling fallback � checks every 3 seconds even within the SAME tab
         setInterval(() => {
             checkKDSForReadyOrders();
         }, 3000);
@@ -1281,10 +1281,10 @@
                     statsHtml = `
                         <div class="bg-black/30 p-4 rounded-xl border border-white/5 space-y-3 text-sm text-gray-300 mt-4">
                             <div class="flex justify-between border-b border-border pb-2"><span class="text-gray-400">Orders Processed</span><span class="font-bold text-white text-base">${stats.orderCount}</span></div>
-                            <div class="flex justify-between"><span>Cash Collected</span><span class="font-mono text-white tracking-wider">₹${stats.cashCollected.toFixed(2)}</span></div>
-                            <div class="flex justify-between"><span>UPI Collected</span><span class="font-mono text-white tracking-wider">₹${stats.upiCollected.toFixed(2)}</span></div>
-                            <div class="flex justify-between border-b border-border pb-2"><span>Card Collected</span><span class="font-mono text-white tracking-wider">₹${stats.cardCollected.toFixed(2)}</span></div>
-                            <div class="flex justify-between text-primary font-bold text-xl pt-2"><span>Total Sales</span><span>₹${stats.salesTotal.toFixed(2)}</span></div>
+                            <div class="flex justify-between"><span>Cash Collected</span><span class="font-mono text-white tracking-wider">?${stats.cashCollected.toFixed(2)}</span></div>
+                            <div class="flex justify-between"><span>UPI Collected</span><span class="font-mono text-white tracking-wider">?${stats.upiCollected.toFixed(2)}</span></div>
+                            <div class="flex justify-between border-b border-border pb-2"><span>Card Collected</span><span class="font-mono text-white tracking-wider">?${stats.cardCollected.toFixed(2)}</span></div>
+                            <div class="flex justify-between text-primary font-bold text-xl pt-2"><span>Total Sales</span><span>?${stats.salesTotal.toFixed(2)}</span></div>
                         </div>
                     `;
                 }
@@ -1332,7 +1332,7 @@
             try {
                 const u = JSON.parse(localStorage.getItem('zoiUser') || '{}');
                 if (u.role === 'pos_staff' || u.isPosOnly) {
-                    // Hide the Delivery mode button — POS-only doesn't do online delivery
+                    // Hide the Delivery mode button � POS-only doesn't do online delivery
                     const deliveryBtn = document.getElementById('btn-Delivery');
                     if (deliveryBtn) deliveryBtn.style.display = 'none';
                 }
@@ -1421,7 +1421,7 @@
             history.forEach(o => (o.items || []).forEach(i => { itemCounts[i.name] = (itemCounts[i.name] || 0) + (i.qty || 1); }));
             const sorted = Object.entries(itemCounts).sort((a, b) => b[1] - a[1]);
             if (sorted.length > 0) {
-                insights.push({ icon: 'trending_up', color: 'text-green-400', bg: 'bg-green-500/10', title: 'Top Seller', desc: `${sorted[0][0]} — ordered ${sorted[0][1]} times today`, badge: 'TREND' });
+                insights.push({ icon: 'trending_up', color: 'text-green-400', bg: 'bg-green-500/10', title: 'Top Seller', desc: `${sorted[0][0]} � ordered ${sorted[0][1]} times today`, badge: 'TREND' });
             } else {
                 insights.push({ icon: 'trending_up', color: 'text-green-400', bg: 'bg-green-500/10', title: 'Top Seller', desc: 'Butter Chicken leads with 40% of dine-in orders', badge: 'TREND' });
             }
@@ -1431,10 +1431,10 @@
                 const inv = ZoiInventory.getAll();
                 const lowItems = inv.filter(i => i.stock <= i.threshold);
                 if (lowItems.length > 0) {
-                    insights.push({ icon: 'inventory_2', color: 'text-red-400', bg: 'bg-red-500/10', title: 'Low Stock Alert', desc: `${lowItems.map(i => i.name).join(', ')} below threshold — auto-reorder recommended`, badge: 'URGENT' });
+                    insights.push({ icon: 'inventory_2', color: 'text-red-400', bg: 'bg-red-500/10', title: 'Low Stock Alert', desc: `${lowItems.map(i => i.name).join(', ')} below threshold � auto-reorder recommended`, badge: 'URGENT' });
                 }
             } else {
-                insights.push({ icon: 'inventory_2', color: 'text-red-400', bg: 'bg-red-500/10', title: 'Low Stock Alert', desc: 'Tomato & Mozzarella running low — auto-reorder triggered for tomorrow', badge: 'URGENT' });
+                insights.push({ icon: 'inventory_2', color: 'text-red-400', bg: 'bg-red-500/10', title: 'Low Stock Alert', desc: 'Tomato & Mozzarella running low � auto-reorder triggered for tomorrow', badge: 'URGENT' });
             }
 
             // Peak hour prediction
@@ -1443,13 +1443,13 @@
             insights.push({
                 icon: 'schedule', color: 'text-yellow-400', bg: 'bg-yellow-500/10',
                 title: isPeak ? 'Peak Hour Active' : 'Off-Peak Period',
-                desc: isPeak ? 'High demand expected — consider enabling Surge Pricing for 10% uplift' : `Next rush predicted at ${hour < 12 ? '12:00 PM' : '7:00 PM'}. Pre-prep recommended.`,
+                desc: isPeak ? 'High demand expected � consider enabling Surge Pricing for 10% uplift' : `Next rush predicted at ${hour < 12 ? '12:00 PM' : '7:00 PM'}. Pre-prep recommended.`,
                 badge: isPeak ? 'PEAK' : 'FORECAST'
             });
 
             // Revenue insight
             const todayTotal = history.reduce((s, o) => s + (o.total || 0), 0);
-            insights.push({ icon: 'payments', color: 'text-primary', bg: 'bg-primary/10', title: 'Revenue Today', desc: todayTotal > 0 ? `₹${todayTotal.toFixed(0)} from ${history.length} orders — ${todayTotal > 5000 ? 'Excellent pace!' : 'Building momentum.'}` : '₹0 so far — the first order of the day is the most important!', badge: 'LIVE' });
+            insights.push({ icon: 'payments', color: 'text-primary', bg: 'bg-primary/10', title: 'Revenue Today', desc: todayTotal > 0 ? `?${todayTotal.toFixed(0)} from ${history.length} orders � ${todayTotal > 5000 ? 'Excellent pace!' : 'Building momentum.'}` : '?0 so far � the first order of the day is the most important!', badge: 'LIVE' });
 
             // Upsell insight
             insights.push({ icon: 'lightbulb', color: 'text-violet-400', bg: 'bg-violet-500/10', title: 'Upsell Opportunity', desc: 'Pairing Garlic Naan with curries can increase avg. ticket by 18%', badge: 'AI TIP' });
@@ -1496,7 +1496,7 @@
 
             currentUpsellItem = available[Math.floor(Math.random() * available.length)];
             const bar = document.getElementById('ai-upsell-bar');
-            document.getElementById('upsell-text').innerText = `Pair "${addedItemName}" with ${currentUpsellItem} — customers love it!`;
+            document.getElementById('upsell-text').innerText = `Pair "${addedItemName}" with ${currentUpsellItem} � customers love it!`;
             bar.classList.remove('hidden');
 
             // Auto-hide after 8s
@@ -1540,12 +1540,12 @@
             document.querySelectorAll('#menu-grid .item-card').forEach(card => {
                 const priceEl = card.querySelector('.text-primary');
                 if (priceEl && !priceEl.dataset.surged) {
-                    const originalPrice = parseInt(priceEl.textContent.replace('₹', ''));
+                    const originalPrice = parseInt(priceEl.textContent.replace('?', ''));
                     if (!isNaN(originalPrice)) {
                         const surgePrice = Math.round(originalPrice * SURGE_MULTIPLIER);
                         priceEl.dataset.surged = 'true';
                         priceEl.dataset.original = originalPrice;
-                        priceEl.innerHTML = `<span class="line-through text-gray-500 text-xs mr-1">₹${originalPrice}</span>₹${surgePrice}`;
+                        priceEl.innerHTML = `<span class="line-through text-gray-500 text-xs mr-1">?${originalPrice}</span>?${surgePrice}`;
                     }
                 }
             });
@@ -1619,6 +1619,8 @@
 
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
+
+    <script src="js/zoi_mobile.js"></script>
 </body>
 
 </html>
