@@ -138,3 +138,57 @@ function injectGlobalSidebar() {
 }
 
 document.addEventListener("DOMContentLoaded", injectGlobalSidebar);
+
+// === GLOBAL POS/HOSTEL NAV TOGGLE ===
+// Required by hostel_pos_sidebar.html and restaurant_pos_sidebar.html templates
+window.togglePosNav = function() {
+    const sidebar = document.getElementById('pos-nav-drawer');
+    const overlay = document.getElementById('pos-nav-overlay');
+    if (sidebar) {
+        sidebar.classList.toggle('-translate-x-full');
+        // Also toggle md:relative class for hostel sidebar
+        if (sidebar.classList.contains('md:relative')) {
+            // Hostel sidebar uses a different toggle pattern
+        }
+    }
+    if (overlay) {
+        overlay.classList.toggle('hidden');
+    }
+};
+
+// === MOBILE HAMBURGER FOR SIDEBAR PAGES ===
+// For pages that have a sidebar but no visible mobile nav trigger
+document.addEventListener("DOMContentLoaded", function() {
+    if (window.innerWidth > 768) return;
+    
+    // Check if any desktop aside exists (partner/admin sidebars with hidden md:flex)
+    const aside = document.querySelector('aside.hidden.md\\:flex, aside[class*="hidden md:flex"]');
+    if (!aside) return;
+    
+    // Ensure the aside can be toggled on mobile
+    aside.style.cssText = 'position:fixed;inset:0;z-index:9995;width:min(80vw,320px);transform:translateX(-100%);transition:transform 0.3s ease;display:flex !important;flex-direction:column;overflow-y:auto;';
+    
+    // Create overlay
+    let overlay = document.getElementById('zoi-sidebar-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'zoi-sidebar-overlay';
+        overlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:9994;background:rgba(0,0,0,0.6);';
+        overlay.onclick = function() {
+            aside.style.transform = 'translateX(-100%)';
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+        };
+        document.body.appendChild(overlay);
+    }
+    
+    // Wire the mobile hamburger (from zoi_mobile.js) to open this sidebar
+    const existingHamburger = document.getElementById('zoi-hamburger');
+    if (existingHamburger) {
+        existingHamburger.onclick = function() {
+            aside.style.transform = 'translateX(0)';
+            overlay.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        };
+    }
+});
