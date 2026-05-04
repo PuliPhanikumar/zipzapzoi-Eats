@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Notice Board - Zoi Hostel POS</title>
+    <meta name="description" content="Digital notice board for hostel announcements on ZipZapZoi platform.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -218,13 +219,13 @@
 
     <script>
         const NOTICES = ZoiDB.get('notices', [
-            { id: 1, title: '?? Water Supply Interruption — March 5', category: 'Maintenance', body: 'Municipal water supply will be interrupted on March 5th from 10 AM to 4 PM due to pipeline repair work. All hostelers are advised to store water in advance. Tanker water will be arranged by 2 PM if supply isn\'t restored.', audience: 'All Hostelers', date: '2026-03-04', expiry: '2026-03-06', pinned: true, postedBy: 'Admin' },
+            { id: 1, title: '?? Water Supply Interruption ï¿½ March 5', category: 'Maintenance', body: 'Municipal water supply will be interrupted on March 5th from 10 AM to 4 PM due to pipeline repair work. All hostelers are advised to store water in advance. Tanker water will be arranged by 2 PM if supply isn\'t restored.', audience: 'All Hostelers', date: '2026-03-04', expiry: '2026-03-06', pinned: true, postedBy: 'Admin' },
             { id: 2, title: '?? Strict Curfew Timing Update', category: 'Urgent', body: 'Effective immediately, hostel gate will close at 10:00 PM sharp (previously 10:30 PM). Any hosteler arriving after 10 PM must have an approved gate pass. Repeated violations will result in penalty of ?500.', audience: 'All Hostelers', date: '2026-03-04', expiry: null, pinned: true, postedBy: 'Warden Ramesh' },
-            { id: 3, title: '?? Holi Celebration — March 14', category: 'Event', body: 'We\'re organizing a Holi celebration in the hostel courtyard on March 14th from 10 AM to 1 PM! Colors, water balloons, music, and special lunch will be provided. All hostelers are invited. Use only organic colors.', audience: 'All Hostelers', date: '2026-03-03', expiry: '2026-03-15', pinned: false, postedBy: 'Admin' },
+            { id: 3, title: '?? Holi Celebration ï¿½ March 14', category: 'Event', body: 'We\'re organizing a Holi celebration in the hostel courtyard on March 14th from 10 AM to 1 PM! Colors, water balloons, music, and special lunch will be provided. All hostelers are invited. Use only organic colors.', audience: 'All Hostelers', date: '2026-03-03', expiry: '2026-03-15', pinned: false, postedBy: 'Admin' },
             { id: 4, title: '?? New Wi-Fi Usage Policy', category: 'Rule Change', body: 'Effective March 10: Each hosteler gets 50 GB/month at 100 Mbps. Torrenting and VPN usage on hostel Wi-Fi is strictly prohibited. Violations will result in temporary ban from hostel internet for 7 days.', audience: 'All Hostelers', date: '2026-03-02', expiry: null, pinned: false, postedBy: 'Admin' },
             { id: 5, title: '?? Floor 2 Bathroom Renovation', category: 'Maintenance', body: 'Bathroom renovation work on Floor 2 will begin March 8 and is expected to complete by March 15. Floor 2 hostelers may use Floor 1 and Floor 3 bathrooms during this period. We apologize for the inconvenience.', audience: 'Floor 2', date: '2026-03-01', expiry: '2026-03-16', pinned: false, postedBy: 'Admin' },
             { id: 6, title: '?? Monthly Rent Reminder', category: 'General', body: 'Rent for March 2026 is due by March 5th. Please pay via UPI, NetBanking, or cash at the admin office. Late payment after March 10th will attract a fine of ?200.', audience: 'All Hostelers', date: '2026-03-01', expiry: '2026-03-10', pinned: false, postedBy: 'Admin' },
-            { id: 7, title: '?? Fire Safety Drill — March 7', category: 'Urgent', body: 'Mandatory fire safety drill scheduled for March 7th at 6:00 PM. ALL hostelers must participate. Assembly point: Main parking area. Fire extinguisher demo will also be conducted by the fire department.', audience: 'All Hostelers', date: '2026-02-28', expiry: '2026-03-08', pinned: false, postedBy: 'Warden Ramesh' },
+            { id: 7, title: '?? Fire Safety Drill ï¿½ March 7', category: 'Urgent', body: 'Mandatory fire safety drill scheduled for March 7th at 6:00 PM. ALL hostelers must participate. Assembly point: Main parking area. Fire extinguisher demo will also be conducted by the fire department.', audience: 'All Hostelers', date: '2026-02-28', expiry: '2026-03-08', pinned: false, postedBy: 'Warden Ramesh' },
         ]);
 
         const CAT_COLORS = { Urgent: 'red', General: 'blue', Event: 'violet', 'Rule Change': 'amber', Maintenance: 'orange' };
@@ -303,7 +304,7 @@
         function postNotice() {
             const title = document.getElementById('n-title').value.trim();
             if (!title) { showToast('Title required.', 'error'); return; }
-            NOTICES.unshift({ id: Date.now(), title, category: document.getElementById('n-category').value, body: document.getElementById('n-body').value || '—', audience: document.getElementById('n-audience').value, date: new Date().toISOString().split('T')[0], expiry: document.getElementById('n-expiry').value || null, pinned: document.getElementById('n-pin').checked, postedBy: 'Admin' });
+            NOTICES.unshift({ id: Date.now(), title, category: document.getElementById('n-category').value, body: document.getElementById('n-body').value || 'ï¿½', audience: document.getElementById('n-audience').value, date: new Date().toISOString().split('T')[0], expiry: document.getElementById('n-expiry').value || null, pinned: document.getElementById('n-pin').checked, postedBy: 'Admin' });
             ZoiDB.set('notices', NOTICES);
             closeNoticeModal(); render();
             showToast('Notice posted successfully', 'success');

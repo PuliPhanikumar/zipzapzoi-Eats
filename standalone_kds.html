@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Standalone POS - Kitchen Display</title>
+    <meta name="description" content="Kitchen Display System for ZipZapZoi Eats. Real-time order management for your kitchen. ZipZapZoi standalone restaurant management. Independent POS and operations suite.">
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link
@@ -425,7 +426,7 @@
         <div class="ticket-paper w-80 p-6 rounded relative transform scale-100 transition-transform">
             <div class="text-center border-b-2 border-black border-dashed pb-4 mb-4">
                 <h2 class="text-2xl font-bold">Zoi Eats</h2>
-                <p class="text-xs font-bold mt-1" id="tick-meta">Dine-In • Table 04</p>
+                <p class="text-xs font-bold mt-1" id="tick-meta">Dine-In ï¿½ Table 04</p>
                 <p class="text-[10px]" id="tick-time">--</p>
             </div>
             <div class="space-y-2 text-sm font-bold border-b-2 border-black border-dashed pb-4 mb-4" id="tick-items">
@@ -747,7 +748,7 @@ function startAutoAcceptTimer() {
             listActive.innerHTML = "";
             listTotal.innerHTML = "";
 
-            // Active Prep — use real DB
+            // Active Prep ï¿½ use real DB
             const activeOrder = ZoiOrders.getActiveOrder();
             const currentRestId = localStorage.getItem('zoiPartnerRestId') || "101";
             let activeCounts = {};
@@ -845,7 +846,7 @@ function startAutoAcceptTimer() {
                     const avg = Math.round(prepTimesForFilter.reduce((a, b) => a + b, 0) / prepTimesForFilter.length);
                     const onTimeCount = prepTimesForFilter.filter(t => t <= 15).length;
                     const onTimePct = Math.round((onTimeCount / prepTimesForFilter.length) * 100);
-                    statText = `?? Performance (${historyFilter}): Avg ${avg}min • On-Time: ${onTimePct}% • ${filteredHistory.length} orders`;
+                    statText = `?? Performance (${historyFilter}): Avg ${avg}min ï¿½ On-Time: ${onTimePct}% ï¿½ ${filteredHistory.length} orders`;
                 }
 
                 const summaryRow = `
@@ -861,7 +862,7 @@ function startAutoAcceptTimer() {
 
         function openTicket(idx) {
             const order = history[idx];
-            document.getElementById('tick-meta').innerText = `${order.mode} • #${order.id}`;
+            document.getElementById('tick-meta').innerText = `${order.mode} ï¿½ #${order.id}`;
             document.getElementById('tick-time').innerText = order.endTime;
             document.getElementById('tick-total').innerText = "?" + order.price;
 

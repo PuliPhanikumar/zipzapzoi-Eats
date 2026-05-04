@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Complaint Tickets - Zoi Hostel POS</title>
+    <meta name="description" content="File and resolve hostel complaints on ZipZapZoi hostel management.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -323,7 +324,7 @@
 
         function viewTicket(id) {
             const t = TICKETS.find(x => x.id === id);
-            document.getElementById('detail-title').innerText = t.id + ' — ' + t.category;
+            document.getElementById('detail-title').innerText = t.id + ' ï¿½ ' + t.category;
             document.getElementById('detail-body').innerHTML = `
                 <div class="flex items-center gap-2 mb-3">${PRIORITY_BADGE[t.priority]}${STATUS_BADGE[t.status]}</div>
                 <h4 class="font-bold text-white text-lg mb-2">${t.subject}</h4>
@@ -363,7 +364,7 @@
             const hosteler = document.getElementById('c-hosteler').value.trim();
             const room = document.getElementById('c-room').value.trim();
             if (!subject || !hosteler || !room) { showToast('Hosteler Name, Room and Subject are required.', 'error'); return; }
-            TICKETS.unshift({ id: 'TKT-' + String(TICKETS.length + 1).padStart(3, '0'), hosteler: hosteler + ' (' + room + ')', category: document.getElementById('c-category').value || 'Other', priority: document.getElementById('c-priority').value || 'Medium', subject, desc: document.getElementById('c-desc').value || '—', status: 'Open', date: new Date().toISOString().split('T')[0], source: document.getElementById('c-source').value || 'Ext App', assignee: null });
+            TICKETS.unshift({ id: 'TKT-' + String(TICKETS.length + 1).padStart(3, '0'), hosteler: hosteler + ' (' + room + ')', category: document.getElementById('c-category').value || 'Other', priority: document.getElementById('c-priority').value || 'Medium', subject, desc: document.getElementById('c-desc').value || 'ï¿½', status: 'Open', date: new Date().toISOString().split('T')[0], source: document.getElementById('c-source').value || 'Ext App', assignee: null });
             ZoiDB.set('complaint_tickets', TICKETS);
             closeComplaintModal();
             renderTickets();

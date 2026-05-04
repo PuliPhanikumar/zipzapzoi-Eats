@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -14,6 +14,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json" />
     <title>ZipZapZoi Eats - Smart Checkout</title>
+    <meta name="description" content="Review your ZipZapZoi Eats shopping cart. Checkout and place your food order.">
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link
@@ -594,7 +595,7 @@
             const delivery = itemTotal > 0 ? 40 : 0;
             const tax = Math.round(itemTotal * 0.05);
 
-            // Check Surge — safe fallback if ZoiSystem isn't loaded
+            // Check Surge ï¿½ safe fallback if ZoiSystem isn't loaded
             let surge = 0;
             const config = (typeof ZoiSystem !== 'undefined' && ZoiSystem.getConfig) ? ZoiSystem.getConfig() : { surgeMultiplier: 1.0 };
             if (config.surgeMultiplier > 1.0) {
@@ -727,7 +728,7 @@
                 if (!date || !time) return showCartToast('Schedule Required', 'Please select date and time for scheduled delivery');
             }
 
-            // All valid — proceed
+            // All valid ï¿½ proceed
             const btn = document.querySelector('button[onclick="validateAndPay()"]');
             btn.innerHTML = `<span class="material-symbols-outlined animate-spin">progress_activity</span> Processing Payment...`;
             btn.disabled = true;
@@ -1134,7 +1135,7 @@
             }
         }
 
-        // copyInviteLink_old removed — replaced by copyInviteLink() above
+        // copyInviteLink_old removed ï¿½ replaced by copyInviteLink() above
 
         function togglePaymentFields() {
             const checked = document.querySelector('input[name="payment"]:checked');

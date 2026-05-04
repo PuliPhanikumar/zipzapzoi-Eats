@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ZipZapZoi - POS Final</title>
+    <meta name="description" content="ZipZapZoi Eats POS terminal. Process orders, manage tables, and accept payments.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
@@ -50,12 +51,12 @@
     <!-- POS Navigation Drawer -->
     <div id="global-sidebar-container" class="shrink-0 z-30"></div>
     <!-- Overlay for the drawer -->
-    <div id="pos-nav-overlay" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="togglePosNav()"></div>
+    <div id="pos-nav-overlay" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="togglePosNav()" aria-label="Toggle navigation menu"></div>
 
     <div class="flex-1 flex flex-col border-r border-border relative">
         <header class="h-16 border-b border-border bg-surface flex items-center justify-between px-4">
             <div class="flex items-center gap-4">
-                <button onclick="togglePosNav()" class="p-2 bg-white/5 rounded-lg text-gray-400 hover:text-white"
+                <button onclick="togglePosNav()" aria-label="Toggle navigation menu" class="p-2 bg-white/5 rounded-lg text-gray-400 hover:text-white"
                     title="Navigation">
                     <span class="material-symbols-outlined">menu</span>
                 </button>

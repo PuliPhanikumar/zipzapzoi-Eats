@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Mess Attendance - Zoi Hostel POS</title>
+    <meta name="description" content="Manage hostel mess menu, meals, and food service on ZipZapZoi.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -137,7 +138,7 @@
             <div class="flex items-center gap-3">
                 <div class="glass-panel px-4 py-2 flex items-center gap-2 text-sm">
                     <span class="material-symbols-outlined text-pink-400 text-lg">calendar_today</span>
-                    <span class="font-bold text-white" id="header-date">—</span>
+                    <span class="font-bold text-white" id="header-date">ï¿½</span>
                 </div>
                 <button onclick="markAllPresent()"
                     class="flex items-center gap-2 px-4 py-2 bg-teal/15 border border-teal/30 rounded-full font-bold text-sm text-teal hover:bg-teal/25 transition-colors">
@@ -213,26 +214,26 @@
                         class="meal-selector active px-5 py-2.5 rounded-xl text-sm font-bold border border-amber-500/30 bg-amber-500/15 text-amber-400 transition-all"
                         data-meal="breakfast" onclick="selectMeal('breakfast')">
                         <span class="material-symbols-outlined text-sm align-middle mr-1">wb_sunny</span>Breakfast <span
-                            class="text-[10px] font-normal">(7:30 – 9:00)</span>
+                            class="text-[10px] font-normal">(7:30 ï¿½ 9:00)</span>
                     </button>
                     <button
                         class="meal-selector px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-gray-400 transition-all"
                         data-meal="lunch" onclick="selectMeal('lunch')">
                         <span class="material-symbols-outlined text-sm align-middle mr-1">lunch_dining</span>Lunch <span
-                            class="text-[10px] font-normal">(12:30 – 2:00)</span>
+                            class="text-[10px] font-normal">(12:30 ï¿½ 2:00)</span>
                     </button>
                     <button
                         class="meal-selector px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-gray-400 transition-all"
                         data-meal="dinner" onclick="selectMeal('dinner')">
                         <span class="material-symbols-outlined text-sm align-middle mr-1">dinner_dining</span>Dinner
-                        <span class="text-[10px] font-normal">(7:30 – 9:00)</span>
+                        <span class="text-[10px] font-normal">(7:30 ï¿½ 9:00)</span>
                     </button>
                 </div>
 
                 <!-- Attendance Grid -->
                 <div class="glass-panel p-0 overflow-hidden">
                     <div class="p-4 border-b border-border flex items-center justify-between">
-                        <h3 class="font-bold text-white text-sm" id="grid-title">Breakfast Attendance — Today</h3>
+                        <h3 class="font-bold text-white text-sm" id="grid-title">Breakfast Attendance ï¿½ Today</h3>
                         <div class="flex items-center gap-4 text-[10px] font-bold">
                             <span class="flex items-center gap-1.5"><span
                                     class="h-2.5 w-2.5 rounded-full bg-teal inline-block"></span> Present</span>
@@ -264,7 +265,7 @@
             <div id="tab-menu" class="tab-content hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-7 gap-4 mb-6">
                     <div class="glass-panel p-4 lg:col-span-7 mb-2">
-                        <h3 class="font-bold text-sm text-white mb-1">Weekly Menu — <span id="week-label"
+                        <h3 class="font-bold text-sm text-white mb-1">Weekly Menu ï¿½ <span id="week-label"
                                 class="text-pink-400">This Week</span></h3>
                         <p class="text-xs text-gray-400">Plan & display the weekly mess menu. Click any item to edit.
                         </p>
@@ -290,7 +291,7 @@
                     </div>
                     <!-- Cost Summary Cards -->
                     <div class="glass-panel p-6 lg:col-span-2">
-                        <h3 class="font-bold text-white text-sm mb-4">Monthly Cost Summary — March 2026</h3>
+                        <h3 class="font-bold text-white text-sm mb-4">Monthly Cost Summary ï¿½ March 2026</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             <div class="p-4 bg-white/[0.03] rounded-xl text-center border border-white/5">
                                 <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Groceries</p>
@@ -305,7 +306,7 @@
                             <div class="p-4 bg-white/[0.03] rounded-xl text-center border border-white/5">
                                 <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Staff Wages</p>
                                 <p class="text-xl font-extrabold text-white">?18,000</p>
-                                <p class="text-[10px] text-gray-400 mt-1">— No change</p>
+                                <p class="text-[10px] text-gray-400 mt-1">ï¿½ No change</p>
                             </div>
                             <div
                                 class="p-4 bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-xl text-center border border-pink-500/20">
@@ -322,7 +323,7 @@
             <div id="tab-history" class="tab-content hidden">
                 <div class="glass-panel p-0 overflow-hidden">
                     <div class="p-4 border-b border-border flex items-center justify-between">
-                        <h3 class="font-bold text-white text-sm">Hosteler Attendance Summary — March 2026</h3>
+                        <h3 class="font-bold text-white text-sm">Hosteler Attendance Summary ï¿½ March 2026</h3>
                         <div class="flex gap-2">
                             <select
                                 class="bg-surface border border-white/10 rounded-lg text-xs px-3 py-1.5 text-gray-300">
@@ -428,9 +429,9 @@
                         </div>
                     </td>
                     <td class="py-3 px-4 text-gray-300">${h.room}</td>
-                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'breakfast')" class="meal-btn ${att.breakfast} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Breakfast">${att.breakfast === 'present' ? '?' : att.breakfast === 'absent' ? '?' : '—'}</button></td>
-                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'lunch')" class="meal-btn ${att.lunch} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Lunch">${att.lunch === 'present' ? '?' : att.lunch === 'absent' ? '?' : '—'}</button></td>
-                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'dinner')" class="meal-btn ${att.dinner} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Dinner">${att.dinner === 'present' ? '?' : att.dinner === 'absent' ? '?' : '—'}</button></td>
+                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'breakfast')" class="meal-btn ${att.breakfast} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Breakfast">${att.breakfast === 'present' ? '?' : att.breakfast === 'absent' ? '?' : 'ï¿½'}</button></td>
+                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'lunch')" class="meal-btn ${att.lunch} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Lunch">${att.lunch === 'present' ? '?' : att.lunch === 'absent' ? '?' : 'ï¿½'}</button></td>
+                    <td class="py-3 px-4 text-center"><button onclick="toggleMeal(${h.id},'dinner')" class="meal-btn ${att.dinner} h-9 w-9 rounded-lg border inline-flex items-center justify-center text-sm font-bold" title="Dinner">${att.dinner === 'present' ? '?' : att.dinner === 'absent' ? '?' : 'ï¿½'}</button></td>
                     <td class="py-3 px-4"><div class="flex items-center gap-2"><div class="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="h-full bg-teal rounded-full" style="width:${(mealCount / 3) * 100}%"></div></div><span class="text-xs text-gray-400 font-bold">${mealCount}/3</span></div></td>
                 </tr>`;
             }).join('');
@@ -494,7 +495,7 @@
                 if (m === meal) { b.className = `meal-selector active px-5 py-2.5 rounded-xl text-sm font-bold border border-${MEAL_COLORS[m]}-500/30 bg-${MEAL_COLORS[m]}-500/15 text-${MEAL_COLORS[m]}-400 transition-all`; }
                 else { b.className = 'meal-selector px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-gray-400 transition-all'; }
             });
-            document.getElementById('grid-title').innerText = MEAL_LABELS[meal] + ' Attendance — Today';
+            document.getElementById('grid-title').innerText = MEAL_LABELS[meal] + ' Attendance ï¿½ Today';
         }
 
         function updateStats() {

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Maintenance Scheduler - Zoi Hostel POS</title>
+    <meta name="description" content="Submit and track maintenance requests on ZipZapZoi hostel platform.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -280,15 +281,15 @@
         const PRIORITY_COLORS = { Low: 'green', Medium: 'blue', High: 'amber', Urgent: 'red' };
 
         const ORDERS = ZoiDB.get('maintenance_orders', [
-            { id: 1, title: 'AC Servicing — Room 204 & 205', category: 'AC/HVAC', priority: 'High', location: 'Room 204, 205', vendor: 'Blue Star Service', cost: 5600, scheduledDate: '2026-03-05', dueDate: '2026-03-06', status: 'Scheduled' },
+            { id: 1, title: 'AC Servicing ï¿½ Room 204 & 205', category: 'AC/HVAC', priority: 'High', location: 'Room 204, 205', vendor: 'Blue Star Service', cost: 5600, scheduledDate: '2026-03-05', dueDate: '2026-03-06', status: 'Scheduled' },
             { id: 2, title: 'Bathroom Pipe Leak Fix', category: 'Plumbing', priority: 'Urgent', location: 'Floor 1 Bathroom', vendor: 'Sri Ganesh Plumbing', cost: 3500, scheduledDate: '2026-03-03', dueDate: '2026-03-03', status: 'Overdue' },
             { id: 3, title: 'Floor 2 Bathroom Renovation', category: 'Plumbing', priority: 'High', location: 'Floor 2 Bathrooms', vendor: 'Krishna Constructions', cost: 45000, scheduledDate: '2026-03-08', dueDate: '2026-03-15', status: 'Scheduled' },
-            { id: 4, title: 'Electrical Wiring Check — Floor 3', category: 'Electrical', priority: 'Medium', location: 'Floor 3 Common Area', vendor: 'Local Electrician', cost: 2000, scheduledDate: '2026-03-04', dueDate: '2026-03-05', status: 'In Progress' },
+            { id: 4, title: 'Electrical Wiring Check ï¿½ Floor 3', category: 'Electrical', priority: 'Medium', location: 'Floor 3 Common Area', vendor: 'Local Electrician', cost: 2000, scheduledDate: '2026-03-04', dueDate: '2026-03-05', status: 'In Progress' },
             { id: 5, title: 'Monthly Pest Control', category: 'Pest Control', priority: 'Medium', location: 'All Floors', vendor: 'Godrej Pest Control', cost: 3000, scheduledDate: '2026-03-01', dueDate: '2026-03-01', status: 'Completed' },
-            { id: 6, title: 'Deep Cleaning — Common Hall', category: 'Deep Cleaning', priority: 'Low', location: 'Common Hall', vendor: 'Housekeeping Team', cost: 1500, scheduledDate: '2026-03-02', dueDate: '2026-03-02', status: 'Completed' },
+            { id: 6, title: 'Deep Cleaning ï¿½ Common Hall', category: 'Deep Cleaning', priority: 'Low', location: 'Common Hall', vendor: 'Housekeeping Team', cost: 1500, scheduledDate: '2026-03-02', dueDate: '2026-03-02', status: 'Completed' },
             { id: 7, title: 'Broken Bed Frame Replacement', category: 'Furniture', priority: 'Medium', location: 'Room 105 Bed B', vendor: 'Local Furniture Shop', cost: 4500, scheduledDate: '2026-03-06', dueDate: '2026-03-08', status: 'Scheduled' },
-            { id: 8, title: 'Wall Repainting — Room 303', category: 'Painting', priority: 'Low', location: 'Room 303', vendor: 'SRK Painters', cost: 6000, scheduledDate: '2026-03-10', dueDate: '2026-03-12', status: 'Scheduled' },
-            { id: 9, title: 'Geyser Replacement — Floor 2', category: 'Electrical', priority: 'High', location: 'Floor 2 Bathroom', vendor: 'Racold Service Center', cost: 8500, scheduledDate: '2026-03-07', dueDate: '2026-03-07', status: 'Scheduled' },
+            { id: 8, title: 'Wall Repainting ï¿½ Room 303', category: 'Painting', priority: 'Low', location: 'Room 303', vendor: 'SRK Painters', cost: 6000, scheduledDate: '2026-03-10', dueDate: '2026-03-12', status: 'Scheduled' },
+            { id: 9, title: 'Geyser Replacement ï¿½ Floor 2', category: 'Electrical', priority: 'High', location: 'Floor 2 Bathroom', vendor: 'Racold Service Center', cost: 8500, scheduledDate: '2026-03-07', dueDate: '2026-03-07', status: 'Scheduled' },
             { id: 10, title: 'Garden Maintenance & Landscaping', category: 'Other', priority: 'Low', location: 'Hostel Garden', vendor: 'Green Thumb Services', cost: 2500, scheduledDate: '2026-03-09', dueDate: '2026-03-09', status: 'Scheduled' },
         ]);
 
@@ -364,7 +365,7 @@
                     <p class="text-[10px] font-bold ${today ? 'text-pink-400' : 'text-gray-400'} mb-0.5">${d}</p>
                     ${events.map(e => {
                     const tc = CAT_COLORS[e.category] || 'gray';
-                    return `<div class="bg-${tc}-500/20 rounded px-1 py-0.5 text-[7px] text-${tc}-400 font-bold truncate mb-0.5">${e.title.substring(0, 15)}…</div>`;
+                    return `<div class="bg-${tc}-500/20 rounded px-1 py-0.5 text-[7px] text-${tc}-400 font-bold truncate mb-0.5">${e.title.substring(0, 15)}ï¿½</div>`;
                 }).join('')}
                 </div>`;
             }).join('');
@@ -438,8 +439,8 @@
                 title: t,
                 category: document.getElementById('nw-cat').value,
                 priority: document.getElementById('nw-priority').value,
-                location: document.getElementById('nw-loc').value || '—',
-                vendor: document.getElementById('nw-vendor').value || '—',
+                location: document.getElementById('nw-loc').value || 'ï¿½',
+                vendor: document.getElementById('nw-vendor').value || 'ï¿½',
                 cost: parseInt(document.getElementById('nw-cost').value) || 0,
                 scheduledDate: document.getElementById('nw-date').value,
                 dueDate: document.getElementById('nw-due').value || document.getElementById('nw-date').value,

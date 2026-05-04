@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ZipZapZoi Admin - Dispute Resolution</title>
+    <meta name="description" content="Resolve customer disputes and complaints on ZipZapZoi Eats admin panel.">
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link
@@ -347,7 +348,7 @@
             <button onclick="closeModal('evidence-modal')"
                 class="absolute -top-10 right-0 text-white hover:text-primary"><span
                     class="material-symbols-outlined text-3xl">close</span></button>
-            <img src="https://via.placeholder.com/800x600/111111/333333?text=Evidence+Photo"
+            <img alt="333333?text=Evidence+Photo" src="https://via.placeholder.com/800x600/111111/333333?text=Evidence+Photo"
                 class="rounded-xl border border-border shadow-2xl mx-auto max-h-[80vh]">
         </div>
     </div>
@@ -469,7 +470,7 @@
                         </div>
                         <h3 class="text-white font-bold text-sm mb-1">${d.title}</h3>
                         <div class="flex items-center justify-between text-xs text-gray-500">
-                            <span>${d.user} • ${d.time}</span>
+                            <span>${d.user} ï¿½ ${d.time}</span>
                         </div>
                     </div>`;
                 container.innerHTML += html;
@@ -491,7 +492,7 @@
             const d = disputes.find(x => x.id === id);
             renderList();
             document.getElementById('detail-title').innerText = `#${d.id}: ${d.title.split(':')[0]}`;
-            document.getElementById('detail-sub').innerText = `${d.title.split(':')[1]} • ${d.user}`;
+            document.getElementById('detail-sub').innerText = `${d.title.split(':')[1]} ï¿½ ${d.user}`;
             document.getElementById('detail-tag').classList.toggle('hidden', d.type !== 'Critical');
             document.getElementById('ai-card').classList.remove('hidden');
             document.getElementById('ai-text').innerText = d.ai;

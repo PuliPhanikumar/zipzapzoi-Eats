@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ZipZapZoi - Menu CommandOS</title>
+    <meta name="description" content="Browse restaurant menus and order delicious food online via ZipZapZoi Eats. Add, edit, and manage your restaurant menu items on ZipZapZoi Eats.">
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link
@@ -170,7 +171,7 @@
                             <label class="text-xs font-bold text-gray-500 uppercase">Product Image</label>
                             <div
                                 class="aspect-video rounded-xl bg-black border border-border relative group overflow-hidden">
-                                <img id="editor-img-preview" src="https://via.placeholder.com/400x300?text=Upload+Image"
+                                <img alt="400x300?text=Upload+Image" id="editor-img-preview" src="https://via.placeholder.com/400x300?text=Upload+Image"
                                     class="w-full h-full object-cover">
                                 <div
                                     class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
@@ -496,7 +497,7 @@
                 const html = `
                     <div class="bg-surface border border-border rounded-xl overflow-hidden group hover:border-primary/50 transition-all flex flex-col h-full relative">
                         <div class="relative h-36 bg-gray-800 overflow-hidden">
-                            <img src="${item.img}" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500">
+                            <img alt="${item" src="${item.img}" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-2 right-2 flex gap-1">
                                 <button onclick="loadIntoEditor(${item.id})" class="p-1.5 bg-black/60 rounded-lg text-white hover:bg-primary hover:text-black backdrop-blur-md transition-colors shadow-lg"><span class="material-symbols-outlined text-sm">edit</span></button>
                             </div>

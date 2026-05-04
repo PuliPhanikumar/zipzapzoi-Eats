@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ZipZapZoi Admin - Financial Ops</title>
+    <meta name="description" content="Process refunds and manage refund policies on ZipZapZoi Eats admin panel.">
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link
@@ -254,15 +255,15 @@
             <div class="space-y-3 max-h-60 overflow-y-auto">
                 <div class="p-3 bg-black/20 rounded border border-border">
                     <p class="text-xs text-white font-bold">Missing Item (Fries)</p>
-                    <p class="text-[10px] text-gray-500">2 days ago • Order #8821</p>
+                    <p class="text-[10px] text-gray-500">2 days ago ï¿½ Order #8821</p>
                 </div>
                 <div class="p-3 bg-black/20 rounded border border-border">
                     <p class="text-xs text-white font-bold">Wrong Item (Veg vs Non-Veg)</p>
-                    <p class="text-[10px] text-gray-500">5 days ago • Order #7712</p>
+                    <p class="text-[10px] text-gray-500">5 days ago ï¿½ Order #7712</p>
                 </div>
                 <div class="p-3 bg-black/20 rounded border border-border">
                     <p class="text-xs text-white font-bold">Spilled Drink</p>
-                    <p class="text-[10px] text-gray-500">Last week • Order #6652</p>
+                    <p class="text-[10px] text-gray-500">Last week ï¿½ Order #6652</p>
                 </div>
             </div>
         </div>
@@ -459,7 +460,7 @@
         function openDrawer(id) {
             const r = refunds.find(x => x.id === id);
             currentRefundId = id;
-            document.getElementById('drawer-id').innerText = `${r.order} • ${r.cust}`;
+            document.getElementById('drawer-id').innerText = `${r.order} ï¿½ ${r.cust}`;
             document.getElementById('drawer-status').innerText = r.status;
             document.getElementById('drawer-amt-full').innerText = r.amt;
             document.getElementById('drawer-score').innerText = r.risk + '%';

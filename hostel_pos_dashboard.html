@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Zoi Hostel POS - AI Management</title>
+    <meta name="description" content="ZipZapZoi hostel management dashboard. Manage rooms, hostelers, and operations.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -181,7 +182,7 @@
                             <span class="material-symbols-outlined text-pink-400 text-sm">person</span>
                             <div>
                                 <p class="text-xs text-white">Rahul Sharma</p>
-                                <p class="text-[10px] text-gray-400">Hosteler • Room 201</p>
+                                <p class="text-[10px] text-gray-400">Hosteler ï¿½ Room 201</p>
                             </div>
                         </a>
                         <a href="hostel_billing.html"
@@ -189,7 +190,7 @@
                             <span class="material-symbols-outlined text-teal text-sm">receipt</span>
                             <div>
                                 <p class="text-xs text-white">INV-2048 (March Rent)</p>
-                                <p class="text-[10px] text-gray-400">?6,500 • Unpaid</p>
+                                <p class="text-[10px] text-gray-400">?6,500 ï¿½ Unpaid</p>
                             </div>
                         </a>
                     </div>
@@ -260,12 +261,12 @@
                 </button>
                 <div class="glass-panel px-3 py-1.5 flex items-center gap-2 text-xs">
                     <span class="material-symbols-outlined text-amber-400 text-sm">partly_cloudy_day</span>
-                    <span class="text-white font-bold">28°C</span>
+                    <span class="text-white font-bold">28ï¿½C</span>
                     <span class="text-gray-500">Bengaluru</span>
                 </div>
                 <div class="glass-panel px-3 py-1.5 text-center">
-                    <p class="text-xs font-bold text-white" id="live-clock">—</p>
-                    <p class="text-[9px] text-gray-500" id="live-date">—</p>
+                    <p class="text-xs font-bold text-white" id="live-clock">ï¿½</p>
+                    <p class="text-[9px] text-gray-500" id="live-date">ï¿½</p>
                 </div>
             </div>
         </header>
@@ -568,7 +569,7 @@
                                         <p
                                             class="font-bold text-sm text-white group-hover:text-pink-400 transition-colors">
                                             Rahul Kumar</p>
-                                        <p class="text-[10px] text-gray-400">Room 102 B • ID: HOS-882</p>
+                                        <p class="text-[10px] text-gray-400">Room 102 B ï¿½ ID: HOS-882</p>
                                     </div>
                                 </div>
                                 <span
@@ -592,7 +593,7 @@
                                         <p
                                             class="font-bold text-sm text-white group-hover:text-pink-400 transition-colors">
                                             Sneha Sharma</p>
-                                        <p class="text-[10px] text-gray-400">Room 305 A • ID: HOS-991</p>
+                                        <p class="text-[10px] text-gray-400">Room 305 A ï¿½ ID: HOS-991</p>
                                     </div>
                                 </div>
                                 <span
@@ -691,7 +692,7 @@
                         <div
                             class="text-center p-4 bg-white/5 rounded-xl border border-white/5 hover:border-violet-500/30 transition-colors">
                             <span class="material-symbols-outlined text-violet-400 text-2xl mb-1">dark_mode</span>
-                            <p class="text-2xl font-extrabold text-white">—</p>
+                            <p class="text-2xl font-extrabold text-white">ï¿½</p>
                             <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wide">Dinner</p>
                             <p class="text-xs text-gray-500 mt-1">Starts 7 PM</p>
                         </div>
@@ -1046,7 +1047,7 @@
                     <td class="px-5 py-3 font-medium text-white">${v.name}</td>
                     <td class="px-3 py-3 text-gray-400">${v.hostelerId}</td>
                     <td class="px-3 py-3 text-gray-300">${v.inTime}</td>
-                    <td class="px-3 py-3 text-gray-300">${v.outTime || '—'}</td>
+                    <td class="px-3 py-3 text-gray-300">${v.outTime || 'ï¿½'}</td>
                     <td class="px-3 py-3">
                         <span class="${isInside ? 'bg-amber-500/20 text-amber-400' : 'bg-teal/20 text-teal'} px-2 py-0.5 rounded text-[10px] font-bold">${v.status}</span>
                     </td>
@@ -1066,7 +1067,7 @@
                         <p class="font-bold text-sm text-white">${t.category} - ${t.subCat}</p>
                         <span class="bg-${pc}-500/20 text-${pc}-400 px-2 py-0.5 rounded text-[9px] font-bold">${t.priority}</span>
                     </div>
-                    <p class="text-[10px] text-gray-400">${t.hosteler} • Room ${t.room}</p>
+                    <p class="text-[10px] text-gray-400">${t.hosteler} ï¿½ Room ${t.room}</p>
                     <p class="text-xs text-gray-300 mt-1">${t.desc}</p>
                 </div>`;
             }).join('') || '<div class="p-4 text-center text-gray-500 text-xs text-white">No active complaints! ??</div>';
@@ -1237,13 +1238,13 @@
                     onclick="window.location.href='hostel-registration.html'">
                     <p class="text-[10px] font-bold text-pink-400 uppercase mb-2">Best Value</p>
                     <p class="text-2xl font-extrabold text-white">?5,499</p>
-                    <p class="text-xs text-pink-400 mt-1 font-bold">6 Months — Save 8%</p>
+                    <p class="text-xs text-pink-400 mt-1 font-bold">6 Months ï¿½ Save 8%</p>
                 </div>
                 <div class="glass-panel p-5 text-center hover:border-pink-500/30 transition-all cursor-pointer"
                     onclick="window.location.href='hostel-registration.html'">
                     <p class="text-[10px] font-bold text-gray-500 uppercase mb-2">Yearly</p>
                     <p class="text-2xl font-extrabold text-white">?8,999</p>
-                    <p class="text-xs text-teal mt-1 font-bold">12 Months — Save 25%</p>
+                    <p class="text-xs text-teal mt-1 font-bold">12 Months ï¿½ Save 25%</p>
                 </div>
             </div>
             <a href="hostel-registration.html"

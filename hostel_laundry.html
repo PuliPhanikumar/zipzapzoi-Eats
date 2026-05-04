@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Laundry & Parcels - Zoi Hostel POS</title>
+    <meta name="description" content="Track laundry services and schedules on ZipZapZoi hostel management.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -343,7 +344,7 @@
             if (!h) { showToast('Select hosteler.', 'error'); return; }
             const shirts = parseInt(document.getElementById('l-shirts').value) || 0; const pants = parseInt(document.getElementById('l-pants').value) || 0; const others = parseInt(document.getElementById('l-others').value) || 0;
             const items = []; if (shirts) items.push(shirts + ' Shirts'); if (pants) items.push(pants + ' Pants'); if (others) items.push(others + ' Others');
-            LAUNDRY.unshift({ id: 'LDR-' + String(LAUNDRY.length + 1).padStart(3, '0'), hosteler: h, items: items.join(', ') || 'Mixed', service: document.getElementById('l-service').value.split('(')[0].trim(), pickup: new Date().toISOString().split('T')[0], delivery: '—', status: 'picked-up' });
+            LAUNDRY.unshift({ id: 'LDR-' + String(LAUNDRY.length + 1).padStart(3, '0'), hosteler: h, items: items.join(', ') || 'Mixed', service: document.getElementById('l-service').value.split('(')[0].trim(), pickup: new Date().toISOString().split('T')[0], delivery: 'ï¿½', status: 'picked-up' });
             ZoiDB.set('laundry', LAUNDRY);
             closeLaundryModal(); renderLaundry();
             showToast('Laundry request submitted', 'success');
@@ -352,7 +353,7 @@
         function logParcel() {
             const h = document.getElementById('p-hosteler').value;
             if (!h) { showToast('Select hosteler.', 'error'); return; }
-            PARCELS.unshift({ id: 'PKL-' + String(PARCELS.length + 1).padStart(3, '0'), hosteler: h, courier: document.getElementById('p-courier').value || 'Other', tracking: document.getElementById('p-tracking').value || '—', received: new Date().toLocaleString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }), desc: document.getElementById('p-desc').value || 'Package', status: 'pending' });
+            PARCELS.unshift({ id: 'PKL-' + String(PARCELS.length + 1).padStart(3, '0'), hosteler: h, courier: document.getElementById('p-courier').value || 'Other', tracking: document.getElementById('p-tracking').value || 'ï¿½', received: new Date().toLocaleString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }), desc: document.getElementById('p-desc').value || 'Package', status: 'pending' });
             ZoiDB.set('parcels', PARCELS);
             closeParcelModal(); renderParcels(); updateStats();
             showToast('New parcel logged', 'success');

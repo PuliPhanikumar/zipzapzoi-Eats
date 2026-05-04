@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Hosteler Feedback - Zoi Hostel POS</title>
+    <meta name="description" content="Share your feedback with ZipZapZoi Eats. Help us improve your food delivery experience. Collect and manage hosteler feedback on ZipZapZoi platform.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -259,10 +260,10 @@
         const FEEDBACKS = [
             { name: 'Ravi Kumar', room: '101', date: '2026-03-04', rating: 5, sentiment: 'positive', comment: 'Excellent food quality this month! The new breakfast menu with idli-vada is amazing. Staff is very helpful, especially the housekeeping team.', anonymous: false, responded: true, response: 'Thank you Ravi! We\'re glad you enjoy the new menu.' },
             { name: 'Deepak S.', room: '102', date: '2026-03-03', rating: 4, sentiment: 'positive', comment: 'Rooms are clean and well maintained. Only issue is Wi-Fi on Floor 1 is a bit slow during peak hours (9-11 PM).', anonymous: false, responded: false, response: null },
-            { name: 'Anonymous', room: '—', date: '2026-03-03', rating: 2, sentiment: 'negative', comment: 'Hot water supply is inconsistent in the morning. Sometimes no hot water at all even at 6 AM. This needs urgent fixing.', anonymous: true, responded: true, response: 'We\'ve scheduled a geyser inspection for March 5. Sorry for the inconvenience.' },
+            { name: 'Anonymous', room: 'ï¿½', date: '2026-03-03', rating: 2, sentiment: 'negative', comment: 'Hot water supply is inconsistent in the morning. Sometimes no hot water at all even at 6 AM. This needs urgent fixing.', anonymous: true, responded: true, response: 'We\'ve scheduled a geyser inspection for March 5. Sorry for the inconvenience.' },
             { name: 'Priya S.', room: '301', date: '2026-03-02', rating: 4, sentiment: 'positive', comment: 'Love the Holi celebration initiative! Also, the new laundry service is very convenient. Would love a gaming room too!', anonymous: false, responded: false, response: null },
-            { name: 'Sanjay V.', room: '201', date: '2026-03-01', rating: 3, sentiment: 'neutral', comment: 'Everything is average. Dinner variety could be better — too much rice-based. Would appreciate more roti/chapati options.', anonymous: false, responded: true, response: 'Noted! We\'ll add more roti options starting next week.' },
-            { name: 'Anonymous', room: '—', date: '2026-02-28', rating: 1, sentiment: 'negative', comment: 'Night security guard sleeping on duty multiple times. Very concerning for safety. Please address this immediately.', anonymous: true, responded: true, response: 'This has been reported to the owner. Strict action will be taken. Thank you for reporting.' },
+            { name: 'Sanjay V.', room: '201', date: '2026-03-01', rating: 3, sentiment: 'neutral', comment: 'Everything is average. Dinner variety could be better ï¿½ too much rice-based. Would appreciate more roti/chapati options.', anonymous: false, responded: true, response: 'Noted! We\'ll add more roti options starting next week.' },
+            { name: 'Anonymous', room: 'ï¿½', date: '2026-02-28', rating: 1, sentiment: 'negative', comment: 'Night security guard sleeping on duty multiple times. Very concerning for safety. Please address this immediately.', anonymous: true, responded: true, response: 'This has been reported to the owner. Strict action will be taken. Thank you for reporting.' },
             { name: 'Kiran R.', room: '103', date: '2026-02-27', rating: 5, sentiment: 'positive', comment: 'Best hostel I\'ve stayed in! The management is very responsive to complaints. Rent is fair for the facilities provided.', anonymous: false, responded: false, response: null },
             { name: 'Sneha Sharma', room: '301', date: '2026-02-25', rating: 4, sentiment: 'positive', comment: 'Good facilities overall. Parking area could be better organized. Also, please add a water purifier on Floor 3.', anonymous: false, responded: true, response: 'Water purifier for Floor 3 has been ordered. Should be installed by March 10.' },
         ];
@@ -299,7 +300,7 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
                                 <span class="font-bold text-white text-sm">${f.name}</span>
-                                ${f.room !== '—' ? `<span class="text-[10px] text-gray-500">Room ${f.room}</span>` : ''}
+                                ${f.room !== 'ï¿½' ? `<span class="text-[10px] text-gray-500">Room ${f.room}</span>` : ''}
                                 <span class="bg-${s.color}-500/20 text-${s.color}-400 px-2 py-0.5 rounded text-[10px] font-bold">${s.icon} ${s.label}</span>
                                 <span class="text-amber-400 text-xs font-bold ml-auto">${stars}</span>
                             </div>
@@ -327,10 +328,10 @@
         function submitSurvey() {
             const avg = surveyRatings.reduce((a, b) => a + b, 0) / surveyRatings.length;
             if (avg === 0) { alert('Please rate at least one category.'); return; }
-            const comment = document.getElementById('survey-comment').value || '—';
+            const comment = document.getElementById('survey-comment').value || 'ï¿½';
             const anon = document.getElementById('survey-anon').checked;
             const sentiment = avg >= 4 ? 'positive' : avg >= 3 ? 'neutral' : 'negative';
-            FEEDBACKS.unshift({ name: anon ? 'Anonymous' : 'Hostel Admin', room: anon ? '—' : '—', date: new Date().toISOString().split('T')[0], rating: Math.round(avg), sentiment, comment, anonymous: anon, responded: false, response: null });
+            FEEDBACKS.unshift({ name: anon ? 'Anonymous' : 'Hostel Admin', room: anon ? 'ï¿½' : 'ï¿½', date: new Date().toISOString().split('T')[0], rating: Math.round(avg), sentiment, comment, anonymous: anon, responded: false, response: null });
             alert('? Thank you! Feedback submitted successfully.');
             switchTab('feedbacks'); renderFeedback(); updateStats();
         }

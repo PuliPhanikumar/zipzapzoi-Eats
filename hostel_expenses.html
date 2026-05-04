@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Expense Tracker - Zoi Hostel POS</title>
+    <meta name="description" content="Track hostel expenses and budgets on ZipZapZoi management platform.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -190,7 +191,7 @@
                     <div class="glass-panel p-6 bouncy-card">
                         <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
                                 class="material-symbols-outlined text-teal text-lg">show_chart</span> Revenue vs
-                            Expenses — 6 Months</h3><canvas id="rev-chart" height="220"></canvas>
+                            Expenses ï¿½ 6 Months</h3><canvas id="rev-chart" height="220"></canvas>
                     </div>
                 </div>
                 <div class="glass-panel p-6 bouncy-card">
@@ -259,16 +260,16 @@
         const CAT_COLORS = { Electricity: 'amber', Water: 'blue', 'Building Rent': 'violet', Repairs: 'orange', 'Staff Salary': 'pink', Groceries: 'green', Gas: 'red', Internet: 'teal', Insurance: 'indigo', Miscellaneous: 'gray' };
 
         const EXPENSES = ZoiDB.get('expenses', [
-            { date: '2026-03-01', category: 'Electricity', desc: 'BESCOM bill — March', vendor: 'BESCOM', amount: 18500, status: 'Paid' },
+            { date: '2026-03-01', category: 'Electricity', desc: 'BESCOM bill ï¿½ March', vendor: 'BESCOM', amount: 18500, status: 'Paid' },
             { date: '2026-03-01', category: 'Water', desc: 'BWSSB water bill', vendor: 'BWSSB', amount: 4200, status: 'Paid' },
             { date: '2026-03-01', category: 'Building Rent', desc: 'Monthly building rent', vendor: 'Lakshmi Properties', amount: 85000, status: 'Paid' },
-            { date: '2026-03-01', category: 'Staff Salary', desc: 'All staff salaries — March', vendor: 'Internal', amount: 55000, status: 'Paid' },
+            { date: '2026-03-01', category: 'Staff Salary', desc: 'All staff salaries ï¿½ March', vendor: 'Internal', amount: 55000, status: 'Paid' },
             { date: '2026-03-01', category: 'Groceries', desc: 'Monthly grocery procurement', vendor: 'Reliance Fresh', amount: 32000, status: 'Paid' },
             { date: '2026-03-01', category: 'Gas', desc: 'Cooking gas cylinders x8', vendor: 'HP Gas', amount: 5600, status: 'Paid' },
             { date: '2026-03-01', category: 'Internet', desc: 'Broadband 500Mbps plan', vendor: 'JioFiber', amount: 3500, status: 'Paid' },
-            { date: '2026-03-02', category: 'Repairs', desc: 'Plumbing repair — Floor 1 bathroom', vendor: 'Sri Ganesh Plumbing', amount: 4500, status: 'Paid' },
-            { date: '2026-03-03', category: 'Repairs', desc: 'AC servicing — Room 204', vendor: 'Blue Star Service', amount: 2800, status: 'Pending' },
-            { date: '2026-03-04', category: 'Electricity', desc: 'Electrical wiring fix — Floor 3', vendor: 'Local Electrician', amount: 1500, status: 'Pending' },
+            { date: '2026-03-02', category: 'Repairs', desc: 'Plumbing repair ï¿½ Floor 1 bathroom', vendor: 'Sri Ganesh Plumbing', amount: 4500, status: 'Paid' },
+            { date: '2026-03-03', category: 'Repairs', desc: 'AC servicing ï¿½ Room 204', vendor: 'Blue Star Service', amount: 2800, status: 'Pending' },
+            { date: '2026-03-04', category: 'Electricity', desc: 'Electrical wiring fix ï¿½ Floor 3', vendor: 'Local Electrician', amount: 1500, status: 'Pending' },
             { date: '2026-03-01', category: 'Insurance', desc: 'Quarterly fire insurance premium', vendor: 'ICICI Lombard', amount: 12000, status: 'Paid' },
             { date: '2026-03-04', category: 'Miscellaneous', desc: 'Pest control service', vendor: 'Godrej Pest Control', amount: 3000, status: 'Paid' },
         ]);
@@ -365,7 +366,7 @@
         function addExpense() {
             const c = document.getElementById('ae-cat').value;
             if (!c) { showToast('Select category.', 'error'); return; }
-            EXPENSES.unshift({ date: document.getElementById('ae-date').value, category: c, desc: document.getElementById('ae-desc').value || '—', vendor: document.getElementById('ae-vendor').value || '—', amount: parseInt(document.getElementById('ae-amount').value) || 0, status: document.getElementById('ae-status').value });
+            EXPENSES.unshift({ date: document.getElementById('ae-date').value, category: c, desc: document.getElementById('ae-desc').value || 'ï¿½', vendor: document.getElementById('ae-vendor').value || 'ï¿½', amount: parseInt(document.getElementById('ae-amount').value) || 0, status: document.getElementById('ae-status').value });
             ZoiDB.set('expenses', EXPENSES);
             closeExpModal(); renderExp();
             showToast('New expense added successfully', 'success');

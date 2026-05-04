@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Billing & Fees - Zoi Hostel POS</title>
+    <meta name="description" content="Track rent, billing, and payments for your hostel on ZipZapZoi.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -176,7 +177,7 @@
                 <div class="glass-panel p-0 overflow-hidden">
                     <div class="p-4 border-b border-border flex items-center justify-between">
                         <div class="flex items-center gap-3">
-                            <h3 class="font-bold text-white text-sm">Monthly Rent Collection — March 2026</h3>
+                            <h3 class="font-bold text-white text-sm">Monthly Rent Collection ï¿½ March 2026</h3>
                             <span class="bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full"
                                 id="collection-pct">80% collected</span>
                         </div>
@@ -252,7 +253,7 @@
                     <!-- GST Breakdown -->
                     <div class="glass-panel p-6">
                         <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2"><span
-                                class="material-symbols-outlined text-amber-400 text-lg">receipt</span> GST Breakdown —
+                                class="material-symbols-outlined text-amber-400 text-lg">receipt</span> GST Breakdown ï¿½
                             March 2026</h3>
                         <div class="space-y-3">
                             <div class="flex justify-between items-center p-3 bg-white/[0.03] rounded-xl"><span
@@ -374,12 +375,12 @@
                 <select id="inv-hosteler"
                     class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
                     <option value="">Select Hosteler *</option>
-                    <option value="Ravi Kumar">Ravi Kumar — Room 101</option>
-                    <option value="Deepak S.">Deepak S. — Room 102</option>
-                    <option value="Rahul Kumar">Rahul Kumar — Room 102</option>
-                    <option value="Manoj P.">Manoj P. — Room 103</option>
-                    <option value="Kiran R.">Kiran R. — Room 103</option>
-                    <option value="Sanjay V.">Sanjay V. — Room 201</option>
+                    <option value="Ravi Kumar">Ravi Kumar ï¿½ Room 101</option>
+                    <option value="Deepak S.">Deepak S. ï¿½ Room 102</option>
+                    <option value="Rahul Kumar">Rahul Kumar ï¿½ Room 102</option>
+                    <option value="Manoj P.">Manoj P. ï¿½ Room 103</option>
+                    <option value="Kiran R.">Kiran R. ï¿½ Room 103</option>
+                    <option value="Sanjay V.">Sanjay V. ï¿½ Room 201</option>
                 </select>
                 <select id="inv-month"
                     class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-300 focus:border-pink-500 focus:outline-none">
@@ -432,7 +433,7 @@
                         class="material-symbols-outlined">close</span></button>
             </div>
             <div class="p-5 space-y-3.5">
-                <p class="text-sm text-gray-300" id="pay-hosteler-label">—</p>
+                <p class="text-sm text-gray-300" id="pay-hosteler-label">ï¿½</p>
                 <input type="number" id="pay-amount" placeholder="Amount ?"
                     class="w-full bg-bg border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-pink-500 focus:outline-none">
                 <select id="pay-method"
@@ -689,7 +690,7 @@
             activePayId = id;
             const r = RENT_RECORDS.find(x => x.id === id);
             const balance = (r.rent + r.mess) - r.paid;
-            document.getElementById('pay-hosteler-label').innerText = `${r.name} — Room ${r.room} — Balance: ?${balance.toLocaleString()}`;
+            document.getElementById('pay-hosteler-label').innerText = `${r.name} ï¿½ Room ${r.room} ï¿½ Balance: ?${balance.toLocaleString()}`;
             document.getElementById('pay-amount').value = balance;
             document.getElementById('pay-date').value = new Date().toISOString().split('T')[0];
             document.getElementById('payment-modal').classList.remove('hidden'); document.getElementById('payment-modal').classList.add('flex');

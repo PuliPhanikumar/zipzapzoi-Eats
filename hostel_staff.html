@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Staff & Salary - Zoi Hostel POS</title>
+    <meta name="description" content="Manage restaurant staff, shifts, and payroll on ZipZapZoi Eats partner dashboard. Manage hostel staff, duties, and schedules on ZipZapZoi platform.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -143,7 +144,7 @@
             <div id="tab-attendance" class="tab-content hidden">
                 <div class="glass-panel p-0 overflow-hidden">
                     <div class="p-4 border-b border-border flex items-center justify-between">
-                        <h3 class="font-bold text-white text-sm">Today's Attendance — <span id="att-date">—</span></h3>
+                        <h3 class="font-bold text-white text-sm">Today's Attendance ï¿½ <span id="att-date">ï¿½</span></h3>
                         <button onclick="markAllPresent()"
                             class="text-xs font-bold text-teal bg-teal/10 px-3 py-1.5 rounded-lg border border-teal/30 hover:bg-teal/20 transition-colors">Mark
                             All Present</button>
@@ -167,7 +168,7 @@
             <div id="tab-payroll" class="tab-content hidden">
                 <div class="glass-panel p-0 overflow-hidden mb-6">
                     <div class="p-4 border-b border-border flex items-center justify-between">
-                        <h3 class="font-bold text-white text-sm">Salary Processing — March 2026</h3><button
+                        <h3 class="font-bold text-white text-sm">Salary Processing ï¿½ March 2026</h3><button
                             onclick="processAll()"
                             class="text-xs font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 px-4 py-1.5 rounded-lg shadow-[0_0_10px_rgba(236,72,153,0.2)] transition-shadow">Process
                             All Salaries</button>
@@ -277,7 +278,7 @@
                         <div class="flex-1 min-w-0">
                             <h4 class="font-bold text-white text-sm">${s.name}</h4>
                             <p class="text-xs text-gray-400">${s.role}</p>
-                            <div class="flex items-center gap-2 mt-1.5"><span class="text-[10px] ${s.present ? 'text-green-400' : 'text-red-400'} font-bold">${s.present ? '? On Duty' : '? Absent'}</span><span class="text-[10px] text-gray-500">• Since ${s.joined}</span></div>
+                            <div class="flex items-center gap-2 mt-1.5"><span class="text-[10px] ${s.present ? 'text-green-400' : 'text-red-400'} font-bold">${s.present ? '? On Duty' : '? Absent'}</span><span class="text-[10px] text-gray-500">ï¿½ Since ${s.joined}</span></div>
                         </div>
                     </div>
                     <div class="px-4 pb-3 grid grid-cols-2 gap-2 text-[10px]">
@@ -297,8 +298,8 @@
                 <td class="py-3 px-4 font-bold text-white text-sm">${s.name}</td>
                 <td class="py-3 px-4"><span class="bg-${ROLE_COLORS[s.role] || 'gray'}-500/20 text-${ROLE_COLORS[s.role] || 'gray'}-400 px-2 py-0.5 rounded text-[10px] font-bold">${s.role}</span></td>
                 <td class="py-3 px-4 text-gray-400 text-xs">${s.shift}</td>
-                <td class="py-3 px-4 text-green-400 font-bold text-xs">${s.checkIn || '—'}</td>
-                <td class="py-3 px-4 text-teal font-bold text-xs">${s.checkOut || '—'}</td>
+                <td class="py-3 px-4 text-green-400 font-bold text-xs">${s.checkIn || 'ï¿½'}</td>
+                <td class="py-3 px-4 text-teal font-bold text-xs">${s.checkOut || 'ï¿½'}</td>
                 <td class="py-3 px-4">${s.present ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">Present</span>' : '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">Absent</span>'}</td>
                 <td class="py-3 px-4"><button onclick="togglePresent(${s.id})" class="text-xs ${s.present ? 'text-red-400 bg-red-500/10' : 'text-green-400 bg-green-500/10'} px-3 py-1.5 rounded-lg font-bold transition-colors">${s.present ? 'Mark Absent' : 'Mark Present'}</button></td>
             </tr>`).join('');
@@ -316,7 +317,7 @@
                     <td class="py-3 px-4 text-gray-400 text-xs">${s.role}</td>
                     <td class="py-3 px-4 text-white font-bold">?${s.salary.toLocaleString()}</td>
                     <td class="py-3 px-4 text-green-400 font-bold">${s.daysPresent}/30</td>
-                    <td class="py-3 px-4 text-red-400 font-bold">${deduction > 0 ? '-?' + deduction.toLocaleString() : '—'}</td>
+                    <td class="py-3 px-4 text-red-400 font-bold">${deduction > 0 ? '-?' + deduction.toLocaleString() : 'ï¿½'}</td>
                     <td class="py-3 px-4 text-teal font-bold">?${net.toLocaleString()}</td>
                     <td class="py-3 px-4">${statusBadge}</td>
                 </tr>`;
@@ -377,7 +378,7 @@
         function hireStaff() {
             const n = document.getElementById('h-name').value.trim();
             if (!n) { showToast('Name required.', 'error'); return; }
-            STAFF.push({ id: Date.now(), name: n, phone: document.getElementById('h-phone').value || '—', role: document.getElementById('h-role').value || 'Admin Staff', shift: document.getElementById('h-shift').value, salary: parseInt(document.getElementById('h-salary').value) || 10000, aadhar: document.getElementById('h-aadhar').value || '—', joined: new Date().toISOString().split('T')[0], status: 'active', present: false, checkIn: null, checkOut: null, daysPresent: 0, paymentStatus: 'Pending' });
+            STAFF.push({ id: Date.now(), name: n, phone: document.getElementById('h-phone').value || 'ï¿½', role: document.getElementById('h-role').value || 'Admin Staff', shift: document.getElementById('h-shift').value, salary: parseInt(document.getElementById('h-salary').value) || 10000, aadhar: document.getElementById('h-aadhar').value || 'ï¿½', joined: new Date().toISOString().split('T')[0], status: 'active', present: false, checkIn: null, checkOut: null, daysPresent: 0, paymentStatus: 'Pending' });
             ZoiDB.set('staff', STAFF);
             closeHireModal(); renderProfiles(); renderAttendance(); renderPayroll();
             if (!document.getElementById('tab-payroll').classList.contains('hidden')) { initCharts(); }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ZipZapZoi Admin - Content CMS</title>
+    <meta name="description" content="Manage platform content, banners, and announcements on ZipZapZoi Eats admin.">
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Inter:wght@300..700&display=swap"
@@ -261,7 +262,7 @@
                     <label class="text-xs font-bold text-text-muted uppercase">Live Preview</label>
                     <div
                         class="aspect-video rounded-xl bg-black border border-border flex items-center justify-center relative group overflow-hidden shadow-lg">
-                        <img id="preview-img" src="" class="w-full h-full object-cover hidden">
+                        <img alt="ZipZapZoi Eats image" id="preview-img" src="" class="w-full h-full object-cover hidden">
                         <div class="text-center p-4" id="preview-placeholder">
                             <span class="material-symbols-outlined text-4xl text-text-muted mb-2">image</span>
                             <p class="text-xs text-text-muted">Paste Image URL below</p>
@@ -337,7 +338,7 @@
                 if (typeFilter !== 'all' && a.type !== typeFilter) return;
 
                 const imgHtml = a.image
-                    ? `<img src="${a.image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">`
+                    ? `<img alt="${a" src="${a.image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">`
                     : `<div class="w-full h-full flex items-center justify-center bg-background"><span class="material-symbols-outlined text-4xl text-text-muted/30">description</span></div>`;
 
                 const statusHtml = a.status === 'Active'
@@ -353,7 +354,7 @@
                         <div class="flex-1 flex flex-col justify-center min-w-0">
                             <div class="flex items-center gap-2 mb-2">
                                 <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary border border-primary/20">${(a.type || 'ASSET').toUpperCase()}</span>
-                                <span class="text-text-muted text-[10px]">•</span>
+                                <span class="text-text-muted text-[10px]">ï¿½</span>
                                 <span class="text-[10px] text-text-muted flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">group</span> ${a.segment || 'All'}</span>
                             </div>
                             <h4 class="text-lg font-bold text-white truncate group-hover:text-primary transition-colors mb-1">${a.title}</h4>

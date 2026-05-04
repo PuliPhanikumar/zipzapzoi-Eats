@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Communication Hub - Zoi Hostel POS</title>
+    <meta name="description" content="Send messages and announcements to hostelers on ZipZapZoi platform.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -201,11 +202,11 @@
 
     <script>
         const TEMPLATES_DATA = [
-            { id: 'rent', icon: 'payments', color: 'amber', title: 'Rent Reminder', body: 'Dear {name}, this is a reminder that your hostel rent of ?{amount} for {month} is due by {date}. Please pay via UPI or at the admin office. Late payment will attract ?200 fine. — Zoi Hostel' },
-            { id: 'event', icon: 'celebration', color: 'violet', title: 'Event Invite', body: '?? Dear {name}, you are invited to {event_name} on {date} at {time} in the hostel {venue}. All hostelers welcome! — Zoi Hostel' },
-            { id: 'emergency', icon: 'emergency', color: 'red', title: 'Emergency Alert', body: '?? URGENT: {message}. Please follow all safety instructions and proceed to the assembly point immediately. — Zoi Hostel Management' },
-            { id: 'guest', icon: 'badge', color: 'blue', title: 'Visitor Notice', body: 'Dear {name}, you have a visitor ({visitor_name}) waiting at the reception. Please come to the reception area. — Zoi Hostel' },
-            { id: 'meeting', icon: 'groups', color: 'teal', title: 'Meeting Call', body: 'Dear all, there will be a hostel meeting on {date} at {time} in the {venue}. Attendance is mandatory. Agenda: {agenda}. — Zoi Hostel Management' },
+            { id: 'rent', icon: 'payments', color: 'amber', title: 'Rent Reminder', body: 'Dear {name}, this is a reminder that your hostel rent of ?{amount} for {month} is due by {date}. Please pay via UPI or at the admin office. Late payment will attract ?200 fine. ï¿½ Zoi Hostel' },
+            { id: 'event', icon: 'celebration', color: 'violet', title: 'Event Invite', body: '?? Dear {name}, you are invited to {event_name} on {date} at {time} in the hostel {venue}. All hostelers welcome! ï¿½ Zoi Hostel' },
+            { id: 'emergency', icon: 'emergency', color: 'red', title: 'Emergency Alert', body: '?? URGENT: {message}. Please follow all safety instructions and proceed to the assembly point immediately. ï¿½ Zoi Hostel Management' },
+            { id: 'guest', icon: 'badge', color: 'blue', title: 'Visitor Notice', body: 'Dear {name}, you have a visitor ({visitor_name}) waiting at the reception. Please come to the reception area. ï¿½ Zoi Hostel' },
+            { id: 'meeting', icon: 'groups', color: 'teal', title: 'Meeting Call', body: 'Dear all, there will be a hostel meeting on {date} at {time} in the {venue}. Attendance is mandatory. Agenda: {agenda}. ï¿½ Zoi Hostel Management' },
         ];
 
         const MESSAGES = ZoiDB.get('messages', [

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Hostelers (KYC) - Zoi Hostel POS</title>
+    <meta name="description" content="Manage hosteler profiles, KYC, and admissions on ZipZapZoi hostel platform.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -506,7 +507,7 @@
                 const initials = h.name.split(' ').map(w => w[0]).join('');
                 const kc = KYC_COLORS[h.kyc];
                 const ki = KYC_ICONS[h.kyc];
-                const age = h.dob ? Math.floor((Date.now() - new Date(h.dob)) / (365.25 * 24 * 60 * 60 * 1000)) : '—';
+                const age = h.dob ? Math.floor((Date.now() - new Date(h.dob)) / (365.25 * 24 * 60 * 60 * 1000)) : 'ï¿½';
                 return `<div class="glass-panel p-0 overflow-hidden bouncy-card kyc-${h.kyc} fade-row" style="animation-delay:${i * 60}ms">
                     <div class="p-4 flex items-start gap-3">
                         <div class="h-12 w-12 rounded-full bg-gradient-to-br from-pink-500/30 to-purple-500/30 flex items-center justify-center text-pink-300 font-bold text-lg flex-shrink-0 border border-white/10">${initials}</div>
@@ -515,10 +516,10 @@
                                 <h4 class="font-bold text-white text-sm truncate">${h.name}</h4>
                                 <span class="material-symbols-outlined text-${kc}-400 text-sm" title="KYC ${h.kyc}">${ki}</span>
                             </div>
-                            <p class="text-xs text-gray-400">${h.room ? `Room ${h.room} • Bed ${h.bed}` : 'No room assigned'}</p>
+                            <p class="text-xs text-gray-400">${h.room ? `Room ${h.room} ï¿½ Bed ${h.bed}` : 'No room assigned'}</p>
                             <div class="flex items-center gap-3 mt-1.5 text-[10px] text-gray-500">
-                                <span>${h.gender} • ${age}y</span>
-                                <span>${h.blood || '—'}</span>
+                                <span>${h.gender} ï¿½ ${age}y</span>
+                                <span>${h.blood || 'ï¿½'}</span>
                                 ${h.status === 'active' ? '<span class="text-green-400 font-bold">? Active</span>' : '<span class="text-gray-500">? Checked Out</span>'}
                             </div>
                         </div>
@@ -527,7 +528,7 @@
                         <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Mobile</span><span class="text-gray-300 font-bold">${h.mobile}</span></div>
                         <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Guardian</span><span class="text-gray-300 font-bold truncate block">${h.guardian}</span></div>
                         <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">ID</span><span class="text-gray-300 font-bold">${h.idType}</span></div>
-                        <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Since</span><span class="text-gray-300 font-bold">${h.checkin || '—'}</span></div>
+                        <div class="p-2 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block">Since</span><span class="text-gray-300 font-bold">${h.checkin || 'ï¿½'}</span></div>
                     </div>
                     <div class="p-3 border-t border-border flex gap-2">
                         <button onclick="viewProfile(${h.id})" class="flex-1 py-2 text-xs font-bold text-pink-400 bg-pink-500/10 rounded-lg hover:bg-pink-500/20 transition-colors flex items-center justify-center gap-1"><span class="material-symbols-outlined text-xs">visibility</span>View</button>
@@ -569,7 +570,7 @@
                     <td class="py-3 px-4 font-bold text-white text-sm">${h.name}</td>
                     <td class="py-3 px-4 text-gray-300">${h.idType}</td>
                     <td class="py-3 px-4 text-gray-400 font-mono text-xs">${h.idNum}</td>
-                    <td class="py-3 px-4 text-gray-400 text-xs">${h.checkin || '—'}</td>
+                    <td class="py-3 px-4 text-gray-400 text-xs">${h.checkin || 'ï¿½'}</td>
                     <td class="py-3 px-4"><span class="bg-${kc}-500/20 text-${kc}-400 px-2 py-0.5 rounded text-[10px] font-bold capitalize">${h.kyc}</span></td>
                     <td class="py-3 px-4 flex gap-1">
                         ${h.documentName ? `<button onclick="viewDoc(${h.id})" class="text-xs text-pink-400 hover:bg-pink-500/10 px-2 py-1 rounded font-bold transition-colors flex items-center gap-1"><span class="material-symbols-outlined text-xs">visibility</span>View</button>`
@@ -593,33 +594,33 @@
         function viewProfile(id) {
             const h = HOSTELERS.find(x => x.id === id);
             const kc = KYC_COLORS[h.kyc];
-            const age = h.dob ? Math.floor((Date.now() - new Date(h.dob)) / (365.25 * 24 * 60 * 60 * 1000)) : '—';
+            const age = h.dob ? Math.floor((Date.now() - new Date(h.dob)) / (365.25 * 24 * 60 * 60 * 1000)) : 'ï¿½';
             document.getElementById('profile-modal-title').innerText = h.name;
             document.getElementById('profile-modal-body').innerHTML = `
                 <div class="flex items-center gap-4 mb-5">
                     <div class="h-16 w-16 rounded-full bg-gradient-to-br from-pink-500/30 to-purple-500/30 flex items-center justify-center text-pink-300 font-bold text-2xl border-2 border-white/10">${h.name.split(' ').map(w => w[0]).join('')}</div>
                     <div>
                         <p class="font-bold text-white text-lg">${h.name}</p>
-                        <p class="text-xs text-gray-400">${h.gender} • ${age}y • ${h.blood || '—'}</p>
+                        <p class="text-xs text-gray-400">${h.gender} ï¿½ ${age}y ï¿½ ${h.blood || 'ï¿½'}</p>
                         <div class="flex items-center gap-2 mt-1"><span class="bg-${kc}-500/20 text-${kc}-400 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1"><span class="material-symbols-outlined text-xs">${KYC_ICONS[h.kyc]}</span>KYC ${h.kyc}</span>
                         ${h.status === 'active' ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold">Active</span>' : '<span class="bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">Checked Out</span>'}</div>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2.5 text-xs">
                     <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Mobile</span><span class="text-white font-bold">${h.mobile}</span></div>
-                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Email</span><span class="text-white font-bold truncate block">${h.email || '—'}</span></div>
-                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Room</span><span class="text-white font-bold">${h.room ? h.room + ' / Bed ' + h.bed : '—'}</span></div>
-                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Check-In</span><span class="text-white font-bold">${h.checkin || '—'}</span></div>
-                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">College/Work</span><span class="text-white font-bold truncate block">${h.college || '—'}</span></div>
-                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Purpose</span><span class="text-white font-bold">${h.purpose || '—'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Email</span><span class="text-white font-bold truncate block">${h.email || 'ï¿½'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Room</span><span class="text-white font-bold">${h.room ? h.room + ' / Bed ' + h.bed : 'ï¿½'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Check-In</span><span class="text-white font-bold">${h.checkin || 'ï¿½'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">College/Work</span><span class="text-white font-bold truncate block">${h.college || 'ï¿½'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Purpose</span><span class="text-white font-bold">${h.purpose || 'ï¿½'}</span></div>
                     <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">ID Type</span><span class="text-white font-bold">${h.idType}</span></div>
                     <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">ID Number</span><span class="text-white font-bold font-mono">${h.idNum}</span></div>
-                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Mess Plan</span><span class="text-white font-bold">${h.messPlan || '—'}</span></div>
-                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Duration</span><span class="text-white font-bold">${h.duration || '—'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Mess Plan</span><span class="text-white font-bold">${h.messPlan || 'ï¿½'}</span></div>
+                    <div class="p-2.5 bg-white/[0.03] rounded-lg"><span class="text-gray-500 block mb-0.5">Duration</span><span class="text-white font-bold">${h.duration || 'ï¿½'}</span></div>
                 </div>
                 <div class="mt-4 p-3 bg-violet-500/10 border border-violet-500/15 rounded-xl">
                     <p class="text-[10px] font-bold text-violet-400 uppercase mb-1">Guardian / Emergency</p>
-                    <p class="text-xs text-gray-300"><strong class="text-white">${h.guardian}</strong> — ${h.guardianPhone}</p>
+                    <p class="text-xs text-gray-300"><strong class="text-white">${h.guardian}</strong> ï¿½ ${h.guardianPhone}</p>
                     ${h.emergency ? `<p class="text-xs text-gray-400 mt-0.5">Emergency: ${h.emergency}</p>` : ''}
                 </div>
                 <div class="mt-3 p-3 bg-white/[0.03] rounded-xl">
@@ -740,7 +741,7 @@
                 documentName: idDoc.name
             };
             HOSTELERS.unshift(newH);
-            CHECK_LOG.unshift({ name: newH.name, room: newH.room || '—', type: 'check-in', date: newH.checkin, reason: 'New Admission' });
+            CHECK_LOG.unshift({ name: newH.name, room: newH.room || 'ï¿½', type: 'check-in', date: newH.checkin, reason: 'New Admission' });
 
             ZoiDB.set('hostelers', HOSTELERS);
             ZoiDB.set('checklog', CHECK_LOG);

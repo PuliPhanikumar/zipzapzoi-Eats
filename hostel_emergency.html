@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Emergency SOS - Zoi Hostel POS</title>
+    <meta name="description" content="Emergency contacts and SOS features on ZipZapZoi hostel platform.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -148,7 +149,7 @@
                                     class="material-symbols-outlined text-red-400">local_police</span></div>
                             <div class="flex-1">
                                 <p class="font-bold text-white text-sm">Whitefield Police Station</p>
-                                <p class="text-[10px] text-gray-400">Dial 100 • 080-2845-1234</p>
+                                <p class="text-[10px] text-gray-400">Dial 100 ï¿½ 080-2845-1234</p>
                             </div><a href="tel:100"
                                 class="p-2 bg-red-500/10 rounded-lg text-red-400 hover:bg-red-500/20"><span
                                     class="material-symbols-outlined text-lg">call</span></a>
@@ -158,7 +159,7 @@
                                     class="material-symbols-outlined text-orange-400">local_fire_department</span></div>
                             <div class="flex-1">
                                 <p class="font-bold text-white text-sm">Fire Department</p>
-                                <p class="text-[10px] text-gray-400">Dial 101 • 080-2222-0101</p>
+                                <p class="text-[10px] text-gray-400">Dial 101 ï¿½ 080-2222-0101</p>
                             </div><a href="tel:101"
                                 class="p-2 bg-orange-500/10 rounded-lg text-orange-400 hover:bg-orange-500/20"><span
                                     class="material-symbols-outlined text-lg">call</span></a>
@@ -168,7 +169,7 @@
                                     class="material-symbols-outlined text-blue-400">local_hospital</span></div>
                             <div class="flex-1">
                                 <p class="font-bold text-white text-sm">Manipal Hospital (Nearest)</p>
-                                <p class="text-[10px] text-gray-400">080-2502-3456 • 2 km away</p>
+                                <p class="text-[10px] text-gray-400">080-2502-3456 ï¿½ 2 km away</p>
                             </div><a href="tel:08025023456"
                                 class="p-2 bg-blue-500/10 rounded-lg text-blue-400 hover:bg-blue-500/20"><span
                                     class="material-symbols-outlined text-lg">call</span></a>
@@ -177,7 +178,7 @@
                             <div class="h-10 w-10 rounded-full bg-violet-500/20 flex items-center justify-center"><span
                                     class="material-symbols-outlined text-violet-400">person</span></div>
                             <div class="flex-1">
-                                <p class="font-bold text-white text-sm">Hostel Owner — Phani Kumar</p>
+                                <p class="font-bold text-white text-sm">Hostel Owner ï¿½ Phani Kumar</p>
                                 <p class="text-[10px] text-gray-400">+91 9876543210</p>
                             </div><a href="tel:9876543210"
                                 class="p-2 bg-violet-500/10 rounded-lg text-violet-400 hover:bg-violet-500/20"><span
@@ -187,7 +188,7 @@
                             <div class="h-10 w-10 rounded-full bg-pink-500/20 flex items-center justify-center"><span
                                     class="material-symbols-outlined text-pink-400">shield_person</span></div>
                             <div class="flex-1">
-                                <p class="font-bold text-white text-sm">Warden — Ramesh K.</p>
+                                <p class="font-bold text-white text-sm">Warden ï¿½ Ramesh K.</p>
                                 <p class="text-[10px] text-gray-400">+91 9876001001</p>
                             </div><a href="tel:9876001001"
                                 class="p-2 bg-pink-500/10 rounded-lg text-pink-400 hover:bg-pink-500/20"><span
@@ -265,7 +266,7 @@
 
     const INCIDENTS = [
     { name: 'Gas leak in kitchen', type: 'Gas', date: '2026-02-20', resolved: true },
-    { name: 'Electrical short circuit — Floor 2', type: 'Electrical', date: '2026-01-25', resolved: true },
+    { name: 'Electrical short circuit ï¿½ Floor 2', type: 'Electrical', date: '2026-01-25', resolved: true },
     { name: 'Hosteler fainted (low BP)', type: 'Medical', date: '2026-01-12', resolved: true },
     { name: 'Minor fire in laundry room', type: 'Fire', date: '2025-11-18', resolved: true },
     { name: 'Snake spotted in garden', type: 'Wildlife', date: '2025-10-05', resolved: true },
@@ -342,7 +343,7 @@
     }
 
     function logDrill() {
-    DRILLS.unshift({ date: new Date().toISOString().split('T')[0], duration: '— min', participants: 42, status: 'pass'
+    DRILLS.unshift({ date: new Date().toISOString().split('T')[0], duration: 'ï¿½ min', participants: 42, status: 'pass'
     });
     ZoiDB.set('fire_drills', DRILLS);
     renderDrills();

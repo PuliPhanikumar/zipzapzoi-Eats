@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 <head>
     <meta charset="utf-8" />
@@ -7,6 +7,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ZipZapZoi Eats - Go Live</title>
+    <meta name="description" content="ZipZapZoi Eats restaurant partner dashboard. Manage orders, menu, and analytics. Launch your restaurant on ZipZapZoi Eats. Go-live checklist and verification.">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -76,7 +77,7 @@
         </div>
     </header>
 
-    <!-- Main Content Area — Single centered content that changes based on state -->
+    <!-- Main Content Area ï¿½ Single centered content that changes based on state -->
     <main class="flex-1 flex items-center justify-center p-6">
         <div class="w-full max-w-lg text-center" id="contentArea">
             <!-- Content is injected by JavaScript based on state -->
@@ -85,7 +86,7 @@
 
     <!-- Minimal Footer -->
     <footer class="px-6 py-4 border-t border-border-dark flex items-center justify-between text-xs text-text-muted">
-        <span>© 2025 ZipZapZoi Technologies</span>
+        <span>ï¿½ 2025 ZipZapZoi Technologies</span>
         <div class="flex gap-4">
             <a href="privacy policy.html" class="hover:text-primary transition-colors">Privacy</a>
             <a href="terms&conditions.html" class="hover:text-primary transition-colors">Terms</a>
@@ -95,7 +96,7 @@
 
     <script>
         // -------------------------------------------
-        // STATE MACHINE — 3 states:
+        // STATE MACHINE ï¿½ 3 states:
         // 1. 'ready'    ? Show blinking "Go Live Now" button
         // 2. 'pending'  ? Show "Under Verification" message
         // 3. 'approved' ? Show Congratulations + link to dashboard
@@ -159,7 +160,7 @@
                         </div>
                     </div>
 
-                    <!-- THE BUTTON — Large, centered, blinking -->
+                    <!-- THE BUTTON ï¿½ Large, centered, blinking -->
                     <button onclick="goLive()" id="goLiveBtn"
                         class="blink-glow w-full max-w-sm py-5 bg-gradient-to-r from-primary to-[#00d4c5] hover:from-[#00d4c5] hover:to-primary text-[#0a0314] font-black text-2xl rounded-2xl transition-all flex items-center justify-center gap-3 cursor-pointer">
                         <span class="material-symbols-outlined" style="font-size:32px">power_settings_new</span>
@@ -258,7 +259,7 @@
             `;
         }
 
-        // --- STATE 3: APPROVED — CONGRATULATIONS ---
+        // --- STATE 3: APPROVED ï¿½ CONGRATULATIONS ---
         function renderApproved() {
             // Fire confetti
             launchConfetti();
@@ -292,7 +293,7 @@
                         </p>
                     </div>
 
-                    <!-- CTA — Go to Dashboard -->
+                    <!-- CTA ï¿½ Go to Dashboard -->
                     <a href="restaurant_partner_dashboard.html" 
                         class="blink-glow w-full max-w-sm py-5 bg-gradient-to-r from-primary to-[#00d4c5] text-[#0a0314] font-black text-xl rounded-2xl transition-all flex items-center justify-center gap-3 no-underline">
                         <span class="material-symbols-outlined" style="font-size:28px">dashboard</span>

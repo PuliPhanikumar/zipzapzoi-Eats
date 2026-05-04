@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
 <title>ZipZapZoi Eats - User Profile</title>
+    <meta name="description" content="Manage your ZipZapZoi Eats profile, addresses, and payment methods.">
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
@@ -215,7 +216,7 @@
 <h4 class="text-white font-bold text-lg truncate">Pepperoni Feast</h4>
 <span class="text-primary font-bold">?250.00</span>
 </div>
-<p class="text-text-muted text-sm truncate">The Pizza Oven • 1.2km</p>
+<p class="text-text-muted text-sm truncate">The Pizza Oven ï¿½ 1.2km</p>
 <div class="mt-auto pt-3">
 <button class="w-full py-2 bg-primary/20 hover:bg-primary text-primary hover:text-background-dark font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
 <span class="material-symbols-outlined text-lg">refresh</span> Reorder
@@ -233,7 +234,7 @@
 <h4 class="text-white font-bold text-lg truncate">Tonkotsu Ramen</h4>
 <span class="text-primary font-bold">?350.50</span>
 </div>
-<p class="text-text-muted text-sm truncate">The Noodle Bowl • 3.5km</p>
+<p class="text-text-muted text-sm truncate">The Noodle Bowl ï¿½ 3.5km</p>
 <div class="mt-auto pt-3">
 <button class="w-full py-2 bg-primary/20 hover:bg-primary text-primary hover:text-background-dark font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
 <span class="material-symbols-outlined text-lg">refresh</span> Reorder
@@ -250,7 +251,7 @@
 <h4 class="text-white font-bold text-lg truncate">Double Cheese Smash</h4>
 <span class="text-primary font-bold">?199.99</span>
 </div>
-<p class="text-text-muted text-sm truncate">Zoi Burgers • 0.8km</p>
+<p class="text-text-muted text-sm truncate">Zoi Burgers ï¿½ 0.8km</p>
 <div class="mt-auto pt-3">
 <button class="w-full py-2 bg-primary/20 hover:bg-primary text-primary hover:text-background-dark font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
 <span class="material-symbols-outlined text-lg">refresh</span> Reorder
@@ -838,7 +839,7 @@
                     // Update backend
                     await zoiApi('/auth/me', { method: 'PUT', body: JSON.stringify(updatedData) });
                 } catch(e) {
-                    // Backend may not be running — continue with local save
+                    // Backend may not be running ï¿½ continue with local save
                 }
 
                 // Update local profile
@@ -868,7 +869,7 @@
             });
         }
         
-        // Wallet Handling — prefer user-set localStorage balance, fallback to deterministic
+        // Wallet Handling ï¿½ prefer user-set localStorage balance, fallback to deterministic
         const stats = typeof ZoiProfile !== 'undefined' ? ZoiProfile.getDeterministicStats(activeSession.zoiId || activeSession.id) : { wallet: 2450.50, points: 1250 };
         let zapWalletBalance = parseFloat(localStorage.getItem('zoiWalletBalance'));
         if (isNaN(zapWalletBalance)) {
@@ -880,7 +881,7 @@
             display.textContent = '?' + zapWalletBalance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         });
 
-        // Addresses Handling — seed defaults then use shared renderAddresses()
+        // Addresses Handling ï¿½ seed defaults then use shared renderAddresses()
         const profileForAddr = getProfileData();
         if (!profileForAddr.addresses || profileForAddr.addresses.length === 0) {
             profileForAddr.addresses = [{id: 1, label: 'Home', address: activeSession.address || '123 Main St, Central City', default: true}];
@@ -888,7 +889,7 @@
         }
         renderAddresses();
 
-        // Favorites Handling — API first, localStorage fallback
+        // Favorites Handling ï¿½ API first, localStorage fallback
         const favoritesContainer = document.getElementById('favorites-container');
         if (favoritesContainer) {
             let displayFavorites = [];
@@ -921,7 +922,7 @@
             if (displayFavorites.length === 0 && typeof ZoiRestaurants !== 'undefined') {
                 const allRest = ZoiRestaurants.getAll();
                 displayFavorites = allRest.slice(0, 3).map(r => ({
-                    id: r.id, name: r.name, type: r.tags ? r.tags.join(' • ') : 'Restaurant',
+                    id: r.id, name: r.name, type: r.tags ? r.tags.join(' ï¿½ ') : 'Restaurant',
                     rating: r.rating || 4.5, time: r.time || '30 min', img: r.image
                 }));
             }
@@ -1013,7 +1014,7 @@
                                     </div>
                                     <div>
                                         <h5 class="text-white text-sm font-bold">Order #${order.id}</h5>
-                                        <p class="text-text-muted text-xs">${itemCount} Items • ?${orderTotal}</p>
+                                        <p class="text-text-muted text-xs">${itemCount} Items ï¿½ ?${orderTotal}</p>
                                     </div>
                                 </div>
                                 <span class="${statusBg} ${statusColor} text-[10px] font-bold px-2 py-1 rounded-full uppercase">${order.status}</span>
@@ -1297,7 +1298,7 @@
                             </div>
                             <div>
                                 <p class="text-white text-sm font-medium">${tx.desc}</p>
-                                <p class="text-text-muted text-xs">${tx.date} • ${tx.time}</p>
+                                <p class="text-text-muted text-xs">${tx.date} ï¿½ ${tx.time}</p>
                             </div>
                         </div>
                         <p class="${isCredit ? 'text-green-500' : 'text-red-400'} text-sm font-bold">${isCredit ? '+' : '-'}?${tx.amount.toFixed(2)}</p>
@@ -1460,7 +1461,7 @@
         container.innerHTML = '';
         methods.forEach((pm, idx) => {
             const icon = pm.type === 'upi' ? 'account_balance_wallet' : 'credit_card';
-            const display = pm.type === 'upi' ? pm.upiId : ('•••• •••• •••• ' + pm.last4);
+            const display = pm.type === 'upi' ? pm.upiId : ('ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ' + pm.last4);
             container.innerHTML += `
             <div class="bg-surface-dark border border-border-dark rounded-xl p-5 flex items-center justify-between hover:border-primary/50 transition-colors">
                 <div class="flex items-center gap-3">

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 
 <html class="dark" lang="en">
 
@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ZipZapZoi Eats - Customer Support</title>
+    <meta name="description" content="Get help with your ZipZapZoi Eats orders. FAQs, live chat, and customer support center.">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
@@ -583,7 +584,7 @@
                 <div
                     class="border-t border-[#3c1e6e] pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm">
-                        <span>© 2025 ZoiEats. All rights reserved.</span>
+                        <span>ï¿½ 2025 ZoiEats. All rights reserved.</span>
                         <span class="hidden sm:inline-block text-[#3c1e6e]">|</span>
                         <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms &
                             Conditions</a>
@@ -688,7 +689,7 @@
                                         <p class="text-white text-base font-bold leading-normal line-clamp-1">${order.restaurantName || order.restaurant || 'Local Restaurant'}</p>
                                         <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${statusColor} uppercase">${order.status || 'Completed'}</span>
                                     </div>
-                                    <p class="text-text-beige text-sm font-normal leading-normal mt-1">Order #${order.id} • ?${orderTotal}</p>
+                                    <p class="text-text-beige text-sm font-normal leading-normal mt-1">Order #${order.id} ï¿½ ?${orderTotal}</p>
                                     <p class="text-text-beige/60 text-xs font-normal leading-normal mt-0.5">${dateFormatted}</p>
                                 </div>
                             </div>
@@ -891,7 +892,7 @@
                         <span class="material-symbols-outlined text-text-beige/60 group-hover:text-primary text-[20px] transition-colors">receipt_long</span>
                         <div class="flex flex-col">
                             <span class="text-white text-xs font-bold leading-none mb-1">${o.restaurantName || o.restaurant || 'Local Restaurant'}</span>
-                            <span class="text-text-beige/70 text-[9px] uppercase tracking-wider font-mono leading-none">#${o.id} • ?${total}</span>
+                            <span class="text-text-beige/70 text-[9px] uppercase tracking-wider font-mono leading-none">#${o.id} ï¿½ ?${total}</span>
                         </div>
                      </button>
                  `;
@@ -980,7 +981,7 @@
                 <div class="bg-primary text-black px-4 py-3 rounded-2xl rounded-tr-sm text-sm shadow-[0_4px_15px_rgba(0,240,255,0.15)] font-medium leading-relaxed">
                     ${formattedText}
                 </div>
-                <span class="text-[9px] text-text-beige/50 mt-1 font-bold tracking-widest uppercase">${timeStr} • You</span>
+                <span class="text-[9px] text-text-beige/50 mt-1 font-bold tracking-widest uppercase">${timeStr} ï¿½ You</span>
             `;
         } else {
             bubble.className = 'self-start flex flex-col items-start max-w-[85%] animate-[fade-in-up_0.3s_ease-out]';
@@ -991,7 +992,7 @@
                     </span>
                     ${formattedText}
                 </div>
-                <span class="text-[9px] text-text-beige/50 mt-1 font-bold tracking-widest uppercase">${timeStr} • Automated</span>
+                <span class="text-[9px] text-text-beige/50 mt-1 font-bold tracking-widest uppercase">${timeStr} ï¿½ Automated</span>
             `;
         }
         

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en" class="dark">
 
 <head>
@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#00f0ff">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Visitor Log - Zoi Hostel POS</title>
+    <meta name="description" content="Track visitor logs and gate passes on ZipZapZoi hostel management.">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -79,7 +80,7 @@
             <div class="flex items-center gap-3">
                 <div class="glass-panel px-4 py-2 flex items-center gap-2 text-sm"><span
                         class="material-symbols-outlined text-pink-400 text-lg">calendar_today</span><span
-                        class="font-bold text-white" id="hdr-date">—</span></div>
+                        class="font-bold text-white" id="hdr-date">ï¿½</span></div>
                 <button onclick="openVisitorModal()"
                     class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full font-bold text-sm shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-shadow"><span
                         class="material-symbols-outlined text-sm">person_add</span> Log Visitor</button>
@@ -234,12 +235,12 @@
         const VISITORS = ZoiDB.get('visitors', [
             { id: 1, name: 'Suresh Kumar', phone: '9876000001', purpose: 'Parent Visit', hosteler: 'Ravi Kumar (101)', inTime: '09:15', outTime: '11:30', idProof: 'Aadhaar-4521', status: 'exited', relation: 'Father', items: 'Food parcel' },
             { id: 2, name: 'Meena Devi', phone: '9876000002', purpose: 'Parent Visit', hosteler: 'Priya S. (301)', inTime: '10:00', outTime: null, idProof: 'Voter-789012', status: 'inside', relation: 'Mother', items: 'Clothes, Snacks' },
-            { id: 3, name: 'Swiggy Delivery', phone: '9000112233', purpose: 'Delivery', hosteler: 'Deepak S. (102)', inTime: '12:45', outTime: '12:55', idProof: 'Delivery-ID-442', status: 'exited', relation: '—', items: 'Food order' },
-            { id: 4, name: 'Rajesh Plumber', phone: '9445001122', purpose: 'Maintenance', hosteler: 'Room 202 (Common)', inTime: '14:00', outTime: null, idProof: 'DL-KA19-9876', status: 'inside', relation: '—', items: 'Toolbox' },
-            { id: 5, name: 'Amit Sharma', phone: '9778001234', purpose: 'Friend Visit', hosteler: 'Sneha Sharma (301)', inTime: '15:30', outTime: null, idProof: 'Pan-ABCDE1234', status: 'inside', relation: 'Brother', items: '—' },
-            { id: 6, name: 'Duraiswamy V.', phone: '9445000001', purpose: 'Parent Visit', hosteler: 'Vijay D. (202)', inTime: '08:30', outTime: '10:15', idProof: 'Aadhaar-5590', status: 'exited', relation: 'Father', items: '—' },
-            { id: 7, name: 'Zomato Delivery', phone: '9000445566', purpose: 'Delivery', hosteler: 'Sanjay V. (201)', inTime: '13:10', outTime: '13:20', idProof: 'ZMT-88213', status: 'exited', relation: '—', items: 'Food' },
-            { id: 8, name: 'Inspector Raju', phone: '9887766554', purpose: 'Official', hosteler: 'Warden Office', inTime: '11:00', outTime: '12:00', idProof: 'Police-ID-4455', status: 'exited', relation: '—', items: 'Documents' },
+            { id: 3, name: 'Swiggy Delivery', phone: '9000112233', purpose: 'Delivery', hosteler: 'Deepak S. (102)', inTime: '12:45', outTime: '12:55', idProof: 'Delivery-ID-442', status: 'exited', relation: 'ï¿½', items: 'Food order' },
+            { id: 4, name: 'Rajesh Plumber', phone: '9445001122', purpose: 'Maintenance', hosteler: 'Room 202 (Common)', inTime: '14:00', outTime: null, idProof: 'DL-KA19-9876', status: 'inside', relation: 'ï¿½', items: 'Toolbox' },
+            { id: 5, name: 'Amit Sharma', phone: '9778001234', purpose: 'Friend Visit', hosteler: 'Sneha Sharma (301)', inTime: '15:30', outTime: null, idProof: 'Pan-ABCDE1234', status: 'inside', relation: 'Brother', items: 'ï¿½' },
+            { id: 6, name: 'Duraiswamy V.', phone: '9445000001', purpose: 'Parent Visit', hosteler: 'Vijay D. (202)', inTime: '08:30', outTime: '10:15', idProof: 'Aadhaar-5590', status: 'exited', relation: 'Father', items: 'ï¿½' },
+            { id: 7, name: 'Zomato Delivery', phone: '9000445566', purpose: 'Delivery', hosteler: 'Sanjay V. (201)', inTime: '13:10', outTime: '13:20', idProof: 'ZMT-88213', status: 'exited', relation: 'ï¿½', items: 'Food' },
+            { id: 8, name: 'Inspector Raju', phone: '9887766554', purpose: 'Official', hosteler: 'Warden Office', inTime: '11:00', outTime: '12:00', idProof: 'Police-ID-4455', status: 'exited', relation: 'ï¿½', items: 'Documents' },
         ]);
 
         function renderVisitors() {
@@ -259,10 +260,10 @@
                     <td class="py-3 px-4"><span class="bg-${pc}-500/20 text-${pc}-400 px-2 py-0.5 rounded text-[10px] font-bold">${v.purpose}</span></td>
                     <td class="py-3 px-4 text-gray-300 text-xs">${v.hosteler}</td>
                     <td class="py-3 px-4 text-green-400 font-bold text-xs">${v.inTime}</td>
-                    <td class="py-3 px-4 text-xs ${v.outTime ? 'text-teal font-bold' : 'text-gray-500'}">${v.outTime || '—'}</td>
+                    <td class="py-3 px-4 text-xs ${v.outTime ? 'text-teal font-bold' : 'text-gray-500'}">${v.outTime || 'ï¿½'}</td>
                     <td class="py-3 px-4 text-gray-400 font-mono text-[10px]">${v.idProof}</td>
                     <td class="py-3 px-4">${v.status === 'inside' ? '<span class="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 w-fit"><span class="material-symbols-outlined text-xs">radio_button_checked</span>Inside</span>' : '<span class="bg-white/10 text-gray-400 px-2 py-0.5 rounded text-[10px] font-bold">Exited</span>'}</td>
-                    <td class="py-3 px-4">${v.status === 'inside' ? `<button onclick="markExit(${v.id})" class="text-xs text-teal bg-teal/10 px-3 py-1.5 rounded-lg font-bold hover:bg-teal/20 transition-colors">Mark Exit</button>` : '<span class="text-xs text-gray-500">—</span>'}</td>
+                    <td class="py-3 px-4">${v.status === 'inside' ? `<button onclick="markExit(${v.id})" class="text-xs text-teal bg-teal/10 px-3 py-1.5 rounded-lg font-bold hover:bg-teal/20 transition-colors">Mark Exit</button>` : '<span class="text-xs text-gray-500">ï¿½</span>'}</td>
                 </tr>`;
             }).join('');
             updateStats();
@@ -311,7 +312,7 @@
         function logVisitor() {
             const name = document.getElementById('v-name').value.trim();
             if (!name) { showToast('Visitor name is required.', 'error'); return; }
-            VISITORS.unshift({ id: Date.now(), name, phone: document.getElementById('v-phone').value || '—', purpose: document.getElementById('v-purpose').value || 'Other', hosteler: document.getElementById('v-hosteler').value || '—', inTime: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false }), outTime: null, idProof: document.getElementById('v-id').value || '—', status: 'inside', relation: document.getElementById('v-relation').value || '—', items: document.getElementById('v-items').value || '—' });
+            VISITORS.unshift({ id: Date.now(), name, phone: document.getElementById('v-phone').value || 'ï¿½', purpose: document.getElementById('v-purpose').value || 'Other', hosteler: document.getElementById('v-hosteler').value || 'ï¿½', inTime: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false }), outTime: null, idProof: document.getElementById('v-id').value || 'ï¿½', status: 'inside', relation: document.getElementById('v-relation').value || 'ï¿½', items: document.getElementById('v-items').value || 'ï¿½' });
             ZoiDB.set('visitors', VISITORS);
             closeVisitorModal();
             renderVisitors();
