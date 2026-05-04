@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html class="dark" lang="en">
 
@@ -426,7 +426,7 @@
         }
 
         // --- SUBMIT REGISTRATION ------------------------
-        function submitRegistration(event) {
+        async async function submitRegistration(event) {
             event.preventDefault();
             const btn = event.currentTarget;
             const originalText = btn.innerHTML;
@@ -459,6 +459,36 @@
             // Show loading
             btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-lg">sync</span> Submitting...';
             btn.disabled = true;
+
+
+            // === TRY API REGISTRATION FIRST ===
+            try {
+                const apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 4000);
+                const apiRes = await fetch(apiBase + '/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: ownerFirst + ' ' + (ownerLast || ''),
+                        email: ownerEmail,
+                        phone: ownerPhone,
+                        password: ownerPhone.slice(-6) || '123456',
+                        role: 'partner'
+                    }),
+                    signal: controller.signal
+                }).finally(() => clearTimeout(timeout));
+
+                if (apiRes.ok) {
+                    const data = await apiRes.json();
+                    localStorage.setItem('zoiAuthToken', data.token);
+                    localStorage.setItem('zoiToken', data.token);
+                    if (data.user && data.user.id) localStorage.setItem('zoiPartnerInternalId', data.user.id);
+                    console.log('[Partner Reg] API registration successful');
+                }
+            } catch (apiErr) {
+                console.warn('[Partner Reg] API unreachable, using local:', apiErr.message);
+            }
 
             const appData = {
                 id: 'PAPP-' + Date.now(),

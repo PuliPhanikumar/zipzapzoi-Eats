@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -226,7 +226,7 @@
                                         class="material-symbols-outlined text-gray-500">lock</span></div>
                                 <input id="password-input" type="password"
                                     class="block w-full rounded-xl border-0 bg-input py-4 pl-12 pr-12 text-white ring-1 ring-white/10 focus:ring-teal sm:text-sm"
-                                    placeholder="••••••••">
+                                    placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½">
                             </div>
 
                             <div id="field-otp" class="relative hidden">
@@ -402,7 +402,7 @@
                         <span class="material-symbols-outlined text-red-400 text-3xl">shield_lock</span>
                     </div>
                     <h2 class="text-xl font-bold text-white">Admin Access</h2>
-                    <p class="text-xs text-gray-500 mt-1 font-mono">RESTRICTED · AUTHORIZED PERSONNEL ONLY</p>
+                    <p class="text-xs text-gray-500 mt-1 font-mono">RESTRICTED ï¿½ AUTHORIZED PERSONNEL ONLY</p>
                 </div>
 
                 <!-- Form -->
@@ -426,7 +426,7 @@
                             </div>
                             <input id="admin-pass-input" type="password" required autocomplete="off"
                                 class="block w-full rounded-xl border-0 bg-black/50 py-3.5 pl-12 text-white ring-1 ring-red-900/30 focus:ring-2 focus:ring-red-500 sm:text-sm placeholder:text-gray-600"
-                                placeholder="••••••••">
+                                placeholder="ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½">
                         </div>
                     </div>
                     <button type="submit" id="btn-admin-login"
@@ -436,7 +436,7 @@
                     </button>
                 </form>
 
-                <p class="text-center text-[10px] text-gray-600 mt-6 font-mono">Session expires in 24h • All activity is logged</p>
+                <p class="text-center text-[10px] text-gray-600 mt-6 font-mono">Session expires in 24h ï¿½ All activity is logged</p>
 
                 <!-- Close button -->
                 <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-gray-600 hover:text-red-400 transition-colors">
@@ -490,7 +490,7 @@
             localStorage.setItem(USERS_KEY, JSON.stringify(users));
         }
 
-        // Helper: Client-side password hash (SHA-256, NOT for server use — localStorage only)
+        // Helper: Client-side password hash (SHA-256, NOT for server use ï¿½ localStorage only)
         async function hashPassword(password) {
             const encoder = new TextEncoder();
             const data = encoder.encode(password + '_zoiSalt_2026');
@@ -768,7 +768,7 @@
             if (isOtpMode) {
                 if (!otp || otp.length < 4) { resetBtn(); return showToast('Error', 'Enter a valid 4-digit OTP.'); }
                 if (otp !== '1234') { resetBtn(); return showToast('OTP Invalid', 'Incorrect OTP. Use 1234 for demo.'); }
-                // OTP verified — find or create user by phone
+                // OTP verified ï¿½ find or create user by phone
                 let user = findRegisteredUser(input, currentRole);
                 if (!user) {
                     // Auto-create user from phone (like real OTP flow)
@@ -792,6 +792,48 @@
                 return;
             }
 
+
+            // === API-FIRST LOGIN ===
+            try {
+                const apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 4000);
+                const apiRes = await fetch(apiBase + '/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier: input, password: password }),
+                    signal: controller.signal
+                }).finally(() => clearTimeout(timeout));
+
+                if (apiRes.ok) {
+                    const data = await apiRes.json();
+                    saveToken(data.token);
+                    const u = data.user;
+                    const sessionUser = {
+                        id: u.id, zoiId: u.zoiId, name: u.name,
+                        email: u.email, phone: u.phone || '',
+                        role: u.role, type: currentRole
+                    };
+                    createSession(sessionUser);
+                    if (u.restaurantId) {
+                        localStorage.setItem('zoiPartnerInternalId', u.restaurantId);
+                    }
+                    showToast('Login Successful', 'Welcome back, ' + u.name + '!');
+                    setTimeout(() => routeToDashboard(currentRole), 1200);
+                    return;
+                } else if (apiRes.status === 403) {
+                    const err = await apiRes.json();
+                    resetBtn();
+                    return showToast('Account Blocked', err.error || 'Access denied');
+                } else if (apiRes.status === 401) {
+                    // API says wrong password - but still try local fallback below
+                    console.warn('[Auth] Server rejected credentials, trying local fallback');
+                }
+            } catch (apiErr) {
+                // API unreachable - fall through to local auth
+                console.warn('[Auth] Server unreachable, using local auth:', apiErr.message);
+            }
+
             // Password mode: check registered users FIRST
             const registeredUser = findRegisteredUser(input, currentRole);
 
@@ -802,7 +844,7 @@
                     resetBtn();
                     return showToast('Login Failed', 'Incorrect password. Please try again.');
                 }
-                // Password match — login success
+                // Password match ï¿½ login success
                 saveToken(generateMockToken(registeredUser));
                 const sessionUser = {
                     id: registeredUser.id,
@@ -870,6 +912,40 @@
                 return showToast('Already Registered', 'An account with this email already exists. Please log in instead.');
             }
 
+
+            // === API-FIRST REGISTRATION ===
+            try {
+                const apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 4000);
+                const fullName = fname + (lname ? ' ' + lname : '');
+                const apiRes = await fetch(apiBase + '/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: fullName, email: email, phone: phone, password: password, role: currentRole }),
+                    signal: controller.signal
+                }).finally(() => clearTimeout(timeout));
+
+                if (apiRes.ok) {
+                    const data = await apiRes.json();
+                    saveToken(data.token);
+                    const u = data.user;
+                    createSession({ id: u.id, zoiId: u.zoiId, name: u.name, email: u.email, phone: u.phone || '', role: u.role, type: currentRole });
+                    if (u.restaurantId) localStorage.setItem('zoiPartnerInternalId', u.restaurantId);
+                    showToast('Account Created!', 'Welcome to ZipZapZoi, ' + fname + '!');
+                    setTimeout(() => routeToDashboard(currentRole), 1500);
+                    return;
+                } else {
+                    const err = await apiRes.json().catch(() => ({}));
+                    if (apiRes.status === 409) {
+                        return showToast('Already Registered', err.error || 'Account exists. Please log in.');
+                    }
+                    console.warn('[Register] API failed, falling back to local:', err.error);
+                }
+            } catch (apiErr) {
+                console.warn('[Register] Server unreachable, using local:', apiErr.message);
+            }
+
             // Create new user with hashed password
             const userId = 'CUST-' + Math.floor(100000 + Math.random() * 900000);
             const passwordHash = await hashPassword(password);
@@ -918,7 +994,7 @@
                 // Fetch services config to check if Google OAuth is configured
                 const config = await zoiApi('/config/services');
                 if (config.oauth && config.oauth.google) {
-                    // Server has GOOGLE_CLIENT_ID — fetch it for client-side init
+                    // Server has GOOGLE_CLIENT_ID ï¿½ fetch it for client-side init
                     // Note: Client ID is public and safe to expose
                     const healthRes = await fetch((typeof ZOI_CONFIG !== 'undefined' ? ZOI_CONFIG.API_BASE_URL : 'http://localhost:5000/api') + '/auth/google-client-id');
                     if (healthRes.ok) {
