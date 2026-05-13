@@ -484,16 +484,28 @@
         // 1. LOAD APPLICANTS
         let applications = [];
 
-        function loadApplicants() {
+        async function loadApplicants() {
             const colPending = document.getElementById('col-pending');
             const colReview = document.getElementById('col-review');
             const colReady = document.getElementById('col-ready');
+            colPending.innerHTML = colReview.innerHTML = colReady.innerHTML = '<div class="text-center py-10 text-gray-500 animate-pulse">Loading...</div>';
 
-            colPending.innerHTML = "";
-            colReview.innerHTML = "";
-            colReady.innerHTML = "";
-
-            applications = ZoiRiderOnboarding.getApplications();
+            // API-FIRST: fetch live rider applications
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || '';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const _res = await fetch(_ab + '/api/rider-applications', { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                if (_res.ok) {
+                    const _d = await _res.json();
+                    applications = (Array.isArray(_d) ? _d : (_d.applications || [])).map(a => ({
+                        id: a.zoiId || ('RA-' + a.id), name: a.name, phone: a.phone,
+                        vehicle: a.vehicleType || a.vehicle, city: a.city,
+                        status: a.status === 'pending' ? 'New' : (a.status === 'approved' ? 'Ready' : 'Verification')
+                    }));
+                }
+            } catch(e) { console.warn('[RiderApps] fallback:', e.message); }
+            if (!applications.length && typeof ZoiRiderOnboarding !== 'undefined') applications = ZoiRiderOnboarding.getApplications();
 
             // Counters
             const newApps = applications.filter(a => a.status === 'New');

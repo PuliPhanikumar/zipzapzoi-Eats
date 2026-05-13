@@ -286,6 +286,27 @@
 
         // INIT
         window.onload = () => {
+            // API: real-time health check from backend
+            (async () => {
+                try {
+                    const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                    const [healthRes, metricsRes] = await Promise.allSettled([
+                        fetch(_ab + '/api/health'),
+                        fetch(_ab + '/api/admin/analytics/live', { headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') } })
+                    ]);
+                    if (healthRes.status === 'fulfilled' && healthRes.value.ok) {
+                        const h = await healthRes.value.json();
+                        const dbEl = document.getElementById('db-status'); if (dbEl) dbEl.textContent = h.database || 'Connected';
+                        const apiEl = document.getElementById('api-status'); if (apiEl) apiEl.textContent = 'Operational';
+                        addLog('System Health check: API ' + (h.status === 'ok' ? 'OK' : 'DEGRADED'));
+                    }
+                    if (metricsRes.status === 'fulfilled' && metricsRes.value.ok) {
+                        const m = await metricsRes.value.json();
+                        const ordersEl = document.getElementById('live-orders-count'); if (ordersEl) ordersEl.textContent = m.liveOrders || '--';
+                        const riderEl = document.getElementById('live-riders-count'); if (riderEl) riderEl.textContent = m.activeRiders || '--';
+                    }
+                } catch(e) { addLog('Health API unavailable: ' + e.message); }
+            })();
             fetch('sidebar.html')
                 .then(response => response.text())
                 .then(data => {

@@ -241,7 +241,8 @@
         window.onload = async () => {
             try {
                 // Fetch Real Restaurants from Backend (Pending ones typically)
-                const response = await fetch('' + ZOI_CONFIG.API_BASE_URL + '/restaurants');
+                const _tk = localStorage.getItem('zoiAuthToken') || '';
+                const response = await fetch((typeof ZOI_CONFIG !== 'undefined' ? ZOI_CONFIG.API_BASE_URL : '') + '/api/restaurant-applications', { headers: { 'Authorization': 'Bearer ' + _tk } });
                 if (response.ok) {
                     const dbRestaurants = await response.json();
 

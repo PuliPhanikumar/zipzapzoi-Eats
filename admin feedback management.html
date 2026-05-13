@@ -899,7 +899,30 @@
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
 
-    <script src="js/zoi_mobile.js"></script>
+    <script src="js/zoi_mobile.js">
+        // === API-FIRST: overlay live feedback from backend ===
+        (async () => {
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || '';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const _res = await fetch(_ab + '/api/feedback', { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                if (_res.ok) {
+                    const _d = await _res.json();
+                    const _items = Array.isArray(_d) ? _d : (_d.feedbacks || []);
+                    if (_items.length > 0) {
+                        FEEDBACK_TICKETS = _items.map((f, i) => ({
+                            id: f.zoiId || ('FBK-' + f.id), type: f.type || 'Feature Request',
+                            title: f.subject || f.message?.substring(0, 50) || 'Feedback',
+                            desc: f.message || '', status: f.status || 'Open',
+                            metas: [{ text: f.user?.name || 'Customer' }, { text: new Date(f.createdAt || Date.now()).toLocaleDateString('en-IN') }]
+                        }));
+                        renderFeedback();
+                        console.log('[Feedback Admin] Loaded', FEEDBACK_TICKETS.length, 'tickets from API');
+                    }
+                }
+            } catch(e) { console.warn('[Feedback Admin] fallback:', e.message); }
+        })();</script>
 </body>
 
 </html>

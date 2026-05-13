@@ -274,7 +274,7 @@
 
         const ZoneAPI = {
             fetchZones: async () => {
-                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/zones', {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/api/zones', {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
                 });
                 if (!response.ok) throw new Error('Failed to fetch zones');
@@ -285,7 +285,7 @@
             saveZone: async (zone) => {
                 const isExisting = zones.some(z => z.id === zone.id && z.id < 100000); // 100000+ are temp IDs
                 const method = isExisting ? 'PUT' : 'POST';
-                const url = ZOI_CONFIG.API_BASE_URL + '/zones' + (isExisting ? '/' + zone.id : '');
+                const url = ZOI_CONFIG.API_BASE_URL + '/api/zones' + (isExisting ? '/' + zone.id : '');
                 
                 const response = await fetch(url, {
                     method,
@@ -309,7 +309,7 @@
                 return await response.json();
             },
             deleteZone: async (id) => {
-                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/zones/' + id, {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/api/zones/' + id, {
                     method: 'DELETE',
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
                 });

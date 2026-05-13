@@ -418,7 +418,7 @@
 
         async function renderList() {
             try {
-                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes', {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/api/disputes', {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
                 });
                 
@@ -529,7 +529,7 @@
             if (!input.value) return;
 
             try {
-                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes/' + currentId + '/log', {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/api/disputes/' + currentId + '/log', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -581,7 +581,7 @@
 
             try {
                 // 1. Update status and resolution
-                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes/' + currentId, {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/api/disputes/' + currentId, {
                     method: 'PATCH',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -597,7 +597,7 @@
                 if (!response.ok) throw new Error('Failed to resolve dispute on server');
 
                 // 2. Add log entry
-                await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes/' + currentId + '/log', {
+                await fetch(ZOI_CONFIG.API_BASE_URL + '/api/disputes/' + currentId + '/log', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',

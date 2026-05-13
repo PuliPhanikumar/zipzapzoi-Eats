@@ -169,7 +169,7 @@
             document.getElementById('current-manager-role').innerText = currentUser.role || "Manager";
 
             try {
-                const dispRes = await fetch(ZOI_CONFIG.API_BASE_URL + '/disputes', {
+                const dispRes = await fetch(ZOI_CONFIG.API_BASE_URL + '/api/disputes', {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
                 });
                 let allDisputes = [];
@@ -183,7 +183,7 @@
                     }));
                 }
 
-                const teamRes = await fetch(ZOI_CONFIG.API_BASE_URL + '/users', {
+                const teamRes = await fetch(ZOI_CONFIG.API_BASE_URL + '/api/users', {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
                 });
                 let allStaff = [];

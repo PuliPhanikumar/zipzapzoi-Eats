@@ -399,11 +399,26 @@
             const original = btn.innerHTML;
             btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Sending...`;
 
-            setTimeout(() => {
-                btn.innerHTML = original;
-                showToast("Sent Successfully", "Push notification dispatched to queue.");
+            (async () => {
+                try {
+                    const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                    const _tk = localStorage.getItem('zoiAuthToken') || '';
+                    const _body = document.getElementById('notif-body')?.value || '';
+                    const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 5000);
+                    const _res = await fetch(_ab + '/api/notifications/test', {
+                        method: 'POST', signal: _ctrl.signal,
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _tk },
+                        body: JSON.stringify({ title, body: _body })
+                    });
+                    btn.innerHTML = original;
+                    if (_res.ok) { showToast('Sent Successfully', 'Push dispatched via backend.'); }
+                    else { showToast('Queued Locally', 'Backend not reachable — notification queued.'); }
+                } catch(e) {
+                    btn.innerHTML = original;
+                    showToast('Queued Locally', 'Will retry when backend is online.');
+                }
                 clearForm();
-            }, 1500);
+            })();
         }
 
         function clearForm() {

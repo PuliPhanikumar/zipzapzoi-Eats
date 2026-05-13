@@ -299,14 +299,26 @@
     <script>
         // DATA
         // DATA
-        let promos = ZoiPromos.getAll();
+        let promos = [];
+        async function loadPromos() {
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || '';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const _res = await fetch(_ab + '/api/promotions', { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                if (_res.ok) { const _d = await _res.json(); promos = Array.isArray(_d) ? _d : (_d.promotions || []); }
+            } catch(e) { console.warn('[Promos] fallback:', e.message); }
+            if (!promos.length && typeof ZoiPromos !== 'undefined') promos = ZoiPromos.getAll();
+            renderTable();
+        }
         let currentPromoId = null;
         let chartInstance = null;
         let currentPage = 1;
         const itemsPerPage = 6;
 
         // INIT
-        window.onload = () => {
+        window.onload = async () => {
+            loadPromos(); // API-first
             fetch('sidebar.html')
                 .then(response => response.text())
                 .then(data => {

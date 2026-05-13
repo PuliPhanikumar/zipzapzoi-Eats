@@ -401,7 +401,7 @@
         async function initData() {
             try {
                 // Fetch Real Users from Backend
-                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/users', {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/api/users', {
                     headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }
                 });
                 if (response.ok) {
@@ -657,7 +657,7 @@
             const status = actionType.includes("Suspension") ? "Suspended" : "Terminated";
 
             try {
-                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/users/' + currentUser.id + '/status', {
+                const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/api/users/' + currentUser.id + '/status', {
                     method: 'PATCH',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -734,7 +734,7 @@
                 const selectedRole = document.getElementById('role-select').value;
                 
                 try {
-                    const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/users/' + currentUser.id + '/role', {
+                    const response = await fetch(ZOI_CONFIG.API_BASE_URL + '/api/users/' + currentUser.id + '/role', {
                         method: 'PATCH',
                         headers: { 
                             'Content-Type': 'application/json',

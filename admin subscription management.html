@@ -440,7 +440,18 @@
 
     <script>
         // 1. DATA
-        let subscribers = ZoiSubscriptions.getAll();
+        let subscribers = [];
+        async function loadSubscriptions() {
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || '';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const _res = await fetch(_ab + '/api/subscriptions', { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                if (_res.ok) { const _d = await _res.json(); subscribers = Array.isArray(_d) ? _d : (_d.subscriptions || []); }
+            } catch(e) { console.warn('[Subs] fallback:', e.message); }
+            if (!subscribers.length && typeof ZoiSubscriptions !== 'undefined') subscribers = ZoiSubscriptions.getAll();
+            renderTable();
+        }
         let plans = ZoiSubscriptions.getPlans();
         let currentId = null;
         let selectedIds = [];
@@ -448,7 +459,8 @@
         const itemsPerPage = 8;
 
         // INIT
-        window.onload = () => {
+        window.onload = async () => {
+            loadSubscriptions(); // API-first
             fetch('sidebar.html')
                 .then(response => response.text())
                 .then(data => {

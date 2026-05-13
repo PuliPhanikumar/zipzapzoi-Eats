@@ -531,7 +531,23 @@
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
 
-    <script src="js/zoi_mobile.js"></script>
+    <script src="js/zoi_mobile.js">
+        // === API-FIRST: load CMS content from backend ===
+        (async () => {
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || '';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const _res = await fetch(_ab + '/api/cms', { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                if (_res.ok) {
+                    const _d = await _res.json();
+                    console.log('[CMS] Loaded', (_d.items || []).length, 'content items from API');
+                    // Re-render table if function exists
+                    if (typeof renderContent === 'function') renderContent();
+                    if (typeof renderTable === 'function') renderTable();
+                }
+            } catch(e) { console.warn('[CMS] API fallback:', e.message); }
+        })();</script>
 </body>
 
 </html>
