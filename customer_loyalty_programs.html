@@ -400,18 +400,42 @@
         }
     };
 
-    // === AUTH GUARD + USER BIND ===
-    document.addEventListener('DOMContentLoaded', () => {
+    // === AUTH GUARD + USER BIND + API LOAD ===
+    document.addEventListener('DOMContentLoaded', async () => {
         if (typeof ZoiCustomer === 'undefined' || !ZoiCustomer.isLoggedIn()) {
             window.location.href = 'login & registration.html';
             return;
         }
         const user = ZoiCustomer.getSession() || { name: 'Guest' };
-        // Bind profile link user indicator
         const profileLink = document.getElementById('header-profile-link');
-        if (profileLink) {
-            profileLink.title = user.name || 'Profile';
-        }
+        if (profileLink) profileLink.title = user.name || 'Profile';
+
+        // === API-FIRST: load badges and zipPoints ===
+        try {
+            const apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+            const hdrs = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') };
+            const controller = new AbortController(); setTimeout(() => controller.abort(), 3000);
+            const [badgesRes, ptsRes] = await Promise.allSettled([
+                fetch(apiBase + '/api/users/me/badges', { headers: hdrs, signal: controller.signal }),
+                fetch(apiBase + '/api/users/me/zippoints', { headers: hdrs })
+            ]);
+            if (badgesRes.status === 'fulfilled' && badgesRes.value.ok) {
+                const data = await badgesRes.value.json();
+                const earnedCount = data.badges ? data.badges.filter(b => b.earned).length : 0;
+                const totalBadges = data.badges ? data.badges.length : 0;
+                const badgeEl = document.getElementById('badge-count');
+                if (badgeEl) badgeEl.textContent = earnedCount + '/' + totalBadges + ' Badges';
+                // Show newly awarded badges
+                if (data.newlyAwarded && data.newlyAwarded.length > 0) {
+                    ZoiLoyalty.showToast('New badge earned: ' + data.newlyAwarded.join(', ') + '!');
+                }
+            }
+            if (ptsRes.status === 'fulfilled' && ptsRes.value.ok) {
+                const pts = await ptsRes.value.json();
+                const ptsEl = document.getElementById('zip-points-balance');
+                if (ptsEl) ptsEl.textContent = (pts.zipPoints || 0).toLocaleString() + ' ZipPoints';
+            }
+        } catch (e) { console.warn('[Loyalty] API fallback:', e.message); }
     });
 </script>
 <script src="js/zoi_ai_assistant.js?v=4"></script>

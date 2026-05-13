@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -268,7 +268,7 @@
 </main>
 
 <footer class="bg-white dark:bg-surface-dark border-t border-gray-200 dark:border-border-dark py-8 text-center text-sm text-gray-500">
-    <p>© 2026 ZipZapZoi Eats. Made with <span class="text-primary">?</span> for food lovers.</p>
+    <p>ï¿½ 2026 ZipZapZoi Eats. Made with <span class="text-primary">?</span> for food lovers.</p>
 </footer>
 
 <!-- Toast -->
@@ -286,7 +286,19 @@
     let _referralLink = 'https://zipzapzoi.in/join?ref=ZOI2026';
     let _refData = { code: 'ZOI2026', referred: 0, earned: 0, pending: 0, history: [] };
 
-    document.addEventListener('DOMContentLoaded', () => {
+    // Fast fetch helper - 3s timeout, never buffers
+    function fastFetch(url, opts) {
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), 3000);
+        return fetch(url, Object.assign({}, opts, { signal: controller.signal })).finally(() => clearTimeout(t));
+    }
+    const API = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+    const authHeaders = () => ({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '')
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
         // Auth Guard
         if (typeof ZoiCustomer === 'undefined' || !ZoiCustomer.isLoggedIn()) {
             window.location.href = 'login & registration.html';
@@ -300,19 +312,28 @@
         if (headerAvatar) headerAvatar.textContent = user.name ? user.name.charAt(0).toUpperCase() : 'U';
         if (headerName) headerName.textContent = user.name || 'Guest';
 
-        // Load referral data
-        if (typeof ZoiReferral !== 'undefined') {
-            _refData = ZoiReferral.getData() || _refData;
+        // === API-FIRST: load live referral data ===
+        try {
+            const apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+            const hdrs = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') };
+            const controller = new AbortController();
+            setTimeout(() => controller.abort(), 3000);
+            const res = await fetch(apiBase + '/api/users/me/referral', { headers: hdrs, signal: controller.signal });
+            if (res.ok) {
+                const data = await res.json();
+                _refData = { code: data.referralCode, referred: data.stats.referred, earned: data.stats.earned, pending: data.stats.pending, history: data.history };
+                _referralCode = data.referralCode;
+                _referralLink = data.referralLink;
+            }
+        } catch (e) {
+            console.warn('[Referral] API fallback:', e.message);
+            if (!_refData.code || _refData.code === 'ZOI2026') {
+                const firstName = user.name ? user.name.split(' ')[0].toUpperCase().replace(/[^A-Z0-9]/g,'') : 'ZIPZAP';
+                _refData.code = firstName + Math.floor(1000 + Math.random() * 9000);
+            }
+            _referralCode = _refData.code;
+            _referralLink = 'https://zipzapzoi.in/join?ref=' + _referralCode;
         }
-
-        // Generate code from user name if not set
-        if (!_refData.code || _refData.code === 'ZOI2026') {
-            const firstName = user.name ? user.name.split(' ')[0].toUpperCase().replace(/[^A-Z0-9]/g,'') : 'ZIPZAP';
-            _refData.code = firstName + Math.floor(1000 + Math.random() * 9000);
-        }
-
-        _referralCode = _refData.code;
-        _referralLink = `https://zipzapzoi.in/join?ref=${_referralCode}`;
 
         // Bind referral code UI
         const codeInput = document.getElementById('referral-code-input');
@@ -321,16 +342,13 @@
         if (linkDisplay) linkDisplay.textContent = _referralLink;
 
         // Bind stats
-        const referred = _refData.referred || _refData.referrals?.length || 0;
-        const earned = (referred) * 200;
-        const pending = (_refData.pending || 0);
-
-        document.getElementById('stat-referred').textContent = referred;
-        document.getElementById('stat-earned').textContent = '?' + earned.toLocaleString('en-IN');
-        document.getElementById('stat-pending').textContent = '?' + pending.toLocaleString('en-IN');
+        const earned = _refData.earned || (_refData.referred || 0) * 200;
+        document.getElementById('stat-referred').textContent = _refData.referred || 0;
+        document.getElementById('stat-earned').textContent = String.fromCharCode(8377) + earned.toLocaleString('en-IN');
+        document.getElementById('stat-pending').textContent = String.fromCharCode(8377) + (_refData.pending || 0).toLocaleString('en-IN');
 
         // Build referral history table
-        renderReferralTable(_refData.referrals || _refData.history || []);
+        renderReferralTable(_refData.history || []);
     });
 
     function renderReferralTable(referrals) {
@@ -376,7 +394,7 @@
 
     // === SHARE FUNCTIONS ===
     function getReferralMsg() {
-        return encodeURIComponent(`Hey! I've been loving ZipZapZoi Eats — amazing food delivery ??. Sign up with my code ${_referralCode} and get 50% OFF your first order! Join here: ${_referralLink}`);
+        return encodeURIComponent(`Hey! I've been loving ZipZapZoi Eats ï¿½ amazing food delivery ??. Sign up with my code ${_referralCode} and get 50% OFF your first order! Join here: ${_referralLink}`);
     }
 
     function shareViaWhatsApp() {

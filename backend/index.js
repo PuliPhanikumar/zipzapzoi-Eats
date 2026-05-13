@@ -2109,6 +2109,150 @@ app.get('/api/users/me/badges', verifyToken, async (req, res, next) => {
 });
 
 // ════════════════════════════════════════════════════════
+// REFERRAL SYSTEM
+// ════════════════════════════════════════════════════════
+
+// GET /api/users/me/referral — get user's referral code, stats, and history
+app.get('/api/users/me/referral', verifyToken, async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+
+        // Fetch or generate referral code
+        let user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { id: true, name: true, referralCode: true, zipPoints: true }
+        });
+
+        // Auto-generate referral code if missing
+        if (!user.referralCode) {
+            const firstName = (user.name || 'ZOI').split(' ')[0].toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const code = firstName + Math.floor(1000 + Math.random() * 9000);
+            user = await prisma.user.update({
+                where: { id: userId },
+                data: { referralCode: code },
+                select: { id: true, name: true, referralCode: true, zipPoints: true }
+            });
+        }
+
+        // Get referral history
+        const rewards = await prisma.referralReward.findMany({
+            where: { referrerId: userId },
+            orderBy: { createdAt: 'desc' }
+        });
+
+        const totalEarned = rewards.filter(r => r.status === 'completed').reduce((s, r) => s + r.pointsAwarded, 0);
+        const pendingEarned = rewards.filter(r => r.status === 'pending').reduce((s, r) => s + r.pointsAwarded, 0);
+
+        res.json({
+            referralCode: user.referralCode,
+            referralLink: `https://zipzapzoi.in/join?ref=${user.referralCode}`,
+            zipPoints: user.zipPoints,
+            stats: {
+                referred: rewards.length,
+                earned: totalEarned,
+                pending: pendingEarned
+            },
+            history: rewards.map(r => ({
+                name: r.refereeName,
+                date: r.createdAt,
+                status: r.status,
+                points: r.pointsAwarded
+            }))
+        });
+    } catch (error) { next(error); }
+});
+
+// POST /api/auth/apply-referral — called after register to credit referrer
+app.post('/api/auth/apply-referral', verifyToken, async (req, res, next) => {
+    try {
+        const { referralCode } = req.body;
+        const userId = req.user.id;
+
+        if (!referralCode) return res.status(400).json({ error: 'No referral code provided' });
+
+        // Find the referrer
+        const referrer = await prisma.user.findUnique({ where: { referralCode } });
+        if (!referrer) return res.status(404).json({ error: 'Invalid referral code' });
+        if (referrer.id === userId) return res.status(400).json({ error: 'Cannot use your own referral code' });
+
+        // Check not already applied
+        const alreadyReferred = await prisma.user.findUnique({ where: { id: userId }, select: { referredById: true } });
+        if (alreadyReferred.referredById) return res.status(409).json({ error: 'Referral code already applied' });
+
+        const newUser = await prisma.user.findUnique({ where: { id: userId }, select: { name: true, email: true } });
+
+        // Apply referral + create reward record (pending until first order)
+        await prisma.$transaction([
+            prisma.user.update({ where: { id: userId }, data: { referredById: referrer.id } }),
+            prisma.referralReward.create({
+                data: {
+                    referrerId: referrer.id,
+                    refereeName: newUser.name,
+                    refereeEmail: newUser.email,
+                    status: 'pending',
+                    pointsAwarded: 200
+                }
+            })
+        ]);
+
+        res.json({ message: 'Referral applied! Your friend will earn 200 ZipPoints when you place your first order.' });
+    } catch (error) { next(error); }
+});
+
+// POST /api/orders/:id/complete-referral — called when first order is delivered (internal)
+// Award referrer points when their referee completes first order
+app.post('/api/orders/:id/complete-referral', verifyToken, async (req, res, next) => {
+    try {
+        const orderId = parseInt(req.params.id);
+        const order = await prisma.order.findUnique({ where: { id: orderId }, select: { userId: true } });
+        if (!order || !order.userId) return res.status(404).json({ error: 'Order not found' });
+
+        const user = await prisma.user.findUnique({ where: { id: order.userId }, select: { referredById: true } });
+        if (!user || !user.referredById) return res.json({ message: 'No referral to complete' });
+
+        // Check if already completed
+        const pending = await prisma.referralReward.findFirst({
+            where: { referrerId: user.referredById, status: 'pending' }
+        });
+        if (!pending) return res.json({ message: 'No pending referral reward' });
+
+        // Complete reward + credit referrer points
+        await prisma.$transaction([
+            prisma.referralReward.update({
+                where: { id: pending.id },
+                data: { status: 'completed', completedAt: new Date() }
+            }),
+            prisma.user.update({
+                where: { id: user.referredById },
+                data: { zipPoints: { increment: pending.pointsAwarded } }
+            }),
+            prisma.notification.create({
+                data: {
+                    userId: user.referredById,
+                    title: 'Referral Reward! 🎉',
+                    body: `${pending.refereeName} just placed their first order. You earned ${pending.pointsAwarded} ZipPoints!`,
+                    type: 'achievement',
+                    url: 'customer referral program.html'
+                }
+            })
+        ]);
+
+        res.json({ message: 'Referral completed', pointsAwarded: pending.pointsAwarded });
+    } catch (error) { next(error); }
+});
+
+// GET /api/users/me/zippoints — get user's ZipPoints balance + transaction log
+app.get('/api/users/me/zippoints', verifyToken, async (req, res, next) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.id },
+            select: { zipPoints: true, name: true }
+        });
+        res.json({ zipPoints: user?.zipPoints || 0 });
+    } catch (error) { next(error); }
+});
+
+// ════════════════════════════════════════════════════════
 // ZOI AI AGENT — INDEPENDENT ENTITY
 // ════════════════════════════════════════════════════════
 const aiLimiter = rateLimit({

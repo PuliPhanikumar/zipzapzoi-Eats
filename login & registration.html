@@ -978,7 +978,22 @@
             }
 
             // Create session and token
-            saveToken(generateMockToken(newUser));
+                        // Auto-apply referral from ?ref=CODE in URL
+            (async () => {
+                const _urlRef = new URLSearchParams(window.location.search).get('ref');
+                if (_urlRef) {
+                    try {
+                        const _apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                        const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                        await fetch(_apiBase + '/api/auth/apply-referral', {
+                            method: 'POST', signal: _ctrl.signal,
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') },
+                            body: JSON.stringify({ referralCode: _urlRef })
+                        });
+                    } catch(e) { /* silent */ }
+                }
+            })();
+saveToken(generateMockToken(newUser));
             createSession(newUser);
 
             showToast('Account Created! ??', `Welcome to ZipZapZoi, ${fname}!`);

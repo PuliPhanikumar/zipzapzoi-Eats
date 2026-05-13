@@ -12,17 +12,22 @@ datasource db {
 
 // ─── USERS ──────────────────────────────────────────────
 model User {
-  id           Int      @id @default(autoincrement())
-  zoiId        String   @unique // e.g., CUST-552, PART-102, RIDE-991, ADM-01
-  name         String
-  email        String?  @unique
-  phone        String?
-  role         String   @default("Customer") // Customer, partner, rider, pos_staff, Super Admin, admin
-  passwordHash String?
-  avatar       String?
-  status       String   @default("Active") // Active, Suspended, Banned, Pending
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             Int      @id @default(autoincrement())
+  zoiId          String   @unique // e.g., CUST-552, PART-102, RIDE-991, ADM-01
+  name           String
+  email          String?  @unique
+  phone          String?
+  role           String   @default("Customer") // Customer, partner, rider, pos_staff, Super Admin, admin
+  passwordHash   String?
+  avatar         String?
+  status         String   @default("Active") // Active, Suspended, Banned, Pending
+  zipPoints      Int      @default(0)         // Gamification points balance
+  referralCode   String?  @unique             // e.g., "RAHUL4821"
+  referredById   Int?                         // userId of the referrer
+  referredBy     User?    @relation("ReferralChain", fields: [referredById], references: [id])
+  referrals      User[]   @relation("ReferralChain") // users this user referred
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   orders            Order[]
   feedbacks         Feedback[]
@@ -35,9 +40,12 @@ model User {
   notifications     Notification[]
   orderRatings      OrderRating[]
   userBadges        UserBadge[]
+  referralRewards   ReferralReward[] @relation("ReferrerRewards")
 
   @@index([role])
   @@index([status])
+  @@index([referralCode])
+  @@index([referredById])
 }
 
 // ─── RESTAURANTS ────────────────────────────────────────
@@ -490,4 +498,20 @@ model UserBadge {
 
   @@unique([userId, badgeId])
   @@index([userId])
+}
+
+// ─── REFERRAL REWARDS ────────────────────────────────────
+model ReferralReward {
+  id           Int      @id @default(autoincrement())
+  referrerId   Int
+  referrer     User     @relation("ReferrerRewards", fields: [referrerId], references: [id], onDelete: Cascade)
+  refereeName  String   // Name of the person who signed up
+  refereeEmail String?
+  pointsAwarded Int    @default(200)
+  status       String   @default("pending") // pending, completed
+  completedAt  DateTime?
+  createdAt    DateTime @default(now())
+
+  @@index([referrerId])
+  @@index([status])
 }

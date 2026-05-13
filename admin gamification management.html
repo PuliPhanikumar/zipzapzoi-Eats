@@ -283,8 +283,32 @@
 
     <script>
         // 1. DATA MODEL
-        let badges = ZoiGamification.getBadges();
-        let config = ZoiGamification.getConfig();
+        let badges = (typeof ZoiGamification !== 'undefined') ? ZoiGamification.getBadges() : [];
+        let config = (typeof ZoiGamification !== 'undefined') ? ZoiGamification.getConfig() : { base: 10, review: 50, ref: 200 };
+
+        // === API-FIRST: load badges from backend ===
+        const _gAPI = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+        const _gHdrs = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') };
+        function _gFetch(url, opts) {
+            const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 3000);
+            return fetch(url, Object.assign({}, opts, { signal: ctrl.signal }));
+        }
+        (async () => {
+            try {
+                const res = await _gFetch(_gAPI + '/api/badges', { headers: _gHdrs });
+                if (res.ok) {
+                    const apiBadges = await res.json();
+                    if (apiBadges.length > 0) {
+                        badges = apiBadges.map(b => ({
+                            id: b.id, name: b.name, icon: b.icon || 'stars',
+                            desc: b.description || '', color: b.color || 'orange',
+                            status: b.status || 'active'
+                        }));
+                        renderBadges();
+                    }
+                }
+            } catch(e) { console.warn('[Admin Gamification] API fallback:', e.message); }
+        })();
 
         const icons = ['stars', 'emoji_events', 'rice_bowl', 'dark_mode', 'eco', 'share', 'local_pizza', 'ramen_dining', 'coffee', 'bolt', 'favorite', 'verified'];
 
@@ -401,12 +425,15 @@
             showToast("Status Updated", `Badge moved.`);
         }
 
-        function deleteBadge(id) {
-            if (confirm("Permanently delete this badge?")) {
-                ZoiGamification.deleteBadge(id);
-                badges = ZoiGamification.getBadges(); // Refresh
+        async function deleteBadge(id) {
+            if (confirm('Permanently delete this badge?')) {
+                try {
+                    await _gFetch(_gAPI + '/api/badges/' + id, { method: 'DELETE', headers: _gHdrs });
+                } catch(e) { /* silent - also update local */ }
+                if (typeof ZoiGamification !== 'undefined') ZoiGamification.deleteBadge(id);
+                badges = badges.filter(b => b.id !== id);
                 renderBadges();
-                showToast("Deleted", "Badge removed.");
+                showToast('Deleted', 'Badge removed.');
             }
         }
 
@@ -452,7 +479,7 @@
             document.getElementById('create-modal').classList.add('flex');
         }
 
-        function saveBadge() {
+        async function saveBadge() {
             const id = document.getElementById('edit-id').value;
             const name = document.getElementById('new-name').value;
             const desc = document.getElementById('new-desc').value;
