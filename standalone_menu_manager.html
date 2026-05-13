@@ -395,12 +395,30 @@
         let historyLog = [{ time: "10:30 AM", user: "System", item: "Zoi Menu Sync", action: "Connected", value: "Live" }];
 
         // === INIT ===
-        window.onload = () => {
-            if (typeof ZoiPartnerMenu !== 'undefined') {
-                const zcat = ZoiPartnerMenu.getAllCategories();
-                if (zcat && zcat.length > 0 && zcat[0] !== 'Recommended') {
-                    categories = zcat;
+        window.onload = async () => {
+            // API-FIRST: load live menu from backend
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+                const _restId = localStorage.getItem('zoiPartnerRestId') || '101';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const _res = await fetch(_ab + '/api/partner/menu/' + _restId, { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                if (_res.ok) {
+                    const _data = await _res.json();
+                    const _items = Array.isArray(_data) ? _data : (_data.items || []);
+                    if (_items.length > 0) {
+                        menuItems = _items.map(m => ({ id: m.id, name: m.itemName || m.name, category: m.category || 'Mains', price: m.price, cost: m.costPrice || 0, stock: m.isAvailable !== false, type: m.type || 'veg', img: m.image || '', time: m.prepTime || 20, cals: m.calories || 0, qty: m.quantity || 100, schedule: m.schedule || 'All Day' }));
+                        const _cats = [...new Set(menuItems.map(m => m.category))];
+                        if (_cats.length > 0) categories = _cats;
+                        renderCategories(); renderMenu();
+                        console.log('[Menu Manager] Loaded', menuItems.length, 'items from API');
+                    }
                 }
+            } catch(e) { console.warn('[Menu Manager] API fallback:', e.message); }
+
+            if (menuItems.length === 0 && typeof ZoiPartnerMenu !== 'undefined') {
+                const zcat = ZoiPartnerMenu.getAllCategories();
+                if (zcat && zcat.length > 0 && zcat[0] !== 'Recommended') { categories = zcat; }
                 const zItems = ZoiPartnerMenu.getMenuItems();
                 if (zItems && zItems.length > 0) {
                     menuItems = zItems;

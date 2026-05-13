@@ -629,7 +629,35 @@
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
 
-    <script src="js/zoi_mobile.js"></script>
+    <script src="js/zoi_mobile.js">
+        // === API-FIRST: load live partner dashboard metrics ===
+        (async () => {
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+                const _restId = localStorage.getItem('zoiPartnerRestId') || '101';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const [dashRes, ordersRes] = await Promise.allSettled([
+                    fetch(_ab + '/api/partner/dashboard/' + _restId, { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal }),
+                    fetch(_ab + '/api/partner/orders/' + _restId, { headers: { 'Authorization': 'Bearer ' + _tk } })
+                ]);
+                if (dashRes.status === 'fulfilled' && dashRes.value.ok) {
+                    const _d = await dashRes.value.json();
+                    const todaySales = document.getElementById('today-sales'); if (todaySales) todaySales.textContent = '₹' + (_d.todaySales || 0).toLocaleString('en-IN');
+                    const todayOrders = document.getElementById('today-orders'); if (todayOrders) todayOrders.textContent = _d.todayOrders || 0;
+                    const avgRating = document.getElementById('avg-rating'); if (avgRating) avgRating.textContent = (_d.avgRating || 0).toFixed(1);
+                    console.log('[Dashboard] Live metrics loaded from API');
+                }
+                if (ordersRes.status === 'fulfilled' && ordersRes.value.ok) {
+                    const _orders = await ordersRes.value.json();
+                    const _list = Array.isArray(_orders) ? _orders : (_orders.orders || []);
+                    if (_list.length > 0) {
+                        sessionStorage.setItem('zoiPartnerOrders_' + _restId, JSON.stringify({ data: _list, ts: Date.now() }));
+                        console.log('[Dashboard] Loaded', _list.length, 'live orders');
+                    }
+                }
+            } catch(e) { console.warn('[Dashboard] API fallback:', e.message); }
+        })();</script>
 </body>
 
 </html>

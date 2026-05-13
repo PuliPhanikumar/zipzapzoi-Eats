@@ -411,7 +411,25 @@
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
 
-    <script src="js/zoi_mobile.js"></script>
+    <script src="js/zoi_mobile.js">
+        // === API-FIRST: load live orders for aggregator hub ===
+        (async () => {
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const _res = await fetch(_ab + '/api/partner/orders/' + PARTNER_ID, { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                if (_res.ok) {
+                    const _data = await _res.json();
+                    const _list = Array.isArray(_data) ? _data : (_data.orders || []);
+                    if (_list.length > 0) {
+                        aggOrders = _list.map(o => ({ id: o.zoiId || o.id, platform: 'ZipZapZoi', status: o.status === 'placed' ? 'New' : o.status, items: o.items || [], total: o.total || 0, time: new Date(o.createdAt || Date.now()).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) }));
+                        renderOrderHub();
+                        console.log('[AggHub] Loaded', aggOrders.length, 'live orders from API');
+                    }
+                }
+            } catch(e) { console.warn('[AggHub] API fallback:', e.message); }
+        })();</script>
 </body>
 
 </html>
