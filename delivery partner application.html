@@ -402,16 +402,29 @@
                 vehicle: document.querySelector('input[name="vehicle"]:checked').value
             };
 
-            setTimeout(() => {
+            // API-first submission to /api/rider-applications
+            (async () => {
                 try {
-                    ZoiRiderOnboarding.addApplication(appData);
-                    showStep('success');
-                } catch (e) {
-                    console.error(e);
-                    alert("Error submitting application.");
-                    btn.innerHTML = "Submit Application";
-                }
-            }, 1500);
+                    const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                    const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 5000);
+                    const _res = await fetch(_ab + '/api/rider-applications', {
+                        method: 'POST', signal: _ctrl.signal,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: appData.name, phone: appData.phone,
+                            city: appData.city, vehicleType: appData.vehicle,
+                            email: document.getElementById('email')?.value || ''
+                        })
+                    });
+                    if (_res.ok) { console.log('[RiderApp] Application submitted to backend'); }
+                } catch(e) { console.warn('[RiderApp] Backend unavailable:', e.message); }
+                // Always save locally too and show success
+                try {
+                    if (typeof ZoiRiderOnboarding !== 'undefined') ZoiRiderOnboarding.addApplication(appData);
+                    localStorage.setItem('zoiRiderApplication', JSON.stringify({ ...appData, ts: Date.now(), status: 'pending' }));
+                } catch(e) {}
+                showStep('success');
+            })();
         }
 
         function adminApprove() {

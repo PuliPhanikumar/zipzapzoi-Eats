@@ -715,9 +715,26 @@
     let allTickets = [];
 
     // 1. Initial Load & Hydrate Tickets Sidebar
-    function loadInboxTickets() {
+    async function loadInboxTickets() {
+        // Load from localStorage immediately (instant)
         allTickets = JSON.parse(localStorage.getItem('zoiSupportTickets') || '[]');
         renderTicketsList(allTickets);
+        // Then overlay with live API data
+        try {
+            const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+            const _tk = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+            const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+            const _res = await fetch(_ab + '/api/support-tickets', { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+            if (_res.ok) {
+                const _data = await _res.json();
+                if (_data.tickets && _data.tickets.length > 0) {
+                    allTickets = _data.tickets;
+                    localStorage.setItem('zoiSupportTickets', JSON.stringify(allTickets));
+                    renderTicketsList(allTickets);
+                    console.log('[Support] Loaded', allTickets.length, 'tickets from API');
+                }
+            }
+        } catch(e) { console.warn('[Support] API fallback:', e.message); }
     }
 
     function renderTicketsList(tickets) {
@@ -1016,6 +1033,21 @@
     function saveTicketsToStorage() {
         localStorage.setItem('zoiSupportTickets', JSON.stringify(allTickets));
         renderTicketsList(allTickets);
+        // Sync latest ticket to backend (fire-and-forget)
+        const latest = allTickets[0];
+        if (latest && latest.id && latest.id.startsWith('TCK-')) {
+            (async () => {
+                try {
+                    const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                    const _tk = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+                    await fetch(_ab + '/api/support-tickets', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _tk },
+                        body: JSON.stringify({ subject: latest.subject, message: latest.messages?.slice(-1)[0]?.text || latest.subject, category: 'General' })
+                    });
+                } catch(e) { /* silent — already saved locally */ }
+            })();
+        }
     }
 
     // Contact Helper

@@ -956,11 +956,28 @@
             updateETA(effectiveStatus);
         }
 
-        function pollOrderStatus() {
-            const order = ZoiOrders.getActiveOrder();
+        async function pollOrderStatus() {
+            // API-first: live status from /api/orders/track/:zoiId
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const _urlId = new URLSearchParams(window.location.search).get('orderId') || new URLSearchParams(window.location.search).get('id');
+                const _loc = (typeof ZoiOrders !== 'undefined') ? ZoiOrders.getActiveOrder() : null;
+                const _oid = _urlId || (_loc && (_loc.zoiId || _loc.id));
+                if (_oid) {
+                    const _r = await fetch(_ab + '/api/orders/track/' + _oid, { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                    if (_r.ok) {
+                        const _d = await _r.json();
+                        if (_currentOrder) { _currentOrder.status = _d.status || _currentOrder.status; _currentOrder.estimatedTime = _d.estimatedDeliveryTime || _currentOrder.estimatedTime; }
+                        else { _currentOrder = _d; }
+                        console.log('[Tracking] API status:', _d.status);
+                    }
+                }
+            } catch(e) { /* fallback to local */ }
+            const order = _currentOrder || ((typeof ZoiOrders !== 'undefined') ? ZoiOrders.getActiveOrder() : null);
             if (!order) return;
             _currentOrder = order;
-
             // Determine effective status for UI
             // Determine effective status for UI
             let effectiveStatus = order.status;
