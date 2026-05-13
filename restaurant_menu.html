@@ -329,8 +329,30 @@
             currentRest = DB_RESTAURANTS.find(r => r.id === currentId);
         }
         if (!currentRest) {
-            const allRestaurants = ZoiRestaurants.getAll();
-            currentRest = allRestaurants.find(r => r.id === currentId) || allRestaurants[0];
+            // API-first restaurant + menu load
+        const _menuAPI = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+        async function loadMenuFromAPI(restId) {
+            try {
+                const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 3000);
+                const [restRes, menuRes] = await Promise.allSettled([
+                    fetch(_menuAPI + '/api/restaurants/' + restId, { signal: ctrl.signal }),
+                    fetch(_menuAPI + '/api/menus/' + restId)
+                ]);
+                let apiRestaurant = null; let apiMenu = [];
+                if (restRes.status === 'fulfilled' && restRes.value.ok) apiRestaurant = await restRes.value.json();
+                if (menuRes.status === 'fulfilled' && menuRes.value.ok) {
+                    const raw = await menuRes.value.json();
+                    apiMenu = raw.map(m => ({
+                        id: m.id, name: m.itemName, price: m.price, description: m.description,
+                        category: m.category, type: m.type || 'Veg', image: m.image,
+                        available: m.isAvailable !== false, bestseller: m.isBestseller || false
+                    }));
+                }
+                return { restaurant: apiRestaurant, menu: apiMenu };
+            } catch(e) { console.warn('[Menu] API fallback:', e.message); return { restaurant: null, menu: [] }; }
+        }
+
+        const allRestaurants = (typeof ZoiRestaurants !== 'undefined') ? ZoiRestaurants.getAll() : [];            currentRest = allRestaurants.find(r => r.id === currentId) || allRestaurants[0];
         }
 
         let currentMenu = [];
@@ -339,6 +361,7 @@
         }
         // Try to load any overridden menu from local storage (partner menu sync)
         const storedMenus = JSON.parse(localStorage.getItem('zoiMenus') || '{}');
+        // (API menu loaded async via loadMenuFromAPI — see window.onload / DOMContentLoaded)
         if (storedMenus[currentId]) {
             // Flatten partner's categories into one array for customer page
             currentMenu = [];
@@ -587,9 +610,37 @@
             renderMenu(type);
         }
 
-        // Initial Render
+        // Initial Render — then try to enrich with live API data
         renderMenu();
         updateCartUI();
+
+        // API-first: overlay live restaurant data + menu items
+        (async () => {
+            const urlRestId = new URLSearchParams(window.location.search).get('id');
+            const restId = urlRestId || (typeof currentRestaurant !== 'undefined' && currentRestaurant ? currentRestaurant.id : null);
+            if (!restId) return;
+
+            const { restaurant: apiRest, menu: apiMenuItems } = await loadMenuFromAPI(restId);
+
+            // Update restaurant info display if API returned data
+            if (apiRest) {
+                const nameEl = document.getElementById('rest-name');
+                const ratingEl = document.getElementById('rest-rating');
+                const timeEl = document.getElementById('rest-time');
+                const tagsEl = document.getElementById('rest-tags');
+                if (nameEl) nameEl.textContent = apiRest.name;
+                if (ratingEl) ratingEl.textContent = apiRest.rating || '4.2';
+                if (timeEl) timeEl.textContent = apiRest.deliveryTime || '30 min';
+                if (tagsEl) tagsEl.textContent = (apiRest.tags || []).join(' • ');
+            }
+
+            // Update menu with live data if API returned items
+            if (apiMenuItems.length > 0) {
+                // Merge API items into storedMenus under this restaurant
+                storedMenus[restId] = apiMenuItems;
+                renderMenu();
+            }
+        })();
 
     </script>
     <script src="js/zoi_customer_engine.js"></script>

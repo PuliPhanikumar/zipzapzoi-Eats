@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -347,7 +347,7 @@
                             <span class="material-symbols-outlined text-neon-green text-3xl">restaurant_menu</span>
                             Zap's Daily Culinary Journey
                         </h2>
-                        <p class="text-text-secondary text-sm mt-2">AI-Predicted Cravings • Based on your regional
+                        <p class="text-text-secondary text-sm mt-2">AI-Predicted Cravings ï¿½ Based on your regional
                             preferences</p>
                     </div>
                     <a href="customer_restaurant_listing.html"
@@ -389,7 +389,7 @@
                                 <span class="flex items-center gap-1"><span
                                         class="material-symbols-outlined text-sm text-primary">schedule</span> 20
                                     mins</span>
-                                <span>•</span>
+                                <span>ï¿½</span>
                                 <span>?180 for two</span>
                             </div>
                             <a href="restaurant_menu.html?id=108"
@@ -437,7 +437,7 @@
                                 <span class="flex items-center gap-1"><span
                                         class="material-symbols-outlined text-sm text-primary">schedule</span> 35
                                     mins</span>
-                                <span>•</span>
+                                <span>ï¿½</span>
                                 <span>?250 for two</span>
                             </div>
                             <a href="restaurant_menu.html?id=107"
@@ -482,7 +482,7 @@
                                 <span class="flex items-center gap-1"><span
                                         class="material-symbols-outlined text-sm text-primary">schedule</span> 45
                                     mins</span>
-                                <span>•</span>
+                                <span>ï¿½</span>
                                 <span>?350 for two</span>
                             </div>
                             <a href="restaurant_menu.html?id=109"
@@ -525,7 +525,7 @@
                         <div class="absolute bottom-5 left-5 right-5 z-10">
                             <h3 class="text-xl font-bold mb-1 text-white group-hover:text-primary">Gujarati Kathiyawadi
                             </h3>
-                            <p class="text-sm text-text-secondary">Authentic Thalis • 92% Match</p>
+                            <p class="text-sm text-text-secondary">Authentic Thalis ï¿½ 92% Match</p>
                         </div>
                         <span
                             class="absolute top-3 right-3 material-symbols-outlined text-3xl text-primary opacity-0 group-hover:opacity-100 transition-opacity z-10">lunch_dining</span>
@@ -543,7 +543,7 @@
                         <div class="absolute bottom-5 left-5 right-5 z-10">
                             <h3 class="text-xl font-bold mb-1 text-white group-hover:text-neon-green">Udupi Breakfasts
                             </h3>
-                            <p class="text-sm text-text-secondary">Idlis & Dosas • 98% Match</p>
+                            <p class="text-sm text-text-secondary">Idlis & Dosas ï¿½ 98% Match</p>
                         </div>
                         <span
                             class="absolute top-3 right-3 material-symbols-outlined text-3xl text-neon-green opacity-0 group-hover:opacity-100 transition-opacity z-10">coffee</span>
@@ -561,7 +561,7 @@
                         <div class="absolute bottom-5 left-5 right-5 z-10">
                             <h3 class="text-xl font-bold mb-1 text-white group-hover:text-neon-yellow">Bengali Sweets &
                                 Fish</h3>
-                            <p class="text-sm text-text-secondary">Kolkata Special • 99% Match</p>
+                            <p class="text-sm text-text-secondary">Kolkata Special ï¿½ 99% Match</p>
                         </div>
                         <span
                             class="absolute top-3 right-3 material-symbols-outlined text-3xl text-neon-yellow opacity-0 group-hover:opacity-100 transition-opacity z-10">set_meal</span>
@@ -579,7 +579,7 @@
                         <div class="absolute bottom-5 left-5 right-5 z-10">
                             <h3 class="text-xl font-bold mb-1 text-white group-hover:text-neon-pink">Awadhi & Mughlai
                             </h3>
-                            <p class="text-sm text-text-secondary">Royal Kitchens • 85% Match</p>
+                            <p class="text-sm text-text-secondary">Royal Kitchens ï¿½ 85% Match</p>
                         </div>
                         <span
                             class="absolute top-3 right-3 material-symbols-outlined text-3xl text-neon-pink opacity-0 group-hover:opacity-100 transition-opacity z-10">restaurant</span>
@@ -791,7 +791,7 @@
 
             <div class="border-t border-border-dark pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-text-secondary">
-                    <span>© 2025 ZoiEats. All rights reserved.</span>
+                    <span>ï¿½ 2025 ZoiEats. All rights reserved.</span>
                     <span class="hidden sm:inline-block text-border-dark">|</span>
                     <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms & Conditions</a>
                     <a class="hover:text-white transition-colors" href="privacy policy.html">Privacy Policy</a>
@@ -977,6 +977,28 @@
             });
         }
     </script>
+
+        // === API-FIRST: pre-warm restaurant data for homepage cards ===
+        (async () => {
+            try {
+                const apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 3000);
+                const res = await fetch(apiBase + '/api/restaurants?status=Active&limit=20', { signal: ctrl.signal });
+                if (res.ok) {
+                    const restaurants = await res.json();
+                    if (restaurants.length > 0) {
+                        // Cache in sessionStorage for fast sub-page navigation
+                        sessionStorage.setItem('zoiRestCache', JSON.stringify({ data: restaurants, ts: Date.now() }));
+                        // Refresh any dynamic restaurant grids on the page
+                        const grid = document.getElementById('featured-grid') || document.getElementById('restaurant-grid');
+                        if (grid && typeof renderIndexRestaurants === 'function') {
+                            renderIndexRestaurants(restaurants.slice(0, 6));
+                        }
+                        console.log('[Index] Pre-loaded', restaurants.length, 'restaurants from API');
+                    }
+                }
+            } catch(e) { console.warn('[Index] Restaurant API fallback:', e.message); }
+        })();
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
 

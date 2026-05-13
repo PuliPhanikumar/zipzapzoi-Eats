@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html class="dark" lang="en">
 
 <head>
@@ -281,7 +281,7 @@
 
             <div class="border-t border-border-dark pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-text-secondary">
-                    <span>© 2025 ZoiEats. All rights reserved.</span>
+                    <span>ï¿½ 2025 ZoiEats. All rights reserved.</span>
                     <span class="hidden sm:inline-block text-border-dark">|</span>
                     <a class="hover:text-white transition-colors" href="terms&conditions.html">Terms & Conditions</a>
                     <a class="hover:text-white transition-colors" href="privacy policy.html">Privacy Policy</a>
@@ -322,12 +322,32 @@
         let dbRestaurants = [];
         let displayedCount = 6; // Show 6 initially
 
-        function loadRestaurants() {
-            // Use DB_RESTAURANTS directly (always up-to-date)
-            if (typeof DB_RESTAURANTS !== 'undefined') {
-                dbRestaurants = DB_RESTAURANTS;
-            } else if (typeof ZoiRestaurants !== 'undefined') {
-                dbRestaurants = ZoiRestaurants.getAll();
+        async function loadRestaurants() {
+            // API-first: fetch live restaurants, fallback to local DB
+            try {
+                const apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 3000);
+                const res = await fetch(apiBase + '/api/restaurants', { signal: ctrl.signal });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.length > 0) {
+                        dbRestaurants = data.map(r => ({
+                            id: r.id, name: r.name, image: r.image || 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400',
+                            rating: r.rating || 4.2, time: r.deliveryTime || '30 min',
+                            tags: r.tags || [], offer: r.offer || null, promoted: r.promoted || false,
+                            cuisine: (r.tags || []).join(', '), costForTwo: r.costForTwo || 'â‚¹300 for two'
+                        }));
+                    }
+                }
+            } catch (e) { console.warn('[Listing] API fallback:', e.message); }
+
+            // Fallback to local DB if API failed
+            if (dbRestaurants.length === 0) {
+                if (typeof DB_RESTAURANTS !== 'undefined') {
+                    dbRestaurants = DB_RESTAURANTS;
+                } else if (typeof ZoiRestaurants !== 'undefined') {
+                    dbRestaurants = ZoiRestaurants.getAll();
+                }
             }
 
             document.getElementById('rest-count').innerText = `${dbRestaurants.length} Restaurants near you`;
@@ -431,7 +451,7 @@
         }
 
         function toggleFilter(category, value, btn) {
-            // Toggle same category — deselect if already active
+            // Toggle same category ï¿½ deselect if already active
             if (activeFilters[category] === value) {
                 activeFilters[category] = null;
                 btn.classList.remove('border-primary', 'text-primary', 'bg-primary/10');

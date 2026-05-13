@@ -477,7 +477,33 @@
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
 
-    <script src="js/zoi_mobile.js"></script>
+    <script src="js/zoi_mobile.js">
+        // === API-FIRST: load active subscription from backend ===
+        (async () => {
+            try {
+                const apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+                const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 3000);
+                const res = await fetch(apiBase + '/api/subscriptions', {
+                    headers: { 'Authorization': 'Bearer ' + token }, signal: ctrl.signal
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    const active = data.find ? data.find(s => s.status === 'Active') : null;
+                    if (active) {
+                        const planEl = document.getElementById('current-plan-name');
+                        const statusEl = document.getElementById('current-plan-status');
+                        const renewEl = document.getElementById('current-plan-renew');
+                        if (planEl) planEl.textContent = active.plan;
+                        if (statusEl) { statusEl.textContent = active.status; statusEl.classList.add('text-green-400'); }
+                        if (renewEl && active.endDate) renewEl.textContent = 'Renews ' + new Date(active.endDate).toLocaleDateString('en-IN');
+                        // Store in localStorage for offline
+                        localStorage.setItem('zoiPendingSub', JSON.stringify({ plan: active.plan, price: active.price, ts: Date.now(), status: 'Active' }));
+                        console.log('[Subscription] Active plan loaded:', active.plan);
+                    }
+                }
+            } catch(e) { console.warn('[Subscription] API fallback:', e.message); }
+        })();</script>
 </body>
 
 </html>

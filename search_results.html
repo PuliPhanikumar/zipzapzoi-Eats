@@ -208,7 +208,8 @@
             
             try {
                 // Fetch from Global App Backend Search Engine
-                const response = await fetch(`${ZOI_CONFIG.API_BASE_URL}/search?q=${encodeURIComponent(query)}`);
+                const _sc = new AbortController(); setTimeout(() => _sc.abort(), 3000);
+                const response = await fetch(`${ZOI_CONFIG.API_BASE_URL}/api/search?q=${encodeURIComponent(query)}`);
                 if (!response.ok) throw new Error('API down');
                 
                 const data = await response.json();
@@ -360,7 +361,14 @@
         }
         
         function fallbackLocalSearch(query) {
-            // Very naive local fallback using db_simulation menus
+            // Try DB_RESTAURANTS first (db_simulation), then localStorage
+            let allRest = [];
+            if (typeof DB_RESTAURANTS !== 'undefined') allRest = DB_RESTAURANTS;
+            else if (typeof ZoiRestaurants !== 'undefined') allRest = ZoiRestaurants.getAll();
+            else allRest = JSON.parse(localStorage.getItem('zoiRest') || '[]');
+            const q = query.toLowerCase();
+            const matched = allRest.filter(r => (r.name||'').toLowerCase().includes(q) || (r.tags||[]).some(t => t.toLowerCase().includes(q)));
+            if (matched.length > 0) { renderRestaurants(matched); document.getElementById('results-container').classList.remove('hidden'); document.getElementById('error-state').classList.add('hidden'); return; }            // Very naive local fallback using db_simulation menus
             document.getElementById('error-state').classList.add('hidden');
             const q = query.toLowerCase();
             const restaurants = (JSON.parse(localStorage.getItem('zoiRest')) || []).filter(r => r.name.toLowerCase().includes(q));

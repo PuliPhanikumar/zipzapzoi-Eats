@@ -770,6 +770,23 @@
             return;
         }
         const activeSession = ZoiCustomer.getSession() || { name: 'Guest', email: '', phone: '' };
+
+            // API-FIRST: overlay live profile data
+            (async () => {
+                try {
+                    const _apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                    const _token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
+                    const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                    const _res = await fetch(_apiBase + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + _token }, signal: _ctrl.signal });
+                    if (_res.ok) {
+                        const _me = await _res.json();
+                        ['profile-name','profile-display-name'].forEach(id => { const el = document.getElementById(id); if (el && _me.name) el.textContent = _me.name; });
+                        const _zipEl = document.getElementById('zip-points-display');
+                        if (_zipEl && _me.zipPoints !== undefined) _zipEl.textContent = _me.zipPoints.toLocaleString() + ' ZipPoints';
+                        console.log('[Profile] Live data:', _me.name, '|', _me.zipPoints, 'ZipPoints');
+                    }
+                } catch(e) { console.warn('[Profile] API fallback:', e.message); }
+            })();
         // DOM Elements
         const welcomeName = document.getElementById('welcome-name');
         const sidebarName = document.getElementById('sidebar-name');

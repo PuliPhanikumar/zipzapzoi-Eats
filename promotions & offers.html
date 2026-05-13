@@ -811,7 +811,28 @@
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
 
-    <script src="js/zoi_mobile.js"></script>
+    <script src="js/zoi_mobile.js">
+        // === API-FIRST: load live promotions ===
+        (async () => {
+            try {
+                const apiBase = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 3000);
+                const res = await fetch(apiBase + '/api/promotions', { signal: ctrl.signal });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.length > 0) {
+                        // Update promo codes in the UI if elements exist
+                        data.filter(p => p.status === 'Active').forEach((promo, idx) => {
+                            const codeEl = document.querySelectorAll('[data-promo-code]')[idx];
+                            if (codeEl) codeEl.textContent = promo.code;
+                            const discEl = document.querySelectorAll('[data-promo-discount]')[idx];
+                            if (discEl) discEl.textContent = promo.type === 'percentage' ? promo.value + '% OFF' : 'Flat ₹' + promo.value + ' OFF';
+                        });
+                        console.log('[Promos] Loaded', data.length, 'promotions from API');
+                    }
+                }
+            } catch(e) { console.warn('[Promos] API fallback:', e.message); }
+        })();</script>
 </body>
 
 </html>
