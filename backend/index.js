@@ -96,17 +96,42 @@ function paginate(query) {
 io.on('connection', (socket) => {
     console.log('📡 Client connected:', socket.id);
 
+    // Join a named room (restaurant_1, rider_R01, order_ORD-1001)
     socket.on('join_room', (room) => {
         socket.join(room);
         console.log(`Socket ${socket.id} joined room: ${room}`);
     });
 
+    // Leave a room
+    socket.on('leave_room', (room) => {
+        socket.leave(room);
+        console.log(`Socket ${socket.id} left room: ${room}`);
+    });
+
+    // Rider location broadcast — relayed to order's customer tracking page
+    socket.on('rider_location', (data) => {
+        // data: { riderId, orderId, lat, lng }
+        if (data.orderId) {
+            io.to(`order_${data.orderId}`).emit('rider_location', data);
+        }
+        if (data.riderId) {
+            io.to(`rider_${data.riderId}`).emit('rider_location', data);
+        }
+    });
+
+    // Chat messages (admin / support)
     socket.on('chat_message', (msg) => {
         io.emit('chat_message', { ...msg, timestamp: new Date() });
     });
 
+    // Ping/pong heartbeat for connection health
+    socket.on('ping_zoi', () => {
+        socket.emit('pong_zoi', { ts: Date.now() });
+    });
+
     socket.on('disconnect', () => console.log('Client disconnected:', socket.id));
 });
+
 
 // ─── RAZORPAY INIT ──────────────────────────────────────
 let razorpay = null;

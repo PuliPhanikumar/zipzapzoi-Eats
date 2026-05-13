@@ -516,7 +516,16 @@
         // --- INIT ---
         window.onload = () => {
             renderBoard();
-            setInterval(renderBoard, 4000);
+            // WebSocket-first, polling fallback
+            const _skdsRestId = localStorage.getItem('zoiPartnerRestId') || '101';
+            if (typeof ZoiSocket !== 'undefined') {
+                ZoiSocket.joinRoom('restaurant_' + _skdsRestId);
+                ZoiSocket.on('new_order', () => { renderBoard(); playBuzzer(); });
+                ZoiSocket.on('order_status_update', () => renderBoard());
+                ZoiSocket.withFallback('new_order', renderBoard, 4000);
+            } else {
+                setInterval(renderBoard, 4000);
+            }
             setInterval(updateTimers, 60000);
 
             const REST_ID = localStorage.getItem('zoiPartnerRestId') || "101";
@@ -1021,6 +1030,7 @@ function startAutoAcceptTimer() {
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
 
+    <script src="js/zoi_socket.js"></script>
     <script src="js/zoi_mobile.js"></script>
 </body>
 

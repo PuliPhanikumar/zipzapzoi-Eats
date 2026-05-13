@@ -750,7 +750,24 @@
 
         // 4. ORDER LOGIC
         // Poll for 'PENDING' orders
-        setInterval(checkForOrders, 5000);
+            // WebSocket-first: listen for new order assignments
+            if (typeof ZoiSocket !== 'undefined') {
+                ZoiSocket.joinRoom('rider_' + (localStorage.getItem('zoiRiderId') || 'R0'));
+                ZoiSocket.on('new_order', (order) => {
+                    console.log('[Rider] New order assignment via WebSocket:', order.zoiId || order.id);
+                    checkForOrders();
+                    if (typeof _riderBuzzer !== 'undefined') {
+                        _riderBuzzer.play().catch(e => {});
+                    }
+                });
+                ZoiSocket.on('order_status_update', (order) => {
+                    console.log('[Rider] Order status updated:', order.status);
+                    checkForOrders();
+                });
+                ZoiSocket.withFallback('new_order', checkForOrders, 5000);
+            } else {
+                setInterval(checkForOrders, 5000);
+            }
 
         async function checkForOrders() {
             if (!document.getElementById('online-toggle').checked) return;
@@ -1291,6 +1308,7 @@
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
 
+    <script src="js/zoi_socket.js"></script>
     <script src="js/zoi_mobile.js"></script>
 </body>
 

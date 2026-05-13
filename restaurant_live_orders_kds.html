@@ -516,10 +516,19 @@
         // --- INIT ---
         window.onload = () => {
             renderBoard();
-            setInterval(renderBoard, 4000);
+            // WebSocket-first, polling fallback for KDS board
+            const _kdsRestId = localStorage.getItem('zoiPartnerRestId') || '101';
+            if (typeof ZoiSocket !== 'undefined') {
+                ZoiSocket.joinRoom('restaurant_' + _kdsRestId);
+                ZoiSocket.on('new_order', () => { renderBoard(); playBuzzer(); });
+                ZoiSocket.on('order_status_update', () => renderBoard());
+                ZoiSocket.withFallback('new_order', renderBoard, 4000);
+            } else {
+                setInterval(renderBoard, 4000);
+            }
             setInterval(updateTimers, 60000);
 
-            const REST_ID = localStorage.getItem('zoiPartnerRestId') || "101";
+            const REST_ID = localStorage.getItem('zoiPartnerRestId') || '101';
             ZoiRestaurantSync.listen((e) => {
                 if (e.restId === REST_ID && (e.type === 'KDS_UPDATED' || e.type === 'HISTORY_UPDATED')) {
                     // Check if anything was marked "Picked Up" externally so we can clear our local buzzer
@@ -566,7 +575,7 @@
 
         async function renderBoard() {
             let liveOrders = [];
-            const REST_ID = localStorage.getItem('zoiPartnerRestId') || "101";
+            const REST_ID = localStorage.getItem('zoiPartnerRestId') || '101';
             const token = localStorage.getItem('zoiAuthToken') || localStorage.getItem('zoiToken') || '';
             const base = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
 
@@ -1029,6 +1038,7 @@ function startAutoAcceptTimer() {
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
 
+    <script src="js/zoi_socket.js"></script>
     <script src="js/zoi_mobile.js"></script>
 </body>
 

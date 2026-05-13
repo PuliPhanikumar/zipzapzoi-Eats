@@ -708,7 +708,18 @@
             initTracking(activeOrder);
             initMap();
             startLiveCounter();
-            setInterval(pollOrderStatus, 3000);
+            // WebSocket-first: live order status updates
+            if (typeof ZoiSocket !== 'undefined') {
+                const _trackOrderId = new URLSearchParams(window.location.search).get('orderId');
+                if (_trackOrderId) ZoiSocket.joinRoom('order_' + _trackOrderId);
+                ZoiSocket.on('order_status_update', (order) => {
+                    console.log('[Tracking] Status via WebSocket:', order.status);
+                    pollOrderStatus();
+                });
+                ZoiSocket.withFallback('order_status_update', pollOrderStatus, 8000);
+            } else {
+                setInterval(pollOrderStatus, 3000);
+            }
         };
 
         // 2. REAL MAP (LEAFLET + ESRI SATELLITE)
@@ -1331,7 +1342,7 @@
                 initTracking(order);
 
                 // Start Polling (every 3s)
-                setInterval(pollOrderStatus, 3000);
+            // poll removed - using WebSocket above
 
                 // Start other simulations
                 if (typeof startLiveCounter === 'function') startLiveCounter();
@@ -1357,6 +1368,7 @@
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
 
+    <script src="js/zoi_socket.js"></script>
     <script src="js/zoi_mobile.js"></script>
 </body>
 

@@ -512,8 +512,28 @@
             ]);
             showLoadingShimmer(false);
 
-            setInterval(fetchActiveOrders, 8000);
-            setInterval(fetchTables, 12000);
+            // WebSocket-first: listen for new orders in real-time
+            if (typeof ZoiSocket !== 'undefined') {
+                ZoiSocket.joinRoom('restaurant_' + PARTNER_ID);
+                ZoiSocket.on('new_order', (order) => {
+                    console.log('[POS] New order via WebSocket:', order.zoiId || order.id);
+                    fetchActiveOrders();
+                    if (typeof posBuzzer !== 'undefined') {
+                        posBuzzer.play().catch(e => {});
+                    }
+                });
+                ZoiSocket.on('order_status_update', () => fetchActiveOrders());
+                ZoiSocket.withFallback('new_order', fetchActiveOrders, 8000);
+            } else {
+                setInterval(fetchActiveOrders, 8000);
+            }
+            // WebSocket: sync table status changes
+            if (typeof ZoiSocket !== 'undefined') {
+                ZoiSocket.on('table_update', () => fetchTables());
+                ZoiSocket.withFallback('table_update', fetchTables, 12000);
+            } else {
+                setInterval(fetchTables, 12000);
+            }
 
             const urlParams = new URLSearchParams(window.location.search);
             const loadTable = urlParams.get('table');
@@ -1161,6 +1181,7 @@
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
 
+    <script src="js/zoi_socket.js"></script>
     <script src="js/zoi_mobile.js"></script>
 </body>
 

@@ -505,12 +505,24 @@
         window.onload = () => {
             fetchTables();
             renderZones();
-            setInterval(fetchTables, 10000); // Live Sync
+            // WebSocket-first: live table status sync
+            if (typeof ZoiSocket !== 'undefined') {
+                const _tmRestId = localStorage.getItem('zoiPartnerRestId') || '1';
+                ZoiSocket.joinRoom('restaurant_' + _tmRestId);
+                ZoiSocket.on('table_update', (table) => {
+                    console.log('[Tables] Update via WebSocket:', table.tableNumber, table.status);
+                    fetchTables();
+                });
+                ZoiSocket.withFallback('table_update', fetchTables, 10000);
+            } else {
+                setInterval(fetchTables, 10000);
+            }
         };
     </script>
 <script src="js/zoi_theme.js"></script>
     <script src="js/zoi_pwa.js"></script>
 
+    <script src="js/zoi_socket.js"></script>
     <script src="js/zoi_mobile.js"></script>
 </body>
 
