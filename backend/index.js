@@ -1128,6 +1128,19 @@ app.put('/api/feedback/:id', verifyToken, requireRole('Super Admin', 'admin'), a
 // ════════════════════════════════════════════════════════
 // REVIEWS API
 // ════════════════════════════════════════════════════════
+// /api/reviews/all?restaurantId=X — must be BEFORE :restaurantId
+app.get('/api/reviews/all', async (req, res, next) => {
+    try {
+        const where = {};
+        if (req.query.restaurantId) where.restaurantId = parseInt(req.query.restaurantId);
+        const reviews = await prisma.review.findMany({
+            where,
+            orderBy: { createdAt: 'desc' }, take: 100
+        });
+        res.json(reviews);
+    } catch (error) { next(error); }
+});
+
 app.get('/api/reviews/:restaurantId', async (req, res, next) => {
     try {
         const reviews = await prisma.review.findMany({
@@ -1347,7 +1360,15 @@ app.get('/api/restaurant-applications', verifyToken, requireRole('Super Admin', 
 app.post('/api/restaurant-applications', async (req, res, next) => {
     try {
         const appId = 'REQ-' + Math.floor(10000 + Math.random() * 90000);
-        const app = await prisma.restaurantApplication.create({ data: { appId, ...req.body } });
+        const name = req.body.name || req.body.restaurantName || 'Unknown';
+        const ownerName = req.body.ownerName || null;
+        const phone = req.body.phone || null;
+        const zone = req.body.city || req.body.zone || null;
+        const category = req.body.cuisine || req.body.category || null;
+
+        const app = await prisma.restaurantApplication.create({ 
+            data: { appId, name, ownerName, phone, zone, category } 
+        });
         res.status(201).json({ message: 'Application submitted!', application: app });
     } catch (error) { next(error); }
 });
@@ -2412,15 +2433,7 @@ function generateLocalResponse(message, context) {
 // ERROR HANDLERS (must be after all routes)
 // ════════════════════════════════════════════════════════
 
-// API 404 handler
-app.all('/api/{*path}', (req, res) => {
-    res.status(404).json({ error: 'API endpoint not found', path: req.path });
-});
-
-// Frontend catch-all: serve index.html for any unmatched routes (deep-linking support)
-app.get('{*path}', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'index.html'));
-});
+// NOTE: API 404 handler and frontend catch-all are now at BOTTOM of file (after hostel routes)
 
 // ═══════════════════════════════════════════════════════════
 // HOSTEL MANAGEMENT SYSTEM — COMPLETE API (Phase 19)
@@ -2881,6 +2894,20 @@ app.use((err, req, res, next) => {
         error: message,
         ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
     });
+});
+
+// ════════════════════════════════════════════════════════
+// FINAL ROUTE HANDLERS (must be LAST, after all API routes)
+// ════════════════════════════════════════════════════════
+
+// API 404 handler
+app.all('/api/{*path}', (req, res) => {
+    res.status(404).json({ error: 'API endpoint not found', path: req.path });
+});
+
+// Frontend catch-all: serve index.html for any unmatched routes (deep-linking support)
+app.get('{*path}', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 // ════════════════════════════════════════════════════════
