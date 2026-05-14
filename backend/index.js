@@ -2422,6 +2422,452 @@ app.get('{*path}', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
+// ═══════════════════════════════════════════════════════════
+// HOSTEL MANAGEMENT SYSTEM — COMPLETE API (Phase 19)
+// ═══════════════════════════════════════════════════════════
+
+const hostelAuth = (req, res, next) => { next(); }; // reuse auth middleware or open for hostel staff
+
+// Helper: get hostelId from session or query
+const getHostelId = (req) => parseInt(req.params.hostelId || req.query.hostelId || req.headers['x-hostel-id'] || '1');
+
+// ── HOSTELS ────────────────────────────────────────────────
+app.get('/api/hostels', async (req, res) => {
+    try {
+        const hostels = await prisma.hostel.findMany({ orderBy: { createdAt: 'desc' } });
+        res.json(hostels);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels', async (req, res) => {
+    try {
+        const hostel = await prisma.hostel.create({ data: req.body });
+        res.json(hostel);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/hostels/:id', async (req, res) => {
+    try {
+        const hostel = await prisma.hostel.findUnique({
+            where: { id: parseInt(req.params.id) },
+            include: { rooms: true, _count: { select: { hostelers: true, billing: true } } }
+        });
+        res.json(hostel || {});
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:id', async (req, res) => {
+    try {
+        const hostel = await prisma.hostel.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(hostel);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── ROOMS ──────────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/rooms', async (req, res) => {
+    try {
+        const rooms = await prisma.hostelRoom.findMany({
+            where: { hostelId: getHostelId(req) },
+            include: { _count: { select: { hostelers: true } } },
+            orderBy: { roomNumber: 'asc' }
+        });
+        res.json(rooms);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/rooms', async (req, res) => {
+    try {
+        const room = await prisma.hostelRoom.create({ data: { ...req.body, hostelId: getHostelId(req) } });
+        res.json(room);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/rooms/:id', async (req, res) => {
+    try {
+        const room = await prisma.hostelRoom.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(room);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/hostels/:hostelId/rooms/:id', async (req, res) => {
+    try {
+        await prisma.hostelRoom.delete({ where: { id: parseInt(req.params.id) } });
+        res.json({ success: true });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── HOSTELERS ──────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/hostelers', async (req, res) => {
+    try {
+        const { status, search } = req.query;
+        const where = { hostelId: getHostelId(req) };
+        if (status) where.status = status;
+        if (search) where.name = { contains: search, mode: 'insensitive' };
+        const hostelers = await prisma.hosteler.findMany({
+            where, include: { room: true }, orderBy: { createdAt: 'desc' }
+        });
+        res.json(hostelers);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/hostelers', async (req, res) => {
+    try {
+        const hosteler = await prisma.hosteler.create({ data: { ...req.body, hostelId: getHostelId(req) } });
+        // Update room occupancy
+        if (req.body.roomId) {
+            await prisma.hostelRoom.update({
+                where: { id: req.body.roomId },
+                data: { occupied: { increment: 1 }, status: 'Occupied' }
+            });
+        }
+        res.json(hosteler);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/hostelers/:id', async (req, res) => {
+    try {
+        const hosteler = await prisma.hosteler.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(hosteler);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/hostels/:hostelId/hostelers/:id', async (req, res) => {
+    try {
+        const h = await prisma.hosteler.findUnique({ where: { id: parseInt(req.params.id) } });
+        if (h?.roomId) await prisma.hostelRoom.update({ where: { id: h.roomId }, data: { occupied: { decrement: 1 } } });
+        await prisma.hosteler.delete({ where: { id: parseInt(req.params.id) } });
+        res.json({ success: true });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── BILLING ────────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/billing', async (req, res) => {
+    try {
+        const { status, month } = req.query;
+        const where = { hostelId: getHostelId(req) };
+        if (status) where.status = status;
+        if (month) where.month = month;
+        const bills = await prisma.hostelBilling.findMany({
+            where, include: { hosteler: true }, orderBy: { createdAt: 'desc' }
+        });
+        res.json(bills);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/billing', async (req, res) => {
+    try {
+        const data = { ...req.body, hostelId: getHostelId(req) };
+        data.totalAmount = (data.rentAmount||0)+(data.messAmount||0)+(data.laundryAmt||0)+(data.otherCharges||0)-(data.discount||0);
+        data.dueAmount = data.totalAmount - (data.paidAmount||0);
+        data.status = data.dueAmount <= 0 ? 'Paid' : (data.paidAmount > 0 ? 'Partial' : 'Pending');
+        const bill = await prisma.hostelBilling.create({ data });
+        res.json(bill);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/billing/:id', async (req, res) => {
+    try {
+        const data = req.body;
+        if (data.paidAmount !== undefined || data.totalAmount !== undefined) {
+            const existing = await prisma.hostelBilling.findUnique({ where: { id: parseInt(req.params.id) } });
+            const total = data.totalAmount ?? existing.totalAmount;
+            const paid = data.paidAmount ?? existing.paidAmount;
+            data.dueAmount = total - paid;
+            data.status = data.dueAmount <= 0 ? 'Paid' : (paid > 0 ? 'Partial' : 'Pending');
+            if (data.status === 'Paid') data.paidDate = new Date();
+        }
+        const bill = await prisma.hostelBilling.update({ where: { id: parseInt(req.params.id) }, data });
+        res.json(bill);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── MESS ───────────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/mess', async (req, res) => {
+    try {
+        const { date, status } = req.query;
+        const where = { hostelId: getHostelId(req) };
+        if (status) where.status = status;
+        if (date) { const d = new Date(date); where.date = { gte: d, lt: new Date(d.getTime()+86400000) }; }
+        const orders = await prisma.hostelMessOrder.findMany({ where, include: { hosteler: true }, orderBy: { createdAt: 'desc' } });
+        res.json(orders);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/mess', async (req, res) => {
+    try {
+        const order = await prisma.hostelMessOrder.create({ data: { ...req.body, hostelId: getHostelId(req) } });
+        res.json(order);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/mess/:id', async (req, res) => {
+    try {
+        const order = await prisma.hostelMessOrder.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(order);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── GATE PASSES ────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/gatepasses', async (req, res) => {
+    try {
+        const { status } = req.query;
+        const where = { hostelId: getHostelId(req) };
+        if (status) where.status = status;
+        const passes = await prisma.hostelGatePass.findMany({ where, include: { hosteler: true }, orderBy: { createdAt: 'desc' } });
+        res.json(passes);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/gatepasses', async (req, res) => {
+    try {
+        const pass = await prisma.hostelGatePass.create({ data: { ...req.body, hostelId: getHostelId(req) } });
+        res.json(pass);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/gatepasses/:id', async (req, res) => {
+    try {
+        const pass = await prisma.hostelGatePass.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(pass);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── COMPLAINTS ─────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/complaints', async (req, res) => {
+    try {
+        const { status, priority } = req.query;
+        const where = { hostelId: getHostelId(req) };
+        if (status) where.status = status;
+        if (priority) where.priority = priority;
+        const items = await prisma.hostelComplaint.findMany({ where, include: { hosteler: true }, orderBy: { createdAt: 'desc' } });
+        res.json(items);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/complaints', async (req, res) => {
+    try {
+        const item = await prisma.hostelComplaint.create({ data: { ...req.body, hostelId: getHostelId(req) } });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/complaints/:id', async (req, res) => {
+    try {
+        if (req.body.status === 'Resolved') req.body.resolvedAt = new Date();
+        const item = await prisma.hostelComplaint.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── MAINTENANCE ────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/maintenance', async (req, res) => {
+    try {
+        const { status } = req.query;
+        const where = { hostelId: getHostelId(req) };
+        if (status) where.status = status;
+        const items = await prisma.hostelMaintenance.findMany({ where, orderBy: { createdAt: 'desc' } });
+        res.json(items);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/maintenance', async (req, res) => {
+    try {
+        const item = await prisma.hostelMaintenance.create({ data: { ...req.body, hostelId: getHostelId(req) } });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/maintenance/:id', async (req, res) => {
+    try {
+        if (req.body.status === 'Completed') req.body.completedAt = new Date();
+        const item = await prisma.hostelMaintenance.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── EXPENSES ───────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/expenses', async (req, res) => {
+    try {
+        const { category } = req.query;
+        const where = { hostelId: getHostelId(req) };
+        if (category) where.category = category;
+        const items = await prisma.hostelExpense.findMany({ where, orderBy: { date: 'desc' } });
+        res.json(items);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/expenses', async (req, res) => {
+    try {
+        const item = await prisma.hostelExpense.create({ data: { ...req.body, hostelId: getHostelId(req) } });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/expenses/:id', async (req, res) => {
+    try {
+        const item = await prisma.hostelExpense.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/hostels/:hostelId/expenses/:id', async (req, res) => {
+    try {
+        await prisma.hostelExpense.delete({ where: { id: parseInt(req.params.id) } });
+        res.json({ success: true });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── STAFF ──────────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/staff', async (req, res) => {
+    try {
+        const items = await prisma.hostelStaff.findMany({ where: { hostelId: getHostelId(req) }, orderBy: { name: 'asc' } });
+        res.json(items);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/staff', async (req, res) => {
+    try {
+        const item = await prisma.hostelStaff.create({ data: { ...req.body, hostelId: getHostelId(req) } });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/staff/:id', async (req, res) => {
+    try {
+        const item = await prisma.hostelStaff.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── NOTICES ────────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/notices', async (req, res) => {
+    try {
+        const items = await prisma.hostelNotice.findMany({ where: { hostelId: getHostelId(req) }, orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }] });
+        res.json(items);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/notices', async (req, res) => {
+    try {
+        const item = await prisma.hostelNotice.create({ data: { ...req.body, hostelId: getHostelId(req) } });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/notices/:id', async (req, res) => {
+    try {
+        const item = await prisma.hostelNotice.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.delete('/api/hostels/:hostelId/notices/:id', async (req, res) => {
+    try {
+        await prisma.hostelNotice.delete({ where: { id: parseInt(req.params.id) } });
+        res.json({ success: true });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── VISITORS ───────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/visitors', async (req, res) => {
+    try {
+        const { status } = req.query;
+        const where = { hostelId: getHostelId(req) };
+        if (status) where.status = status;
+        const items = await prisma.hostelVisitor.findMany({ where, orderBy: { inTime: 'desc' } });
+        res.json(items);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/visitors', async (req, res) => {
+    try {
+        const item = await prisma.hostelVisitor.create({ data: { ...req.body, hostelId: getHostelId(req) } });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/visitors/:id', async (req, res) => {
+    try {
+        if (req.body.status === 'Out') req.body.outTime = new Date();
+        const item = await prisma.hostelVisitor.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── LAUNDRY ────────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/laundry', async (req, res) => {
+    try {
+        const { status } = req.query;
+        const where = { hostelId: getHostelId(req) };
+        if (status) where.status = status;
+        const items = await prisma.hostelLaundry.findMany({ where, include: { hosteler: true }, orderBy: { createdAt: 'desc' } });
+        res.json(items);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/hostels/:hostelId/laundry', async (req, res) => {
+    try {
+        const item = await prisma.hostelLaundry.create({ data: { ...req.body, hostelId: getHostelId(req) } });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/hostels/:hostelId/laundry/:id', async (req, res) => {
+    try {
+        if (req.body.status === 'Delivered') req.body.deliverDate = new Date();
+        const item = await prisma.hostelLaundry.update({ where: { id: parseInt(req.params.id) }, data: req.body });
+        res.json(item);
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── ANALYTICS ─────────────────────────────────────────────
+app.get('/api/hostels/:hostelId/analytics', async (req, res) => {
+    try {
+        const hId = getHostelId(req);
+        const [totalRooms, occupiedRooms, totalHostelers, pendingBills, pendingComplaints, pendingMaintenance, monthExpenses] = await Promise.all([
+            prisma.hostelRoom.count({ where: { hostelId: hId } }),
+            prisma.hostelRoom.count({ where: { hostelId: hId, status: 'Occupied' } }),
+            prisma.hosteler.count({ where: { hostelId: hId, status: 'Active' } }),
+            prisma.hostelBilling.aggregate({ where: { hostelId: hId, status: { in: ['Pending','Partial'] } }, _sum: { dueAmount: true }, _count: true }),
+            prisma.hostelComplaint.count({ where: { hostelId: hId, status: { in: ['Open','InProgress'] } } }),
+            prisma.hostelMaintenance.count({ where: { hostelId: hId, status: { in: ['Pending','InProgress'] } } }),
+            prisma.hostelExpense.aggregate({ where: { hostelId: hId, date: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) } }, _sum: { amount: true } })
+        ]);
+        res.json({
+            totalRooms, occupiedRooms, availableRooms: totalRooms - occupiedRooms,
+            occupancyRate: totalRooms > 0 ? Math.round((occupiedRooms/totalRooms)*100) : 0,
+            totalHostelers,
+            pendingDues: pendingBills._sum.dueAmount || 0,
+            pendingBillsCount: pendingBills._count,
+            pendingComplaints, pendingMaintenance,
+            monthExpenses: monthExpenses._sum.amount || 0
+        });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── REGISTRATION (hostelER self-registration) ──────────────
+app.post('/api/hostels/register', async (req, res) => {
+    try {
+        const { hostelId, name, email, phone, parentPhone, idType, idNumber, plan, address } = req.body;
+        const hosteler = await prisma.hosteler.create({
+            data: { hostelId: parseInt(hostelId)||1, name, email, phone, parentPhone, idType, idNumber, plan, address, status: 'Active' }
+        });
+        res.json({ success: true, hosteler, message: 'Registration submitted! Admin will allocate your room shortly.' });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── ALLOCATION (assign room) ───────────────────────────────
+app.post('/api/hostels/:hostelId/allocate', async (req, res) => {
+    try {
+        const { hostelerId, roomId } = req.body;
+        const [hosteler] = await Promise.all([
+            prisma.hosteler.update({ where: { id: parseInt(hostelerId) }, data: { roomId: parseInt(roomId) } }),
+            prisma.hostelRoom.update({ where: { id: parseInt(roomId) }, data: { occupied: { increment: 1 }, status: 'Occupied' } })
+        ]);
+        res.json({ success: true, hosteler });
+    } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
 // Global error handler
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;

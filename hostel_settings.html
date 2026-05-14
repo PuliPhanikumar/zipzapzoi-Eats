@@ -599,7 +599,18 @@
 
     <script src="js/zoi_ai_assistant.js?v=4"></script>
 
-<script src="js/zoi_theme.js?v=5"></script>
+<script src="js/zoi_theme.js?v=5">
+        const _H = { BASE: (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '', ID: () => localStorage.getItem('zoiHostelId') || '1', TK: () => localStorage.getItem('zoiHostelToken') || localStorage.getItem('zoiAuthToken') || '', get: async (path, t=3000) => { try { const c=new AbortController(); setTimeout(()=>c.abort(),t); const r=await fetch(_H.BASE+path,{headers:{'Authorization':'Bearer '+_H.TK(),'x-hostel-id':_H.ID()},signal:c.signal}); return r.ok?await r.json():null; } catch(e){return null;} }, post: async (path, body) => { try { const r=await fetch(_H.BASE+path,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+_H.TK(),'x-hostel-id':_H.ID()},body:JSON.stringify(body)}); return r.ok?await r.json():null; } catch(e){return null;} } };
+        (async () => {
+            const _d = await _H.get('/api/hostels/' + _H.ID());
+            if (_d) {
+                const nameEl=document.getElementById('hostel-name'); if(nameEl)nameEl.value=_d.name||'';
+                const addrEl=document.getElementById('hostel-address'); if(addrEl)addrEl.value=_d.address||'';
+                const phoneEl=document.getElementById('hostel-phone'); if(phoneEl)phoneEl.value=_d.phone||'';
+                const emailEl=document.getElementById('hostel-email'); if(emailEl)emailEl.value=_d.email||'';
+                console.log('[Settings] Hostel data loaded from API');
+            }
+        })();</script>
 
 </html>
 

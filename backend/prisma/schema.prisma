@@ -515,3 +515,282 @@ model ReferralReward {
   @@index([referrerId])
   @@index([status])
 }
+
+// ═══════════════════════════════════════════════
+// HOSTEL MANAGEMENT SYSTEM
+// ═══════════════════════════════════════════════
+
+model Hostel {
+  id          Int      @id @default(autoincrement())
+  zoiId       String   @unique @default(cuid())
+  name        String
+  address     String?
+  city        String?
+  phone       String?
+  email       String?
+  type        String   @default("Mixed")  // Boys, Girls, Mixed
+  totalRooms  Int      @default(0)
+  status      String   @default("Active") // Active, Inactive
+  ownerId     Int?
+  settings    Json?    // { messEnabled, laundryEnabled, gatepassEnabled }
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rooms        HostelRoom[]
+  hostelers    Hosteler[]
+  billing      HostelBilling[]
+  messOrders   HostelMessOrder[]
+  gatePasses   HostelGatePass[]
+  complaints   HostelComplaint[]
+  maintenance  HostelMaintenance[]
+  expenses     HostelExpense[]
+  staff        HostelStaff[]
+  notices      HostelNotice[]
+  visitors     HostelVisitor[]
+  laundry      HostelLaundry[]
+
+  @@index([status])
+}
+
+model HostelRoom {
+  id          Int      @id @default(autoincrement())
+  zoiId       String   @unique @default(cuid())
+  hostelId    Int
+  hostel      Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  roomNumber  String
+  floor       Int      @default(1)
+  type        String   @default("Double") // Single, Double, Triple, Dormitory
+  capacity    Int      @default(2)
+  occupied    Int      @default(0)
+  status      String   @default("Available") // Available, Occupied, Maintenance, Reserved
+  rent        Float    @default(0)
+  amenities   Json?    // ["AC", "WiFi", "Attached Bathroom"]
+  createdAt   DateTime @default(now())
+
+  hostelers   Hosteler[]
+
+  @@unique([hostelId, roomNumber])
+  @@index([hostelId, status])
+}
+
+model Hosteler {
+  id           Int      @id @default(autoincrement())
+  zoiId        String   @unique @default(cuid())
+  hostelId     Int
+  hostel       Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  roomId       Int?
+  room         HostelRoom? @relation(fields: [roomId], references: [id])
+  name         String
+  email        String?
+  phone        String
+  parentPhone  String?
+  idType       String   @default("Aadhar") // Aadhar, PAN, Passport
+  idNumber     String?
+  joinDate     DateTime @default(now())
+  leaveDate    DateTime?
+  status       String   @default("Active") // Active, Inactive, Checked-Out
+  plan         String   @default("Monthly") // Monthly, Quarterly, Yearly
+  photoUrl     String?
+  address      String?
+  createdAt    DateTime @default(now())
+
+  billing     HostelBilling[]
+  gatePasses  HostelGatePass[]
+  complaints  HostelComplaint[]
+  messOrders  HostelMessOrder[]
+  laundry     HostelLaundry[]
+
+  @@index([hostelId, status])
+}
+
+model HostelBilling {
+  id           Int      @id @default(autoincrement())
+  zoiId        String   @unique @default(cuid())
+  hostelId     Int
+  hostel       Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  hostelerId   Int
+  hosteler     Hosteler @relation(fields: [hostelerId], references: [id], onDelete: Cascade)
+  month        String   // "2025-01"
+  rentAmount   Float    @default(0)
+  messAmount   Float    @default(0)
+  laundryAmt   Float    @default(0)
+  otherCharges Float    @default(0)
+  discount     Float    @default(0)
+  totalAmount  Float    @default(0)
+  paidAmount   Float    @default(0)
+  dueAmount    Float    @default(0)
+  status       String   @default("Pending") // Pending, Partial, Paid, Overdue
+  dueDate      DateTime?
+  paidDate     DateTime?
+  paymentMode  String?  // Cash, UPI, Bank
+  receiptNo    String?
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  @@index([hostelId, status])
+  @@index([hostelerId])
+}
+
+model HostelMessOrder {
+  id         Int      @id @default(autoincrement())
+  zoiId      String   @unique @default(cuid())
+  hostelId   Int
+  hostel     Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  hostelerId Int?
+  hosteler   Hosteler? @relation(fields: [hostelerId], references: [id])
+  mealType   String   @default("Lunch") // Breakfast, Lunch, Dinner, Snack
+  items      Json     // [{name, qty, price}]
+  totalAmount Float   @default(0)
+  status     String   @default("Pending") // Pending, Preparing, Served
+  date       DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([hostelId, date])
+}
+
+model HostelGatePass {
+  id           Int      @id @default(autoincrement())
+  zoiId        String   @unique @default(cuid())
+  hostelId     Int
+  hostel       Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  hostelerId   Int
+  hosteler     Hosteler @relation(fields: [hostelerId], references: [id], onDelete: Cascade)
+  purpose      String
+  destination  String?
+  outTime      DateTime?
+  expectedIn   DateTime?
+  actualIn     DateTime?
+  status       String   @default("Pending") // Pending, Approved, Returned, Denied
+  approvedBy   String?
+  createdAt    DateTime @default(now())
+
+  @@index([hostelId, status])
+  @@index([hostelerId])
+}
+
+model HostelComplaint {
+  id         Int      @id @default(autoincrement())
+  zoiId      String   @unique @default(cuid())
+  hostelId   Int
+  hostel     Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  hostelerId Int?
+  hosteler   Hosteler? @relation(fields: [hostelerId], references: [id])
+  category   String   @default("General") // Room, Mess, WiFi, Security, General
+  subject    String
+  message    String
+  priority   String   @default("Medium") // Low, Medium, High, Critical
+  status     String   @default("Open") // Open, InProgress, Resolved, Closed
+  response   String?
+  resolvedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([hostelId, status])
+}
+
+model HostelMaintenance {
+  id          Int      @id @default(autoincrement())
+  zoiId       String   @unique @default(cuid())
+  hostelId    Int
+  hostel      Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  roomId      Int?
+  category    String   @default("Electrical") // Electrical, Plumbing, Furniture, Cleaning
+  title       String
+  description String?
+  priority    String   @default("Medium")
+  status      String   @default("Pending") // Pending, InProgress, Completed
+  assignedTo  String?
+  cost        Float?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([hostelId, status])
+}
+
+model HostelExpense {
+  id         Int      @id @default(autoincrement())
+  zoiId      String   @unique @default(cuid())
+  hostelId   Int
+  hostel     Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  category   String   @default("Maintenance") // Maintenance, Utilities, Staff, Groceries, Other
+  title      String
+  amount     Float
+  paidTo     String?
+  paidBy     String?
+  paymentMode String? // Cash, UPI, Bank
+  receiptUrl  String?
+  date       DateTime @default(now())
+  notes      String?
+  createdAt  DateTime @default(now())
+
+  @@index([hostelId, date])
+}
+
+model HostelStaff {
+  id         Int      @id @default(autoincrement())
+  zoiId      String   @unique @default(cuid())
+  hostelId   Int
+  hostel     Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  name       String
+  role       String   @default("Caretaker") // Warden, Caretaker, Cook, Security, Cleaner
+  phone      String?
+  email      String?
+  salary     Float?
+  joinDate   DateTime @default(now())
+  status     String   @default("Active") // Active, Inactive
+  createdAt  DateTime @default(now())
+
+  @@index([hostelId, status])
+}
+
+model HostelNotice {
+  id         Int      @id @default(autoincrement())
+  zoiId      String   @unique @default(cuid())
+  hostelId   Int
+  hostel     Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  title      String
+  message    String
+  category   String   @default("General") // General, Rules, Events, Maintenance
+  pinned     Boolean  @default(false)
+  expiresAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([hostelId, createdAt])
+}
+
+model HostelVisitor {
+  id           Int      @id @default(autoincrement())
+  zoiId        String   @unique @default(cuid())
+  hostelId     Int
+  hostel       Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  visitorName  String
+  phone        String?
+  purpose      String?
+  toMeetId     Int?     // hostelerId they are visiting
+  inTime       DateTime @default(now())
+  outTime      DateTime?
+  idType       String?
+  idNumber     String?
+  status       String   @default("In")  // In, Out
+  createdAt    DateTime @default(now())
+
+  @@index([hostelId, createdAt])
+}
+
+model HostelLaundry {
+  id          Int      @id @default(autoincrement())
+  zoiId       String   @unique @default(cuid())
+  hostelId    Int
+  hostel      Hostel   @relation(fields: [hostelId], references: [id], onDelete: Cascade)
+  hostelerId  Int
+  hosteler    Hosteler @relation(fields: [hostelerId], references: [id], onDelete: Cascade)
+  items       Json     // [{type, qty}]
+  totalItems  Int      @default(0)
+  charges     Float    @default(0)
+  status      String   @default("Collected") // Collected, Washing, Ready, Delivered
+  pickupDate  DateTime @default(now())
+  deliverDate DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([hostelId, status])
+  @@index([hostelerId])
+}

@@ -257,7 +257,15 @@
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
 
-    <script src="js/zoi_mobile.js"></script>
+    <script src="js/zoi_mobile.js">
+        const _H = { BASE: (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '', ID: () => localStorage.getItem('zoiHostelId') || '1', TK: () => localStorage.getItem('zoiHostelToken') || localStorage.getItem('zoiAuthToken') || '', get: async (path, t=3000) => { try { const c=new AbortController(); setTimeout(()=>c.abort(),t); const r=await fetch(_H.BASE+path,{headers:{'Authorization':'Bearer '+_H.TK(),'x-hostel-id':_H.ID()},signal:c.signal}); return r.ok?await r.json():null; } catch(e){return null;} }, post: async (path, body) => { try { const r=await fetch(_H.BASE+path,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+_H.TK(),'x-hostel-id':_H.ID()},body:JSON.stringify(body)}); return r.ok?await r.json():null; } catch(e){return null;} } };
+        (async () => {
+            const [rooms, hostelers] = await Promise.all([ _H.get('/api/hostels/' + _H.ID() + '/rooms'), _H.get('/api/hostels/' + _H.ID() + '/hostelers?status=Active') ]);
+            if (rooms && rooms.length > 0) { if (typeof allRooms !== 'undefined') allRooms=rooms; else if (typeof ROOMS !== 'undefined') ROOMS=rooms; }
+            if (hostelers && hostelers.length > 0) { if (typeof allHostelers !== 'undefined') allHostelers=hostelers; else if (typeof HOSTELERS !== 'undefined') HOSTELERS=hostelers; }
+            if(typeof renderAllocation==='function')renderAllocation(); if(typeof renderAll==='function')renderAll();
+            console.log('[Allocation] Rooms:',rooms?.length,'Hostelers:',hostelers?.length);
+        })();</script>
 </body>
 
 </html>
