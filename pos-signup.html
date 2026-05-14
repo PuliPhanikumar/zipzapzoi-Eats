@@ -459,7 +459,31 @@
 
     <script>
         // Form Submission Simulation
-        function handleSignup(e) {
+        async function handleSignup(e) {
+            e.preventDefault();
+            // API-FIRST: register via backend
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _name = document.getElementById('name')?.value || '';
+                const _email = document.getElementById('email')?.value || '';
+                const _phone = document.getElementById('phone')?.value || '';
+                const _restName = document.getElementById('restaurant-name')?.value || document.getElementById('restaurantName')?.value || '';
+                const _pass = document.getElementById('password')?.value || document.getElementById('pass')?.value || 'ZoiPOS@123';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 5000);
+                const _res = await fetch(_ab + '/api/auth/register', {
+                    method: 'POST', signal: _ctrl.signal,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: _name, email: _email, phone: _phone, password: _pass, restaurantName: _restName, role: 'restaurant_owner', isPosOnly: true })
+                });
+                if (_res.ok) {
+                    const _d = await _res.json();
+                    if (_d.token) { localStorage.setItem('zoiAuthToken', _d.token); localStorage.setItem('zoiToken', _d.token); }
+                    if (_d.user) { localStorage.setItem('zoiUser', JSON.stringify(_d.user)); }
+                    console.log('[POS Signup] Registered via API');
+                }
+            } catch(apiErr) { console.warn('[POS Signup] API fallback to local:', apiErr.message); }
+            // Continue with existing local signup logic
+            {
             e.preventDefault();
             const btn = document.getElementById('submit-btn');
             const originalText = btn.innerHTML;
@@ -508,7 +532,8 @@
                     localStorage.setItem('zoiUsers', JSON.stringify(users));
 
                     // Pre-fill local session so auth works
-                    localStorage.setItem('zoiUser', JSON.stringify({
+                    } // end API block
+            localStorage.setItem('zoiUser', JSON.stringify({
                         id: newId,
                         name: `${fName} ${lName}`,
                         email: phone,

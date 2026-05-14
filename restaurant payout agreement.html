@@ -350,7 +350,23 @@
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
 
-    <script src="js/zoi_mobile.js"></script>
+    <script src="js/zoi_mobile.js">
+        // === API-FIRST: load partner payout info from /api/restaurants/:id ===
+        (async () => {
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || '';
+                const _restId = localStorage.getItem('zoiPartnerRestId') || '101';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const _res = await fetch(_ab + '/api/restaurants/' + _restId, { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                if (_res.ok) {
+                    const _r = await _res.json();
+                    const _nameEl = document.getElementById('rest-name'); if (_nameEl) _nameEl.textContent = _r.name || '';
+                    const _bankEl = document.getElementById('bank-info'); if (_bankEl) _bankEl.textContent = _r.bankAccount || 'Not configured';
+                    console.log('[Payout] Restaurant data loaded from API');
+                }
+            } catch(e) { console.warn('[Payout] API fallback:', e.message); }
+        })();</script>
 </body></html>
 
 

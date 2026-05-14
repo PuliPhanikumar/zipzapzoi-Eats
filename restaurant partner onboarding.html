@@ -378,7 +378,39 @@
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
 
-    <script src="js/zoi_mobile.js"></script>
+    <script src="js/zoi_mobile.js">
+        // === API-FIRST: submit onboarding to /api/restaurant-applications ===
+        (async () => {
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || '';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const _res = await fetch(_ab + '/api/restaurant-applications', { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                if (_res.ok) {
+                    const _d = await _res.json();
+                    const _list = Array.isArray(_d) ? _d : (_d.applications || []);
+                    if (_list.length > 0) {
+                        localStorage.setItem('zoiPartnerApplications', JSON.stringify(_list));
+                        console.log('[Onboarding] Status loaded from API');
+                    }
+                }
+            } catch(e) { console.warn('[Onboarding] API fallback:', e.message); }
+
+            // Override form submit to POST to API
+            const _form = document.querySelector('form');
+            if (_form && !_form.dataset.apiWired) {
+                _form.dataset.apiWired = '1';
+                _form.addEventListener('submit', async (ev) => {
+                    ev.preventDefault();
+                    const _fd = Object.fromEntries(new FormData(_form));
+                    try {
+                        const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                        await fetch(_ab + '/api/restaurant-applications', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('zoiAuthToken') || '') }, body: JSON.stringify(_fd) });
+                        console.log('[Onboarding] Application submitted to API');
+                    } catch(e) { /* silent */ }
+                }, { once: false });
+            }
+        })();</script>
 </body></html>
 
 

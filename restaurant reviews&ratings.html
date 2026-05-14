@@ -346,7 +346,26 @@
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
 
-    <script src="js/zoi_mobile.js"></script>
+    <script src="js/zoi_mobile.js">
+        // === API-FIRST: load live reviews from /api/reviews/all ===
+        (async () => {
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || '';
+                const _restId = localStorage.getItem('zoiPartnerRestId') || '101';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                const _res = await fetch(_ab + '/api/reviews/all?restaurantId=' + _restId, { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                if (_res.ok) {
+                    const _d = await _res.json();
+                    const _list = Array.isArray(_d) ? _d : (_d.reviews || []);
+                    if (_list.length > 0 && typeof reviews !== 'undefined') {
+                        reviews = _list.map(r => ({ id: r.id, user: r.user?.name || 'Customer', rating: r.foodRating || 4, comment: r.comment || '', date: new Date(r.createdAt).toLocaleDateString('en-IN'), source: 'ZipZapZoi', reply: r.reply || null }));
+                        if (typeof renderReviews === 'function') renderReviews();
+                        console.log('[Reviews] Loaded', reviews.length, 'reviews from API');
+                    }
+                }
+            } catch(e) { console.warn('[Reviews] API fallback:', e.message); }
+        })();</script>
 </body>
 </html>
 

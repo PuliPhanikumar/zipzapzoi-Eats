@@ -462,7 +462,26 @@
 <script src="js/zoi_theme.js?v=5"></script>
     <script src="js/zoi_pwa.js"></script>
 
-    <script src="js/zoi_mobile.js"></script>
+    <script src="js/zoi_mobile.js">
+        // === API: log plan view for analytics ===
+        (async () => {
+            try {
+                const _ab = (typeof ZOI_CONFIG !== 'undefined' && ZOI_CONFIG.API_BASE_URL) ? ZOI_CONFIG.API_BASE_URL : '';
+                const _tk = localStorage.getItem('zoiAuthToken') || '';
+                const _ctrl = new AbortController(); setTimeout(() => _ctrl.abort(), 3000);
+                // Load any active plan from backend
+                const _res = await fetch(_ab + '/api/subscriptions?type=restaurant', { headers: { 'Authorization': 'Bearer ' + _tk }, signal: _ctrl.signal });
+                if (_res.ok) {
+                    const _d = await _res.json();
+                    const _active = Array.isArray(_d) ? _d[0] : (_d.subscriptions?.[0]);
+                    if (_active) {
+                        const _badge = document.querySelector('[data-plan="' + _active.plan + '"] .active-badge');
+                        if (_badge) _badge.style.display = 'block';
+                        console.log('[Pricing] Active plan:', _active.plan);
+                    }
+                }
+            } catch(e) { /* silent on pricing page */ }
+        })();</script>
 </body></html>
 
 
