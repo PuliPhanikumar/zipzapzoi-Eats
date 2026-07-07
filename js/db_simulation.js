@@ -727,22 +727,72 @@ const DB_REST_APPLICATIONS = [
 ];
 
 const ZoiRestaurants = {
-    getAll: () => {
-        const stored = localStorage.getItem('zoiRest');
-        if (!stored) {
-            localStorage.setItem('zoiRest', JSON.stringify(DB_RESTAURANTS));
-            return DB_RESTAURANTS;
+    _keyRest: 'zoiRest',
+    _keyApps: 'zoiRestApps',
+    init: () => {
+        if (!localStorage.getItem(ZoiRestaurants._keyRest)) {
+            localStorage.setItem(ZoiRestaurants._keyRest, JSON.stringify(DB_RESTAURANTS));
         }
-        return JSON.parse(stored);
-    },
-    getApplications: () => {
-        const stored = localStorage.getItem('zoiRestApps');
-        if (!stored) {
-            localStorage.setItem('zoiRestApps', JSON.stringify(DB_REST_APPLICATIONS));
-            return DB_REST_APPLICATIONS;
+        if (!localStorage.getItem(ZoiRestaurants._keyApps)) {
+            localStorage.setItem(ZoiRestaurants._keyApps, JSON.stringify(DB_REST_APPLICATIONS));
         }
-        return JSON.parse(stored);
+        ZoiRestaurants.syncFromBackend();
     },
+    syncFromBackend: async () => {
+        try {
+            if (typeof zoiApiSilent === 'undefined') return;
+            // Sync active restaurants
+            const res = await zoiApiSilent('/restaurants');
+            if (res && res.ok) {
+                const backendRests = await res.json();
+                if (Array.isArray(backendRests) && backendRests.length > 0) {
+                    const mapped = backendRests.map(r => ({
+                        id: r.id,
+                        name: r.name,
+                        image: r.imageUrl || DB_RESTAURANTS[0].image,
+                        tags: r.cuisineTypes || ["Restaurant"],
+                        rating: parseFloat(r.rating) || 4.0,
+                        time: "25-30 min",
+                        cost: r.costForTwo ? `₹${r.costForTwo} for two` : "₹300 for two",
+                        promoted: r.isPromoted || false,
+                        offer: r.discountOffer || null,
+                        isPosOnly: r.isPosOnly || false
+                    }));
+                    localStorage.setItem(ZoiRestaurants._keyRest, JSON.stringify(mapped));
+                }
+            }
+
+            // Sync applications
+            const appRes = await zoiApiSilent('/restaurant-applications');
+            if (appRes && appRes.ok) {
+                const backendApps = await appRes.json();
+                if (Array.isArray(backendApps)) {
+                    const mappedApps = backendApps.map(a => ({
+                        id: a.id,
+                        name: a.restaurantName,
+                        owner: a.ownerName,
+                        phone: a.contactPhone,
+                        zone: a.zoneId || "Unassigned",
+                        docs: { fssai: a.documents?.fssai || "pending", gst: a.documents?.gst || "pending", bank: "pending" },
+                        image: DB_RESTAURANTS[0].image,
+                        tags: a.cuisineTypes || ["Application"],
+                        rating: 0,
+                        time: "30 min",
+                        cost: "₹300 for two",
+                        promoted: false,
+                        offer: null,
+                        isPosOnly: a.isPosOnly || false,
+                        plan: a.posPlan || null
+                    }));
+                    if(mappedApps.length > 0) {
+                        localStorage.setItem(ZoiRestaurants._keyApps, JSON.stringify(mappedApps));
+                    }
+                }
+            }
+        } catch (e) { /* silent fallback */ }
+    },
+    getAll: () => JSON.parse(localStorage.getItem(ZoiRestaurants._keyRest)) || DB_RESTAURANTS,
+    getApplications: () => JSON.parse(localStorage.getItem(ZoiRestaurants._keyApps)) || DB_REST_APPLICATIONS,
     addApplication: (appData) => {
         const apps = ZoiRestaurants.getApplications();
         const newApp = {
@@ -752,7 +802,7 @@ const ZoiRestaurants = {
             phone: appData.phone,
             zone: appData.zone,
             docs: { fssai: "pending", gst: "pending", bank: "pending" },
-            image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBKO5w3PjAegdWNtmjpyygcoqbWDbb1MMykp1Ra9F3QjtGred4ExZyv6xsp55ec6MQj__XypBAvDihrl8j2HS434CoBWARyYMu14hsj4d-q8o0eBQeff024K-JdssN8pZmm-E1eeoitvTeuVrygnhdtMXo7jW3emz7KKG7vMm4R465g2e1vlL4xNht0rGjjnY4p54Nw9xBRM90IqXs1c0wLTzZiBc-zJUsoX6K2G1uzBH_6v_WyaSD6kXP0dxGcogDA5B5Ck094Qsg", // Mock
+            image: DB_RESTAURANTS[0].image, // Mock
             tags: [appData.category],
             rating: 0,
             time: "30 min",
@@ -763,7 +813,7 @@ const ZoiRestaurants = {
             plan: appData.plan || null
         };
         apps.unshift(newApp);
-        localStorage.setItem('zoiRestApps', JSON.stringify(apps));
+        localStorage.setItem(ZoiRestaurants._keyApps, JSON.stringify(apps));
         return newApp;
     },
     approveApplication: (id) => {
@@ -772,10 +822,9 @@ const ZoiRestaurants = {
 
         if (appIndex > -1) {
             const app = apps[appIndex];
-
             // Remove from apps
             apps.splice(appIndex, 1);
-            localStorage.setItem('zoiRestApps', JSON.stringify(apps));
+            localStorage.setItem(ZoiRestaurants._keyApps, JSON.stringify(apps));
 
             // Add to active restaurants
             const restaurants = ZoiRestaurants.getAll();
@@ -791,9 +840,8 @@ const ZoiRestaurants = {
                 offer: "New Arrival 20% OFF",
                 isPosOnly: app.isPosOnly || false
             };
-
             restaurants.push(newRest);
-            localStorage.setItem('zoiRest', JSON.stringify(restaurants));
+            localStorage.setItem(ZoiRestaurants._keyRest, JSON.stringify(restaurants));
             return newRest;
         }
         return null;
@@ -801,9 +849,10 @@ const ZoiRestaurants = {
     rejectApplication: (id) => {
         const apps = ZoiRestaurants.getApplications();
         const newApps = apps.filter(a => a.id !== id);
-        localStorage.setItem('zoiRestApps', JSON.stringify(newApps));
+        localStorage.setItem(ZoiRestaurants._keyApps, JSON.stringify(newApps));
     }
 };
+ZoiRestaurants.init();
 
 // 6. REFUNDS & DISPUTES DATA (For Admin Console)
 const DB_REFUNDS = [
@@ -815,44 +864,74 @@ const DB_REFUNDS = [
 ];
 
 const ZoiRefunds = {
-    getAll: () => {
-        const stored = localStorage.getItem('zoiRefunds');
-        if (!stored) {
-            localStorage.setItem('zoiRefunds', JSON.stringify(DB_REFUNDS));
-            return DB_REFUNDS;
+    _key: 'zoiRefunds',
+    init: () => {
+        if (!localStorage.getItem(ZoiRefunds._key)) {
+            localStorage.setItem(ZoiRefunds._key, JSON.stringify(DB_REFUNDS));
         }
-        return JSON.parse(stored);
+        ZoiRefunds.syncFromBackend();
     },
+    syncFromBackend: async () => {
+        try {
+            if (typeof zoiApiSilent === 'undefined') return;
+            const res = await zoiApiSilent('/refunds');
+            if (res && res.ok) {
+                const backendRefunds = await res.json();
+                if (Array.isArray(backendRefunds) && backendRefunds.length > 0) {
+                    const mapped = backendRefunds.map(r => ({
+                        id: "R-" + r.id,
+                        date: new Date(r.createdAt).toISOString().split('T')[0],
+                        rest: r.restaurant?.name || "Unknown",
+                        order: "ORD-" + r.orderId,
+                        cust: r.user?.name || "Unknown",
+                        reason: r.reason,
+                        amt: `₹${r.amount}`,
+                        risk: r.riskScore || Math.floor(Math.random() * 50),
+                        status: r.status,
+                        items: "Items", 
+                        desc: r.description || "",
+                        pay: "Online",
+                        receipt: []
+                    }));
+                    localStorage.setItem(ZoiRefunds._key, JSON.stringify(mapped));
+                }
+            }
+        } catch (e) { /* silent fallback */ }
+    },
+    getAll: () => JSON.parse(localStorage.getItem(ZoiRefunds._key)) || DB_REFUNDS,
     updateStatus: (id, status) => {
         const refunds = ZoiRefunds.getAll();
         const r = refunds.find(x => x.id === id);
         if (r) {
             r.status = status;
-            localStorage.setItem('zoiRefunds', JSON.stringify(refunds));
+            localStorage.setItem(ZoiRefunds._key, JSON.stringify(refunds));
+            const dbId = id.replace('R-', '');
+            if (typeof zoiApi !== 'undefined') zoiApi(`/refunds/${dbId}`, { method: 'PUT', body: JSON.stringify({ status }) }).catch(()=>{});
         }
         return r;
     },
     autoResolve: () => {
-        // God Mode: Bulk resolve low risk to Approved, high risk to Rejected
         const refunds = ZoiRefunds.getAll();
         let count = 0;
         refunds.forEach(r => {
             if (r.status === 'Pending') {
-                if (r.risk < 20) r.status = 'Approved';
-                else if (r.risk > 80) r.status = 'Auto-Rejected';
+                if (r.risk < 20) { r.status = 'Approved'; ZoiRefunds.updateStatus(r.id, 'Approved'); }
+                else if (r.risk > 80) { r.status = 'Auto-Rejected'; ZoiRefunds.updateStatus(r.id, 'Auto-Rejected'); }
                 if (r.status !== 'Pending') count++;
             }
         });
-        localStorage.setItem('zoiRefunds', JSON.stringify(refunds));
+        localStorage.setItem(ZoiRefunds._key, JSON.stringify(refunds));
         return count;
     },
     addRefund: (refund) => {
         const refunds = ZoiRefunds.getAll();
         refunds.unshift(refund);
-        localStorage.setItem('zoiRefunds', JSON.stringify(refunds));
+        localStorage.setItem(ZoiRefunds._key, JSON.stringify(refunds));
+        if (typeof zoiApi !== 'undefined') zoiApi('/refunds', { method: 'POST', body: JSON.stringify(refund) }).catch(()=>{});
         return refund;
     }
 };
+ZoiRefunds.init();
 
 // 5. SUBSCRIPTIONS DATA (For Admin Console)
 const DB_SUBSCRIPTIONS = [
@@ -873,40 +952,60 @@ const DB_SUBSCRIPTION_PLANS = [
 ];
 
 const ZoiSubscriptions = {
-    getAll: () => {
-        const stored = localStorage.getItem('zoiSubs');
-        if (!stored) {
-            localStorage.setItem('zoiSubs', JSON.stringify(DB_SUBSCRIPTIONS));
-            return DB_SUBSCRIPTIONS;
+    _keySubs: 'zoiSubs',
+    _keyPlans: 'zoiPlans',
+    init: () => {
+        if (!localStorage.getItem(ZoiSubscriptions._keySubs)) {
+            localStorage.setItem(ZoiSubscriptions._keySubs, JSON.stringify(DB_SUBSCRIPTIONS));
         }
-        return JSON.parse(stored);
+        if (!localStorage.getItem(ZoiSubscriptions._keyPlans)) {
+            localStorage.setItem(ZoiSubscriptions._keyPlans, JSON.stringify(DB_SUBSCRIPTION_PLANS));
+        }
+        ZoiSubscriptions.syncFromBackend();
     },
+    syncFromBackend: async () => {
+        try {
+            if (typeof zoiApiSilent === 'undefined') return;
+            const res = await zoiApiSilent('/subscriptions');
+            if (res && res.ok) {
+                const subs = await res.json();
+                if (Array.isArray(subs) && subs.length > 0) {
+                    const mapped = subs.map(s => ({
+                        id: s.id,
+                        name: s.user?.name || "Customer",
+                        email: s.user?.email || "",
+                        plan: s.planId === 'gold' ? 'ZipZap Gold' : (s.planId === 'platinum' ? 'Zoi Platinum' : 'ZipZap Starter'),
+                        status: s.status === 'active' ? 'Active' : (s.status === 'past_due' ? 'Past Due' : 'Cancelled'),
+                        amt: s.planId === 'gold' ? '₹399' : (s.planId === 'platinum' ? '₹599' : '₹99'),
+                        renewal: new Date(s.endDate).toLocaleDateString('en-US', {month: 'short', day: '2-digit', year:'numeric'}),
+                        ltv: Math.floor(Math.random() * 5000) // Placeholder until LTV metric is added to backend
+                    }));
+                    localStorage.setItem(ZoiSubscriptions._keySubs, JSON.stringify(mapped));
+                }
+            }
+        } catch (e) { /* silent fallback */ }
+    },
+    getAll: () => JSON.parse(localStorage.getItem(ZoiSubscriptions._keySubs)) || DB_SUBSCRIPTIONS,
     update: (id, updates) => {
         const subs = ZoiSubscriptions.getAll();
         const index = subs.findIndex(s => s.id === id);
         if (index > -1) {
             subs[index] = { ...subs[index], ...updates };
-            localStorage.setItem('zoiSubs', JSON.stringify(subs));
+            localStorage.setItem(ZoiSubscriptions._keySubs, JSON.stringify(subs));
+            if (typeof zoiApi !== 'undefined') zoiApi(`/subscriptions/${id}`, { method: 'PUT', body: JSON.stringify(updates) }).catch(()=>{});
             return subs[index];
         }
         return null;
     },
-    // Plans
-    getPlans: () => {
-        const stored = localStorage.getItem('zoiPlans');
-        if (!stored) {
-            localStorage.setItem('zoiPlans', JSON.stringify(DB_SUBSCRIPTION_PLANS));
-            return DB_SUBSCRIPTION_PLANS;
-        }
-        return JSON.parse(stored);
-    },
+    getPlans: () => JSON.parse(localStorage.getItem(ZoiSubscriptions._keyPlans)) || DB_SUBSCRIPTION_PLANS,
     savePlan: (plan) => {
         const plans = ZoiSubscriptions.getPlans();
         const index = plans.findIndex(p => p.id === plan.id);
         if (index > -1) plans[index] = plan;
-        localStorage.setItem('zoiPlans', JSON.stringify(plans));
+        localStorage.setItem(ZoiSubscriptions._keyPlans, JSON.stringify(plans));
     }
 };
+ZoiSubscriptions.init();
 
 // --- NEW FOR PHASE 8: INVENTORY ENGINE ---
 const DB_INVENTORY_START = [
@@ -1027,24 +1126,50 @@ const DB_RIDERS = [
 
 // 5. FLEET MANAGEMENT SYSTEM
 const ZoiFleet = {
-    getAllRiders: () => {
-        const stored = localStorage.getItem('zoiFleet');
-        if (!stored) {
-            localStorage.setItem('zoiFleet', JSON.stringify(DB_RIDERS));
-            return DB_RIDERS;
+    _key: 'zoiFleet',
+    init: () => {
+        if (!localStorage.getItem(ZoiFleet._key)) {
+            localStorage.setItem(ZoiFleet._key, JSON.stringify(DB_RIDERS));
         }
-        return JSON.parse(stored);
+        ZoiFleet.syncFromBackend();
     },
+    syncFromBackend: async () => {
+        try {
+            if (typeof zoiApiSilent === 'undefined') return;
+            const res = await zoiApiSilent('/users'); // Fetch all users, filter riders
+            if (res && res.ok) {
+                const users = await res.json();
+                const riders = users.filter(u => u.role === 'rider' || u.role === 'partner');
+                if (riders.length > 0) {
+                    const mapped = riders.map((r, i) => ({
+                        id: "ZZ-" + r.id,
+                        name: r.name,
+                        status: r.status === 'active' ? 'Online' : 'Offline',
+                        trips: Math.floor(Math.random() * 30), // Simulated stats until analytics endpoint is ready
+                        time: "20m",
+                        rating: 4.8,
+                        earn: "₹" + Math.floor(Math.random() * 2000),
+                        zone: "Assigned Zone",
+                        lat: DB_RIDERS[i % DB_RIDERS.length].lat, // Mock GPS for visual map
+                        lng: DB_RIDERS[i % DB_RIDERS.length].lng
+                    }));
+                    localStorage.setItem(ZoiFleet._key, JSON.stringify(mapped));
+                }
+            }
+        } catch (e) { /* silent fallback */ }
+    },
+    getAllRiders: () => JSON.parse(localStorage.getItem(ZoiFleet._key)) || DB_RIDERS,
     updateRiderStatus: (id, status) => {
         const riders = ZoiFleet.getAllRiders();
         const rider = riders.find(r => r.id === id);
         if (rider) {
             rider.status = status;
-            localStorage.setItem('zoiFleet', JSON.stringify(riders));
+            localStorage.setItem(ZoiFleet._key, JSON.stringify(riders));
         }
         return rider;
     }
 };
+ZoiFleet.init();
 
 
 
@@ -1214,55 +1339,69 @@ const DB_DISPUTES = [
 ];
 
 const ZoiDisputes = {
-    // Initialize DB
+    _key: 'zoiDisputes',
     init: () => {
-        if (!localStorage.getItem('zoiDisputes')) {
-            localStorage.setItem('zoiDisputes', JSON.stringify(DB_DISPUTES));
+        if (!localStorage.getItem(ZoiDisputes._key)) {
+            localStorage.setItem(ZoiDisputes._key, JSON.stringify(DB_DISPUTES));
         }
+        ZoiDisputes.syncFromBackend();
     },
-
-    // Get all disputes
-    getAll: () => {
-        return JSON.parse(localStorage.getItem('zoiDisputes')) || [];
+    syncFromBackend: async () => {
+        try {
+            if (typeof zoiApiSilent === 'undefined') return;
+            const res = await zoiApiSilent('/disputes');
+            if (res && res.ok) {
+                const backendDisputes = await res.json();
+                if (Array.isArray(backendDisputes) && backendDisputes.length > 0) {
+                    const mapped = backendDisputes.map(d => ({
+                        id: "TKT-" + d.id,
+                        title: d.title || "Dispute",
+                        user: d.user?.name || "Customer",
+                        time: new Date(d.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                        status: d.status,
+                        type: d.priority === "High" || d.priority === "Critical" ? "Critical" : "Standard",
+                        ai: d.aiSummary || "System flagged dispute.",
+                        log: d.logs ? d.logs.map(l => ({ role: l.role || "system", msg: l.message })) : [{role: "system", msg: "Dispute opened."}],
+                        items: []
+                    }));
+                    localStorage.setItem(ZoiDisputes._key, JSON.stringify(mapped));
+                }
+            }
+        } catch (e) { /* silent fallback */ }
     },
-
-    // Get dispute by ID
+    getAll: () => JSON.parse(localStorage.getItem(ZoiDisputes._key)) || DB_DISPUTES,
     getById: (id) => {
         const disputes = ZoiDisputes.getAll();
         return disputes.find(d => d.id === id);
     },
-
-    // Update dispute status
     updateStatus: (id, newStatus, logEntry = null) => {
         let disputes = ZoiDisputes.getAll();
         const index = disputes.findIndex(d => d.id === id);
         if (index !== -1) {
             disputes[index].status = newStatus;
-            if (logEntry) {
-                disputes[index].log.push(logEntry);
-            } else {
-                disputes[index].log.push({ role: "system", msg: `Status updated to ${newStatus}` });
-            }
-            localStorage.setItem('zoiDisputes', JSON.stringify(disputes));
+            if (logEntry) disputes[index].log.push(logEntry);
+            else disputes[index].log.push({ role: "system", msg: `Status updated to ${newStatus}` });
+            
+            localStorage.setItem(ZoiDisputes._key, JSON.stringify(disputes));
+            const dbId = id.replace('TKT-', '');
+            if (typeof zoiApi !== 'undefined') zoiApi(`/disputes/${dbId}`, { method: 'PATCH', body: JSON.stringify({ status: newStatus }) }).catch(()=>{});
             return disputes[index];
         }
         return null;
     },
-
-    // Add message to dispute log
     addLog: (id, logEntry) => {
         let disputes = ZoiDisputes.getAll();
         const index = disputes.findIndex(d => d.id === id);
         if (index !== -1) {
             disputes[index].log.push(logEntry);
-            localStorage.setItem('zoiDisputes', JSON.stringify(disputes));
+            localStorage.setItem(ZoiDisputes._key, JSON.stringify(disputes));
+            const dbId = id.replace('TKT-', '');
+            if (typeof zoiApi !== 'undefined') zoiApi(`/disputes/${dbId}/log`, { method: 'POST', body: JSON.stringify({ message: logEntry.msg, role: logEntry.role }) }).catch(()=>{});
             return disputes[index];
         }
         return null;
     }
 };
-
-// Initialize Disputes on load
 ZoiDisputes.init();
 
 
